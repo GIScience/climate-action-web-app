@@ -132,23 +132,12 @@
       </ul>
     </div>
   </div>
-  
-  <!-- ### $Main content ### -->
-  <main class='row main-content bgc-grey-100'>
-    <!-- ## Left sidebar Artefacts -->
-    <div class="col-md-4 col-lg-3 d-md-block bg-light">
-      <app-artefacts></app-artefacts>
-    </div>
-    <!-- ## Report view -->
-    <div class="col-md-8 col-lg-9">
-      <app-report></app-report>
-    </div>
-  </main>
 
-  <!-- ### $Bottom Plugin List -->
-  <div class="row bd plugin-list">
-    <app-plugins></app-plugins>
-  </div>
+  <!-- ### $App Main ### -->
+  <router-outlet></router-outlet>
+
+  <!-- ### $App Toast ### -->
+  <app-toast></app-toast>
 
   <!-- ### $App Screen Footer ### -->
   <footer class="bdT ta-c p-10 lh-1\/2 fsz-sm c-grey-600" style="white-space: pre-line;">

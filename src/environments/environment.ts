@@ -3,8 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
-  climateActionApiUrl: 'https://climate-action.heigit.org/api',
+    production: false,
+    climateActionApiUrl: 'https://dev.climate-action.heigit.org/api/v1/gateway',
 };
 
 /*

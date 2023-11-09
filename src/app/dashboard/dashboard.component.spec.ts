@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ArtefactsComponent } from './artefacts.component';
+import { DashboardComponent } from './dashboard.component';
 
-describe('ArtefactsComponent', () => {
-  let component: ArtefactsComponent;
-  let fixture: ComponentFixture<ArtefactsComponent>;
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ArtefactsComponent]
+      declarations: [DashboardComponent]
     });
-    fixture = TestBed.createComponent(ArtefactsComponent);
+    fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

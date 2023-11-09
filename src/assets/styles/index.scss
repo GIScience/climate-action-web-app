@@ -1,28 +1,12 @@
+@use 'globals';
+
 @import 'spec/settings/index';
 @import 'spec/tools/index';
 @import "bootstrap/scss/bootstrap";
 @import 'spec/index';
 @import 'vendor/index';
 
-$plugin-height: 30vh;
-
-.note {
-  @extend .p-10;
-  @extend .bd;
-  @extend .bdc-yellow-800;
-  @extend .bdwL-5;
-  width: fit-content;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  @extend .bgc-yellow-50;
-  @extend .bdrs-3;
-}
-
-.main-content {
-  min-height: calc(100vh - ($plugin-height + $footer-height));
-}
-
 .plugin-list {
-  height: $plugin-height;
+  height: globals.$plugin-height;
 }
 
