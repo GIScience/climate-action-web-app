@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 
-import { IToastUI, ToastService } from '../toast.service';
+import { IToastUI, ToastService } from '../services/toast.service';
 import { ToastTypes } from './toasttypes.modal';
 
 @Component({
@@ -23,7 +23,7 @@ export class ToastComponent implements OnInit {
     this.toastService.showToast$.subscribe((param: IToastUI | null) => {
       if(! param)
         return
-        
+
       // console.log('>>> ToastComponent >>> showToast$.subscribe ', param, ToastTypes, ToastTypes[param.type as keyof typeof ToastTypes])
       this.title = param.title
       this.body = param.body
@@ -45,7 +45,7 @@ export class ToastComponent implements OnInit {
     if(this.time ){
       setTimeout(() => {
         this.hideToast()
-      }, this.time) 
+      }, this.time)
     }
   }
 

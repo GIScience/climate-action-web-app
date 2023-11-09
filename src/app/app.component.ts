@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { ToastService } from './toast.service';
+import { ToastService } from './services/toast.service';
 
 @Component({
   selector: 'app-root',

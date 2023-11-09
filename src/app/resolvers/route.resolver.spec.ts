@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RouteResolver } from './route.resolver';
-import { DataService } from '../data.service';
+import { DataService } from '../services/data.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { of } from 'rxjs';

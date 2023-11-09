@@ -5,20 +5,20 @@
       <div class="progress-bar"></div>
     </div>
     <div class="plugin-container">
-      <button class="handle left-handle" (click)="onClick('left')">
+      <button class="handle left-handle" (click)="onSlideClick('left')">
         <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
           <i class="ti-angle-left"></i>
         </span>
       </button>
       <div class="slider">
-        <div class="card m-3 p-2" *ngFor="let card of plugins">
-          <img [src]="card.image" class="p-5 card-img-top card-tall-img shadow rounded-4" alt="{{card.attribution}}">
+        <div class="card m-3 p-2" *ngFor="let card of plugins" style="cursor: pointer">
+          <img [src]="card.icon" (click)="showPluginInfo(card.name)" class="p-5 card-img-top card-tall-img shadow rounded-4" alt="{{card['attribution']}}">
           <div class="card-body">
-            <h5 class="card-title">{{ card.title }}</h5>
+            <p (click)="showPluginInfo(card.name)" class="card-title fsz-sm whs-nw ov-h tov-e">{{ card.name }}</p>
           </div>
         </div>
       </div>
-      <button class="handle right-handle" (click)="onClick('right')">
+      <button class="handle right-handle" (click)="onSlideClick('right')">
         <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
           <i class="ti-angle-right"></i>
         </span>

@@ -1,0 +1,55 @@
+<!-- ### $Main content ### -->
+<main class="row main-content bgc-grey-100">
+    <ng-container *ngIf="(pluginObs$ | async) as plugin; else loading">
+        <!-- ## Plugin Details -->
+        <div class="col-5">
+            <div class="mX-5 p-10 bgc-white bd plugin-content">
+                <div class="container-fluid">
+                    <h1>{{ plugin.name }}</h1>
+                    <p><strong>Purpose:</strong> {{ plugin.purpose }}</p>
+                    <p><strong>Methodology:</strong> {{ plugin.methodology }}</p>
+                    <!-- if sources is object of objects -->
+                    <div *ngIf="plugin.sources">
+                        <p><strong>Sources:</strong></p>
+                        <div *ngFor="let source of plugin.sources">
+                            <div class="source-item">
+                                <p><strong>{{ source.title }}</strong></p>
+                                <p>Author: {{ source.author }}</p>
+                                <p>Year: {{ source.year }}</p>
+                                <p>Journal/Volume: {{ source.journal }}
+                                    (Vol. {{ source.volume }})</p>
+                                <p>Pages: {{ source.pages }}</p>
+                                <p>Entry Type: {{ source.ENTRYTYPE }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- ## Report view -->
+        <div class="col-7">
+            <div class="mX-5 p-20 bgc-white bd plugin-content">
+                <ng-container *ngIf="plugin?.operator_schema; else loadingPluginParam">
+                    <app-plugin-parameter [schema]="plugin?.operator_schema" [pluginName]="plugin.name"></app-plugin-parameter>
+                </ng-container>
+                <ng-template #loadingPluginParam>
+                    <div class="d-f jc-c top-50 h-100p">
+                        <!-- TODO: Message saying No Schema-->
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #loading>
+        <div class="d-f jc-c top-50 h-100p">
+            <div class="spinner-grow" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </ng-template>
+</main>
+<!-- ### $Bottom Plugin List -->
+<div class="row bd plugin-list">
+    <app-plugins></app-plugins>
+</div>

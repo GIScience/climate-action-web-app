@@ -5,23 +5,34 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { AboutComponent } from './about/about.component';
 import { HelpComponent } from './help/help.component';
 import { PluginsComponent } from './plugins/plugins.component';
-import { ArtefactsComponent } from './artefacts/artefacts.component';
+import { ArtifactsComponent } from './artifacts/artifacts.component';
+import { DashboardComponent } from "./dashboard/dashboard.component";
+import { PluginComponent } from "./plugin/plugin.component";
 
 const routes: Routes = [
-    // {
-    //     path: '',
-    //     pathMatch: 'full',
-    //     redirectTo: 'plugins'
-    // },
+    {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard'
+    },
+    {
+        path: 'dashboard',
+        pathMatch: 'full',
+        component: DashboardComponent
+    },
     {
         path: 'plugins',
         pathMatch: 'full',
         component: PluginsComponent,
     },
     {
-        path: 'artefacts',
+        path: 'plugin/:name',
+        component: PluginComponent,
+    },
+    {
+        path: 'artifacts',
         pathMatch: 'full',
-        component: ArtefactsComponent,
+        component: ArtifactsComponent,
     },
     {
         path: 'about',
