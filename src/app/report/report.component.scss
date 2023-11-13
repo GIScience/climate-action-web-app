@@ -1,0 +1,23 @@
+.paper-div {
+  background-color: #f9f9f9; // Light gray background
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); // Shadow to create depth
+  border: 1px solid #ddd; // Thin border for separation
+
+  // Optional styles to enhance the paper-like effect
+  padding: 20px; // Add some padding for content
+  //border-radius: 5px;  // Rounded corners
+  //font-family: 'Arial', sans-serif;  // Font choice
+  line-height: 1.4; // Line spacing
+  transition: 0.3s ease; // Smooth hover effect
+
+  // Hover effect for interaction
+  &:hover {
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2); // Slightly lift on hover
+  }
+}
+
+.report-content {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  height: calc(100vh - (30vh + 42px + 95px));
+}

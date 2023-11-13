@@ -22,8 +22,8 @@ export class PluginService {
         return this.http.get<Plugin>(`${this.apiUrl}/plugin/${pluginName}` );
     }
 
-    computePlugin(pluginName: string, params: any): Observable<any> {
-        return this.http.post(`${this.apiUrl}/plugin/${pluginName}`, params)
+    computePlugin(pluginId: string, params: any): Observable<any> {
+        return this.http.post(`${this.apiUrl}/plugin/${pluginId}`, params)
     }
 
     getArtifacts(id: string): Observable<Array<ArtifactType>> {
@@ -47,6 +47,6 @@ export class PluginService {
             correlationIDs = commaSeperatedCorrelationIDs.split(',')
         }
         correlationIDs.push(id)
-        localStorage.setItem('correlation_id', id)
+        localStorage.setItem('correlation_id', correlationIDs.toString())
     }
 }

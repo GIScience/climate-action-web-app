@@ -12,9 +12,9 @@
       </button>
       <div class="slider">
         <div class="card m-3 p-2" *ngFor="let card of plugins" style="cursor: pointer">
-          <img [src]="card.icon" (click)="showPluginInfo(card.name)" class="p-5 card-img-top card-tall-img shadow rounded-4" alt="{{card['attribution']}}">
+          <img [src]="card.icon" (click)="showPluginInfo(card.plugin_id)" class="p-5 card-img-top card-tall-img shadow rounded-4" alt="{{card['attribution']}}">
           <div class="card-body">
-            <p (click)="showPluginInfo(card.name)" class="card-title fsz-sm whs-nw ov-h tov-e">{{ card.name }}</p>
+            <p (click)="showPluginInfo(card.plugin_id)" class="card-title fsz-sm whs-nw ov-h tov-e">{{ card.name }}</p>
           </div>
         </div>
       </div>

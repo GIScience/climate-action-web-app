@@ -14,7 +14,6 @@ import {Fill, Stroke, Style, Text} from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON.js';
 // @ts-ignore
 import {testSchema} from './test.js';
-// import {testSchema} from './test2.js';
 import {regions} from '../../support/region-of-interest';
 import {FeatureLike} from 'ol/Feature.js';
 import {Geometry} from 'ol/geom.js';
@@ -29,7 +28,7 @@ import {ToastService} from "../../services/toast.service";
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     @Input() schema: any
-    @Input() pluginName!: string
+    @Input() pluginId!: string
 
     tempSchema: { schema: any; model: any; } = { schema: {}, model: {} };
     model: any = {};
@@ -370,15 +369,15 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     private requestCompute(model: any) {
-        this.pluginService.computePlugin(this.pluginName, model).subscribe({
+        this.pluginService.computePlugin(this.pluginId, model).subscribe({
             next: (data) => {
                 console.log('response from /plugin ', data)
                 this.pluginService.storeComputeIds(data)
                 this.toastService.show({
-                    title: `${this.pluginName} parameters are send to process!`,
+                    title: `${this.pluginId} parameters are send to process!`,
                     body: `Result from plugin execution will be listing on the dashboard`,
                     type: 'success',
-                    time: 1000
+                    time: 4000
                 })
                 setTimeout(() => {
                     this.router.navigate(['dashboard']);
@@ -388,8 +387,8 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             error: error => {
                 console.error('Error while request to compute plugin:', error);
                 this.toastService.show({
-                    title: `Error while computing plugin ${this.pluginName}`,
-                    body: `Error while computing plugin ${this.pluginName}`,
+                    title: `Error while computing plugin ${this.pluginId}`,
+                    body: `Error while computing plugin ${this.pluginId}`,
                     type: 'error',
                     time: 4000
                 })

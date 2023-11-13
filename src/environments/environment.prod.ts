@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    climateActionApiUrl: 'https://climate-action.heigit.org/api/v1/gateway',
+    climateActionApiUrl: 'https://dev.climate-action.heigit.org/api/v1/gateway',
 };

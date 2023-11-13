@@ -1,4 +1,5 @@
 export interface Plugin {
+    "plugin_id": string,
     "name": string,
     "icon": string,
     "version": string,
@@ -10,16 +11,6 @@ export interface Plugin {
     "library_version": string,
     "attribution": string
 }
-
-
-// {
-//   id: number,
-//   image: string,
-//   title: string,
-//   desc: string,
-//   type: string,
-//   attribution?: string
-// }
 
 export interface Concern {
     concern: "ghg_emission" | "mitigation" | "adaption" | "waste"

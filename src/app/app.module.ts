@@ -4,15 +4,15 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core';
 import {FormlyBootstrapModule} from '@ngx-formly/bootstrap';
 import {HttpClientModule} from '@angular/common/http';
+import {MarkdownModule} from "ngx-markdown";
+import {NgChartsModule} from 'ng2-charts';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {DataService} from './services/data.service';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
 import {ToastComponent} from './toast/toast.component';
 import {AboutComponent} from './about/about.component';
 import {NgOptimizedImage} from '@angular/common';
-// import { HelpComponent } from './help/help.component';
 import {PluginsComponent} from './plugins/plugins.component';
 import {ArtifactsComponent} from './artifacts/artifacts.component';
 import {ReportComponent} from './report/report.component';
@@ -23,6 +23,9 @@ import {ObjectTypeComponent} from "./types/object.type";
 import {MultiSchemaTypeComponent} from "./types/multischema.type";
 import {ArrayTypeComponent} from "./types/array.type";
 import {NullTypeComponent} from "./types/null.type";
+import {ChartComponent} from './report/chart/chart.component';
+
+// import { HelpComponent } from './help/help.component';
 
 export function minItemsValidationMessage(error: any, field: FormlyFieldConfig) {
     // @ts-ignore
@@ -94,7 +97,8 @@ export function typeValidationMessage({schemaType}: any) {
         ArrayTypeComponent,
         ObjectTypeComponent,
         MultiSchemaTypeComponent,
-        NullTypeComponent
+        NullTypeComponent,
+        ChartComponent,
     ],
     imports: [
         BrowserModule,
@@ -127,10 +131,11 @@ export function typeValidationMessage({schemaType}: any) {
                 {name: 'multischema', component: MultiSchemaTypeComponent},
             ],
         }),
-        FormlyBootstrapModule
+        FormlyBootstrapModule,
+        MarkdownModule.forRoot(),
+        NgChartsModule,
     ],
     providers: [
-        DataService,
         // { provide: APP_INITIALIZER, useFactory: metadataFactory, deps: [DataService], multi: true }
     ],
     bootstrap: [AppComponent]
