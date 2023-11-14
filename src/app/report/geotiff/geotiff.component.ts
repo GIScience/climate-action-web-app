@@ -1,10 +1,14 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
-import GeoTIFF from 'ol/source/GeoTIFF.js';
 import Map from "ol/Map";
+import {View} from "ol";
 import TileLayer from "ol/layer/WebGLTile.js";
-import BaseLayer from 'ol/layer/Base';
+import ImageLayer from "ol/layer/Image";
+import Static from "ol/source/ImageStatic";
+import {fromArrayBuffer} from "geotiff";
+import OSM from "ol/source/OSM";
+
 import {ArtifactType} from "../../models/artifact.interface";
 
 @Component({
@@ -18,8 +22,6 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
     @Input() inputData: { url: string; artifact: ArtifactType | null; } | undefined;
     mapDivID: string = '';
     map!: Map;
-    geotiffLayer!: BaseLayer;
-    geotiffLayerSource!: GeoTIFF;
 
     constructor(private http: HttpClient) {
     }
@@ -51,43 +53,78 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
         if (!this.inputData)
             return
 
-        console.log('this.inputData.url ', this.inputData.url)
-
-        this.geotiffLayerSource = new GeoTIFF({
-            sources: [
-                {
-                    url: this.inputData.url,
-                    // url: 'https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/36/Q/WD/2020/7/S2A_36QWD_20200701_0_L2A/TCI.tif',
-                },
-            ],
-        }),
-        this.geotiffLayer = new TileLayer({
-            source: this.geotiffLayerSource
-        })
-
         this.map = new Map({
             layers: [
-                // new TileLayer({
-                //     source: new OSM(),
-                // }),
-                this.geotiffLayer
+                new TileLayer({
+                    source: new OSM(),
+                }),
             ],
             target: this.mapDivID,
-            view: this.geotiffLayerSource.getView(),
+            view: new View({projection: "EPSG:4326"})
         })
 
-        // Get the extent of the GeoTIFF source
-        // this.geotiffLayerSource.on('tileloadend', async () => {
-        //     const geoTiffLayerView = await this.geotiffLayerSource.getView();
-        //     const geoTiffExtent = geoTiffLayerView.extent
-        //
-        //     console.log('geoTiffExtent = ', geoTiffExtent)
-        //     // Zoom to the extent
-        //     // if(geoTiffExtent) {
-        //     //     if(this.map.getSize())
-        //     //         this.map.getView().fit(geoTiffExtent, this.map.getSize());
-        //     // }
-        // });
+        this.getGeoTiff(this.inputData.url)
+    }
+
+    async getGeoTiff(url: string) {
+        if (!this.inputData)
+            return
+
+        let width: number
+        let height: number
+        let extent: any
+        try {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            const tiff = await fromArrayBuffer(arrayBuffer);
+            const image = await tiff.getImage();
+
+            width = image.getWidth();
+            height = image.getHeight();
+            extent = image.getBoundingBox();
+
+            const rgb = await image.readRGB();
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const context = canvas.getContext("2d");
+            // @ts-ignore
+            const data = context.getImageData(0, 0, width, height);
+            const rgba = data.data;
+            let j = 0;
+
+            for (let i = 0; i < rgb.length; i += 3) {
+                // @ts-ignore
+                rgba[j] = rgb[i];
+                // @ts-ignore
+                rgba[j + 1] = rgb[i + 1];
+                // @ts-ignore
+                rgba[j + 2] = rgb[i + 2];
+                rgba[j + 3] = 255;
+                j += 4;
+            }
+
+            // @ts-ignore
+            context.putImageData(data, 0, 0);
+
+            const geotiffLayer = new ImageLayer({
+                source: new Static({
+                    url: canvas.toDataURL(),
+                    imageExtent: extent
+                })
+            });
+
+            if (this.map.getSize()) {
+                // @ts-ignore
+                this.map.getView().fit(extent, this.map.getSize());
+            }
+
+            this.map.addLayer(geotiffLayer);
+        } catch (error) {
+            console.error("Error fetching or processing data:", error);
+        }
     }
 
     getFirstPartBeforeDot(inputString: string): string | null {
