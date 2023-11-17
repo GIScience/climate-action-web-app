@@ -1,0 +1,43 @@
+<ul class="nav-right">
+    <li class="notifications dropdown">
+        <!--<span class="counter bgc-red">{{processes.length}}</span>-->
+        <a href="" class="dropdown-toggle " id="btnNotification" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti-bell"></i>
+        </a>
+
+        <ul class="dropdown-menu" aria-labelledby="btnNotification">
+            <li class="pX-20 pY-15 bdB">
+                <i class="ti-bell pR-10"></i>
+                <span class="fsz-sm fw-600 c-grey-900">Processes</span>
+            </li>
+            <li>
+                <ul class="ovY-a pos-r scrollable lis-n p-0 m-0 fsz-sm">
+                    <li *ngFor="let r of runs">
+                        <a href="" class='peers fxw-nw td-n p-20 bdB c-grey-800 cH-blue bgcH-grey-100'>
+                            <div class="peer peer-greed">
+                                <span>
+                                    <span class="fw-500">{{r.pluginName}}</span>
+                                    <p class="m-0">
+                                        <small class="fsz-xs">ID: {{r.correlation_id}}</small>
+                                    </p>
+                                </span>
+                            </div>
+                            <div class="peer mR-15">
+                                <!-- status -->
+                                <span class="badge rounded-pill"
+                                      [ngClass]="getStatusClass(r.status)">{{r.status}}</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!--            <li class="pX-20 pY-15 ta-c bdT">-->
+            <!--                <span>-->
+            <!--                    <a href="./processes" class="c-grey-600 cH-blue fsz-sm td-n">View All Processes -->
+            <!--                        <i class="ti-angle-right fsz-xs mL-10"></i>-->
+            <!--                    </a>-->
+            <!--                </span>-->
+            <!--            </li>-->
+        </ul>
+    </li>
+</ul>

@@ -24,6 +24,7 @@ import {MultiSchemaTypeComponent} from "./types/multischema.type";
 import {ArrayTypeComponent} from "./types/array.type";
 import {NullTypeComponent} from "./types/null.type";
 import {ChartComponent} from './report/chart/chart.component';
+import {RunsComponent} from './runs/runs.component';
 
 // import { HelpComponent } from './help/help.component';
 
@@ -99,6 +100,7 @@ export function typeValidationMessage({schemaType}: any) {
         MultiSchemaTypeComponent,
         NullTypeComponent,
         ChartComponent,
+        RunsComponent,
     ],
     imports: [
         BrowserModule,

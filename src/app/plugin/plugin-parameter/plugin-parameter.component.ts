@@ -19,6 +19,7 @@ import {FeatureLike} from 'ol/Feature.js';
 import {Geometry} from 'ol/geom.js';
 import {PluginService} from "../../services/plugin.service";
 import {ToastService} from "../../services/toast.service";
+import {Plugin} from "../../models/plugin.interface";
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -28,7 +29,7 @@ import {ToastService} from "../../services/toast.service";
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     @Input() schema: any
-    @Input() pluginId!: string
+    @Input() plugin!: Plugin
 
     tempSchema: { schema: any; model: any; } = { schema: {}, model: {} };
     model: any = {};
@@ -206,9 +207,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             this.tempSchema.schema.properties[key] = propertiesSchema
         }
 
-        // console.log('this.model = ', this.model)
         this.tempSchema.model = this.model
-        // console.log('this.tempSchema = ', this.tempSchema)
 
         // @ts-ignore
         this.fields = [this.formlyJsonschema.toFieldConfig(this.tempSchema.schema)];
@@ -369,12 +368,12 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     private requestCompute(model: any) {
-        this.pluginService.computePlugin(this.pluginId, model).subscribe({
+        this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
-                console.log('response from /plugin ', data)
-                this.pluginService.storeComputeIds(data)
+                console.debug('response from /plugin ', data)
+                this.pluginService.storeComputes(data, this.plugin)
                 this.toastService.show({
-                    title: `${this.pluginId} parameters are send to process!`,
+                    title: `${this.plugin.plugin_id} parameters are send to process!`,
                     body: `Result from plugin execution will be listing on the dashboard`,
                     type: 'success',
                     time: 4000
@@ -387,8 +386,8 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             error: error => {
                 console.error('Error while request to compute plugin:', error);
                 this.toastService.show({
-                    title: `Error while computing plugin ${this.pluginId}`,
-                    body: `Error while computing plugin ${this.pluginId}`,
+                    title: `Error while computing plugin ${this.plugin.name}`,
+                    body: `Error while computing plugin ${this.plugin.name}`,
                     type: 'error',
                     time: 4000
                 })
@@ -404,7 +403,6 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
      * @private
      */
     private checkForRequiredFields(model: any, schema: any): boolean {
-        // console.log('>>> checkForRequiredFields ', model, schema)
         if (!schema['required']) return true;
 
         const requiredList: String[] = schema['required']
