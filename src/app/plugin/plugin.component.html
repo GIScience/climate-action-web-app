@@ -31,7 +31,7 @@
         <div class="col-7">
             <div class="mX-5 p-20 bgc-white bd plugin-content">
                 <ng-container *ngIf="plugin?.operator_schema; else loadingPluginParam">
-                    <app-plugin-parameter [schema]="plugin?.operator_schema" [pluginId]="plugin.plugin_id"></app-plugin-parameter>
+                    <app-plugin-parameter [schema]="plugin?.operator_schema" [plugin]="plugin"></app-plugin-parameter>
                 </ng-container>
                 <ng-template #loadingPluginParam>
                     <div class="d-f jc-c top-50 h-100p">

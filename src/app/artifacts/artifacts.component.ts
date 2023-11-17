@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {PluginService} from "../services/plugin.service";
 import {ArtifactType} from "../models/artifact.interface";
 import {ReportService} from "../services/report.service";
+import {PluginRun} from "../models/plugin.interface";
 
 @Component({
     selector: 'app-artifacts',
@@ -11,7 +12,7 @@ import {ReportService} from "../services/report.service";
 export class ArtifactsComponent implements OnInit {
 
     artifacts: Array<ArtifactType> = []
-    artifactIds: string[] | undefined;
+    currentRuns!: PluginRun[];
 
     constructor(private pluginService: PluginService,
                 private reportService: ReportService) {
@@ -23,25 +24,19 @@ export class ArtifactsComponent implements OnInit {
 
     fetchArtifactIds() {
         // Fetch the artifact IDs from local storage as an array
-        this.artifactIds = this.pluginService.getComputeIds()
-        if (!this.artifactIds)
-            return
-
-        this.artifactIds.forEach(id => {
-            // console.log('artifactId ', id)
-            this.fetchArtifact(id)
+        this.currentRuns = this.pluginService.getComputes()
+        this.currentRuns.forEach(currentRun => {
+            this.fetchArtifact(currentRun.correlation_id)
         })
     }
 
-    fetchArtifact(currentArtifactId: string) {
+    fetchArtifact(correlation_id: string) {
         // Call the API to get artifact content for the current ID
-        this.pluginService.getArtifacts(currentArtifactId).subscribe({
-            next: (data) => {
+        this.pluginService.getArtifacts(correlation_id).subscribe({
+            next: (data: ArtifactType[]) => {
+                if (!data)
+                    return
                 if (Array.isArray(data) && data.length > 0) {
-                    // Update the artifacts with the response data
-                    if (!data)
-                        return
-
                     // assign icon based on their modality
                     const icons = {
                         'IMAGE': 'ti-image',
@@ -56,13 +51,17 @@ export class ArtifactsComponent implements OnInit {
                         return d
                     })
                     this.artifacts.push(...data);
+                    this.pluginService.updateRunStatus(correlation_id, "completed")
                 } else {
                     // Retry after 30 seconds
-                    setTimeout(() => this.fetchArtifact(currentArtifactId), 30000);
+                    setTimeout(() => this.fetchArtifact(correlation_id), 30000);
+                    this.pluginService.updateRunStatus(correlation_id, "in-progress")
                 }
             },
             error: error => {
-                console.error('Error fetching getArtifacts: ', currentArtifactId, error);
+                console.error('Error fetching getArtifacts: ', correlation_id, error);
+                // update the status of correlation as failed
+                this.pluginService.updateRunStatus(correlation_id, "failed")
             }
         })
     }

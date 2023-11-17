@@ -26,3 +26,10 @@ export interface Source {
     ENTRYTYPE?: string;
     ID?: string;
 }
+
+export interface PluginRun {
+    correlation_id: string,
+    pluginId: string,
+    pluginName: string,
+    status?: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input',
+}
