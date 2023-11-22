@@ -6,11 +6,14 @@ import Map from "ol/Map";
 import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import {View} from "ol";
-import {fromLonLat} from "ol/proj";
-import {ArtifactType} from "../../models/artifact.interface";
+import {fromLonLat, transformExtent} from "ol/proj";
+import {getCenter} from "ol/extent";
+import {Vector} from "ol/source";
+import {ArtifactType} from "../../artifacts/artifact.interface";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Fill, Stroke, Style} from "ol/style";
+import {Geometry} from "ol/geom.js";
 
 @Component({
     selector: 'app-geojson',
@@ -21,13 +24,14 @@ import {Fill, Stroke, Style} from "ol/style";
 })
 export class GeojsonComponent implements OnInit, AfterViewInit {
     @Input() inputData: { url: string; artifact: ArtifactType | null; } | undefined;
-    mapDivID: string = '';
+    mapDivID = '';
     map!: Map;
-    geojsonLayer!: VectorLayer<any>;
+    geojsonLayer!: VectorLayer<VectorSource<Geometry>>;
     geojsonLayerSource!: VectorSource;
 
     constructor(private http: HttpClient) {
     }
+
     ngOnInit(): void {
         if (!this.inputData)
             return
@@ -49,23 +53,41 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
         if (!this.inputData['artifact'])
             return
 
-        this.initMap()
-
         if (this.inputData.url !== null) {
-            this.http.get<GeoJSON>(this.inputData.url).subscribe((data) => {
-                console.log('>>> GeojsonComponent >>>  ', data)
-
-                if(! this.geojsonLayerSource)
-                    return
-
-                this.geojsonLayerSource.addFeatures(new GeoJSON().readFeatures(data, {
+            this.http.get<object>(this.inputData.url).subscribe((data) => {
+                const features = new GeoJSON().readFeatures(data, {
                     dataProjection: 'EPSG:4326',
                     featureProjection: 'EPSG:3857'
-                }))
-                // Style the features based on the color attribute
+                })
+
+                const extent = transformExtent(new Vector({
+                    features: features
+                }).getExtent(), 'EPSG:3857', 'EPSG:4326');
+
+                this.geojsonLayerSource = new VectorSource()
+                this.geojsonLayerSource.addFeatures(features)
+
+                this.geojsonLayer = new VectorLayer({
+                    source: this.geojsonLayerSource,
+                })
+
+                this.map = new Map({
+                    layers: [
+                        new TileLayer({
+                            source: new OSM(),
+                        }),
+                        this.geojsonLayer
+                    ],
+                    target: this.mapDivID,
+                    view: new View({
+                        center: fromLonLat(extent ? getCenter(extent) : [8.6759928, 49.4187355]),
+                        zoom: 12,
+                    }),
+                })
+
                 this.geojsonLayer.setStyle((feature) => {
-                    const color = feature.get('color') // Assuming 'color' is the attribute name
-                    const strokeColor = [0, 0, 0, 1] // Black border color
+                    const color = feature.get('color')
+                    const strokeColor = [0, 0, 0, 1]
 
                     return new Style({
                         fill: new Fill({
@@ -77,34 +99,8 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
                         }),
                     })
                 })
-
-                // zoom to extent
-                this.map.getView().fit(this.geojsonLayerSource.getExtent(), {
-                    padding: [30, 10, 30, 10],
-                    duration: 1000
-                })
             })
         }
-    }
-
-    private initMap() {
-        this.geojsonLayerSource = new VectorSource()
-        this.geojsonLayer = new VectorLayer({
-            source: this.geojsonLayerSource,
-        }),
-        this.map = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                }),
-                this.geojsonLayer
-            ],
-            target: this.mapDivID,
-            view: new View({
-                center: fromLonLat([8.6759928, 49.4187355]),
-                zoom: 10,
-            }),
-        })
     }
 
     getFirstPartBeforeDot(inputString: string): string | null {
@@ -112,6 +108,6 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
             const parts = inputString.split('.')
             return parts[0]
         }
-        return null; // Return null if the string doesn't contain a period
+        return null;
     }
 }

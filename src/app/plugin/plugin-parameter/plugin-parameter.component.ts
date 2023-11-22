@@ -10,16 +10,16 @@ import {View} from "ol";
 import {fromLonLat} from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import {Fill, Stroke, Style, Text} from 'ol/style';
+import {Fill, Stroke, Style} from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON.js';
-// @ts-ignore
-import {testSchema} from './test.js';
+
 import {regions} from '../../support/region-of-interest';
 import {FeatureLike} from 'ol/Feature.js';
 import {Geometry} from 'ol/geom.js';
 import {PluginService} from "../../services/plugin.service";
 import {ToastService} from "../../services/toast.service";
-import {Plugin} from "../../models/plugin.interface";
+import {Plugin} from "../plugin.interface";
+import {PluginParametersSchema, PluginPropertiesSchema} from "./plugin-parameter.interface";
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -28,10 +28,10 @@ import {Plugin} from "../../models/plugin.interface";
 })
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
-    @Input() schema: any
+    @Input() schema!: PluginParametersSchema
     @Input() plugin!: Plugin
 
-    tempSchema: { schema: any; model: any; } = { schema: {}, model: {} };
+    tempSchema: { schema: any; model: any; } = {schema: {}, model: {}};
     model: any = {};
     options: FormlyFormOptions = {};
     form = new FormGroup({});
@@ -49,9 +49,9 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     onSubmit(model: any) {
-        if (this.selectedRegionLayer.getSource()?.getFeatures()[0]) {
-            // @ts-ignore
-            const paramFeature = new GeoJSON().writeFeaturesObject(this.selectedRegionLayer.getSource()?.getFeatures(), {
+        const features = this.selectedRegionLayer.getSource()?.getFeatures()
+        if (features && features[0]) {
+            const paramFeature = new GeoJSON().writeFeaturesObject(features, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
             })
@@ -60,9 +60,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 if (!value)
                     return
 
-                // @ts-ignore
-                if (value['allOf'] && value['allOf'][0]) {
-                    // @ts-ignore
+                if (value && value.allOf && value.allOf[0].$ref) {
                     const refVal: string = value['allOf'][0]['$ref']
                     if (refVal.includes(this.jsonSchema_polygon)) {
                         model[key] = paramFeature.features[0]
@@ -70,9 +68,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 }
             }
         }
-        console.debug(model)
 
-        // check if all required fields are entered
         if (this.checkForRequiredFields(model, this.tempSchema.schema)) {
             this.requestCompute(model)
         } else {
@@ -103,42 +99,32 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             "model": {}
         }
 
-        // @ts-ignore
         this.tempSchema.schema.required = this.schema.required
-        // @ts-ignore
-        this.tempSchema.schema['$defs'] = this.schema.$defs
+        this.tempSchema.schema.$defs = this.schema.$defs
+
         for (const [key, value] of Object.entries(this.schema.properties)) {
             if (!value)
                 return
 
-            let propertiesSchema: any = {}
+            const propertiesSchema: any = {}
 
-            // @ts-ignore
             if (value['anyOf']) {
-                let arr: any[] = []
-                // @ts-ignore
+                const arr: any[] = []
+
+                // @ts-ignore can be any
                 value['anyOf'].forEach(val => {
                     arr.push(val.type)
 
                     if (val.type === 'number' || val.type === 'integer') {
-                        // check for min and max ranges
                         const minMaxRange = this.checkForMinAndMaxRange(val)
-                        // @ts-ignore
                         propertiesSchema['maximum'] = minMaxRange.max
-                        // @ts-ignore
                         propertiesSchema['minimum'] = minMaxRange.min
                     }
-                    // @ts-ignore
+
                     if (val['type'] === 'string' && val['format'] === 'date') {
-                        // check for min and max date ranges
-                        // @ts-ignore
                         const minMaxRange = this.checkForMinAndMaxDateRange(val)
-                        // @ts-ignore
                         propertiesSchema['max'] = minMaxRange.max
-                        // @ts-ignore
                         propertiesSchema['min'] = minMaxRange.min
-                        // @ts-ignore
-                        // value['type'] = 'date' // Since bootstrap doesn't support input type "date" this won't work #12
                         value['type'] = 'text'
                     }
 
@@ -149,67 +135,40 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                         propertiesSchema['items'] = val['items']
                     }
                 })
-                // @ts-ignore
                 propertiesSchema['type'] = arr
             } else {
-                // @ts-ignore
                 propertiesSchema['type'] = value['type']
             }
 
-            // @ts-ignore
             if (value['type'] === 'number') {
-                // check for min and max ranges
-                // @ts-ignore
                 const minMaxRange = this.checkForMinAndMaxRange(value)
-                // @ts-ignore
                 propertiesSchema['maximum'] = minMaxRange.max
-                // @ts-ignore
                 propertiesSchema['minimum'] = minMaxRange.min
             }
-            // @ts-ignore
             if (value['type'] === 'string' && value['format'] === 'date') {
-                // check for min and max date ranges
-                // @ts-ignore
                 const minMaxRange = this.checkForMinAndMaxDateRange(value)
-                // @ts-ignore
                 propertiesSchema['max'] = minMaxRange.max
-                // @ts-ignore
                 propertiesSchema['min'] = minMaxRange.min
-                // @ts-ignore
-                // value['type'] = 'date' // Since bootstrap doesn't support input type "date" this won't work #12
                 value['type'] = 'text'
             }
-            // @ts-ignore
             if (value['$ref']) {
-                // @ts-ignore
                 propertiesSchema['$ref'] = value['$ref']
             }
 
-            // @ts-ignore
             propertiesSchema['title'] = value.title
-            // @ts-ignore
             propertiesSchema['description'] = value.description
-            // @ts-ignore
+
             if (value.examples && value.examples.length > 0) {
-                // @ts-ignore
-                // propertiesSchema['default'] = value.examples[0]
-                // @ts-ignore
                 propertiesSchema['props'] = {'placeholder': value.examples[0]}
             }
 
-            // @ts-ignore
             if (value['enum']) {
-                // @ts-ignore
                 propertiesSchema['enum'] = value['enum']
             }
-
-            // @ts-ignore
             this.tempSchema.schema.properties[key] = propertiesSchema
         }
 
         this.tempSchema.model = this.model
-
-        // @ts-ignore
         this.fields = [this.formlyJsonschema.toFieldConfig(this.tempSchema.schema)];
     }
 
@@ -240,7 +199,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             },
         })
 
-        let regionSource = new VectorSource()
+        const regionSource = new VectorSource()
         this.regionLayer = new VectorLayer({
             source: regionSource,
             style: new Style({
@@ -261,117 +220,48 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     private selectRegions(pixel: Array<number>) {
-        this.regionLayer!.getFeatures(pixel).then((features) => {
-            const feature = features.length ? features[0] : undefined;
+        if (this.regionLayer) {
+            this.regionLayer.getFeatures(pixel).then((features) => {
+                if (features) {
+                    const feature = features[0]
+                    const selIndex = this.highlightedFeature.indexOf(feature);
+                    if (selIndex < 0) {
+                        if (feature) {
+                            this.highlightedFeature.push(feature)
+                        }
+                    } else {
+                        this.highlightedFeature.splice(selIndex, 1)
+                    }
 
-            // @ts-ignore
-            const selIndex = this.highlightedFeature.indexOf(feature);
-            if (selIndex < 0) {
-                if(feature) {
-                    // @ts-ignore
-                    this.highlightedFeature.push(feature)
+                    this.selectedRegionLayer.getSource()?.clear()
+                    if (this.highlightedFeature.length > 0) {
+                        // @ts-ignore TODO possible type mismatch
+                        this.selectedRegionLayer.getSource().addFeatures(this.highlightedFeature)
+                    }
                 }
-            } else {
-                this.highlightedFeature.splice(selIndex, 1)
-            }
-
-            // @ts-ignore
-            this.selectedRegionLayer.getSource().clear()
-            if(this.highlightedFeature.length > 0) {
-                // @ts-ignore
-                this.selectedRegionLayer.getSource().addFeatures(this.highlightedFeature)
-            }
-        })
+            })
+        }
     }
 
-    private checkForMinAndMaxRange(val: any) {
-        let returnRange = {
-            min: Number.NEGATIVE_INFINITY,
-            max: Number.POSITIVE_INFINITY
+    private checkForMinAndMaxRange(value: PluginPropertiesSchema) {
+        return {
+            min: value.exclusiveMaximum || value.Maximum || Number.NEGATIVE_INFINITY,
+            max: value.exclusiveMinimum || value.Minimum || Number.POSITIVE_INFINITY
         }
-        if (val['exclusiveMaximum'] || val['Maximum']) {
-            // @ts-ignore
-            returnRange.max = val['exclusiveMaximum'] || val['Maximum']
-        }
-        if (val['exclusiveMinimum'] || val['Minimum']) {
-            // @ts-ignore
-            returnRange.min = val['exclusiveMinimum'] || val['Minimum']
-        }
-
-        return returnRange
     }
 
-    private checkForMinAndMaxDateRange(value: {
-        examples: [boolean];
-        description: string;
-        title: string;
-        type: string
-    } | {
-        default: number;
-        examples: [number];
-        anyOf: [{ exclusiveMaximum: number, exclusiveMinimum: number, type: string }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        default: string;
-        examples: [string];
-        anyOf: [{ format: string, type: string }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        default: string;
-        examples: [string];
-        anyOf: [{ type: string }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        default: [string];
-        examples: [[string]];
-        anyOf: [{ type: string, items: { $ref: string } }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        default: number;
-        examples: [number];
-        anyOf: [{ exclusiveMaximum: number, exclusiveMinimum: number, type: string }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        default: string;
-        examples: [string];
-        anyOf: [{ $ref: string }, { type: string }];
-        description: string;
-        title: string
-    } | {
-        allOf: [{ $ref: string }];
-        examples: [{ geometry: { coordinates: [[number[][]]], type: string }, type: string, properties: {} }];
-        description: string;
-        title: string
-    }) {
-
-        let returnRange = {
-            min: '1970-01-01',
-            max: new Date().toISOString().substring(0, 10).replace("T", " ")
+    private checkForMinAndMaxDateRange(value: PluginPropertiesSchema) {
+        const today = new Date().toISOString().substring(0, 10).replace("T", " ")
+        return {
+            min: value.exclusiveMaximum || value.Maximum || '1970-01-01',
+            max: value.exclusiveMinimum || value.Minimum || today
         }
-        // @ts-ignore
-        if (value['exclusiveMaximum'] || value['Maximum']) {
-            // @ts-ignore
-            returnRange.max = value['exclusiveMaximum'] || value['Maximum']
-        }
-        // @ts-ignore
-        if (value['exclusiveMinimum'] || value['Minimum']) {
-            // @ts-ignore
-            returnRange.min = value['exclusiveMinimum'] || value['Minimum']
-        }
-
-        return returnRange
     }
 
     private requestCompute(model: any) {
         this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
-                console.debug('response from /plugin ', data)
-                this.pluginService.storeComputes(data, this.plugin)
+                this.pluginService.storeComputes(data.correlation_id, this.plugin)
                 this.toastService.show({
                     title: `${this.plugin.plugin_id} parameters are send to process!`,
                     body: `Result from plugin execution will be listing on the dashboard`,
@@ -395,18 +285,10 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         });
     }
 
-    /**
-     * Check for 'required' fields are been entered by user
-     *
-     * @param model
-     * @param schema
-     * @private
-     */
-    private checkForRequiredFields(model: any, schema: any): boolean {
+    private checkForRequiredFields(model: any, schema: PluginParametersSchema): boolean {
         if (!schema['required']) return true;
 
-        const requiredList: String[] = schema['required']
-        return requiredList.every((i) => model.hasOwnProperty(i))
-
+        const requiredList: string[] = schema['required']
+        return requiredList.every((i) => Object.prototype.hasOwnProperty.call(model, i))
     }
 }

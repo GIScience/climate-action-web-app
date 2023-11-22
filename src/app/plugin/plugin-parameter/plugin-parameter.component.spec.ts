@@ -1,21 +1,29 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { PluginParameterComponent } from './plugin-parameter.component';
+import {PluginParameterComponent} from './plugin-parameter.component';
+import {HttpClientModule} from "@angular/common/http";
+import {FormlyModule} from "@ngx-formly/core";
+import {ReactiveFormsModule} from "@angular/forms";
 
 describe('PluginParameterComponent', () => {
-  let component: PluginParameterComponent;
-  let fixture: ComponentFixture<PluginParameterComponent>;
+    let component: PluginParameterComponent;
+    let fixture: ComponentFixture<PluginParameterComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [PluginParameterComponent]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                FormlyModule.forRoot(),
+                ReactiveFormsModule,
+                HttpClientModule
+            ],
+            declarations: [PluginParameterComponent]
+        });
+        fixture = TestBed.createComponent(PluginParameterComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
-    fixture = TestBed.createComponent(PluginParameterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

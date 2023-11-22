@@ -1,8 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
-import {Plugin} from '../models/plugin.interface';
-import {UserPlugin} from "../models/user-plugin.interface";
-import {UserPluginListService} from "../services/user-plugin-list.service";
+import {Plugin} from '../plugin/plugin.interface';
 import {PluginService} from "../services/plugin.service";
 
 @Component({
@@ -16,12 +14,10 @@ export class PluginsComponent implements OnInit, AfterViewInit {
 
     constructor(
         private router: Router,
-        private userPluginListService: UserPluginListService,
-        private pluginService: PluginService) {}
+        private pluginService: PluginService) {
+    }
 
     ngOnInit(): void {
-        // calculate slider progress
-        // give some time to load the items and then calculate the progressbar
         setTimeout(() => {
             this.calculateProgressBar();
         }, 200);
@@ -30,8 +26,6 @@ export class PluginsComponent implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
         const slider = document.querySelector(".slider") as HTMLElement;
         slider.style.setProperty("--slider-index", '0');
-
-        // get plugins from API
         this.loadPlugins()
     }
 
@@ -78,7 +72,7 @@ export class PluginsComponent implements OnInit, AfterViewInit {
         } else if (direction === "right") {
             newIndex = sliderIndex + 1 >= progressBarItemCount ? 0 : sliderIndex + 1;
         } else {
-            return; // Invalid direction
+            return;
         }
 
         slider.style.setProperty("--slider-index", newIndex + '');
@@ -86,43 +80,9 @@ export class PluginsComponent implements OnInit, AfterViewInit {
         progressBar.children[newIndex].classList.add("active");
     }
 
-    private throttle(cb: Function, delay = 1000) {
-        let shouldWait = false;
-        let waitingArgs: any[] | null = null;
-
-        const timeoutFunc = () => {
-            if (waitingArgs === null) {
-                shouldWait = false;
-            } else {
-                cb(...waitingArgs);
-                waitingArgs = null;
-                setTimeout(timeoutFunc, delay);
-            }
-        };
-
-        return (...args: any[]) => {
-            if (shouldWait) {
-                waitingArgs = args;
-                return;
-            }
-
-            cb(...args);
-            shouldWait = true;
-            setTimeout(timeoutFunc, delay);
-        };
-    }
-
-    private throttleProgressBar = this.throttle(() => {
-        this.calculateProgressBar();
-    });
-
-    /**
-     * Gets plugins from API
-     */
     loadPlugins() {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
-                console.log('response from /plugin ', data)
                 this.plugins = data;
             },
             error: error => {
@@ -131,38 +91,6 @@ export class PluginsComponent implements OnInit, AfterViewInit {
         });
     }
 
-    /**
-     * Add a plugin to User's plugin list
-     *
-     * @param plugin
-     */
-    /*addPlugin(plugin: Plugin) {
-        console.log('>>> addPlugin ', plugin.id)
-        // get plugin details from pluginId
-
-        // form a UserPlugin object
-        let tempUserPlugin: UserPlugin = {
-            id: plugin.id,
-            title: plugin.title
-        }
-        this.userPluginListService.addPlugin(tempUserPlugin);
-    }*/
-
-    /**
-     * Deletes a plugin (with all it's artifacts) from the user's plugin list
-     *
-     * @param pluginId
-     */
-    /*deletePlugin(pluginId: number) {
-        console.log('>>> deletePlugin ', pluginId)
-        this.userPluginListService.deletePlugin(pluginId)
-    }*/
-
-    /**
-     * Redirect to /plugin/{id} to show plugin's details
-     *
-     * @param pluginId
-     */
     showPluginInfo(pluginId: string) {
         this.router.navigate(['plugin', pluginId]);
     }

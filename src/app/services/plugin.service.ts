@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {Plugin, PluginRun} from '../models/plugin.interface';
-import {ArtifactType} from "../models/artifact.interface";
+import {BehaviorSubject, map, Observable} from 'rxjs';
+import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface';
+import {ArtifactType} from "../artifacts/artifact.interface";
 import {environment} from "../../environments/environment";
-import {RunsService} from "./runs.service";
 
 @Injectable({
     providedIn: 'root'
@@ -20,23 +19,26 @@ export class PluginService {
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http.get<Plugin[]>(`${this.apiUrl}/plugin/`);
+        return this.http.get<Plugin[]>(`${this.apiUrl}/api/v1/gateway/plugin/`);
     }
 
     getPluginDetails(pluginName: string): Observable<Plugin> {
-        return this.http.get<Plugin>(`${this.apiUrl}/plugin/${pluginName}`);
+        return this.http.get<Plugin>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginName}`);
     }
 
-    computePlugin(pluginId: string, params: any): Observable<any> {
-        return this.http.post(`${this.apiUrl}/plugin/${pluginId}`, params)
+    computePlugin(pluginId: string, params: object): Observable<PluginCorrelator> {
+        return this.http.post<string>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
+            .pipe(map(x => ({
+                correlation_id: x
+            } as PluginCorrelator)))
     }
 
     getArtifacts(id: string): Observable<Array<ArtifactType>> {
-        return this.http.get<Array<ArtifactType>>(`${this.apiUrl}/store/${id}`)
+        return this.http.get<Array<ArtifactType>>(`${this.apiUrl}/api/v1/gateway/store/${id}`)
     }
 
     getComputes(): Array<PluginRun> {
-        let plugin_runs: string | null = localStorage.getItem('plugin_runs')
+        const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs)
             return [];
 
@@ -44,9 +46,8 @@ export class PluginService {
     }
 
     storeComputes(id: string, plugin: Plugin) {
-        // store plugin run/commute info like correlation_id, plugin.plugin_id, plugin.name in a json format
-        let runs = this.getComputes()
-        let currentRunInfo = {
+        const runs = this.getComputes()
+        const currentRunInfo = {
             correlation_id: id,
             pluginId: plugin.plugin_id,
             pluginName: plugin.name
@@ -74,7 +75,7 @@ export class PluginService {
     }
 
     updateRunStatus(correlationId: string, newStatus: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input') {
-        let runs = this.getComputes()
+        const runs = this.getComputes()
         const index = runs.findIndex((run) => run.correlation_id === correlationId);
 
         if (index !== -1) {

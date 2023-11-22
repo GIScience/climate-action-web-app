@@ -1,5 +1,5 @@
 export const regions = {
-    'type':'FeatureCollection',
+    'type': 'FeatureCollection',
     'features': [
         {
             'type': 'Feature', 'id': 'admin_world_water.-285864-_-Heidelberg',

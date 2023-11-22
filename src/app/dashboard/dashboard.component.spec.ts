@@ -1,21 +1,31 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { DashboardComponent } from './dashboard.component';
+import {DashboardComponent} from './dashboard.component';
+import {ArtifactsComponent} from "../artifacts/artifacts.component";
+import {HttpClientModule} from "@angular/common/http";
+import {ReportComponent} from "../report/report.component";
+import {PluginsComponent} from "../plugins/plugins.component";
 
 describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+    let component: DashboardComponent;
+    let fixture: ComponentFixture<DashboardComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [DashboardComponent]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [HttpClientModule],
+            declarations: [
+                ArtifactsComponent,
+                DashboardComponent,
+                ReportComponent,
+                PluginsComponent
+            ]
+        });
+        fixture = TestBed.createComponent(DashboardComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
-    fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
