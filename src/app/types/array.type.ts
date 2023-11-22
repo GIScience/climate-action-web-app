@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FieldArrayType } from '@ngx-formly/core';
 
 @Component({
-    selector: 'formly-array-type',
+    selector: 'app-formly-array-type',
     template: `
         <div class="mb-3">
             <legend *ngIf="props.label">{{ props.label }}</legend>

@@ -5,11 +5,13 @@ import Map from "ol/Map";
 import {View} from "ol";
 import TileLayer from "ol/layer/WebGLTile.js";
 import ImageLayer from "ol/layer/Image";
-import Static from "ol/source/ImageStatic";
+import ImageStatic from "ol/source/ImageStatic";
 import {fromArrayBuffer} from "geotiff";
 import OSM from "ol/source/OSM";
 
-import {ArtifactType} from "../../models/artifact.interface";
+import {ArtifactType} from "../../artifacts/artifact.interface";
+import {fromLonLat} from "ol/proj";
+import {getCenter} from "ol/extent";
 
 @Component({
     selector: 'app-geotiff',
@@ -20,7 +22,7 @@ import {ArtifactType} from "../../models/artifact.interface";
 })
 export class GeoTiffComponent implements OnInit, AfterViewInit {
     @Input() inputData: { url: string; artifact: ArtifactType | null; } | undefined;
-    mapDivID: string = '';
+    mapDivID = '';
     map!: Map;
 
     constructor(private http: HttpClient) {
@@ -49,32 +51,19 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
         this.initMap()
     }
 
-    private initMap() {
+    private async initMap() {
         if (!this.inputData)
             return
 
-        this.map = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                }),
-            ],
-            target: this.mapDivID,
-            view: new View({projection: "EPSG:4326"})
-        })
-
-        this.getGeoTiff(this.inputData.url)
-    }
-
-    async getGeoTiff(url: string) {
         if (!this.inputData)
             return
 
         let width: number
         let height: number
-        let extent: any
+        let extent: number[]
+
         try {
-            const response = await fetch(url);
+            const response = await fetch(this.inputData.url);
             const arrayBuffer = await response.arrayBuffer();
             const tiff = await fromArrayBuffer(arrayBuffer);
             const image = await tiff.getImage();
@@ -90,38 +79,46 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
             canvas.height = height;
 
             const context = canvas.getContext("2d");
-            // @ts-ignore
-            const data = context.getImageData(0, 0, width, height);
-            const rgba = data.data;
-            let j = 0;
+            if (context) {
+                const data = context.getImageData(0, 0, width, height);
+                const rgba = data.data;
+                let j = 0;
 
-            for (let i = 0; i < rgb.length; i += 3) {
-                // @ts-ignore
-                rgba[j] = rgb[i];
-                // @ts-ignore
-                rgba[j + 1] = rgb[i + 1];
-                // @ts-ignore
-                rgba[j + 2] = rgb[i + 2];
-                rgba[j + 3] = 255;
-                j += 4;
-            }
+                for (let i = 0; i < rgb.length; i += 3) {
+                    // @ts-ignore valid assignment
+                    rgba[j] = rgb[i];
+                    // @ts-ignore valid assignment
+                    rgba[j + 1] = rgb[i + 1];
+                    // @ts-ignore valid assignment
+                    rgba[j + 2] = rgb[i + 2];
+                    rgba[j + 3] = 255;
+                    j += 4;
+                }
 
-            // @ts-ignore
-            context.putImageData(data, 0, 0);
+                context.putImageData(data, 0, 0);
 
-            const geotiffLayer = new ImageLayer({
-                source: new Static({
-                    url: canvas.toDataURL(),
-                    imageExtent: extent
+                const geotiffLayer = new ImageLayer({
+                    source: new ImageStatic({
+                        url: canvas.toDataURL(),
+                        imageExtent: extent,
+                        projection: "EPSG:4326"
+                    })
+                });
+
+                this.map = new Map({
+                    layers: [
+                        new TileLayer({
+                            source: new OSM(),
+                        }),
+                        geotiffLayer,
+                    ],
+                    target: this.mapDivID,
+                    view: new View({
+                        center: fromLonLat(extent ? getCenter(extent) : [8.6759928, 49.4187355]),
+                        zoom: 12,
+                    })
                 })
-            });
-
-            if (this.map.getSize()) {
-                // @ts-ignore
-                this.map.getView().fit(extent, this.map.getSize());
             }
-
-            this.map.addLayer(geotiffLayer);
         } catch (error) {
             console.error("Error fetching or processing data:", error);
         }
@@ -132,6 +129,6 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
             const parts = inputString.split('.')
             return parts[0]
         }
-        return null; // Return null if the string doesn't contain a period
+        return null;
     }
 }

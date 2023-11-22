@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { FieldType } from '@ngx-formly/core';
+import {Component} from '@angular/core';
+import {FieldType} from '@ngx-formly/core';
 
 @Component({
-    selector: 'formly-null-type',
+    selector: 'app-formly-null-type',
     template: '',
 })
-export class NullTypeComponent extends FieldType {}
+export class NullTypeComponent extends FieldType {
+}
 
 
 /**  Copyright 2021 Formly. All Rights Reserved.

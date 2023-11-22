@@ -1,36 +1,17 @@
 <div class="page-container">
-  <!-- ### $Topbar Header ### -->
-  <div class="header navbar">
-    <div class="header-container">
-      <ul class="nav-left">
-        <!-- <li>
-          <a href="/">
-            <img class="h-1r h-3/2r@sm h-2r@md h-2r@lg h-5/2r@xl+" src="assets/images/logo.svg" alt="climate action logo">
-          </a>
-        </li> -->
-        <!-- <li class="search-box">
-          <a class="search-toggle no-pdd-right" href="javascript:void(0);">
-            <i class="search-icon ti-search pdd-right-10"></i>
-            <i class="search-icon-close ti-close pdd-right-10"></i>
-          </a>
-        </li>
-        <li class="search-input">
-          <input class="form-control" type="text" placeholder="Search...">
-        </li> -->
-      </ul>
-      <!-- #### $App Processes / Plugin Runs #### -->
-      <app-runs></app-runs>
+    <div class="header navbar">
+        <div class="header-container">
+            <ul class="nav-left">
+            </ul>
+            <app-runs></app-runs>
+        </div>
     </div>
-  </div>
 
-  <!-- ### $App Main ### -->
-  <router-outlet></router-outlet>
-
-  <!-- ### $App Toast ### -->
-  <app-toast></app-toast>
-
-  <!-- ### $App Screen Footer ### -->
-  <footer class="bdT ta-c p-10 lh-1\/2 fsz-sm c-grey-600" style="white-space: pre-line;">
-    <span> © 2023 Heidelberg Institute for Geoinformation Technology at <a href="https://uni-heidelberg.de/gis/" target="_blank">Heidelberg University</a> | <a href="https://heigit.org" target="_blank">HeiGIT gGmbH</a> | <a href="https://heigit.org/imprint/" target="_blank">imprint</a>&nbsp;|&nbsp;<a href="https://heigit.org/privacy-policy" target="_blank">privacy policy</a></span>
-  </footer>
+    <router-outlet></router-outlet>
+    <app-toast></app-toast>
+    <footer class="bdT ta-c p-10 lh-1\/2 fsz-sm c-grey-600" style="white-space: pre-line;">
+        <span> © 2023 Heidelberg Institute for Geoinformation Technology at <a href="https://uni-heidelberg.de/gis/" target="_blank">Heidelberg University</a> | <a href="https://heigit.org"
+                                                                                                                                                                    target="_blank">HeiGIT gGmbH</a> | <a
+                href="https://heigit.org/imprint/" target="_blank">imprint</a>&nbsp;|&nbsp;<a href="https://heigit.org/privacy-policy" target="_blank">privacy policy</a></span>
+    </footer>
 </div>

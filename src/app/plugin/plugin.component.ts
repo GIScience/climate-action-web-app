@@ -1,6 +1,6 @@
 import {AfterViewInit, Component} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {Plugin} from '../models/plugin.interface';
+import {Plugin} from './plugin.interface';
 import {PluginService} from "../services/plugin.service";
 import {map, Observable, switchMap} from "rxjs";
 
@@ -15,27 +15,22 @@ export class PluginComponent implements AfterViewInit {
     constructor(
         private pluginService: PluginService,
         private route: ActivatedRoute
-    ) {}
+    ) {
+    }
 
     ngAfterViewInit(): void {
-        // get plugins from API
         this.loadPluginDetails()
     }
 
     private loadPluginDetails() {
-
         this.pluginObs$ = this.route.paramMap.pipe(
             map(params => params.get('name')),
             switchMap(pluginName => {
-                // check for valid pluginName
-                if (! pluginName || pluginName == '') {
-                    // pluginName can't be null
-                    console.error('pluginName can\'t be null')
-                    // return
+                if (!pluginName || pluginName == '') {
+                    throw Error(`Plugin ${pluginName} does not exist`)
                 }
-                return this.pluginService.getPluginDetails(pluginName!)
-            } )
+                return this.pluginService.getPluginDetails(pluginName)
+            })
         );
     }
-
 }

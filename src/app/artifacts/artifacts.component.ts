@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {PluginService} from "../services/plugin.service";
-import {ArtifactType} from "../models/artifact.interface";
+import {ArtifactType} from "./artifact.interface";
 import {ReportService} from "../services/report.service";
-import {PluginRun} from "../models/plugin.interface";
+import {PluginRun} from "../plugin/plugin.interface";
 
 @Component({
     selector: 'app-artifacts',
@@ -23,7 +23,6 @@ export class ArtifactsComponent implements OnInit {
     }
 
     fetchArtifactIds() {
-        // Fetch the artifact IDs from local storage as an array
         this.currentRuns = this.pluginService.getComputes()
         this.currentRuns.forEach(currentRun => {
             this.fetchArtifact(currentRun.correlation_id)
@@ -31,13 +30,11 @@ export class ArtifactsComponent implements OnInit {
     }
 
     fetchArtifact(correlation_id: string) {
-        // Call the API to get artifact content for the current ID
         this.pluginService.getArtifacts(correlation_id).subscribe({
             next: (data: ArtifactType[]) => {
                 if (!data)
                     return
                 if (Array.isArray(data) && data.length > 0) {
-                    // assign icon based on their modality
                     const icons = {
                         'IMAGE': 'ti-image',
                         'MARKDOWN': 'ti-align-left',
@@ -53,14 +50,12 @@ export class ArtifactsComponent implements OnInit {
                     this.artifacts.push(...data);
                     this.pluginService.updateRunStatus(correlation_id, "completed")
                 } else {
-                    // Retry after 30 seconds
                     setTimeout(() => this.fetchArtifact(correlation_id), 30000);
                     this.pluginService.updateRunStatus(correlation_id, "in-progress")
                 }
             },
             error: error => {
                 console.error('Error fetching getArtifacts: ', correlation_id, error);
-                // update the status of correlation as failed
                 this.pluginService.updateRunStatus(correlation_id, "failed")
             }
         })
@@ -88,5 +83,4 @@ export class ArtifactsComponent implements OnInit {
                 break;
         }
     }
-
 }

@@ -1,3 +1,5 @@
+import {PluginParametersSchema} from "./plugin-parameter/plugin-parameter.interface";
+
 export interface Plugin {
     "plugin_id": string,
     "name": string,
@@ -7,7 +9,7 @@ export interface Plugin {
     "purpose": string,
     "methodology": string,
     "sources": Array<Source>,
-    "operator_schema": {},
+    "operator_schema": PluginParametersSchema,
     "library_version": string,
     "attribution": string
 }
@@ -32,4 +34,8 @@ export interface PluginRun {
     pluginId: string,
     pluginName: string,
     status?: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input',
+}
+
+export interface PluginCorrelator {
+    correlation_id: string
 }

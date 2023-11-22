@@ -18,5 +18,5 @@ export interface IToastUI {
     title: string,
     body: string,
     type: string,
-    time?: number // number of milliseconds toast should stay on screen
+    time?: number
 }

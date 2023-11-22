@@ -1,0 +1,17 @@
+image: trion/ng-cli-e2e:17.0.0
+
+stages:
+  - test
+
+cache:
+  paths:
+    - node_modules
+
+before_script:
+  - npm install
+
+test:
+  stage: test
+  script:
+    - npm run lint
+    - npm test --no-progress --browsers=Chrome --watch=false

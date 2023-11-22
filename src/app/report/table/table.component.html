@@ -1,14 +1,14 @@
 <div class="bd mY-2" style="max-height: 500px; overflow-y: auto">
     <table class="table table-bordered table-hover" *ngIf="csvData.length > 0">
         <thead>
-            <tr>
-                <th *ngFor="let header of csvData[0] | keyvalue">{{ header.key }}</th>
-            </tr>
+        <tr>
+            <th *ngFor="let header of csvData[0] | keyvalue">{{ header.key }}</th>
+        </tr>
         </thead>
         <tbody class="table-group-divider">
-            <tr *ngFor="let record of csvData">
-                <td *ngFor="let field of record | keyvalue">{{ field.value }}</td>
-            </tr>
+        <tr *ngFor="let record of csvData">
+            <td *ngFor="let field of record | keyvalue">{{ field.value }}</td>
+        </tr>
         </tbody>
     </table>
     <div *ngIf="csvData.length === 0">

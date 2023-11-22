@@ -5,7 +5,7 @@ export interface ArtifactType {
     summary: string,
     description: string,
     correlation_uuid: string,
-    params: {},
+    params: object,
     store_id: string,
     icon?: "ti-image" | "ti-align-left" | "ti-stats-up" | "ti-layout-grid3" | "ti-map-alt" | "ti-file"
 }

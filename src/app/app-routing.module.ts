@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { AboutComponent } from './about/about.component';
-import { HelpComponent } from './help/help.component';
-import { PluginsComponent } from './plugins/plugins.component';
-import { ArtifactsComponent } from './artifacts/artifacts.component';
-import { DashboardComponent } from "./dashboard/dashboard.component";
-import { PluginComponent } from "./plugin/plugin.component";
+import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
+import {AboutComponent} from './about/about.component';
+import {HelpComponent} from './help/help.component';
+import {PluginsComponent} from './plugins/plugins.component';
+import {ArtifactsComponent} from './artifacts/artifacts.component';
+import {DashboardComponent} from "./dashboard/dashboard.component";
+import {PluginComponent} from "./plugin/plugin.component";
 
 const routes: Routes = [
     {
@@ -44,7 +44,6 @@ const routes: Routes = [
         pathMatch: 'full',
         component: HelpComponent
     },
-    // Wild Card Route for 404 request
     {
         path: '**',
         pathMatch: 'full',

@@ -1,18 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {PluginsComponent} from './plugins.component';
+import {NotificationComponent} from './notification.component';
 import {HttpClientModule} from "@angular/common/http";
 
-describe('PluginsComponent', () => {
-    let component: PluginsComponent;
-    let fixture: ComponentFixture<PluginsComponent>;
+describe('RunsComponent', () => {
+    let component: NotificationComponent;
+    let fixture: ComponentFixture<NotificationComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
-            declarations: [PluginsComponent]
+            declarations: [NotificationComponent]
         });
-        fixture = TestBed.createComponent(PluginsComponent);
+        fixture = TestBed.createComponent(NotificationComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

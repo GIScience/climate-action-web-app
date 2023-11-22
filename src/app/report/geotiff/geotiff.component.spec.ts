@@ -1,21 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { GeotiffComponent } from './geotiff.component';
+import {GeoTiffComponent} from './geotiff.component';
+import {HttpClientModule} from "@angular/common/http";
 
 describe('GeotiffComponent', () => {
-  let component: GeotiffComponent;
-  let fixture: ComponentFixture<GeotiffComponent>;
+    let component: GeoTiffComponent;
+    let fixture: ComponentFixture<GeoTiffComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [GeotiffComponent]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [GeoTiffComponent, HttpClientModule]
+        });
+        fixture = TestBed.createComponent(GeoTiffComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
-    fixture = TestBed.createComponent(GeotiffComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
