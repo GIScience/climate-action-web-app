@@ -1,6 +1,6 @@
-import {AfterViewInit, Component} from '@angular/core';
-import * as bootstrap from 'bootstrap';
-import {ToastService} from './services/toast.service';
+import {AfterViewInit, Component} from '@angular/core'
+import * as bootstrap from 'bootstrap'
+import {ToastService} from './services/toast.service'
 
 @Component({
     selector: 'app-root',
@@ -8,8 +8,8 @@ import {ToastService} from './services/toast.service';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
-    title = 'Dashboard - Climate Action';
-    name = 'HeiGIT';
+    title = 'Dashboard - Climate Action'
+    name = 'HeiGIT'
     activeLink = ''
 
     constructor(private toastService: ToastService) {

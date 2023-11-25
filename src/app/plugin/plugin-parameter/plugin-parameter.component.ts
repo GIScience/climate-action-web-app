@@ -1,46 +1,52 @@
-import {AfterViewInit, Component, Input, OnChanges} from '@angular/core';
-import {Router} from "@angular/router";
-import {FormGroup} from '@angular/forms';
-import {FormlyFieldConfig, FormlyFormOptions} from "@ngx-formly/core";
-import {FormlyJsonschema} from '@ngx-formly/core/json-schema';
-import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import TileLayer from 'ol/layer/Tile';
-import {View} from "ol";
-import {fromLonLat} from 'ol/proj';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import {Fill, Stroke, Style} from 'ol/style';
-import GeoJSON from 'ol/format/GeoJSON.js';
+import {AfterViewInit, Component, Input, OnChanges} from '@angular/core'
+import {Router} from "@angular/router"
+import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from "@ngx-formly/core"
+import {FormlyJsonschema} from '@ngx-formly/core/json-schema'
+import Map from 'ol/Map'
+import OSM from 'ol/source/OSM'
+import TileLayer from 'ol/layer/Tile'
+import {View} from "ol"
+import {fromLonLat} from 'ol/proj'
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import {Fill, Stroke, Style} from 'ol/style'
+import GeoJSON from 'ol/format/GeoJSON.js'
 
-import {regions} from '../../support/region-of-interest';
-import {FeatureLike} from 'ol/Feature.js';
-import {Geometry} from 'ol/geom.js';
-import {PluginService} from "../../services/plugin.service";
-import {ToastService} from "../../services/toast.service";
-import {Plugin} from "../plugin.interface";
-import {PluginParametersSchema, PluginPropertiesSchema} from "./plugin-parameter.interface";
+import {regions} from '../../support/region-of-interest'
+import {FeatureLike} from 'ol/Feature.js'
+import {Geometry} from 'ol/geom.js'
+import {PluginService} from "../../services/plugin.service"
+import {ToastService} from "../../services/toast.service"
+import {Plugin} from "../plugin.interface"
+import {PluginParametersSchema, PluginPropertiesSchema} from "./plugin-parameter.interface"
 
 @Component({
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
-    styleUrls: ['./plugin-parameter.component.scss']
+    styleUrls: ['./plugin-parameter.component.scss'],
+    imports: [
+        FormlyModule,
+        FormsModule,
+        ReactiveFormsModule
+    ],
+    standalone: true
 })
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     @Input() schema!: PluginParametersSchema
     @Input() plugin!: Plugin
 
-    tempSchema: { schema: any; model: any; } = {schema: {}, model: {}};
-    model: any = {};
-    options: FormlyFormOptions = {};
-    form = new FormGroup({});
-    fields: FormlyFieldConfig[] = [];
-    map: Map | undefined;
-    regionLayer: VectorLayer<VectorSource<Geometry>> | undefined;
-    selectedRegionLayer!: VectorLayer<VectorSource<Geometry>>;
-    jsonSchema_polygon = 'Feature_MultiPolygon';
-    highlightedFeature: Array<FeatureLike> = [];
+    tempSchema: { schema: any, model: any } = {schema: {}, model: {}}
+    model: any = {}
+    options: FormlyFormOptions = {}
+    form = new FormGroup({})
+    fields: FormlyFieldConfig[] = []
+    map: Map | undefined
+    regionLayer: VectorLayer<VectorSource<Geometry>> | undefined
+    selectedRegionLayer!: VectorLayer<VectorSource<Geometry>>
+    jsonSchema_polygon = 'Feature_MultiPolygon'
+    highlightedFeature: Array<FeatureLike> = []
 
     constructor(private formlyJsonschema: FormlyJsonschema,
                 private pluginService: PluginService,
@@ -169,7 +175,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         }
 
         this.tempSchema.model = this.model
-        this.fields = [this.formlyJsonschema.toFieldConfig(this.tempSchema.schema)];
+        this.fields = [this.formlyJsonschema.toFieldConfig(this.tempSchema.schema)]
     }
 
     ngAfterViewInit(): void {
@@ -224,7 +230,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             this.regionLayer.getFeatures(pixel).then((features) => {
                 if (features) {
                     const feature = features[0]
-                    const selIndex = this.highlightedFeature.indexOf(feature);
+                    const selIndex = this.highlightedFeature.indexOf(feature)
                     if (selIndex < 0) {
                         if (feature) {
                             this.highlightedFeature.push(feature)
@@ -261,7 +267,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     private requestCompute(model: any) {
         this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
-                this.pluginService.storeComputes(data.correlation_id, this.plugin)
+                this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
                 this.toastService.show({
                     title: `${this.plugin.plugin_id} parameters are send to process!`,
                     body: `Result from plugin execution will be listing on the dashboard`,
@@ -269,12 +275,12 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     time: 4000
                 })
                 setTimeout(() => {
-                    this.router.navigate(['dashboard']);
+                    this.router.navigate(['dashboard'])
                 }, 1000)
 
             },
             error: error => {
-                console.error('Error while request to compute plugin:', error);
+                console.error('Error while request to compute plugin:', error)
                 this.toastService.show({
                     title: `Error while computing plugin ${this.plugin.name}`,
                     body: `Error while computing plugin ${this.plugin.name}`,
@@ -282,11 +288,11 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     time: 4000
                 })
             }
-        });
+        })
     }
 
     private checkForRequiredFields(model: any, schema: PluginParametersSchema): boolean {
-        if (!schema['required']) return true;
+        if (!schema['required']) return true
 
         const requiredList: string[] = schema['required']
         return requiredList.every((i) => Object.prototype.hasOwnProperty.call(model, i))

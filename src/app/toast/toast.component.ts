@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import * as bootstrap from 'bootstrap';
+import {Component, OnInit} from '@angular/core'
+import * as bootstrap from 'bootstrap'
 
-import {IToastUI, ToastService} from '../services/toast.service';
-import {ToastTypes} from './toasttypes.modal';
+import {IToastUI, ToastService} from '../services/toast.service'
+import {ToastTypes} from './toasttypes.modal'
 
 @Component({
     selector: 'app-toast',

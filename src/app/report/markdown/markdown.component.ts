@@ -1,6 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {CommonModule} from "@angular/common";
-import {MarkdownModule} from "ngx-markdown";
+import {Component, Input} from '@angular/core'
+import {CommonModule} from "@angular/common"
+import {MarkdownModule} from "ngx-markdown"
 
 @Component({
     selector: 'app-markdown',
@@ -10,5 +10,5 @@ import {MarkdownModule} from "ngx-markdown";
     styleUrls: ['./markdown.component.scss']
 })
 export class MarkdownComponent {
-    @Input() url: string | undefined;
+    @Input() url: string | undefined
 }

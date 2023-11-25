@@ -1,16 +1,25 @@
-import {AfterViewInit, Component} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {Plugin} from './plugin.interface';
-import {PluginService} from "../services/plugin.service";
-import {map, Observable, switchMap} from "rxjs";
+import {AfterViewInit, Component} from '@angular/core'
+import {ActivatedRoute} from "@angular/router"
+import {Plugin} from './plugin.interface'
+import {PluginService} from "../services/plugin.service"
+import {map, Observable, switchMap} from "rxjs"
+import {PluginParameterComponent} from "./plugin-parameter/plugin-parameter.component"
+import {CommonModule} from "@angular/common"
+import {PluginsComponent} from "../plugins/plugins.component"
 
 @Component({
     selector: 'app-plugin',
     templateUrl: './plugin.component.html',
-    styleUrls: ['./plugin.component.scss']
+    styleUrls: ['./plugin.component.scss'],
+    imports: [
+        CommonModule,
+        PluginsComponent,
+        PluginParameterComponent
+    ],
+    standalone: true
 })
 export class PluginComponent implements AfterViewInit {
-    pluginObs$: Observable<Plugin> | undefined;
+    pluginObs$: Observable<Plugin> | undefined
 
     constructor(
         private pluginService: PluginService,
@@ -31,6 +40,6 @@ export class PluginComponent implements AfterViewInit {
                 }
                 return this.pluginService.getPluginDetails(pluginName)
             })
-        );
+        )
     }
 }

@@ -1,15 +1,15 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject} from "rxjs";
-import {HttpClient} from "@angular/common/http";
-import {ArtifactType, ChartResponse} from "../artifacts/artifact.interface";
-import {environment} from "../../environments/environment";
+import {Injectable} from '@angular/core'
+import {BehaviorSubject} from "rxjs"
+import {HttpClient} from "@angular/common/http"
+import {Artifact, ChartResponse} from "../artifacts/artifact.interface"
+import {environment} from "../../environments/environment"
 
 @Injectable({
     providedIn: 'root'
 })
 export class ReportService {
 
-    private apiUrl = environment.climateActionApiUrl;
+    private apiUrl = environment.climateActionApiUrl
 
     private bsMarkdown = new BehaviorSubject<string>('')
     markdownOb = this.bsMarkdown.asObservable()
@@ -17,11 +17,11 @@ export class ReportService {
     imageOb = this.bsImage.asObservable()
     private bsTable = new BehaviorSubject<string>('')
     tableOb = this.bsTable.asObservable()
-    private bsGeoJson = new BehaviorSubject<{ url: string, artifact: ArtifactType | null }>({url: '', artifact: null})
+    private bsGeoJson = new BehaviorSubject<{ url: string, artifact: Artifact | null }>({url: '', artifact: null})
     geojsonOb = this.bsGeoJson.asObservable()
-    private bsGeoTiff = new BehaviorSubject<{ url: string, artifact: ArtifactType | null }>({url: '', artifact: null})
+    private bsGeoTiff = new BehaviorSubject<{ url: string, artifact: Artifact | null }>({url: '', artifact: null})
     geotiffOb = this.bsGeoTiff.asObservable()
-    private bsChart = new BehaviorSubject<{ data: ChartResponse | null, artifact: ArtifactType | null }>({
+    private bsChart = new BehaviorSubject<{ data: ChartResponse | null, artifact: Artifact | null }>({
         data: null,
         artifact: null
     })
@@ -30,19 +30,19 @@ export class ReportService {
     constructor(private http: HttpClient) {
     }
 
-    getMarkdown(artifact: ArtifactType): void {
+    getMarkdown(artifact: Artifact): void {
         this.bsMarkdown.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
     }
 
-    getImage(artifact: ArtifactType): void {
+    getImage(artifact: Artifact): void {
         this.bsImage.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
     }
 
-    getTable(artifact: ArtifactType): void {
+    getTable(artifact: Artifact): void {
         this.bsTable.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
     }
 
-    getChart(artifact: ArtifactType): void {
+    getChart(artifact: Artifact): void {
         this.http.get<ChartResponse>(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`).subscribe((data) => {
             this.bsChart.next({
                 data: data,
@@ -51,14 +51,14 @@ export class ReportService {
         })
     }
 
-    getGeoTiff(artifact: ArtifactType): void {
+    getGeoTiff(artifact: Artifact): void {
         this.bsGeoTiff.next({
             url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             artifact
         })
     }
 
-    getGeoJson(artifact: ArtifactType): void {
+    getGeoJson(artifact: Artifact): void {
         this.bsGeoJson.next({
             url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             artifact

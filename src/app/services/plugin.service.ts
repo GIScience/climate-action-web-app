@@ -1,46 +1,43 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, map, Observable} from 'rxjs';
-import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface';
-import {ArtifactType} from "../artifacts/artifact.interface";
-import {environment} from "../../environments/environment";
+import {Injectable} from '@angular/core'
+import {HttpClient} from '@angular/common/http'
+import {BehaviorSubject, Observable} from 'rxjs'
+import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface'
+import {Artifact} from "../artifacts/artifact.interface"
+import {environment} from "../../environments/environment"
 
 @Injectable({
     providedIn: 'root'
 })
 export class PluginService {
 
-    private apiUrl = environment.climateActionApiUrl;
+    private apiUrl = environment.climateActionApiUrl
 
-    private pluginRuns: PluginRun[] = [];
-    private pluginRunsSubject = new BehaviorSubject<PluginRun[]>(this.pluginRuns);
+    private pluginRuns: PluginRun[] = []
+    private pluginRunsSubject = new BehaviorSubject<PluginRun[]>(this.pluginRuns)
 
     constructor(private http: HttpClient) {
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http.get<Plugin[]>(`${this.apiUrl}/api/v1/gateway/plugin/`);
+        return this.http.get<Plugin[]>(`${this.apiUrl}/api/v1/gateway/plugin/`)
     }
 
     getPluginDetails(pluginName: string): Observable<Plugin> {
-        return this.http.get<Plugin>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginName}`);
+        return this.http.get<Plugin>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginName}`)
     }
 
     computePlugin(pluginId: string, params: object): Observable<PluginCorrelator> {
-        return this.http.post<string>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
-            .pipe(map(x => ({
-                correlation_id: x
-            } as PluginCorrelator)))
+        return this.http.post<PluginCorrelator>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
     }
 
-    getArtifacts(id: string): Observable<Array<ArtifactType>> {
-        return this.http.get<Array<ArtifactType>>(`${this.apiUrl}/api/v1/gateway/store/${id}`)
+    getArtifacts(id: string): Observable<Array<Artifact>> {
+        return this.http.get<Array<Artifact>>(`${this.apiUrl}/api/v1/gateway/store/${id}`)
     }
 
     getComputes(): Array<PluginRun> {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs)
-            return [];
+            return []
 
         return JSON.parse(plugin_runs)
     }
@@ -71,17 +68,17 @@ export class PluginService {
     }
 
     getPluginRuns() {
-        return this.pluginRunsSubject.asObservable();
+        return this.pluginRunsSubject.asObservable()
     }
 
     updateRunStatus(correlationId: string, newStatus: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input') {
         const runs = this.getComputes()
-        const index = runs.findIndex((run) => run.correlation_id === correlationId);
+        const index = runs.findIndex((run) => run.correlation_id === correlationId)
 
         if (index !== -1) {
-            runs[index].status = newStatus;
+            runs[index].status = newStatus
             this.refreshCompute(runs)
-            this.pluginRunsSubject.next([...runs]);
+            this.pluginRunsSubject.next([...runs])
         }
     }
 }

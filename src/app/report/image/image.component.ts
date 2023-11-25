@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {CommonModule} from "@angular/common";
+import {Component, Input} from '@angular/core'
+import {CommonModule} from "@angular/common"
 
 @Component({
     selector: 'app-image',
@@ -9,5 +9,5 @@ import {CommonModule} from "@angular/common";
     styleUrls: ['./image.component.scss']
 })
 export class ImageComponent {
-    @Input() url: string | undefined;
+    @Input() url: string | undefined
 }

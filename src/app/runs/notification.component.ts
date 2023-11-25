@@ -1,8 +1,8 @@
-import {Component, HostListener} from '@angular/core';
-import {PluginService} from "../services/plugin.service";
-import {PluginRun} from "../plugin/plugin.interface";
-import {NotificationService} from "./notification.service";
-import moment from "moment";
+import {Component, HostListener} from '@angular/core'
+import {PluginService} from "../services/plugin.service"
+import {PluginRun} from "../plugin/plugin.interface"
+import {NotificationService} from "./notification.service"
+import moment from "moment"
 
 @Component({
     selector: 'app-runs',
@@ -17,8 +17,8 @@ export class NotificationComponent {
                 private pluginService: PluginService) {
 
         this.pluginService.getPluginRuns().subscribe((runs) => {
-            this.runs = runs;
-        });
+            this.runs = runs
+        })
 
         this.runsService.startWebSocket().subscribe({
             next: (message) => {
@@ -53,7 +53,7 @@ export class NotificationComponent {
             'failed': 'text-bg-danger',
             'wrong-input': 'text-bg-warning',
         }
-        return status ? statusClassMap[status] : 'text-bg-secondary';
+        return status ? statusClassMap[status] : 'text-bg-secondary'
     }
 
     @HostListener('window:beforeunload')
