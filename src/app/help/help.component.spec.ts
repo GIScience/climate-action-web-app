@@ -1,23 +1,22 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing'
 
-import {HelpComponent} from './help.component';
+import {HelpComponent} from './help.component'
 
 describe('HelpComponent', () => {
-    let component: HelpComponent;
-    let fixture: ComponentFixture<HelpComponent>;
+    let component: HelpComponent
+    let fixture: ComponentFixture<HelpComponent>
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [HelpComponent]
-        })
-            .compileComponents();
+            imports: [HelpComponent]
+        }).compileComponents()
 
         fixture = TestBed.createComponent(HelpComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+        component = fixture.componentInstance
+        fixture.detectChanges()
     });
 
     it('should create', () => {
-        expect(component).toBeTruthy();
+        expect(component).toBeTruthy()
     });
 });

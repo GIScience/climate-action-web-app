@@ -1,4 +1,4 @@
-export interface ArtifactType {
+export interface Artifact {
     name: string,
     modality: "IMAGE" | "MARKDOWN" | "CHART" | "TABLE" | "MAP_LAYER_GEOJSON" | "MAP_LAYER_GEOTIFF",
     file_path: string,

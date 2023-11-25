@@ -1,12 +1,17 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {Plugin} from '../plugin/plugin.interface';
-import {PluginService} from "../services/plugin.service";
+import {AfterViewInit, Component, OnInit} from '@angular/core'
+import {Router} from "@angular/router"
+import {Plugin} from '../plugin/plugin.interface'
+import {PluginService} from "../services/plugin.service"
+import {CommonModule} from "@angular/common"
 
 @Component({
     selector: 'app-plugins',
     templateUrl: './plugins.component.html',
-    styleUrls: ['./plugins.component.scss']
+    styleUrls: ['./plugins.component.scss'],
+    imports: [
+        CommonModule
+    ],
+    standalone: true
 })
 export class PluginsComponent implements OnInit, AfterViewInit {
 
@@ -19,79 +24,79 @@ export class PluginsComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         setTimeout(() => {
-            this.calculateProgressBar();
-        }, 200);
+            this.calculateProgressBar()
+        }, 200)
     }
 
     ngAfterViewInit(): void {
-        const slider = document.querySelector(".slider") as HTMLElement;
-        slider.style.setProperty("--slider-index", '0');
+        const slider = document.querySelector(".slider") as HTMLElement
+        slider.style.setProperty("--slider-index", '0')
         this.loadPlugins()
     }
 
     calculateProgressBar() {
-        const progressBarElements = document.querySelectorAll(".progress-bar");
+        const progressBarElements = document.querySelectorAll(".progress-bar")
         progressBarElements.forEach((progressBar) => {
-            progressBar.innerHTML = "";
+            progressBar.innerHTML = ""
 
-            const slider = document.querySelector(".slider") as HTMLElement;
+            const slider = document.querySelector(".slider") as HTMLElement
             if (slider == null) return
-            const itemCount = slider.children.length;
-            const itemsPerScreen = parseInt(getComputedStyle(slider).getPropertyValue("--items-per-screen"));
-            let sliderIndex = parseInt(getComputedStyle(slider).getPropertyValue("--slider-index"));
+            const itemCount = slider.children.length
+            const itemsPerScreen = parseInt(getComputedStyle(slider).getPropertyValue("--items-per-screen"))
+            let sliderIndex = parseInt(getComputedStyle(slider).getPropertyValue("--slider-index"))
             const progressBarItemCount = Math.ceil(itemCount / itemsPerScreen);
 
             if (sliderIndex >= progressBarItemCount) {
-                slider.style.setProperty("--slider-index", progressBarItemCount - 1 + '');
-                sliderIndex = progressBarItemCount - 1;
+                slider.style.setProperty("--slider-index", progressBarItemCount - 1 + '')
+                sliderIndex = progressBarItemCount - 1
             }
 
             for (let i = 0; i < progressBarItemCount; i++) {
-                const barItem = document.createElement("div");
-                barItem.classList.add("progress-item");
+                const barItem = document.createElement("div")
+                barItem.classList.add("progress-item")
                 if (i === sliderIndex) {
-                    barItem.classList.add("active");
+                    barItem.classList.add("active")
                 }
-                progressBar.appendChild(barItem);
+                progressBar.appendChild(barItem)
             }
-        });
+        })
     }
 
     onSlideClick(direction: string) {
-        const progressBar = document.querySelector(".progress-bar");
-        const slider = document.querySelector(".slider") as HTMLElement;
-        if (slider === null || progressBar === null) return;
+        const progressBar = document.querySelector(".progress-bar")
+        const slider = document.querySelector(".slider") as HTMLElement
+        if (slider === null || progressBar === null) return
 
-        const sliderIndex = parseInt(getComputedStyle(slider).getPropertyValue("--slider-index"));
-        const progressBarItemCount = progressBar.children.length;
+        const sliderIndex = parseInt(getComputedStyle(slider).getPropertyValue("--slider-index"))
+        const progressBarItemCount = progressBar.children.length
 
-        let newIndex;
+        let newIndex
 
         if (direction === "left") {
-            newIndex = sliderIndex - 1 < 0 ? progressBarItemCount - 1 : sliderIndex - 1;
+            newIndex = sliderIndex - 1 < 0 ? progressBarItemCount - 1 : sliderIndex - 1
         } else if (direction === "right") {
-            newIndex = sliderIndex + 1 >= progressBarItemCount ? 0 : sliderIndex + 1;
+            newIndex = sliderIndex + 1 >= progressBarItemCount ? 0 : sliderIndex + 1
         } else {
-            return;
+            return
         }
 
-        slider.style.setProperty("--slider-index", newIndex + '');
-        progressBar.children[sliderIndex].classList.remove("active");
-        progressBar.children[newIndex].classList.add("active");
+        slider.style.setProperty("--slider-index", newIndex + '')
+        progressBar.children[sliderIndex].classList.remove("active")
+        progressBar.children[newIndex].classList.add("active")
     }
 
     loadPlugins() {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
-                this.plugins = data;
+                this.plugins = data
             },
             error: error => {
-                console.error('Error fetching plugins:', error);
+                console.error('Error fetching plugins:', error)
             }
-        });
+        })
     }
 
     showPluginInfo(pluginId: string) {
-        this.router.navigate(['plugin', pluginId]);
+        this.router.navigate(['plugin', pluginId])
     }
 }

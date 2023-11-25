@@ -1,4 +1,4 @@
-import {PluginParametersSchema} from "./plugin-parameter/plugin-parameter.interface";
+import {PluginParametersSchema} from "./plugin-parameter/plugin-parameter.interface"
 
 export interface Plugin {
     "plugin_id": string,
@@ -19,14 +19,14 @@ export interface Concern {
 }
 
 export interface Source {
-    pages?: string;
-    volume?: string;
-    journal?: string;
-    year?: string;
-    title?: string;
-    author?: string;
-    ENTRYTYPE?: string;
-    ID?: string;
+    pages?: string
+    volume?: string
+    journal?: string
+    year?: string
+    title?: string
+    author?: string
+    ENTRYTYPE?: string
+    ID?: string
 }
 
 export interface PluginRun {
@@ -37,5 +37,5 @@ export interface PluginRun {
 }
 
 export interface PluginCorrelator {
-    correlation_id: string
+    correlation_uuid: string
 }

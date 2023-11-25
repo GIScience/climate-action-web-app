@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {FieldType} from '@ngx-formly/core';
+import {Component} from '@angular/core'
+import {FieldType} from '@ngx-formly/core'
 
 @Component({
     selector: 'app-formly-null-type',

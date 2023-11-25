@@ -1,19 +1,19 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
-import {CommonModule} from "@angular/common";
-import {HttpClient} from "@angular/common/http";
-import GeoJSON from "ol/format/GeoJSON.js";
-import Map from "ol/Map";
-import TileLayer from "ol/layer/Tile";
-import OSM from "ol/source/OSM";
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core'
+import {CommonModule} from "@angular/common"
+import {HttpClient} from "@angular/common/http"
+import GeoJSON from "ol/format/GeoJSON.js"
+import Map from "ol/Map"
+import TileLayer from "ol/layer/Tile"
+import OSM from "ol/source/OSM"
 import {View} from "ol";
-import {fromLonLat, transformExtent} from "ol/proj";
-import {getCenter} from "ol/extent";
-import {Vector} from "ol/source";
-import {ArtifactType} from "../../artifacts/artifact.interface";
-import VectorLayer from "ol/layer/Vector";
-import VectorSource from "ol/source/Vector";
-import {Fill, Stroke, Style} from "ol/style";
-import {Geometry} from "ol/geom.js";
+import {fromLonLat, transformExtent} from "ol/proj"
+import {getCenter} from "ol/extent"
+import {Vector} from "ol/source"
+import {Artifact} from "../../artifacts/artifact.interface"
+import VectorLayer from "ol/layer/Vector"
+import VectorSource from "ol/source/Vector"
+import {Fill, Stroke, Style} from "ol/style"
+import {Geometry} from "ol/geom.js"
 
 @Component({
     selector: 'app-geojson',
@@ -23,11 +23,11 @@ import {Geometry} from "ol/geom.js";
     styleUrls: ['./geojson.component.scss']
 })
 export class GeojsonComponent implements OnInit, AfterViewInit {
-    @Input() inputData: { url: string; artifact: ArtifactType | null; } | undefined;
-    mapDivID = '';
-    map!: Map;
-    geojsonLayer!: VectorLayer<VectorSource<Geometry>>;
-    geojsonLayerSource!: VectorSource;
+    @Input() inputData: { url: string; artifact: Artifact | null; } | undefined
+    mapDivID = ''
+    map!: Map
+    geojsonLayer!: VectorLayer<VectorSource<Geometry>>
+    geojsonLayerSource!: VectorSource
 
     constructor(private http: HttpClient) {
     }

@@ -1,17 +1,17 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
-import {CommonModule} from "@angular/common";
-import {HttpClient} from "@angular/common/http";
-import Map from "ol/Map";
-import {View} from "ol";
-import TileLayer from "ol/layer/WebGLTile.js";
-import ImageLayer from "ol/layer/Image";
-import ImageStatic from "ol/source/ImageStatic";
-import {fromArrayBuffer} from "geotiff";
-import OSM from "ol/source/OSM";
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core'
+import {CommonModule} from "@angular/common"
+import {HttpClient} from "@angular/common/http"
+import Map from "ol/Map"
+import {View} from "ol"
+import TileLayer from "ol/layer/WebGLTile.js"
+import ImageLayer from "ol/layer/Image"
+import ImageStatic from "ol/source/ImageStatic"
+import {fromArrayBuffer} from "geotiff"
+import OSM from "ol/source/OSM"
 
-import {ArtifactType} from "../../artifacts/artifact.interface";
-import {fromLonLat} from "ol/proj";
-import {getCenter} from "ol/extent";
+import {Artifact} from "../../artifacts/artifact.interface"
+import {fromLonLat} from "ol/proj"
+import {getCenter} from "ol/extent"
 
 @Component({
     selector: 'app-geotiff',
@@ -21,9 +21,9 @@ import {getCenter} from "ol/extent";
     styleUrls: ['./geotiff.component.scss']
 })
 export class GeoTiffComponent implements OnInit, AfterViewInit {
-    @Input() inputData: { url: string; artifact: ArtifactType | null; } | undefined;
-    mapDivID = '';
-    map!: Map;
+    @Input() inputData: { url: string, artifact: Artifact | null } | undefined
+    mapDivID = ''
+    map!: Map
 
     constructor(private http: HttpClient) {
     }
@@ -63,39 +63,39 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
         let extent: number[]
 
         try {
-            const response = await fetch(this.inputData.url);
-            const arrayBuffer = await response.arrayBuffer();
-            const tiff = await fromArrayBuffer(arrayBuffer);
-            const image = await tiff.getImage();
+            const response = await fetch(this.inputData.url)
+            const arrayBuffer = await response.arrayBuffer()
+            const tiff = await fromArrayBuffer(arrayBuffer)
+            const image = await tiff.getImage()
 
-            width = image.getWidth();
-            height = image.getHeight();
-            extent = image.getBoundingBox();
+            width = image.getWidth()
+            height = image.getHeight()
+            extent = image.getBoundingBox()
 
-            const rgb = await image.readRGB();
+            const rgb = await image.readRGB()
 
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
+            const canvas = document.createElement("canvas")
+            canvas.width = width
+            canvas.height = height
 
-            const context = canvas.getContext("2d");
+            const context = canvas.getContext("2d")
             if (context) {
-                const data = context.getImageData(0, 0, width, height);
-                const rgba = data.data;
-                let j = 0;
+                const data = context.getImageData(0, 0, width, height)
+                const rgba = data.data
+                let j = 0
 
                 for (let i = 0; i < rgb.length; i += 3) {
                     // @ts-ignore valid assignment
-                    rgba[j] = rgb[i];
+                    rgba[j] = rgb[i]
                     // @ts-ignore valid assignment
-                    rgba[j + 1] = rgb[i + 1];
+                    rgba[j + 1] = rgb[i + 1]
                     // @ts-ignore valid assignment
-                    rgba[j + 2] = rgb[i + 2];
-                    rgba[j + 3] = 255;
-                    j += 4;
+                    rgba[j + 2] = rgb[i + 2]
+                    rgba[j + 3] = 255
+                    j += 4
                 }
 
-                context.putImageData(data, 0, 0);
+                context.putImageData(data, 0, 0)
 
                 const geotiffLayer = new ImageLayer({
                     source: new ImageStatic({
@@ -103,7 +103,7 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
                         imageExtent: extent,
                         projection: "EPSG:4326"
                     })
-                });
+                })
 
                 this.map = new Map({
                     layers: [
@@ -120,7 +120,7 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
                 })
             }
         } catch (error) {
-            console.error("Error fetching or processing data:", error);
+            console.error("Error fetching or processing data:", error)
         }
     }
 
@@ -129,6 +129,6 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
             const parts = inputString.split('.')
             return parts[0]
         }
-        return null;
+        return null
     }
 }

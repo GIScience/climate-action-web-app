@@ -1,17 +1,22 @@
 import {Component, OnInit} from '@angular/core';
 import {PluginService} from "../services/plugin.service";
-import {ArtifactType} from "./artifact.interface";
+import {Artifact} from "./artifact.interface";
 import {ReportService} from "../services/report.service";
 import {PluginRun} from "../plugin/plugin.interface";
+import {CommonModule} from "@angular/common";
 
 @Component({
     selector: 'app-artifacts',
     templateUrl: './artifacts.component.html',
-    styleUrls: ['./artifacts.component.scss']
+    styleUrls: ['./artifacts.component.scss'],
+    imports: [
+        CommonModule
+    ],
+    standalone: true
 })
 export class ArtifactsComponent implements OnInit {
 
-    artifacts: Array<ArtifactType> = []
+    artifacts: Array<Artifact> = []
     currentRuns!: PluginRun[];
 
     constructor(private pluginService: PluginService,
@@ -31,7 +36,7 @@ export class ArtifactsComponent implements OnInit {
 
     fetchArtifact(correlation_id: string) {
         this.pluginService.getArtifacts(correlation_id).subscribe({
-            next: (data: ArtifactType[]) => {
+            next: (data: Artifact[]) => {
                 if (!data)
                     return
                 if (Array.isArray(data) && data.length > 0) {
@@ -44,7 +49,7 @@ export class ArtifactsComponent implements OnInit {
                         'MAP_LAYER_GEOTIFF': 'ti-map-alt'
                     }
                     data = data.map((d) => {
-                        d.icon = (icons[d.modality] ?? 'ti-file') as ArtifactType['icon']
+                        d.icon = (icons[d.modality] ?? 'ti-file') as Artifact['icon']
                         return d
                     })
                     this.artifacts.push(...data);
@@ -61,7 +66,7 @@ export class ArtifactsComponent implements OnInit {
         })
     }
 
-    addArtifactToReport(artifact: ArtifactType) {
+    addArtifactToReport(artifact: Artifact) {
         switch (artifact.modality) {
             case 'IMAGE':
                 this.reportService.getImage(artifact)

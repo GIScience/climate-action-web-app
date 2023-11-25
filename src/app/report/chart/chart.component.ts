@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ChartConfiguration, ChartType} from 'chart.js';
+import {Component, Input, OnInit} from '@angular/core'
+import {ChartConfiguration, ChartType} from 'chart.js'
 
-import {ArtifactType, ChartResponse} from "../../artifacts/artifact.interface";
+import {Artifact, ChartResponse} from "../../artifacts/artifact.interface"
 
 @Component({
     selector: 'app-chart',
@@ -10,13 +10,13 @@ import {ArtifactType, ChartResponse} from "../../artifacts/artifact.interface";
 })
 export class ChartComponent implements OnInit {
 
-    @Input() inputData: { data: ChartResponse | null, artifact: ArtifactType | null } | undefined;
+    @Input() inputData: { data: ChartResponse | null, artifact: Artifact | null } | undefined
 
-    public baseChartLegend = true;
-    public baseChartPlugins = [];
-    public baseChartData: ChartConfiguration['data'] | undefined;
+    public baseChartLegend = true
+    public baseChartPlugins = []
+    public baseChartData: ChartConfiguration['data'] | undefined
     public baseChartOptions: ChartConfiguration['options']
-    public baseChartType!: ChartType;
+    public baseChartType!: ChartType
 
     ngOnInit(): void {
         if (!this.inputData)
