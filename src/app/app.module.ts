@@ -19,7 +19,7 @@ import {MultiSchemaTypeComponent} from "./types/multischema.type"
 import {ArrayTypeComponent} from "./types/array.type"
 import {NullTypeComponent} from "./types/null.type"
 import {ChartComponent} from './report/chart/chart.component'
-import {NotificationComponent} from './runs/notification.component'
+import {NotificationComponent} from './notification/notification.component'
 
 @NgModule({
     declarations: [

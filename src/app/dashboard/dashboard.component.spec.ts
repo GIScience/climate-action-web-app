@@ -1,7 +1,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {DashboardComponent} from './dashboard.component'
-import {ArtifactsComponent} from "../artifacts/artifacts.component"
+import {ArtifactComponent} from "../artifact/artifact.component"
 import {HttpClientModule} from "@angular/common/http"
 import {ReportComponent} from "../report/report.component"
 import {PluginsComponent} from "../plugins/plugins.component"
@@ -13,7 +13,7 @@ describe('DashboardComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                ArtifactsComponent,
+                ArtifactComponent,
                 DashboardComponent,
                 HttpClientModule,
                 ReportComponent,

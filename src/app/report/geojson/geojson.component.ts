@@ -9,7 +9,7 @@ import {View} from "ol";
 import {fromLonLat, transformExtent} from "ol/proj"
 import {getCenter} from "ol/extent"
 import {Vector} from "ol/source"
-import {Artifact} from "../../artifacts/artifact.interface"
+import {Artifact} from "../../artifact/artifact.interface"
 import VectorLayer from "ol/layer/Vector"
 import VectorSource from "ol/source/Vector"
 import {Fill, Stroke, Style} from "ol/style"

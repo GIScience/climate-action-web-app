@@ -1,0 +1,39 @@
+<div class="p-10 bgc-white bd h-100p artifact-tree">
+    <h3 class="mx-2">Artifacts </h3>
+
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+        <mat-tree-node *matTreeNodeDef="let node;when: isParent" class="mat-tree-parent-node run-card grid">
+            <div class="col-md-2 col-lg-2">
+                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name" *ngIf="node.expandable">
+                    <mat-icon class="mat-icon-rtl-mirror">
+                        {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </button>
+                <button mat-icon-button disabled *ngIf="!node.expandable"></button>
+            </div>
+            <div class="col-md-8 col-lg-9 card-header">
+                <h5>{{node.name}}</h5>
+                <p class="card-subtitle">{{node.timestamp}}</p>
+                <p class="card-subtitle">{{node.uuid}}</p>
+            </div>
+            <mat-icon aria-hidden="false"
+                      aria-label="Run progress"
+                      fontIcon="{{node.icon}}"
+                      class="col-md-2 col-lg-1 run-status"
+                      matTooltip="{{node.status}}"/>
+        </mat-tree-node>
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding
+                       class="mat-tree-child-node grid"
+                       (click)="addArtifactToReport(node.ref)"
+                       (keydown)="addArtifactToReport(node.ref)"
+                       tabindex="0">
+            <div class="col-lg-11 offset-1">
+                <div matTooltip="{{node.summary}}"
+                     matTooltipPosition="right">
+                    <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{node.icon}}"/>
+                    <div>{{node.name}}</div>
+                </div>
+            </div>
+        </mat-tree-node>
+    </mat-tree>
+</div>
