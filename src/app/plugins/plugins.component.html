@@ -1,5 +1,5 @@
-<div class="p-10 bgc-white bd h-100p">
-    <div class="row h-100p">
+<div class="p-10 bgc-white bd">
+    <div class="row">
         <div class="plugin-header mx-3">
             <h3 class="plugin-title">Plugins</h3>
             <div class="progress-bar"></div>
@@ -11,20 +11,18 @@
         </span>
             </button>
             <div class="slider">
-                <div class="card m-3 p-2" *ngFor="let card of plugins" style="cursor: pointer">
-                    <img [src]="card.icon"
-                         (click)="showPluginInfo(card.plugin_id)"
-                         (keydown)="showPluginInfo(card.plugin_id)"
-                         class="p-5 card-img-top card-tall-img shadow rounded-4"
-                         alt="{{card['attribution']}}"
-                         tabindex="0">
-                    <div class="card-body">
-                        <p (click)="showPluginInfo(card.plugin_id)"
-                           (keydown)="showPluginInfo(card.plugin_id)"
-                           class="card-title fsz-sm whs-nw ov-h tov-e"
-                           tabindex="1">{{ card.name }}
-                        </p>
-                    </div>
+                <div class="m-3 p-2" *ngFor="let plugin of plugins; let i = index;" style="cursor: pointer">
+                    <mat-card class="plugin-card"
+                              (click)="showPluginInfo(plugin.plugin_id)"
+                              (keydown)="showPluginInfo(plugin.plugin_id)"
+                              tabindex="{{i}}"
+                              matTooltip="{{plugin.purpose}}">
+                        <mat-card-header>
+                            <mat-card-title>{{plugin.name}}</mat-card-title>
+                            <mat-card-subtitle>ver. {{plugin.version}}/{{plugin.library_version}}</mat-card-subtitle>
+                        </mat-card-header>
+                        <img mat-card-image [src]="plugin.icon" alt="{{plugin['attribution']}}">
+                    </mat-card>
                 </div>
             </div>
             <button class="handle right-handle" (click)="onSlideClick('right')">

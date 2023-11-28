@@ -3,13 +3,19 @@ import {Router} from '@angular/router'
 import {Plugin} from '../plugin/plugin.interface'
 import {PluginService} from '../services/plugin.service'
 import {CommonModule} from '@angular/common'
+import {MatCardModule} from '@angular/material/card';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-plugins',
     templateUrl: './plugins.component.html',
     styleUrls: ['./plugins.component.scss'],
     imports: [
-        CommonModule
+        CommonModule,
+        MatCardModule,
+        MatIconModule,
+        MatTooltipModule
     ],
     standalone: true
 })

@@ -11,7 +11,6 @@
   display: flex;
   justify-content: center;
   overflow: hidden;
-  height: 90%;
 }
 
 .slider {
@@ -24,12 +23,31 @@
   transition: transform 250ms ease-in-out;
 }
 
-.slider > .card {
-  flex: 0 0 calc(100% / var(--items-per-screen));
-  max-width: calc(100% / var(--items-per-screen));
-  aspect-ratio: 16 / 9;
-  padding: var(--img-gap);
-  border-radius: 1rem;
+.plugin-card {
+  width: 220px;
+  background-color: #f9f9f9;
+  border-radius: 0;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+
+.plugin-card .mat-mdc-card-header {
+  padding: 5px 5px 0;
+}
+
+.plugin-card .mat-mdc-card-title {
+  font-size: small;
+  color: black;
+}
+
+.plugin-card .mat-mdc-card-subtitle {
+  font-size: smaller;
+}
+
+.plugin-card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  background: lightgray;
+  cursor: pointer;
 }
 
 .handle {
@@ -42,7 +60,6 @@
   z-index: 10;
   margin: var(--img-gap) 0;
   width: var(--handle-size);
-  cursor: pointer;
   font-size: 5rem;
   align-items: center;
   justify-content: center;
@@ -104,11 +121,6 @@
   background-color: #ffffffe6; // rgba(255, 255, 255, .9);
 }
 
-.card-tall-img {
-  height: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-}
 
 @media (max-width: 2200px) {
   .slider {
