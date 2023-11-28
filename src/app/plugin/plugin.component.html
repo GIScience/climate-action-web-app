@@ -2,7 +2,7 @@
     <ng-container *ngIf="(pluginObs$ | async) as plugin; else loading">
 
         <div class="col-5">
-            <div class="mX-5 p-10 bgc-white bd plugin-content">
+            <div class="p-10 bgc-white bd plugin-content">
                 <div class="container-fluid">
                     <h1>{{ plugin.name }}</h1>
                     <p><strong>Purpose:</strong> {{ plugin.purpose }}</p>
@@ -49,6 +49,6 @@
     </ng-template>
 </main>
 
-<div class="row bd plugin-list">
-    <app-plugins></app-plugins>
+<div class="bgc-grey-100">
+    <app-plugins class="row plugin-list"></app-plugins>
 </div>
