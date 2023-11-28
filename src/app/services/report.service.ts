@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {BehaviorSubject} from "rxjs"
 import {HttpClient} from "@angular/common/http"
-import {Artifact, ChartResponse} from "../artifacts/artifact.interface"
+import {Artifact, ChartResponse} from "../artifact/artifact.interface"
 import {environment} from "../../environments/environment"
 
 @Injectable({

@@ -1,0 +1,45 @@
+.artifact-tree {
+  overflow-y: auto;
+  height: calc(100vh - (30vh + 42px + 95px));
+}
+
+.artifact-tree .mat-tree {
+  background-color: #f9f9f9;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+
+.artifact-tree .mat-tree-child-node {
+  min-height: 0;
+  padding: 2px 0;
+}
+
+.artifact-tree .mat-tree-child-node div {
+  display: flex;
+  align-items: center;
+}
+
+.artifact-tree .mat-tree-child-node .mat-icon {
+  margin: 0 25px 0 10px;
+}
+
+.artifact-tree .run-card {
+  transition: 0.3s;
+  width: 100%;
+  padding: 5px 0;
+}
+
+.artifact-tree .run-card:not(:first-child) {
+  margin: 5px 0 0 0;
+}
+
+.artifact-tree .run-card:hover, .artifact-tree .mat-tree-child-node:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  background: lightgray;
+  cursor: pointer;
+}
+
+.artifact-tree .run-card .card-subtitle {
+  font-size: small;
+  color: gray;
+}

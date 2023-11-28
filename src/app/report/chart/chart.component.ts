@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core'
 import {ChartConfiguration, ChartType} from 'chart.js'
 
-import {Artifact, ChartResponse} from "../../artifacts/artifact.interface"
+import {Artifact, ChartResponse} from "../../artifact/artifact.interface"
 
 @Component({
     selector: 'app-chart',

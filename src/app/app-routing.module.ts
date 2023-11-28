@@ -5,7 +5,7 @@ import {PageNotFoundComponent} from './page-not-found/page-not-found.component'
 import {AboutComponent} from './about/about.component'
 import {HelpComponent} from './help/help.component'
 import {PluginsComponent} from './plugins/plugins.component'
-import {ArtifactsComponent} from './artifacts/artifacts.component'
+import {ArtifactComponent} from './artifact/artifact.component'
 import {DashboardComponent} from "./dashboard/dashboard.component"
 import {PluginComponent} from "./plugin/plugin.component"
 
@@ -32,7 +32,7 @@ const routes: Routes = [
     {
         path: 'artifacts',
         pathMatch: 'full',
-        component: ArtifactsComponent,
+        component: ArtifactComponent,
     },
     {
         path: 'about',

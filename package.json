@@ -7,6 +7,7 @@
     "dev": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "build:prod": "ng build --configuration production --base-href /webapp/",
+    "build:staging": "ng build --configuration staging --base-href /webapp/",
     "build:int": "ng build --configuration integration",
     "build:stats": "ng build --stats-json",
     "analyze": "webpack-bundle-analyzer dist/stats.json",

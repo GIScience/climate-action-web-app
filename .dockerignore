@@ -1,0 +1,8 @@
+.env
+.idea/**
+.git
+.gitignore
+.angular/**
+
+dist/**
+node_modules/**

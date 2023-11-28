@@ -1,4 +1,5 @@
 FROM node:20 AS build
+ARG BUILD_TARGET=prod
 
 WORKDIR /ca-web-app
 
@@ -8,7 +9,7 @@ RUN npm ci
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
-RUN npm run build:prod --omit=dev
+RUN npm run build:$BUILD_TARGET --omit=dev
 
 FROM httpd:2.4 AS runtime
 COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf

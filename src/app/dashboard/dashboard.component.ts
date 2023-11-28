@@ -1,5 +1,5 @@
 import {Component} from '@angular/core'
-import {ArtifactsComponent} from "../artifacts/artifacts.component"
+import {ArtifactComponent} from "../artifact/artifact.component"
 import {PluginsComponent} from "../plugins/plugins.component"
 import {ReportComponent} from "../report/report.component"
 
@@ -7,7 +7,11 @@ import {ReportComponent} from "../report/report.component"
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    imports: [ArtifactsComponent, PluginsComponent, ReportComponent],
+    imports: [
+        ArtifactComponent,
+        PluginsComponent,
+        ReportComponent
+    ],
     standalone: true
 })
 export class DashboardComponent {

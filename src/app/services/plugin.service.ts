@@ -2,8 +2,9 @@ import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {BehaviorSubject, Observable} from 'rxjs'
 import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface'
-import {Artifact} from "../artifacts/artifact.interface"
+import {Artifact} from "../artifact/artifact.interface"
 import {environment} from "../../environments/environment"
+import moment from "moment/moment";
 
 @Injectable({
     providedIn: 'root'
@@ -43,11 +44,12 @@ export class PluginService {
     }
 
     storeComputes(id: string, plugin: Plugin) {
-        const runs = this.getComputes()
+        const runs: Array<PluginRun> = this.getComputes()
         const currentRunInfo = {
-            correlation_id: id,
+            correlation_uuid: id,
             pluginId: plugin.plugin_id,
-            pluginName: plugin.name
+            pluginName: plugin.name,
+            timestamp: moment().format()
         }
         runs.push(currentRunInfo)
 
@@ -73,7 +75,7 @@ export class PluginService {
 
     updateRunStatus(correlationId: string, newStatus: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input') {
         const runs = this.getComputes()
-        const index = runs.findIndex((run) => run.correlation_id === correlationId)
+        const index = runs.findIndex((run) => run.correlation_uuid === correlationId)
 
         if (index !== -1) {
             runs[index].status = newStatus

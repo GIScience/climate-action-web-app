@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing'
 import {RouterTestingModule} from '@angular/router/testing'
 import {AppComponent} from './app.component'
 import {ToastComponent} from './toast/toast.component'
-import {NotificationComponent} from "./runs/notification.component"
+import {NotificationComponent} from "./notification/notification.component"
 import {HttpClientModule} from "@angular/common/http"
 
 describe('AppComponent', () => {

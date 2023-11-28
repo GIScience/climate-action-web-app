@@ -30,10 +30,11 @@ export interface Source {
 }
 
 export interface PluginRun {
-    correlation_id: string,
+    correlation_uuid: string,
     pluginId: string,
     pluginName: string,
     status?: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input',
+    timestamp: string
 }
 
 export interface PluginCorrelator {

@@ -9,7 +9,7 @@ import ImageStatic from "ol/source/ImageStatic"
 import {fromArrayBuffer} from "geotiff"
 import OSM from "ol/source/OSM"
 
-import {Artifact} from "../../artifacts/artifact.interface"
+import {Artifact} from "../../artifact/artifact.interface"
 import {fromLonLat} from "ol/proj"
 import {getCenter} from "ol/extent"
 
