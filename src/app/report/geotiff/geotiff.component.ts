@@ -1,17 +1,17 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core'
-import {CommonModule} from "@angular/common"
-import {HttpClient} from "@angular/common/http"
-import Map from "ol/Map"
-import {View} from "ol"
-import TileLayer from "ol/layer/WebGLTile.js"
-import ImageLayer from "ol/layer/Image"
-import ImageStatic from "ol/source/ImageStatic"
-import {fromArrayBuffer} from "geotiff"
-import OSM from "ol/source/OSM"
+import {CommonModule} from '@angular/common'
+import {HttpClient} from '@angular/common/http'
+import Map from 'ol/Map'
+import {View} from 'ol'
+import TileLayer from 'ol/layer/WebGLTile.js'
+import ImageLayer from 'ol/layer/Image'
+import ImageStatic from 'ol/source/ImageStatic'
+import {fromArrayBuffer} from 'geotiff'
+import OSM from 'ol/source/OSM'
 
-import {Artifact} from "../../artifact/artifact.interface"
-import {fromLonLat} from "ol/proj"
-import {getCenter} from "ol/extent"
+import {Artifact} from '../../artifact/artifact.interface'
+import {fromLonLat} from 'ol/proj'
+import {getCenter} from 'ol/extent'
 
 @Component({
     selector: 'app-geotiff',
@@ -74,11 +74,11 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
 
             const rgb = await image.readRGB()
 
-            const canvas = document.createElement("canvas")
+            const canvas = document.createElement('canvas')
             canvas.width = width
             canvas.height = height
 
-            const context = canvas.getContext("2d")
+            const context = canvas.getContext('2d')
             if (context) {
                 const data = context.getImageData(0, 0, width, height)
                 const rgba = data.data
@@ -101,26 +101,26 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
                     source: new ImageStatic({
                         url: canvas.toDataURL(),
                         imageExtent: extent,
-                        projection: "EPSG:4326"
+                        projection: 'EPSG:4326'
                     })
                 })
 
                 this.map = new Map({
                     layers: [
                         new TileLayer({
-                            source: new OSM(),
+                            source: new OSM()
                         }),
-                        geotiffLayer,
+                        geotiffLayer
                     ],
                     target: this.mapDivID,
                     view: new View({
                         center: fromLonLat(extent ? getCenter(extent) : [8.6759928, 49.4187355]),
-                        zoom: 12,
+                        zoom: 12
                     })
                 })
             }
         } catch (error) {
-            console.error("Error fetching or processing data:", error)
+            console.error('Error fetching or processing data:', error)
         }
     }
 

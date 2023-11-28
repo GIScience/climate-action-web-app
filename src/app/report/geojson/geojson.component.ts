@@ -1,19 +1,19 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core'
-import {CommonModule} from "@angular/common"
-import {HttpClient} from "@angular/common/http"
-import GeoJSON from "ol/format/GeoJSON.js"
-import Map from "ol/Map"
-import TileLayer from "ol/layer/Tile"
-import OSM from "ol/source/OSM"
-import {View} from "ol";
-import {fromLonLat, transformExtent} from "ol/proj"
-import {getCenter} from "ol/extent"
-import {Vector} from "ol/source"
-import {Artifact} from "../../artifact/artifact.interface"
-import VectorLayer from "ol/layer/Vector"
-import VectorSource from "ol/source/Vector"
-import {Fill, Stroke, Style} from "ol/style"
-import {Geometry} from "ol/geom.js"
+import {CommonModule} from '@angular/common'
+import {HttpClient} from '@angular/common/http'
+import GeoJSON from 'ol/format/GeoJSON.js'
+import Map from 'ol/Map'
+import TileLayer from 'ol/layer/Tile'
+import OSM from 'ol/source/OSM'
+import {View} from 'ol';
+import {fromLonLat, transformExtent} from 'ol/proj'
+import {getCenter} from 'ol/extent'
+import {Vector} from 'ol/source'
+import {Artifact} from '../../artifact/artifact.interface'
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import {Fill, Stroke, Style} from 'ol/style'
+import {Geometry} from 'ol/geom.js'
 
 @Component({
     selector: 'app-geojson',
@@ -62,27 +62,27 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
 
                 const extent = transformExtent(new Vector({
                     features: features
-                }).getExtent(), 'EPSG:3857', 'EPSG:4326');
+                }).getExtent(), 'EPSG:3857', 'EPSG:4326')
 
                 this.geojsonLayerSource = new VectorSource()
                 this.geojsonLayerSource.addFeatures(features)
 
                 this.geojsonLayer = new VectorLayer({
-                    source: this.geojsonLayerSource,
+                    source: this.geojsonLayerSource
                 })
 
                 this.map = new Map({
                     layers: [
                         new TileLayer({
-                            source: new OSM(),
+                            source: new OSM()
                         }),
                         this.geojsonLayer
                     ],
                     target: this.mapDivID,
                     view: new View({
                         center: fromLonLat(extent ? getCenter(extent) : [8.6759928, 49.4187355]),
-                        zoom: 12,
-                    }),
+                        zoom: 12
+                    })
                 })
 
                 this.geojsonLayer.setStyle((feature) => {
@@ -91,12 +91,12 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
 
                     return new Style({
                         fill: new Fill({
-                            color: color,
+                            color: color
                         }),
                         stroke: new Stroke({
                             color: strokeColor,
-                            width: 0.5,
-                        }),
+                            width: 0.5
+                        })
                     })
                 })
             })
@@ -108,6 +108,6 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
             const parts = inputString.split('.')
             return parts[0]
         }
-        return null;
+        return null
     }
 }

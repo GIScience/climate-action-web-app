@@ -6,8 +6,8 @@ import {AboutComponent} from './about/about.component'
 import {HelpComponent} from './help/help.component'
 import {PluginsComponent} from './plugins/plugins.component'
 import {ArtifactComponent} from './artifact/artifact.component'
-import {DashboardComponent} from "./dashboard/dashboard.component"
-import {PluginComponent} from "./plugin/plugin.component"
+import {DashboardComponent} from './dashboard/dashboard.component'
+import {PluginComponent} from './plugin/plugin.component'
 
 const routes: Routes = [
     {
@@ -23,16 +23,16 @@ const routes: Routes = [
     {
         path: 'plugins',
         pathMatch: 'full',
-        component: PluginsComponent,
+        component: PluginsComponent
     },
     {
         path: 'plugin/:name',
-        component: PluginComponent,
+        component: PluginComponent
     },
     {
         path: 'artifacts',
         pathMatch: 'full',
-        component: ArtifactComponent,
+        component: ArtifactComponent
     },
     {
         path: 'about',
@@ -48,7 +48,7 @@ const routes: Routes = [
         path: '**',
         pathMatch: 'full',
         component: PageNotFoundComponent
-    },
+    }
 ]
 
 @NgModule({

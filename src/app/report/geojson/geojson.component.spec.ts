@@ -1,7 +1,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {GeojsonComponent} from './geojson.component'
-import {HttpClientModule} from "@angular/common/http"
+import {HttpClientModule} from '@angular/common/http'
 
 describe('GeojsonComponent', () => {
     let component: GeojsonComponent

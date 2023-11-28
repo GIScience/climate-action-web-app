@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core'
 import {ChartConfiguration, ChartType} from 'chart.js'
 
-import {Artifact, ChartResponse} from "../../artifact/artifact.interface"
+import {Artifact, ChartResponse} from '../../artifact/artifact.interface'
 
 @Component({
     selector: 'app-chart',
@@ -37,9 +37,9 @@ export class ChartComponent implements OnInit {
                 {
                     data: this.inputData.data.y,
                     label: this.inputData.artifact?.name,
-                    backgroundColor: this.inputData.data.color,
+                    backgroundColor: this.inputData.data.color
                 }
-            ],
+            ]
         }
 
         this.baseChartOptions = {
@@ -47,8 +47,8 @@ export class ChartComponent implements OnInit {
             maintainAspectRatio: false,
             scales: {
                 x: {},
-                y: {},
-            },
+                y: {}
+            }
         }
     }
 }

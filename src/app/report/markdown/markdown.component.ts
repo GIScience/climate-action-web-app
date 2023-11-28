@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core'
-import {CommonModule} from "@angular/common"
-import {MarkdownModule} from "ngx-markdown"
+import {CommonModule} from '@angular/common'
+import {MarkdownModule} from 'ngx-markdown'
 
 @Component({
     selector: 'app-markdown',

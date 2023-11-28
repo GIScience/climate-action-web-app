@@ -4,7 +4,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyModule} from '@ngx-formly/core'
 import {FormlyBootstrapModule} from '@ngx-formly/bootstrap'
 import {HttpClientModule} from '@angular/common/http'
-import {MarkdownModule} from "ngx-markdown"
+import {MarkdownModule} from 'ngx-markdown'
 import {NgChartsModule} from 'ng2-charts'
 import {MatTreeModule} from '@angular/material/tree'
 
@@ -14,10 +14,10 @@ import {PageNotFoundComponent} from './page-not-found/page-not-found.component'
 import {ToastComponent} from './toast/toast.component'
 import {AboutComponent} from './about/about.component'
 import {NgOptimizedImage} from '@angular/common'
-import {ObjectTypeComponent} from "./types/object.type"
-import {MultiSchemaTypeComponent} from "./types/multischema.type"
-import {ArrayTypeComponent} from "./types/array.type"
-import {NullTypeComponent} from "./types/null.type"
+import {ObjectTypeComponent} from './types/object.type'
+import {MultiSchemaTypeComponent} from './types/multischema.type'
+import {ArrayTypeComponent} from './types/array.type'
+import {NullTypeComponent} from './types/null.type'
 import {ChartComponent} from './report/chart/chart.component'
 import {NotificationComponent} from './notification/notification.component'
 
@@ -32,7 +32,7 @@ import {NotificationComponent} from './notification/notification.component'
         MultiSchemaTypeComponent,
         NullTypeComponent,
         ChartComponent,
-        NotificationComponent,
+        NotificationComponent
     ],
     imports: [
         BrowserModule,
@@ -49,13 +49,13 @@ import {NotificationComponent} from './notification/notification.component'
                 {name: 'null', component: NullTypeComponent, wrappers: ['form-field']},
                 {name: 'array', component: ArrayTypeComponent},
                 {name: 'object', component: ObjectTypeComponent},
-                {name: 'multischema', component: MultiSchemaTypeComponent},
-            ],
+                {name: 'multischema', component: MultiSchemaTypeComponent}
+            ]
         }),
         FormlyBootstrapModule,
         MarkdownModule.forRoot(),
         MatTreeModule,
-        NgChartsModule,
+        NgChartsModule
     ],
     providers: [],
     bootstrap: [AppComponent]

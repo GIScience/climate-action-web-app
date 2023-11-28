@@ -1,12 +1,12 @@
 import {AfterViewInit, Component, Input, OnChanges} from '@angular/core'
-import {Router} from "@angular/router"
+import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
-import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from "@ngx-formly/core"
+import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
 import {FormlyJsonschema} from '@ngx-formly/core/json-schema'
 import Map from 'ol/Map'
 import OSM from 'ol/source/OSM'
 import TileLayer from 'ol/layer/Tile'
-import {View} from "ol"
+import {View} from 'ol'
 import {fromLonLat} from 'ol/proj'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
@@ -16,10 +16,10 @@ import GeoJSON from 'ol/format/GeoJSON.js'
 import {regions} from '../../support/region-of-interest'
 import {FeatureLike} from 'ol/Feature.js'
 import {Geometry} from 'ol/geom.js'
-import {PluginService} from "../../services/plugin.service"
-import {ToastService} from "../../services/toast.service"
-import {Plugin} from "../plugin.interface"
-import {PluginParametersSchema, PluginPropertiesSchema} from "./plugin-parameter.interface"
+import {PluginService} from '../../services/plugin.service'
+import {ToastService} from '../../services/toast.service'
+import {Plugin} from '../plugin.interface'
+import {PluginParametersSchema, PluginPropertiesSchema} from './plugin-parameter.interface'
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -95,14 +95,14 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         this.fields = []
         this.model = {}
         this.tempSchema = {
-            "schema": {
-                "title": "Parameters",
-                "description": "A simple form example.",
-                "type": "object",
-                "required": [],
-                "properties": {}
+            'schema': {
+                'title': 'Parameters',
+                'description': 'A simple form example.',
+                'type': 'object',
+                'required': [],
+                'properties': {}
             },
-            "model": {}
+            'model': {}
         }
 
         this.tempSchema.schema.required = this.schema.required
@@ -186,14 +186,14 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         this.map = new Map({
             layers: [
                 new TileLayer({
-                    source: new OSM(),
-                }),
+                    source: new OSM()
+                })
             ],
             target: 'map',
             view: new View({
                 center: fromLonLat([8.6759928, 49.4187355]),
-                zoom: 10,
-            }),
+                zoom: 10
+            })
         })
 
         this.selectedRegionLayer = new VectorLayer({
@@ -201,8 +201,8 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             map: this.map,
             style: {
                 'stroke-color': 'rgba(255, 0, 0, 0.7)',
-                'stroke-width': 2,
-            },
+                'stroke-width': 2
+            }
         })
 
         const regionSource = new VectorSource()
@@ -257,7 +257,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     private checkForMinAndMaxDateRange(value: PluginPropertiesSchema) {
-        const today = new Date().toISOString().substring(0, 10).replace("T", " ")
+        const today = new Date().toISOString().substring(0, 10).replace('T', ' ')
         return {
             min: value.exclusiveMaximum || value.Maximum || '1970-01-01',
             max: value.exclusiveMinimum || value.Minimum || today
@@ -270,7 +270,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
                 this.toastService.show({
                     title: `${this.plugin.plugin_id} parameters are send to process!`,
-                    body: `Result from plugin execution will be listing on the dashboard`,
+                    body: 'Result from plugin execution will be listing on the dashboard',
                     type: 'success',
                     time: 5000
                 })

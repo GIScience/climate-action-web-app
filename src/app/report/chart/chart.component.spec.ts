@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 import {ChartComponent} from './chart.component'
-import {NgChartsModule} from "ng2-charts"
+import {NgChartsModule} from 'ng2-charts'
 
 describe('BarChartComponent', () => {
     let component: ChartComponent
