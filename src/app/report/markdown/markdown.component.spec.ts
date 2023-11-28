@@ -1,7 +1,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {MarkdownComponent} from './markdown.component'
-import {MarkdownModule} from "ngx-markdown"
+import {MarkdownModule} from 'ngx-markdown'
 
 describe('MarkdownComponent', () => {
     let component: MarkdownComponent

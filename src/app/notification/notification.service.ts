@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core'
 import {webSocket, WebSocketSubject} from 'rxjs/webSocket'
-import {environment} from "../../environments/environment"
-import {WSMessage} from "./notification.interface"
-import {map, Observable} from "rxjs"
-import moment from "moment/moment";
+import {environment} from '../../environments/environment'
+import {WSMessage} from './notification.interface'
+import {map, Observable} from 'rxjs'
+import moment from 'moment/moment';
 
 
 @Injectable({
@@ -26,7 +26,7 @@ export class NotificationService {
         if (this.websocketSubject) {
             this.websocketSubject.next(JSON.stringify(message))
         } else {
-            console.error("WebSocket connection has not bee established.")
+            console.error('WebSocket connection has not bee established.')
         }
     }
 
@@ -39,8 +39,8 @@ export class NotificationService {
     private keepAlive() {
         setInterval(() => {
             this.sendMessage({
-                "type": "heartbeat",
-                "timestamp": moment(new Date()).format()
+                'type': 'heartbeat',
+                'timestamp': moment(new Date()).format()
             })
         }, 5000)
     }

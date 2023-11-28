@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from '@angular/core'
-import {ReportService} from "../services/report.service"
-import {MarkdownComponent} from "./markdown/markdown.component"
-import {ImageComponent} from "./image/image.component"
-import {TableComponent} from "./table/table.component"
-import {GeojsonComponent} from "./geojson/geojson.component"
-import {GeoTiffComponent} from "./geotiff/geotiff.component"
-import {ChartComponent} from "./chart/chart.component"
+import {ReportService} from '../services/report.service'
+import {MarkdownComponent} from './markdown/markdown.component'
+import {ImageComponent} from './image/image.component'
+import {TableComponent} from './table/table.component'
+import {GeojsonComponent} from './geojson/geojson.component'
+import {GeoTiffComponent} from './geotiff/geotiff.component'
+import {ChartComponent} from './chart/chart.component'
 
 @Component({
     selector: 'app-report',
@@ -22,7 +22,6 @@ export class ReportComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Markdown text
         this.reportService.markdownOb.subscribe(markdownUrl => {
             if (markdownUrl === '')
                 return

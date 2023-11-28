@@ -1,9 +1,9 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {PluginParameterComponent} from './plugin-parameter.component'
-import {HttpClientModule} from "@angular/common/http"
-import {FormlyModule} from "@ngx-formly/core"
-import {ReactiveFormsModule} from "@angular/forms"
+import {HttpClientModule} from '@angular/common/http'
+import {FormlyModule} from '@ngx-formly/core'
+import {ReactiveFormsModule} from '@angular/forms'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent

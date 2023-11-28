@@ -12,7 +12,7 @@ import {FieldType} from '@ngx-formly/core'
             </div>
             <formly-field *ngFor="let f of field.fieldGroup" [field]="f"></formly-field>
         </div>
-    `,
+    `
 })
 export class ObjectTypeComponent extends FieldType {
 }

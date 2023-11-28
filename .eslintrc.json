@@ -3,6 +3,9 @@
   "ignorePatterns": [
     "projects/**/*"
   ],
+  "plugins": [
+    "@stylistic"
+  ],
   "overrides": [
     {
       "files": [
@@ -37,6 +40,16 @@
             "prefix": "app",
             "style": "kebab-case"
           }
+        ],
+        "@stylistic/comma-dangle": [
+          "warn"
+        ],
+        "@stylistic/no-extra-semi": [
+          "warn"
+        ],
+        "@stylistic/quotes": [
+          "warn",
+          "single"
         ]
       }
     },

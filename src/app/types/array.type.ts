@@ -22,7 +22,7 @@ import { FieldArrayType } from '@ngx-formly/core'
                 </div>
             </div>
         </div>
-    `,
+    `
 })
 export class ArrayTypeComponent extends FieldArrayType {}
 

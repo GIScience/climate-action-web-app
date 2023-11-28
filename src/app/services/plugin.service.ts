@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {BehaviorSubject, Observable} from 'rxjs'
 import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface'
-import {Artifact} from "../artifact/artifact.interface"
-import {environment} from "../../environments/environment"
-import moment from "moment/moment";
+import {Artifact} from '../artifact/artifact.interface'
+import {environment} from '../../environments/environment'
+import moment from 'moment/moment';
 
 @Injectable({
     providedIn: 'root'

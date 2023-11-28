@@ -1,7 +1,7 @@
 import {TestBed} from '@angular/core/testing'
 
 import {PluginService} from './plugin.service'
-import {HttpClientModule} from "@angular/common/http"
+import {HttpClientModule} from '@angular/common/http'
 
 describe('PluginService', () => {
     let service: PluginService

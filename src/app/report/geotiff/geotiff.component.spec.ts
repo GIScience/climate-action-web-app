@@ -1,7 +1,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {GeoTiffComponent} from './geotiff.component'
-import {HttpClientModule} from "@angular/common/http"
+import {HttpClientModule} from '@angular/common/http'
 
 describe('GeotiffComponent', () => {
     let component: GeoTiffComponent

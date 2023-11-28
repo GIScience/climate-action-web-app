@@ -1,9 +1,9 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 
 import {PluginComponent} from './plugin.component'
-import {HttpClientModule} from "@angular/common/http"
-import {RouterModule} from "@angular/router"
-import {PluginsComponent} from "../plugins/plugins.component"
+import {HttpClientModule} from '@angular/common/http'
+import {RouterModule} from '@angular/router'
+import {PluginsComponent} from '../plugins/plugins.component'
 
 describe('PluginComponent', () => {
     let component: PluginComponent

@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 import {PluginsComponent} from './plugins.component'
-import {HttpClientModule} from "@angular/common/http"
+import {HttpClientModule} from '@angular/common/http'
 
 describe('PluginsComponent', () => {
     let component: PluginsComponent
@@ -10,7 +10,7 @@ describe('PluginsComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                PluginsComponent,
+                PluginsComponent
 
             ]
         })
