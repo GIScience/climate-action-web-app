@@ -1,17 +1,17 @@
 import {PluginParametersSchema} from './plugin-parameter/plugin-parameter.interface'
 
 export interface Plugin {
-    'plugin_id': string,
-    'name': string,
-    'icon': string,
-    'version': string,
-    'concerns': Array<Concern>,
-    'purpose': string,
-    'methodology': string,
-    'sources': Array<Source>,
-    'operator_schema': PluginParametersSchema,
-    'library_version': string,
-    'attribution': string
+    plugin_id: string
+    name: string
+    icon: string
+    version: string
+    concerns: Array<Concern>
+    purpose: string
+    methodology: string
+    sources: Array<Source>
+    operator_schema: PluginParametersSchema
+    library_version: string
+    attribution: string
 }
 
 export interface Concern {
