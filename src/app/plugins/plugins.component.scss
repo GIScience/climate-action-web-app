@@ -17,6 +17,7 @@
   --items-per-screen: 5;
   --slider-index: 0%;
   display: flex;
+  justify-content: center;
   flex-grow: 1;
   margin: 0 var(--img-gap);
   transform: translateX(calc(var(--slider-index) * -100%));
@@ -32,7 +33,8 @@
 }
 
 .plugin-card .mat-mdc-card-header {
-  padding: 5px 5px 0;
+  padding: 0 10px 0;
+  height: 60px;
 }
 
 .plugin-card .mat-mdc-card-title {
@@ -44,10 +46,15 @@
   font-size: smaller;
 }
 
-.plugin-card:hover {
+.plugin-card.enabled-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
   background: lightgray;
   cursor: pointer;
+}
+
+.plugin-card.disabled-card {
+  filter: brightness(60%);
+  cursor: default;
 }
 
 .handle {

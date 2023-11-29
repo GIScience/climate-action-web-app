@@ -1,31 +1,31 @@
 <div class="p-10 bgc-white bd">
-    <div class="row">
+    <div class="row" style="height: 100%">
         <div class="plugin-header mx-3">
             <h3 class="plugin-title">Plugins</h3>
             <div class="progress-bar"></div>
         </div>
         <div class="plugin-container">
-            <button class="handle left-handle" (click)="onSlideClick('left')">
+            <button class="handle left-handle">
         <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
           <i class="ti-angle-left"></i>
         </span>
             </button>
             <div class="slider">
-                <div class="m-3 p-2" *ngFor="let plugin of plugins; let i = index;" style="cursor: pointer">
-                    <mat-card class="plugin-card"
-                              (click)="showPluginInfo(plugin.plugin_id)"
-                              (keydown)="showPluginInfo(plugin.plugin_id)"
+                <div class="m-3 p-2" *ngFor="let card of cards; let i = index;">
+                    <mat-card class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
+                              (click)="card.enabled ? showPluginInfo(card.plugin_id) : ''"
+                              (keydown)="card.enabled ? showPluginInfo(card.plugin_id): ''"
                               tabindex="{{i}}"
-                              matTooltip="{{plugin.purpose}}">
+                              matTooltip="{{card.purpose}}">
                         <mat-card-header>
-                            <mat-card-title>{{plugin.name}}</mat-card-title>
-                            <mat-card-subtitle>ver. {{plugin.version}}/{{plugin.library_version}}</mat-card-subtitle>
+                            <mat-card-title>{{card.name}}</mat-card-title>
+                            <mat-card-subtitle *ngIf="card.version && card.library_version">ver. {{card.version}}/{{card.library_version}}</mat-card-subtitle>
                         </mat-card-header>
-                        <img mat-card-image [src]="plugin.icon" alt="{{plugin['attribution']}}">
+                        <img mat-card-image [src]="card.image" alt="{{card.image_source}}">
                     </mat-card>
                 </div>
             </div>
-            <button class="handle right-handle" (click)="onSlideClick('right')">
+            <button class="handle right-handle">
         <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
           <i class="ti-angle-right"></i>
         </span>

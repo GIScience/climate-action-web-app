@@ -1,11 +1,11 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core'
 import {Router} from '@angular/router'
-import {Plugin} from '../plugin/plugin.interface'
 import {PluginService} from '../services/plugin.service'
 import {CommonModule} from '@angular/common'
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {availableCards, PluginCard} from './plugins.interface';
 
 @Component({
     selector: 'app-plugins',
@@ -21,7 +21,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 })
 export class PluginsComponent implements OnInit, AfterViewInit {
 
-    plugins: Array<Plugin> = []
+    cards: Array<PluginCard> = availableCards
 
     constructor(
         private router: Router,
@@ -94,7 +94,15 @@ export class PluginsComponent implements OnInit, AfterViewInit {
     loadPlugins() {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
-                this.plugins = data
+                data.forEach((plugin) => {
+                    const card = availableCards.find((x) => x.plugin_id == plugin.plugin_id);
+                    if (card) {
+                        card.enabled = true
+                        card.library_version = plugin.library_version
+                        card.version = plugin.version
+                        card.purpose = plugin.purpose
+                    }
+                })
             },
             error: error => {
                 console.error('Error fetching plugins:', error)
