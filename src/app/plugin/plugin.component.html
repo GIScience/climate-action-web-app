@@ -1,32 +1,27 @@
 <main class="row main-content bgc-grey-100">
     <ng-container *ngIf="(pluginObs$ | async) as plugin; else loading">
-
         <div class="col-5">
             <div class="p-10 bgc-white bd plugin-content">
                 <div class="container-fluid">
                     <h1>{{ plugin.name }}</h1>
-                    <p><strong>Purpose:</strong> {{ plugin.purpose }}</p>
-                    <p><strong>Methodology:</strong> {{ plugin.methodology }}</p>
-
+                    <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
+                    <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
                     <div *ngIf="plugin.sources">
-                        <p><strong>Sources:</strong></p>
+                        <h2>Sources</h2>
                         <div *ngFor="let source of plugin.sources">
                             <div class="source-item">
-                                <p><strong>{{ source.title }}</strong></p>
-                                <p>Author: {{ source.author }}</p>
-                                <p>Year: {{ source.year }}</p>
-                                <p>Journal/Volume: {{ source.journal }}
-                                    (Vol. {{ source.volume }})</p>
-                                <p>Pages: {{ source.pages }}</p>
-                                <p>Entry Type: {{ source.ENTRYTYPE }}</p>
+                                <strong>{{ source.title }}</strong>,
+                                {{ source.author }},
+                                {{ source.journal }},
+                                {{ source.year }},
+                                {{ source.volume }},
+                                {{ source.pages }}.
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
         <div class="col-7">
             <div class="mX-5 p-20 bgc-white bd plugin-content">
                 <ng-container *ngIf="plugin?.operator_schema; else loadingPluginParam">
@@ -48,7 +43,6 @@
         </div>
     </ng-template>
 </main>
-
 <div class="bgc-grey-100">
     <app-plugins class="row plugin-list"></app-plugins>
 </div>

@@ -6,6 +6,7 @@ import {map, Observable, switchMap} from 'rxjs'
 import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
 import {CommonModule} from '@angular/common'
 import {PluginsComponent} from '../plugins/plugins.component'
+import {MarkdownModule} from 'ngx-markdown'
 
 @Component({
     selector: 'app-plugin',
@@ -13,6 +14,7 @@ import {PluginsComponent} from '../plugins/plugins.component'
     styleUrls: ['./plugin.component.scss'],
     imports: [
         CommonModule,
+        MarkdownModule,
         PluginsComponent,
         PluginParameterComponent
     ],
