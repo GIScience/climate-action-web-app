@@ -4,15 +4,15 @@
   overflow-y: auto;
   scrollbar-gutter: stable;
   height: calc(100vh - (#{globals.$plugin-height} + #{globals.$footer-buffer} + #{globals.$header-buffer} + #{globals.$header}));
+  text-align: justify;
 }
 
 .source-item {
   border: 1px solid #ccc;
   padding: 10px;
-  margin: 5px;
+  margin: 5px 0;
   background-color: #f9f9f9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
 }
 
 .source-item h3 {
@@ -20,6 +20,11 @@
   margin: 0;
 }
 
-.source-item > p {
+.source-item > p, .source-item > h5 {
   margin: 0.05rem 0;
+  line-height: 1.3;
+}
+
+.source-item > h5 {
+  margin: 0 0 5px 0;
 }
