@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core'
 import {PluginService} from '../services/plugin.service'
-import {Artifact, ArtifactFlatNode, ArtifactNode} from './artifact.interface'
+import {ActiveArtifactRef, Artifact, ArtifactFlatNode, ArtifactNode} from './artifact.interface'
 import {ReportService} from '../services/report.service'
 import {PluginRun} from '../plugin/plugin.interface'
 import {FlatTreeControl} from '@angular/cdk/tree'
@@ -8,7 +8,7 @@ import {MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule} from '@angular/m
 import {MatIconModule} from '@angular/material/icon'
 import {MatButtonModule} from '@angular/material/button'
 import {BehaviorSubject} from 'rxjs'
-import {NgIf} from '@angular/common'
+import {NgClass, NgIf} from '@angular/common'
 import {MatTooltipModule} from '@angular/material/tooltip'
 import {NotificationService} from '../notification/notification.service'
 import moment from 'moment/moment'
@@ -40,7 +40,8 @@ const STATUS_ICON_MAP = {
         MatButtonModule,
         MatIconModule,
         MatTooltipModule,
-        NgIf
+        NgIf,
+        NgClass
     ],
     standalone: true
 })
@@ -76,6 +77,7 @@ export class ArtifactComponent implements OnInit {
     dataChange = new BehaviorSubject<ArtifactNode[]>([])
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     currentRuns: PluginRun[] = []
+    activeNode?: ArtifactFlatNode
 
     constructor(private pluginService: PluginService,
                 private reportService: ReportService,
@@ -84,13 +86,22 @@ export class ArtifactComponent implements OnInit {
 
     ngOnInit(): void {
         this.currentRuns = this.pluginService.getComputes()
+
         this.dataChange.subscribe(data => {
-            this.dataSource.data = data
+            if (data.length > 0) {
+                this.dataSource.data = data
+                this.activateNode()
+            }
         })
 
-        this.dataChange.next([])
         this.fetchArtifacts()
         this.syncRuns()
+    }
+
+    fetchArtifacts() {
+        this.currentRuns.forEach(currentRun => {
+            this.syncArtifact(currentRun)
+        })
     }
 
     syncRuns() {
@@ -115,10 +126,53 @@ export class ArtifactComponent implements OnInit {
         })
     }
 
-    fetchArtifacts() {
-        this.currentRuns.forEach(currentRun => {
-            this.syncArtifact(currentRun)
-        })
+    syncArtifact(run: PluginRun) {
+        this.pluginService.getArtifacts(run.correlation_uuid)
+            .subscribe({
+                next: (artifacts: Artifact[]) => {
+                    if (!artifacts)
+                        return
+
+                    const node: ArtifactNode = {
+                        name: run.pluginName,
+                        uuid: run.correlation_uuid,
+                        children: [],
+                        icon: run.status && STATUS_ICON_MAP[run.status] || 'scheduled',
+                        status: run.status || 'scheduled',
+                        timestamp: run.timestamp
+                    }
+
+                    if (Array.isArray(artifacts) && artifacts.length > 0) {
+                        node.children = artifacts.map<ArtifactNode>((x) => {
+                            return {
+                                name: x.name,
+                                uuid: x.store_id,
+                                children: [],
+                                icon: ARTIFACT_ICON_MAP[x.modality],
+                                summary: x.summary,
+                                ref: x
+                            }
+                        })
+
+                        this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
+                    } else {
+                        this.pluginService.updateRunStatus(run.correlation_uuid, 'in-progress')
+                    }
+                    this.updateNode(run.correlation_uuid, node)
+                },
+                error: () => {
+                    const node: ArtifactNode = {
+                        name: run.pluginName,
+                        uuid: run.correlation_uuid,
+                        children: [],
+                        icon: STATUS_ICON_MAP['failed'],
+                        status: 'failed',
+                        timestamp: run.timestamp
+                    }
+                    this.updateNode(run.correlation_uuid, node)
+                    this.pluginService.updateRunStatus(run.correlation_uuid, 'failed')
+                }
+            })
     }
 
     updateNode(correlation_uuid: string, node: ArtifactNode) {
@@ -130,48 +184,9 @@ export class ArtifactComponent implements OnInit {
         this.dataChange.next(this.nodes)
     }
 
-    syncArtifact(run: PluginRun) {
-        this.pluginService.getArtifacts(run.correlation_uuid).subscribe({
-            next: (artifacts: Artifact[]) => {
-                if (!artifacts)
-                    return
-
-                const node: ArtifactNode = {
-                    name: run.pluginName,
-                    uuid: run.correlation_uuid,
-                    children: [],
-                    icon: run.status && STATUS_ICON_MAP[run.status] || 'scheduled',
-                    status: run.status || 'scheduled',
-                    timestamp: run.timestamp
-                }
-
-                if (Array.isArray(artifacts) && artifacts.length > 0) {
-                    node.children = artifacts.map<ArtifactNode>((x) => {
-                        return {
-                            name: x.name,
-                            uuid: x.store_id,
-                            children: [],
-                            icon: ARTIFACT_ICON_MAP[x.modality],
-                            summary: x.summary,
-                            ref: x
-                        }
-                    })
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
-                } else {
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'in-progress')
-                }
-                this.updateNode(run.correlation_uuid, node)
-            },
-            error: error => {
-                this.pluginService.updateRunStatus(run.correlation_uuid, 'failed')
-                console.error('Error fetching getArtifacts: ', run.correlation_uuid, error);
-            }
-        })
-    }
-
     isParent = (_: number, node: ArtifactFlatNode) => node.level == 0;
 
-    addArtifactToReport(artifact: Artifact) {
+    renderReport(node: ArtifactFlatNode) {
         const report_f = {
             'IMAGE': (x: Artifact) => this.reportService.getImage(x),
             'MARKDOWN': (x: Artifact) => this.reportService.getMarkdown(x),
@@ -180,6 +195,39 @@ export class ArtifactComponent implements OnInit {
             'MAP_LAYER_GEOJSON': (x: Artifact) => this.reportService.getGeoJson(x),
             'MAP_LAYER_GEOTIFF': (x: Artifact) => this.reportService.getGeoTiff(x)
         }
-        return report_f[artifact.modality](artifact)
+        if (node.ref) {
+            return report_f[node.ref.modality](node.ref)
+        }
+    }
+
+    storeActivatedRef(node: ArtifactFlatNode) {
+        if (node.ref) {
+            this.activeNode = node
+
+            localStorage.setItem('active_node', JSON.stringify({
+                correlation_uuid: node.ref.correlation_uuid,
+                store_uuid: node.ref.store_id
+            } as ActiveArtifactRef))
+
+        } else {
+            console.error('Cannot persist active node: ', node.uuid)
+        }
+    }
+
+    activateNode() {
+        if (this.nodes.length == this.currentRuns.length) {
+            const storedItem = localStorage.getItem('active_node')
+            if (storedItem) {
+                const activeArtifactRef = JSON.parse(storedItem) as ActiveArtifactRef
+                const parentNode = this.treeControl.dataNodes.find((x) => x.uuid === activeArtifactRef.correlation_uuid)
+                if (parentNode) {
+                    this.treeControl.expand(parentNode)
+                    this.activeNode = this.treeControl.getDescendants(parentNode).find((x) => x.uuid === activeArtifactRef.store_uuid)
+                    if (this.activeNode) {
+                        this.renderReport(this.activeNode)
+                    }
+                }
+            }
+        }
     }
 }

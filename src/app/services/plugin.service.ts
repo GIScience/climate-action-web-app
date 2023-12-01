@@ -56,16 +56,11 @@ export class PluginService {
         localStorage.setItem('plugin_runs', JSON.stringify(runs))
     }
 
-    clearComputes() {
-        localStorage.clear()
-    }
-
     /**
      * Refreshes the localstorage with updated data
      * @param runs Plugin_runs[]
      */
     refreshCompute(runs: PluginRun[]) {
-        this.clearComputes()
         localStorage.setItem('plugin_runs', JSON.stringify(runs))
     }
 

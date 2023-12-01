@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {HttpClient} from '@angular/common/http';
-import {Papa} from 'ngx-papaparse';
+import {Component, Input, OnInit} from '@angular/core'
+import {CommonModule} from '@angular/common'
+import {HttpClient} from '@angular/common/http'
+import {Papa} from 'ngx-papaparse'
 
 @Component({
     selector: 'app-table',

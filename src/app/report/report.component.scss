@@ -1,18 +1,19 @@
-.paper-div {
+.report {
   background-color: #f9f9f9;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
   padding: 5px;
   line-height: 1.4;
   transition: 0.3s ease;
+  height: 95%;
 
   &:hover {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
   }
+
 }
 
 .report-content {
-  overflow-y: auto;
   scrollbar-gutter: stable;
   height: calc(100vh - (25vh + 42px + 95px));
 }
