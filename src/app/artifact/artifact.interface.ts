@@ -34,7 +34,12 @@ export interface ArtifactFlatNode {
     level: number
     icon?: string
     summary?: string
-    status?: string,
+    status?: string
     timestamp?: string
     ref?: Artifact
+}
+
+export interface ActiveArtifactRef {
+    correlation_uuid: string
+    store_uuid: string
 }

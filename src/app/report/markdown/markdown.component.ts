@@ -5,7 +5,10 @@ import {MarkdownModule} from 'ngx-markdown'
 @Component({
     selector: 'app-markdown',
     standalone: true,
-    imports: [CommonModule, MarkdownModule],
+    imports: [
+        CommonModule,
+        MarkdownModule
+    ],
     templateUrl: './markdown.component.html',
     styleUrls: ['./markdown.component.scss']
 })

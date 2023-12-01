@@ -39,6 +39,10 @@
   cursor: pointer;
 }
 
+.artifact-tree .mat-tree-child-node-highlight, .artifact-tree .mat-tree-child-node-highlight:hover {
+  background: lightskyblue;
+}
+
 .artifact-tree .run-card .card-subtitle {
   font-size: small;
   color: gray;

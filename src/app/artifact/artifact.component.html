@@ -1,5 +1,5 @@
 <div class="p-10 bgc-white bd h-100p artifact-tree">
-    <h3 class="mx-2">Artifacts </h3>
+    <h3 class="mx-2">Artifacts</h3>
 
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
         <mat-tree-node *matTreeNodeDef="let node;when: isParent" class="mat-tree-parent-node run-card grid">
@@ -24,8 +24,9 @@
         </mat-tree-node>
         <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding
                        class="mat-tree-child-node grid"
-                       (click)="addArtifactToReport(node.ref)"
-                       (keydown)="addArtifactToReport(node.ref)"
+                       (click)="renderReport(node); storeActivatedRef(node)"
+                       (keydown)="renderReport(node); storeActivatedRef(node)"
+                       [ngClass]="{ 'mat-tree-child-node-highlight': activeNode === node }"
                        tabindex="0">
             <div class="col-lg-11 offset-1">
                 <div matTooltip="{{node.summary}}"
