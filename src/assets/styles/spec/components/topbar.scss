@@ -122,7 +122,17 @@
 
     .nav-left {
       float: left;
-      margin-left: 15px;
+      margin: 0px 0px 0px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-left h2 {
+      color: #d60039;
+      line-height: 65px;
+      margin: 0;
+      cursor: pointer;
     }
 
     .nav-right {
