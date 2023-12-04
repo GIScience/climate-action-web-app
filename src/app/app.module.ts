@@ -10,7 +10,6 @@ import {MatTreeModule} from '@angular/material/tree'
 
 import {AppRoutingModule} from './app-routing.module'
 import {AppComponent} from './app.component'
-import {PageNotFoundComponent} from './page-not-found/page-not-found.component'
 import {ToastComponent} from './toast/toast.component'
 import {AboutComponent} from './about/about.component'
 import {NgOptimizedImage} from '@angular/common'
@@ -20,11 +19,11 @@ import {ArrayTypeComponent} from './types/array.type'
 import {NullTypeComponent} from './types/null.type'
 import {ChartComponent} from './report/chart/chart.component'
 import {NotificationComponent} from './notification/notification.component'
+import {ArtifactComponent} from './artifact/artifact.component'
 
 @NgModule({
     declarations: [
         AppComponent,
-        PageNotFoundComponent,
         ToastComponent,
         AboutComponent,
         ArrayTypeComponent,
@@ -55,7 +54,8 @@ import {NotificationComponent} from './notification/notification.component'
         FormlyBootstrapModule,
         MarkdownModule.forRoot(),
         MatTreeModule,
-        NgChartsModule
+        NgChartsModule,
+        ArtifactComponent
     ],
     providers: [],
     bootstrap: [AppComponent]
