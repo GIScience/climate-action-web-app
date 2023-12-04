@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges} from '@angular/core'
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
-import {FormlyJsonschema} from '@ngx-formly/core/json-schema'
+import {JSONSchema7, JSONSchema7Definition} from 'json-schema';
 import Map from 'ol/Map'
 import OSM from 'ol/source/OSM'
 import TileLayer from 'ol/layer/Tile'
@@ -11,7 +11,6 @@ import {fromLonLat} from 'ol/proj'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import {Fill, Stroke, Style} from 'ol/style'
-import GeoJSON from 'ol/format/GeoJSON.js'
 
 import {regions} from '../../support/region-of-interest'
 import {FeatureLike} from 'ol/Feature.js'
@@ -19,7 +18,11 @@ import {Geometry} from 'ol/geom.js'
 import {PluginService} from '../../services/plugin.service'
 import {ToastService} from '../../services/toast.service'
 import {Plugin} from '../plugin.interface'
-import {PluginParametersSchema, PluginPropertiesSchema} from './plugin-parameter.interface'
+import {FormlyModel, SelectOption, SelectOptions} from './plugin-parameter.interface'
+import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
+import GeoJSON from 'ol/format/GeoJSON.js'
+import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
+
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -34,148 +37,200 @@ import {PluginParametersSchema, PluginPropertiesSchema} from './plugin-parameter
 })
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
-    @Input() schema!: PluginParametersSchema
+    @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
-    tempSchema: { schema: any, model: any } = {schema: {}, model: {}}
-    model: any = {}
-    options: FormlyFormOptions = {}
-    form = new FormGroup({})
+    aoiAttribute: string | undefined = undefined
+    selectOptions: SelectOptions = {}
+    form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
+    model: FormlyModel = {}
+    options: FormlyFormOptions = {}
+
     map: Map | undefined
     regionLayer: VectorLayer<VectorSource<Geometry>> | undefined
     selectedRegionLayer!: VectorLayer<VectorSource<Geometry>>
-    jsonSchema_polygon = 'Feature_MultiPolygon'
-    highlightedFeature: Array<FeatureLike> = []
+    jsonSchema_polygon = 'MultiPolygon'
+    highlightedFeatures: Array<FeatureLike> = []
 
-    constructor(private formlyJsonschema: FormlyJsonschema,
-                private pluginService: PluginService,
+    constructor(private pluginService: PluginService,
                 private toastService: ToastService,
                 private router: Router) {
     }
 
-    onSubmit(model: any) {
+
+    ngOnChanges(): void {
+        if (this.options.resetModel)
+            this.options.resetModel({})
+
+        const schema = this.plugin.operator_schema
+        if (!schema)
+            return
+
+        this.aoiAttribute = this.getAoiAttribute(schema)
+        this.selectOptions = this.parseSelectOptions(schema.$defs)
+
+        this.fields = this.parseFields(schema)
+    }
+
+    onSubmit(model: FormlyModel) {
+        const selectedRegion = this.getSelectedRegion()
+        if (this.aoiAttribute && selectedRegion)
+            model[this.aoiAttribute] = selectedRegion
+
+        const missingFields = this.checkForRequiredFields(model)
+        if (missingFields.length == 0) {
+            this.requestCompute(model)
+        } else {
+            this.alertUserMissingFields(missingFields)
+        }
+
+    }
+
+    private getSelectedRegion(): GeoJSONFeatureCollection {
         const features = this.selectedRegionLayer.getSource()?.getFeatures()
         if (features && features[0]) {
             const paramFeature = new GeoJSON().writeFeaturesObject(features, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
             })
-
-            for (const [key, value] of Object.entries(this.schema.properties)) {
-                if (!value)
-                    return
-
-                if (value && value.allOf && value.allOf[0].$ref) {
-                    const refVal: string = value['allOf'][0]['$ref']
-                    if (refVal.includes(this.jsonSchema_polygon)) {
-                        model[key] = paramFeature.features[0]
-                    }
-                }
-            }
-        }
-
-        if (this.checkForRequiredFields(model, this.tempSchema.schema)) {
-            this.requestCompute(model)
-        } else {
-            this.toastService.show({
-                title: 'Required fields empty!',
-                body: 'Please enter values to the required fields',
-                type: 'error',
-                time: 4000
-            })
+            return paramFeature.features[0]
         }
 
     }
 
-    ngOnChanges(): void {
-        if (!this.schema)
+    private parseFields(schema: JSONSchema7): FormlyFieldConfig[] {
+        if (!schema.properties)
+            return []
+
+        const fields: FormlyFieldConfig[] = []
+
+        for (const [key, value] of Object.entries(schema.properties)) {
+            if (typeof value != 'boolean') {
+                if (value.anyOf) {
+                    value.anyOf.forEach((nullable) => {
+                        if (typeof nullable != 'boolean' && nullable.type != 'null') {
+                            Object.assign(value, nullable)
+                        }
+                    })
+                }
+                const field: FormlyFieldConfig = {}
+                field.key = key
+                field.type = this.parseType(value)
+                field.props = this.parseProps(value)
+
+                if (schema.required && schema.required.includes(key))
+                    field.props.required = true
+
+                fields.push(field)
+            }
+        }
+
+        return fields
+    }
+
+    private parseType(property: JSONSchema7): string {
+        switch (property.type) {
+            case 'boolean':
+            case 'number':
+            case 'integer':
+                return property.type
+            case 'string':
+                if (property['format'] === 'date') {
+                    return 'input' // should be a date picker https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/issues/12
+                } else {
+                    return 'input'
+                }
+            case undefined:
+                if (property.$ref) {
+                    return 'select'
+                }
+                console.error('Wrong format in select schema, "$ref" missing.')
+                return 'textarea'
+            case 'array':
+                if (property.items) {
+                    return 'select'
+                }
+                console.error('Wrong format in multi-select schema, "items" missing.')
+                return 'textarea'
+            default:
+                console.error(`Unexpected plugin parameter type: ${property.type} in ${property.title}`)
+                return 'textarea'
+        }
+    }
+
+    private parseProps(property: JSONSchema7): FormlyFieldProps {
+        const props: FormlyFieldProps = {}
+
+        props.label = property.title
+        props.description = property.description
+
+        if (property.examples && Array.isArray(property.examples) && property.examples.length > 0) {
+            props.placeholder = String(property.examples[0])
+        }
+
+        switch (property.type) {
+            case 'number':
+            case 'integer':
+                Object.assign(props, this.checkForMinAndMaxRange(property))
+                break
+            case 'string':
+                if (property['format'] === 'date') {
+                    Object.assign(props, this.checkForMinAndMaxDateRange(property))
+                }
+                break
+            case 'array':
+                // @ts-ignore typing definition incomplete
+                props.multiple = true
+                if (property.items && typeof property.items != 'boolean' && !Array.isArray(property.items)) {
+                    props.options = this.selectOptions[this.getRefName(property.items.$ref)]
+                }
+                break
+            case undefined:
+                if (property.$ref) {
+                    props.placeholder = 'Choose' //select placeholder is effectively default
+                    props.options = this.selectOptions[this.getRefName(property.$ref)]
+                }
+        }
+        return props
+    }
+
+    private getAoiAttribute(schema: JSONSchema7): string | undefined {
+        if (!schema.properties)
             return
 
-        this.fields = []
-        this.model = {}
-        this.tempSchema = {
-            'schema': {
-                'title': 'Parameters',
-                'description': 'A simple form example.',
-                'type': 'object',
-                'required': [],
-                'properties': {}
-            },
-            'model': {}
+        for (const [key, value] of Object.entries(schema.properties)) {
+            if (typeof value != 'boolean' && value && value.allOf && typeof value.allOf[0] != 'boolean' && value.allOf[0].$ref && value.allOf[0].$ref.includes(this.jsonSchema_polygon)) {
+                delete schema.properties[key]
+                return key
+            }
         }
+        return
+    }
 
-        this.tempSchema.schema.required = this.schema.required
-        this.tempSchema.schema.$defs = this.schema.$defs
 
-        for (const [key, value] of Object.entries(this.schema.properties)) {
-            if (!value)
-                return
+    private parseSelectOptions($defs: { [p: string]: JSONSchema7Definition } | undefined): SelectOptions {
+        const transformedDefs: SelectOptions = {}
+        if (!$defs)
+            return transformedDefs
 
-            const propertiesSchema: any = {}
-
-            if (value['anyOf']) {
-                const arr: any[] = []
-
-                // @ts-ignore can be any
-                value['anyOf'].forEach(val => {
-                    arr.push(val.type)
-
-                    if (val.type === 'number' || val.type === 'integer') {
-                        const minMaxRange = this.checkForMinAndMaxRange(val)
-                        propertiesSchema['maximum'] = minMaxRange.max
-                        propertiesSchema['minimum'] = minMaxRange.min
-                    }
-
-                    if (val['type'] === 'string' && val['format'] === 'date') {
-                        const minMaxRange = this.checkForMinAndMaxDateRange(val)
-                        propertiesSchema['max'] = minMaxRange.max
-                        propertiesSchema['min'] = minMaxRange.min
-                        value['type'] = 'text'
-                    }
-
-                    if (val['$ref']) {
-                        propertiesSchema['$ref'] = val['$ref']
-                    }
-                    if (val['items']) {
-                        propertiesSchema['items'] = val['items']
-                    }
+        for (const [key, value] of Object.entries($defs)) {
+            if (typeof value != 'boolean' && value.enum && !key.includes(this.jsonSchema_polygon)) {
+                const option: SelectOption[] = []
+                value.enum.forEach(value => {
+                    option.push({label: String(value), value: value})
                 })
-                propertiesSchema['type'] = arr
-            } else {
-                propertiesSchema['type'] = value['type']
+                transformedDefs[key] = option
             }
-
-            if (value['type'] === 'number') {
-                const minMaxRange = this.checkForMinAndMaxRange(value)
-                propertiesSchema['maximum'] = minMaxRange.max
-                propertiesSchema['minimum'] = minMaxRange.min
-            }
-            if (value['type'] === 'string' && value['format'] === 'date') {
-                const minMaxRange = this.checkForMinAndMaxDateRange(value)
-                propertiesSchema['max'] = minMaxRange.max
-                propertiesSchema['min'] = minMaxRange.min
-                value['type'] = 'text'
-            }
-            if (value['$ref']) {
-                propertiesSchema['$ref'] = value['$ref']
-            }
-
-            propertiesSchema['title'] = value.title
-            propertiesSchema['description'] = value.description
-
-            if (value.examples && value.examples.length > 0) {
-                propertiesSchema['props'] = {'placeholder': value.examples[0]}
-            }
-
-            if (value['enum']) {
-                propertiesSchema['enum'] = value['enum']
-            }
-            this.tempSchema.schema.properties[key] = propertiesSchema
         }
 
-        this.tempSchema.model = this.model
-        this.fields = [this.formlyJsonschema.toFieldConfig(this.tempSchema.schema)]
+        return transformedDefs
+    }
+
+    private getRefName($ref: string | undefined): string {
+        if (!$ref)
+            return ''
+        return $ref.replace('#/$defs/', '')
     }
 
     ngAfterViewInit(): void {
@@ -230,41 +285,41 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             this.regionLayer.getFeatures(pixel).then((features) => {
                 if (features) {
                     const feature = features[0]
-                    const selIndex = this.highlightedFeature.indexOf(feature)
+                    const selIndex = this.highlightedFeatures.indexOf(feature)
                     if (selIndex < 0) {
                         if (feature) {
-                            this.highlightedFeature.push(feature)
+                            this.highlightedFeatures.push(feature)
                         }
                     } else {
-                        this.highlightedFeature.splice(selIndex, 1)
+                        this.highlightedFeatures.splice(selIndex, 1)
                     }
 
                     this.selectedRegionLayer.getSource()?.clear()
-                    if (this.highlightedFeature.length > 0) {
+                    if (this.highlightedFeatures.length > 0) {
                         // @ts-ignore TODO possible type mismatch
-                        this.selectedRegionLayer.getSource().addFeatures(this.highlightedFeature)
+                        this.selectedRegionLayer.getSource().addFeatures(this.highlightedFeatures)
                     }
                 }
             })
         }
     }
 
-    private checkForMinAndMaxRange(value: PluginPropertiesSchema) {
+    private checkForMinAndMaxRange(value: JSONSchema7) {
         return {
-            min: value.exclusiveMaximum || value.Maximum || Number.NEGATIVE_INFINITY,
-            max: value.exclusiveMinimum || value.Minimum || Number.POSITIVE_INFINITY
+            minimum: value.exclusiveMaximum || Number.NEGATIVE_INFINITY,
+            maximum: value.exclusiveMinimum || Number.POSITIVE_INFINITY
         }
     }
 
-    private checkForMinAndMaxDateRange(value: PluginPropertiesSchema) {
+    private checkForMinAndMaxDateRange(value: JSONSchema7) {
         const today = new Date().toISOString().substring(0, 10).replace('T', ' ')
         return {
-            min: value.exclusiveMaximum || value.Maximum || '1970-01-01',
-            max: value.exclusiveMinimum || value.Minimum || today
+            min: value.exclusiveMaximum || '1970-01-01',
+            max: value.exclusiveMinimum || today
         }
     }
 
-    private requestCompute(model: any) {
+    private requestCompute(model: FormlyModel) {
         this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
@@ -291,10 +346,43 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         })
     }
 
-    private checkForRequiredFields(model: any, schema: PluginParametersSchema): boolean {
-        if (!schema['required']) return true
+    private checkForRequiredFields(model: FormlyModel): string[] {
+        const required = this.schema.required
+        if (!required) return []
+        let missingFields: string[] = required.filter(key => !Object.keys(model).includes(key))
 
-        const requiredList: string[] = schema['required']
-        return requiredList.every((i) => Object.prototype.hasOwnProperty.call(model, i))
+        missingFields = missingFields.map(key => {
+            if (this.schema.properties && key != this.aoiAttribute) {
+                const property = this.schema.properties[key]
+                if (property && typeof property != 'boolean') {
+                    if (property.title)
+                        return property.title
+                }
+            }
+            return key
+        })
+        return missingFields
+    }
+
+    private alertUserMissingFields(missingFields: string[]) {
+        let aoiBody = ''
+        if (this.aoiAttribute && missingFields.includes(this.aoiAttribute)) {
+            aoiBody = 'don\'t forget to choose an area on the map.'
+            missingFields = missingFields.filter(e => e !== this.aoiAttribute)
+        }
+
+        const body: string[] = []
+        if (missingFields[0])
+            body.push(`Please enter values to the required fields "${missingFields.join(' and ')}"`)
+        if (aoiBody)
+            body.push(aoiBody)
+
+        this.toastService.show({
+            title: 'Required fields empty!',
+            body: body.join(' and '),
+            type: 'error',
+            time: 4000
+        })
+
     }
 }
