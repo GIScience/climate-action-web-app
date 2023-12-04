@@ -1,23 +1,14 @@
-export interface PluginParametersSchema {
-    required: string[]
-    properties: PluginPropertiesSchema[]
-    $defs: string
+import {JSONSchema7Type} from 'json-schema';
+
+export interface FormlyModel {
+    [key: string]: string
 }
 
-export interface PluginPropertiesSchema {
-    default: boolean | string | number
-    examples: [boolean] | [string] | [number] | [{ geometry: { coordinates: [[number[][]]], type: string }, type: string, properties: unknown }]
-    description: string
-    title: string
-    type: string
-    anyOf?: [PluginPropertiesSchema],
-    allOf?: [PluginPropertiesSchema],
-    exclusiveMaximum?: number | string
-    exclusiveMinimum?: number | string
-    Maximum?: number | string
-    Minimum?: number | string
-    $ref?: string
-    format?: string
-    enum?: string
-    items?: { $ref?: string }
+export interface SelectOptions {
+    [key: string]: SelectOption[]
+}
+
+export interface SelectOption {
+    label: string,
+    value: JSONSchema7Type
 }

@@ -1,4 +1,4 @@
-import {PluginParametersSchema} from './plugin-parameter/plugin-parameter.interface'
+import {JSONSchema7} from 'json-schema';
 
 export interface Plugin {
     plugin_id: string
@@ -9,7 +9,7 @@ export interface Plugin {
     purpose: string
     methodology: string
     sources: Array<Source>
-    operator_schema: PluginParametersSchema
+    operator_schema: JSONSchema7
     library_version: string
     attribution: string
 }
