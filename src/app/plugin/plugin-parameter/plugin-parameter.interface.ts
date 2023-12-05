@@ -12,3 +12,11 @@ export interface SelectOption {
     label: string,
     value: JSONSchema7Type
 }
+
+export interface DatepickerOptions {
+    [key: string]: DatepickerOption[]
+}
+
+export interface DatepickerOption {
+    format: string
+}
