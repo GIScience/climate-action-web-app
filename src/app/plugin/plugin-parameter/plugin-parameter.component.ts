@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnChanges} from '@angular/core'
+import {AfterViewInit, Component, Input, OnChanges, ViewEncapsulation} from '@angular/core'
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
@@ -33,7 +33,8 @@ import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
         FormsModule,
         ReactiveFormsModule
     ],
-    standalone: true
+    standalone: true,
+    encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
@@ -137,7 +138,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 return property.type
             case 'string':
                 if (property['format'] === 'date') {
-                    return 'input' // should be a date picker https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/issues/12
+                    return 'datepicker'
                 } else {
                     return 'input'
                 }
@@ -177,6 +178,11 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             case 'string':
                 if (property['format'] === 'date') {
                     Object.assign(props, this.checkForMinAndMaxDateRange(property))
+                    Object.assign(props, {
+                        datepickerOptions: {
+                            max: new Date()
+                        }
+                    })
                 }
                 break
             case 'array':
