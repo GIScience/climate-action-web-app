@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    climateActionApiUrl: 'https://dev.climate-action.heigit.org',
-    climateActionWSUrl: 'wss://dev.climate-action.heigit.org'
+    climateActionApiUrl: 'https://staging.climate-action.heigit.org',
+    climateActionWSUrl: 'wss://staging.climate-action.heigit.org'
 };
