@@ -6,11 +6,11 @@ import {BehaviorSubject} from 'rxjs'
 })
 export class ToastService {
 
-    private showToastSource = new BehaviorSubject<IToastUI | null>(null)
-    showToast$ = this.showToastSource.asObservable()
+    private toastSubject = new BehaviorSubject<IToastUI | null>(null)
+    showToast$ = this.toastSubject.asObservable()
 
-    show(param: IToastUI) {
-        this.showToastSource.next(param)
+    next(param: IToastUI) {
+        this.toastSubject.next(param)
     }
 }
 

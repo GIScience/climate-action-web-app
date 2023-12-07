@@ -21,6 +21,7 @@ export class TableComponent implements OnInit {
     ngOnInit(): void {
         if (!this.url)
             return
+
         this.http.get(this.url, {responseType: 'text'})
             .subscribe((data) => {
                 this.parseCSVData(data);

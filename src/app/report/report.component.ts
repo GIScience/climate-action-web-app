@@ -1,5 +1,5 @@
 import {Component, OnInit, Type, ViewChild, ViewContainerRef} from '@angular/core'
-import {ReportService} from '../services/report.service'
+import {ReportService} from './report.service'
 import {MarkdownComponent} from './markdown/markdown.component'
 import {ImageComponent} from './image/image.component'
 import {TableComponent} from './table/table.component'
@@ -32,27 +32,27 @@ export class ReportComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.reportService.markdownOb.subscribe(v => {
+        this.reportService.markdown.subscribe(v => {
             if (v === '') return
             this.display(MarkdownComponent, 'url', v)
         })
-        this.reportService.imageOb.subscribe(v => {
+        this.reportService.image.subscribe(v => {
             if (v === '') return
             this.display(ImageComponent, 'url', v)
         })
-        this.reportService.tableOb.subscribe(v => {
+        this.reportService.table.subscribe(v => {
             if (v === '') return
             this.display(TableComponent, 'url', v)
         })
-        this.reportService.geojsonOb.subscribe(v => {
+        this.reportService.geojson.subscribe(v => {
             if (v.url === '') return
             this.display(GeojsonComponent, 'inputData', v)
         })
-        this.reportService.geotiffOb.subscribe(v => {
+        this.reportService.geotiff.subscribe(v => {
             if (v.url === '') return
             this.display(GeoTiffComponent, 'inputData', v)
         })
-        this.reportService.chartOb.subscribe(v => {
+        this.reportService.chart.subscribe(v => {
             if (!v.data) return
             this.display(ChartComponent, 'inputData', v)
         })

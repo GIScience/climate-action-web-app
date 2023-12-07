@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {BehaviorSubject, Observable} from 'rxjs'
-import {Plugin, PluginCorrelator, PluginRun} from '../plugin/plugin.interface'
+import {Plugin, PluginCorrelator, PluginRun} from './plugin.interface'
 import {Artifact} from '../artifact/artifact.interface'
 import {environment} from '../../environments/environment'
 import moment from 'moment/moment';
@@ -31,11 +31,11 @@ export class PluginService {
         return this.http.post<PluginCorrelator>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
     }
 
-    getArtifacts(id: string): Observable<Array<Artifact>> {
+    getArtifacts(id: string): Observable<Artifact[]> {
         return this.http.get<Array<Artifact>>(`${this.apiUrl}/api/v1/gateway/store/${id}`)
     }
 
-    getComputes(): Array<PluginRun> {
+    getComputes(): PluginRun[] {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs)
             return []
