@@ -1,3 +1,7 @@
+[![pipeline status](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/badges/main/pipeline.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/commits/main)
+[![Latest Release](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/badges/release.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/releases)
+[![coverage report](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/badges/main/coverage.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/commits/main)
+
 # Climate Action frontend
 
 ## Installation
