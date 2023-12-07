@@ -21,6 +21,7 @@ import {getCenter} from 'ol/extent'
     styleUrls: ['./geotiff.component.scss']
 })
 export class GeoTiffComponent implements OnInit, AfterViewInit {
+
     @Input() inputData: { url: string, artifact: Artifact | null } | undefined
     mapDivID = ''
     map!: Map
@@ -29,10 +30,9 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (!this.inputData)
+        if (!this.inputData || !this.inputData['artifact'])
             return
-        if (!this.inputData['artifact'])
-            return
+
 
         const tempMapDivId = this.getFirstPartBeforeDot(this.inputData.artifact.store_id)
         if (!tempMapDivId) {
@@ -43,18 +43,13 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        if (!this.inputData)
-            return
-        if (!this.inputData['artifact'])
+        if (!this.inputData || !this.inputData['artifact'])
             return
 
         this.initMap()
     }
 
     private async initMap() {
-        if (!this.inputData)
-            return
-
         if (!this.inputData)
             return
 

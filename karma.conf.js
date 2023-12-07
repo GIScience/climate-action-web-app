@@ -22,11 +22,12 @@ module.exports = function (config) {
             suppressAll: true
         },
         coverageReporter: {
-            dir: require('path').join(__dirname, './coverage/climate-action-app'),
+            dir: require('path').join(__dirname, './coverage/'),
             subdir: '.',
             reporters: [
                 {type: 'html'},
-                {type: 'text-summary'}
+                {type: 'text-summary'},
+                {type: 'cobertura'}
             ]
         },
         reporters: ['progress', 'kjhtml'],

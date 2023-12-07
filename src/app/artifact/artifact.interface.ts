@@ -9,10 +9,10 @@ export interface Artifact {
     store_id: string,
 }
 
-export interface ChartResponse {
+export interface ChartData {
     chart_type: string,
-    color: string[],
-    x: string[],
+    color: string | string[],
+    x: string[] | number[],
     y: number[]
 }
 

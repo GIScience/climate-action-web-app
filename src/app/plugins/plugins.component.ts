@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core'
 import {Router} from '@angular/router'
-import {PluginService} from '../services/plugin.service'
+import {PluginService} from '../plugin/plugin.service'
 import {CommonModule} from '@angular/common'
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';

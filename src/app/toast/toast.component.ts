@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core'
 import * as bootstrap from 'bootstrap'
 
-import {IToastUI, ToastService} from '../services/toast.service'
+import {IToastUI, ToastService} from './toast.service'
 import {ToastTypes} from './toasttypes.modal'
 
 @Component({

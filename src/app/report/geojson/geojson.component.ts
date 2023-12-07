@@ -23,6 +23,7 @@ import {Geometry} from 'ol/geom.js'
     styleUrls: ['./geojson.component.scss']
 })
 export class GeojsonComponent implements OnInit, AfterViewInit {
+
     @Input() inputData: { url: string; artifact: Artifact | null; } | undefined
     mapDivID = ''
     map!: Map
@@ -33,14 +34,12 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (!this.inputData)
-            return
-        if (!this.inputData['artifact'])
+        if (!this.inputData || !this.inputData['artifact'])
             return
 
         const tempMapDivId = this.getFirstPartBeforeDot(this.inputData.artifact.store_id)
         if (!tempMapDivId) {
-            console.error('GeojsonComponent >>> store_id doesn\'t contain a dot in it')
+            console.error(`Malformed store id ${this.inputData.artifact.store_id}`)
             return
         }
         this.mapDivID = tempMapDivId
@@ -48,9 +47,7 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
 
-        if (!this.inputData)
-            return
-        if (!this.inputData['artifact'])
+        if (!this.inputData || !this.inputData['artifact'])
             return
 
         if (this.inputData.url !== null) {

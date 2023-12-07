@@ -15,8 +15,8 @@ import {Fill, Stroke, Style} from 'ol/style'
 import {regions} from '../../support/region-of-interest'
 import {FeatureLike} from 'ol/Feature.js'
 import {Geometry} from 'ol/geom.js'
-import {PluginService} from '../../services/plugin.service'
-import {ToastService} from '../../services/toast.service'
+import {PluginService} from '../plugin.service'
+import {ToastService} from '../../toast/toast.service'
 import {Plugin} from '../plugin.interface'
 import {FormlyModel, SelectOption, SelectOptions} from './plugin-parameter.interface'
 import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
@@ -329,7 +329,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
-                this.toastService.show({
+                this.toastService.next({
                     title: `${this.plugin.plugin_id} parameters are send to process!`,
                     body: 'Result from plugin execution will be listing on the dashboard',
                     type: 'success',
@@ -342,7 +342,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             },
             error: error => {
                 console.error('Error while request to compute plugin:', error)
-                this.toastService.show({
+                this.toastService.next({
                     title: `Error while computing plugin ${this.plugin.name}`,
                     body: `Error while computing plugin ${this.plugin.name}`,
                     type: 'error',
@@ -383,7 +383,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         if (aoiBody)
             body.push(aoiBody)
 
-        this.toastService.show({
+        this.toastService.next({
             title: 'Required fields empty!',
             body: body.join(' and '),
             type: 'error',

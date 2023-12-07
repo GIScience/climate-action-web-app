@@ -9,7 +9,7 @@
                         {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                 </button>
-                <button mat-icon-button disabled *ngIf="!node.expandable"></button>
+                <button mat-icon-button disabled *ngIf="!node.expandable" aria-label="Expand node"></button>
             </div>
             <div class="col-md-8 col-lg-9 card-header">
                 <h5>{{node.name}}</h5>

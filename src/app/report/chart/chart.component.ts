@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core'
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
 import {ChartConfiguration, ChartType} from 'chart.js'
 
-import {Artifact, ChartResponse} from '../../artifact/artifact.interface'
+import {Artifact, ChartData} from '../../artifact/artifact.interface'
 
 @Component({
     selector: 'app-chart',
@@ -10,7 +10,8 @@ import {Artifact, ChartResponse} from '../../artifact/artifact.interface'
 })
 export class ChartComponent implements OnInit {
 
-    @Input() inputData: { data: ChartResponse | null, artifact: Artifact | null } | undefined
+    @ViewChild('chartCanvas') chartCanvas?: ElementRef
+    @Input() inputData: { data: ChartData | null, artifact: Artifact | null } | undefined
 
     public baseChartLegend = true
     public baseChartPlugins = []
@@ -19,11 +20,9 @@ export class ChartComponent implements OnInit {
     public baseChartType!: ChartType
 
     ngOnInit(): void {
-        if (!this.inputData)
+        if (!this.inputData || !this.inputData.data)
             return
 
-        if (!this.inputData.data)
-            return
 
         if (this.inputData.data.chart_type === 'PIE') {
             this.inputData.data.y = this.inputData.data.y.map(y => y * 100)
