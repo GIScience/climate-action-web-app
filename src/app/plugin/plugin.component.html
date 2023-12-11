@@ -10,12 +10,12 @@
                         <h2>Sources</h2>
                         <div *ngFor="let source of plugin.sources">
                             <div class="source-item">
-                                <strong>{{ source.title }}</strong>,
-                                {{ source.author }},
-                                {{ source.journal }},
-                                {{ source.year }},
-                                {{ source.volume }},
-                                {{ source.pages }}.
+                                <strong *ngIf="source.title">{{ source.title }}</strong>
+                                {{ computeSourceText(source) }}{{ source.url ? "," : "" }}
+                                <a href="{{ source.url }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   *ngIf="source.url">{{ source.url }}</a>
                             </div>
                         </div>
                     </div>

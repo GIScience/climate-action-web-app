@@ -26,7 +26,9 @@ export interface Source {
     title?: string
     author?: string
     ENTRYTYPE?: string
-    ID?: string
+    ID?: string,
+    note?: string
+    url?: string
 }
 
 export interface PluginRun {
