@@ -5,31 +5,20 @@
             <div class="progress-bar"></div>
         </div>
         <div class="plugin-container">
-            <button class="handle left-handle">
-        <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
-          <i class="ti-angle-left"></i>
-        </span>
-            </button>
-            <div class="slider">
-                <div class="m-3 p-2" *ngFor="let card of cards; let i = index;">
-                    <mat-card class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
-                              (click)="card.enabled ? showPluginInfo(card.plugin_id) : ''"
-                              (keydown)="card.enabled ? showPluginInfo(card.plugin_id): ''"
-                              tabindex="{{i}}"
-                              matTooltip="{{card.purpose}}">
-                        <mat-card-header>
-                            <mat-card-title>{{card.name}}</mat-card-title>
-                            <mat-card-subtitle *ngIf="card.version && card.library_version">ver. {{card.version}}/{{card.library_version}}</mat-card-subtitle>
-                        </mat-card-header>
-                        <img mat-card-image [src]="card.image" alt="{{card.image_source}}">
-                    </mat-card>
-                </div>
+            <div class="menu m-3 p-2" *ngFor="let card of cards; let i = index;">
+                <mat-card class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
+                          (click)="showPluginInfo(card); activateCard(card)"
+                          (keydown)="showPluginInfo(card); activateCard(card)"
+                          [ngClass]="{ 'plugin-card-highlight': activeCard === card }"
+                          tabindex="{{i}}"
+                          matTooltip="{{card.purpose}}">
+                    <mat-card-header>
+                        <mat-card-title>{{ card.name }}</mat-card-title>
+                        <mat-card-subtitle *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{ card.library_version }}</mat-card-subtitle>
+                    </mat-card-header>
+                    <img mat-card-image [src]="card.image" alt="{{card.image_source}}">
+                </mat-card>
             </div>
-            <button class="handle right-handle">
-        <span class="w-5r bdrs-50p bdB pt-2" style="color: black;" aria-hidden="true">
-          <i class="ti-angle-right"></i>
-        </span>
-            </button>
         </div>
     </div>
 </div>
