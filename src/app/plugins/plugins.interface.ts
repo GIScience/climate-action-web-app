@@ -13,8 +13,8 @@ export interface PluginCard {
 export const availableCards = [
     {
         enabled: false,
-        plugin_id: 'blueprint_plugin',
-        name: 'Blueprint Plugin',
+        plugin_id: 'plugin_blueprint',
+        name: 'Plugin Blueprint',
         image: 'https://images.unsplash.com/photo-1542621334-a254cf47733d?q=80&w=500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         image_source: 'https://unsplash.com/@sxoxm'
     }, {
