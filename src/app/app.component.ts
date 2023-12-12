@@ -1,6 +1,7 @@
 import {AfterViewInit, Component} from '@angular/core'
 import * as bootstrap from 'bootstrap'
 import {ToastService} from './toast/toast.service'
+import {default as packageInfo} from '../../package.json'
 
 @Component({
     selector: 'app-root',
@@ -8,9 +9,9 @@ import {ToastService} from './toast/toast.service'
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
-    title = 'Dashboard - Climate Action'
+    title = 'Climate Action Platform'
     name = 'HeiGIT'
-    activeLink = ''
+    version: string = packageInfo.version
 
     constructor(private toastService: ToastService) {
     }

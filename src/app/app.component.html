@@ -2,7 +2,7 @@
     <div class="header navbar">
         <div class="header-container">
             <div class="nav-left">
-                <h2 [routerLink]="'/dashboard'">Climate Action Platform</h2>
+                <h2 [routerLink]="'/dashboard'">{{title}}</h2>
             </div>
             <app-runs></app-runs>
         </div>
@@ -14,5 +14,6 @@
         <span> © 2023 Heidelberg Institute for Geoinformation Technology at <a href="https://uni-heidelberg.de/gis/" target="_blank">Heidelberg University</a> | <a href="https://heigit.org"
                                                                                                                                                                     target="_blank">HeiGIT gGmbH</a> | <a
                 href="https://heigit.org/imprint/" target="_blank">imprint</a>&nbsp;|&nbsp;<a href="https://heigit.org/privacy-policy" target="_blank">privacy policy</a></span>
+        <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>
     </footer>
 </div>
