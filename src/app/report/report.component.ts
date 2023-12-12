@@ -26,7 +26,9 @@ export class ReportComponent implements OnInit {
     }
 
     display<C>(componentType: Type<C>, name: string, value: unknown) {
-        this.container.clear()
+        if(this.container)
+            this.container.clear()
+
         const ref = this.container.createComponent(componentType)
         ref.setInput(name, value)
     }

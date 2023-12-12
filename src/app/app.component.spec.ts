@@ -30,7 +30,7 @@ describe('AppComponent', () => {
     it('should have as title "Dashboard - Climate Action"', () => {
         const fixture = TestBed.createComponent(AppComponent)
         const app = fixture.componentInstance
-        expect(app.title).toEqual('Dashboard - Climate Action')
+        expect(app.title).toEqual('Climate Action Platform')
     })
 
 })
