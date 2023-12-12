@@ -12,7 +12,7 @@ import {Vector} from 'ol/source'
 import {Artifact} from '../../artifact/artifact.interface'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import {Fill, Stroke, Style} from 'ol/style'
+import {Fill, Stroke, Style, Circle} from 'ol/style'
 import {Geometry} from 'ol/geom.js'
 
 @Component({
@@ -78,7 +78,7 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
                     target: this.mapDivID,
                     view: new View({
                         center: fromLonLat(extent ? getCenter(extent) : [8.6759928, 49.4187355]),
-                        zoom: 12
+                        zoom: 14
                     })
                 })
 
@@ -92,7 +92,16 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
                         }),
                         stroke: new Stroke({
                             color: strokeColor,
-                            width: 0.5
+                            width: 2
+                        }),
+                        image: new Circle({
+                            radius: 5,
+                            stroke: new Stroke({
+                                color: strokeColor
+                            }),
+                            fill: new Fill({
+                                color: color
+                            })
                         })
                     })
                 })
