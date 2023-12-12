@@ -16,12 +16,13 @@
   display: flex;
   justify-content: center;
   margin: 0 var(--img-gap);
-  overflow: auto;
+  overflow: hidden;
+  height: 90%;
 }
 
 .plugin-card {
   min-width: 100px;
-  max-width: 350px;
+  max-width: 300px;
   background-color: #f9f9f9;
   border-radius: 0;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -45,6 +46,10 @@
 
 .plugin-card .mat-mdc-card-subtitle {
   font-size: smaller;
+}
+
+.plugin-card > img {
+  object-fit: cover;
 }
 
 .plugin-card.enabled-card:hover {
