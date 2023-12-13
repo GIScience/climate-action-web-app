@@ -12,13 +12,14 @@ import moment from 'moment/moment';
 export class NotificationService {
 
     private wsUrl = environment.climateActionWSUrl
-    private websocketSubject!: WebSocketSubject<string>
+    private websocketSubject?: WebSocketSubject<string>
+    private hearbeat?: number
 
     startWebSocket(): Observable<WSMessage> {
         if (!this.websocketSubject) {
             this.websocketSubject = webSocket(`${this.wsUrl}/api/v1/gateway/computation/`)
+            this.hearbeat = this.keepAlive()
         }
-        this.keepAlive()
         return this.websocketSubject.asObservable().pipe(map((x) => JSON.parse(x) as WSMessage))
     }
 
@@ -32,16 +33,18 @@ export class NotificationService {
 
     public closeWebSocket() {
         if (this.websocketSubject) {
+            clearInterval(this.hearbeat)
             this.websocketSubject.complete()
+            this.websocketSubject = undefined
         }
     }
 
-    private keepAlive() {
-        setInterval(() => {
-            this.sendMessage({
-                'type': 'heartbeat',
-                'timestamp': moment(new Date()).format()
-            })
+    private keepAlive(): number {
+        return setInterval(() => {
+                this.sendMessage({
+                    'type': 'heartbeat',
+                    'timestamp': moment(new Date()).format()
+                })
         }, 5000)
     }
 
