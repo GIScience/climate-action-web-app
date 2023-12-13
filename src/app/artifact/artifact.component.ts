@@ -1,13 +1,13 @@
-import {Component, OnInit} from '@angular/core'
+import {Component, OnDestroy, OnInit} from '@angular/core'
 import {PluginService} from '../plugin/plugin.service'
 import {ActiveArtifactRef, Artifact, ArtifactFlatNode, ArtifactNode} from './artifact.interface'
 import {ReportService} from '../report/report.service'
-import {PluginRun} from '../plugin/plugin.interface'
+import {PluginRun, Status} from '../plugin/plugin.interface'
 import {FlatTreeControl} from '@angular/cdk/tree'
 import {MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule} from '@angular/material/tree'
 import {MatIconModule} from '@angular/material/icon'
 import {MatButtonModule} from '@angular/material/button'
-import {BehaviorSubject} from 'rxjs'
+import {BehaviorSubject, Subscription} from 'rxjs'
 import {NgClass, NgIf} from '@angular/common'
 import {MatTooltipModule} from '@angular/material/tooltip'
 import {NotificationService} from '../notification/notification.service'
@@ -45,7 +45,7 @@ const STATUS_ICON_MAP = {
     ],
     standalone: true
 })
-export class ArtifactComponent implements OnInit {
+export class ArtifactComponent implements OnInit, OnDestroy {
 
     private _transformer = (node: ArtifactNode, level: number): ArtifactFlatNode => {
         return {
@@ -78,6 +78,7 @@ export class ArtifactComponent implements OnInit {
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     currentRuns: PluginRun[] = []
     activeNode?: ArtifactFlatNode
+    sync?: Subscription
 
     constructor(private pluginService: PluginService,
                 private reportService: ReportService,
@@ -95,7 +96,12 @@ export class ArtifactComponent implements OnInit {
         })
 
         this.fetchArtifacts()
-        this.syncRuns()
+        this.sync = this.syncRuns()
+    }
+
+    ngOnDestroy() {
+        if(this.sync)
+            this.sync.unsubscribe()
     }
 
     fetchArtifacts() {
@@ -105,13 +111,12 @@ export class ArtifactComponent implements OnInit {
     }
 
     syncRuns() {
-        this.notificationService.startWebSocket().subscribe({
+        return this.notificationService.startWebSocket().subscribe({
             next: (message) => {
                 switch (message.type) {
                     case undefined:
                     case 'computation_status': {
                         this.currentRuns = this.pluginService.getComputes()
-
                         const run = this.currentRuns.find(x => x.correlation_uuid === message.correlation_uuid)
                         if (run && message.status) {
                             run.status = message.status
@@ -153,10 +158,9 @@ export class ArtifactComponent implements OnInit {
                                 ref: x
                             }
                         })
-
                         this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
                     } else {
-                        this.pluginService.updateRunStatus(run.correlation_uuid, 'in-progress')
+                        this.pluginService.updateRunStatus(run.correlation_uuid, run.status as Status)
                     }
                     this.updateNode(run.correlation_uuid, node)
                 },
