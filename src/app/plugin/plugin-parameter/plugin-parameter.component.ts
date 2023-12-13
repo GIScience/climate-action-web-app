@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges, ViewEncapsulation} from '@an
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
-import {JSONSchema7, JSONSchema7Definition} from 'json-schema';
+import {JSONSchema7, JSONSchema7Definition} from 'json-schema'
 import Map from 'ol/Map'
 import OSM from 'ol/source/OSM'
 import TileLayer from 'ol/layer/Tile'
@@ -18,10 +18,17 @@ import {Geometry} from 'ol/geom.js'
 import {PluginService} from '../plugin.service'
 import {ToastService} from '../../toast/toast.service'
 import {Plugin} from '../plugin.interface'
-import {FormlyModel, SelectOption, SelectOptions} from './plugin-parameter.interface'
+import {
+    FormlyModel,
+    SelectOption,
+    SelectOptions,
+    ValidationProperty,
+    ValidatorOptions
+} from './plugin-parameter.interface'
 import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
+import moment from 'moment/moment'
 
 
 @Component({
@@ -100,7 +107,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     }
 
-    private parseFields(schema: JSONSchema7): FormlyFieldConfig[] {
+    parseFields(schema: JSONSchema7): FormlyFieldConfig[] {
         if (!schema.properties)
             return []
 
@@ -119,6 +126,8 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 field.key = key
                 field.type = this.parseType(value)
                 field.props = this.parseProps(value)
+                field.validators = this.getValidators(value)
+                field.parsers = this.getParsers(value)
 
                 if (schema.required && schema.required.includes(key))
                     field.props.required = true
@@ -133,26 +142,27 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     private parseType(property: JSONSchema7): string {
         switch (property.type) {
             case 'boolean':
-            case 'number':
+                return 'checkbox'
             case 'integer':
-                return property.type
+            case 'number':
+                return 'input'
             case 'string':
                 if (property['format'] === 'date') {
                     return 'datepicker'
                 } else {
                     return 'input'
                 }
-            case undefined:
-                if (property.$ref) {
-                    return 'select'
-                }
-                console.error('Wrong format in select schema, "$ref" missing.')
-                return 'textarea'
             case 'array':
                 if (property.items) {
                     return 'select'
                 }
                 console.error('Wrong format in multi-select schema, "items" missing.')
+                return 'textarea'
+            case undefined:
+                if (property.$ref) {
+                    return 'select'
+                }
+                console.error('Wrong format in select schema, "$ref" missing.')
                 return 'textarea'
             default:
                 console.error(`Unexpected plugin parameter type: ${property.type} in ${property.title}`)
@@ -171,16 +181,18 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         }
 
         switch (property.type) {
-            case 'number':
+            case 'boolean':
             case 'integer':
-                Object.assign(props, this.checkForMinAndMaxRange(property))
+            case 'number':
                 break
             case 'string':
                 if (property['format'] === 'date') {
-                    Object.assign(props, this.checkForMinAndMaxDateRange(property))
+                    const minMax = this.checkForMinAndMaxDateRange(property)
                     Object.assign(props, {
                         datepickerOptions: {
-                            max: new Date()
+                            startAt: props.placeholder,
+                            min: minMax.min,
+                            max: minMax.max
                         }
                     })
                 }
@@ -197,11 +209,55 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     props.placeholder = 'Choose' //select placeholder is effectively default
                     props.options = this.selectOptions[this.getRefName(property.$ref)]
                 }
+                break
+            default:
+                break
         }
         return props
     }
 
-    private getAoiAttribute(schema: JSONSchema7): string | undefined {
+    private getValidators(property: JSONSchema7): ValidationProperty {
+        switch (property.type) {
+            case'boolean':
+                break
+            case 'integer':
+                return {validation: [{name: 'intType', options: this.checkForMinAndMaxRange(property)}]}
+            case 'number':
+                return {validation: [{name: 'numType', options: this.checkForMinAndMaxRange(property)}]}
+            case 'string':
+                if (property['format'] === 'date') {
+                    return {validation: [{name: 'dateType', options: this.checkForMinAndMaxDateRange(property)}]}
+                }
+                break
+            case 'array':
+            case undefined:
+            default:
+                break
+
+        }
+        return {'validation': []}
+    }
+
+    private getParsers(property: JSONSchema7) {
+        switch (property.type) {
+            case'boolean':
+            case 'integer':
+            case 'number':
+                break
+            case 'string':
+                if (property['format'] === 'date') {
+                    return [this.parseDate]
+                }
+                break
+            case 'array':
+            case undefined:
+            default:
+                break
+        }
+        return []
+    }
+
+    getAoiAttribute(schema: JSONSchema7): string | undefined {
         if (!schema.properties)
             return
 
@@ -215,7 +271,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
 
-    private parseSelectOptions($defs: { [p: string]: JSONSchema7Definition } | undefined): SelectOptions {
+    parseSelectOptions($defs: { [p: string]: JSONSchema7Definition } | undefined): SelectOptions {
         const transformedDefs: SelectOptions = {}
         if (!$defs)
             return transformedDefs
@@ -310,18 +366,17 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         }
     }
 
-    private checkForMinAndMaxRange(value: JSONSchema7) {
+    private checkForMinAndMaxRange(value: JSONSchema7): ValidatorOptions {
         return {
-            minimum: value.exclusiveMaximum || Number.NEGATIVE_INFINITY,
-            maximum: value.exclusiveMinimum || Number.POSITIVE_INFINITY
+            min: value.minimum ?? value.exclusiveMinimum ?? Number.NEGATIVE_INFINITY,
+            max: value.maximum ?? value.exclusiveMaximum ?? Number.POSITIVE_INFINITY
         }
     }
 
-    private checkForMinAndMaxDateRange(value: JSONSchema7) {
-        const today = new Date().toISOString().substring(0, 10).replace('T', ' ')
+    private checkForMinAndMaxDateRange(value: JSONSchema7): ValidatorOptions {
         return {
-            min: value.exclusiveMaximum || '1970-01-01',
-            max: value.exclusiveMinimum || today
+            min: String(value.minimum ?? value.exclusiveMinimum ?? '1970-01-01'),
+            max: String(value.maximum ?? value.exclusiveMaximum ?? new Date().toISOString().split('T')[0])
         }
     }
 
@@ -387,5 +442,16 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             time: 4000
         })
 
+    }
+
+    parseDate(value: moment.Moment): string {
+        if (moment.isMoment(value)) {
+            return value.format('YYYY-MM-DD')
+        } else if (moment(value, 'YYYY-MM-DD', true).isValid()) {
+            return value
+        } else {
+            console.error('Parsing date failed.')
+            return value
+        }
     }
 }

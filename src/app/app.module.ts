@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
-import {FormsModule, ReactiveFormsModule} from '@angular/forms'
-import {FormlyModule} from '@ngx-formly/core'
+import {AbstractControl, FormsModule, ReactiveFormsModule, ValidationErrors} from '@angular/forms'
+import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core'
 import {HttpClientModule} from '@angular/common/http'
 import {MarkdownModule} from 'ngx-markdown'
 import {NgChartsModule} from 'ng2-charts'
@@ -25,7 +25,54 @@ import {MatDatepickerModule} from '@angular/material/datepicker'
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import {MatInputModule} from '@angular/material/input'
 import {MAT_DATE_FORMATS} from '@angular/material/core'
-import {MomentDateModule} from '@angular/material-moment-adapter'
+import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from '@angular/material-moment-adapter'
+import moment from 'moment/moment'
+import {ValidatorOptions} from './plugin/plugin-parameter/plugin-parameter.interface'
+
+export function intTypeValidator(control: AbstractControl,
+                                 _: FormlyFieldConfig,
+                                 options: ValidatorOptions = {}): ValidationErrors {
+    if (!control.value) {
+        return {}
+    } else if (!/^-?[0-9]*$/.test(control.value) || isNaN(parseInt(control.value))) {
+        return {intType: {message: 'Not an integer!'}}
+    } else if (options.min != undefined && parseInt(control.value) < options.min) {
+        return {intType: {message: `Value must be bigger than ${options.min}`}}
+    } else if (options.max != undefined && parseInt(control.value) > options.max) {
+        return {intType: {message: `Value must be smaller than ${options.max}`}}
+    }
+    return {}
+}
+
+export function numericTypeValidator(control: AbstractControl,
+                                     _: FormlyFieldConfig,
+                                     options: ValidatorOptions = {}): ValidationErrors {
+    if (!control.value) {
+        return {}
+    } else if (!/^-?[0-9]*(\.[0-9]*)?$/.test(control.value) || isNaN(parseFloat(control.value))) {
+        return {numType: {message: 'Not a number!'}}
+    } else if (options.min != undefined && parseFloat(control.value) < options.min) {
+        return {numType: {message: `Value must be bigger than ${options.min}`}}
+    } else if (options.max != undefined && parseFloat(control.value) > options.max) {
+        return {numType: {message: `Value must be smaller than ${options.max}`}}
+    }
+    return {}
+}
+
+export function dateTypeValidator(control: AbstractControl,
+                                  _: FormlyFieldConfig,
+                                  options: ValidatorOptions = {}): ValidationErrors {
+    if (!control.value) {
+        return {}
+    } else if (!moment(control.value, moment.ISO_8601, true).isValid()) {
+        return {numType: {message: 'Not a date!'}}
+    } else if (moment(control.value) < moment(options.min)) {
+        return {numType: {message: `Value must be bigger than ${options.min}`}}
+    } else if (moment(control.value) > moment(options.max)) {
+        return {numType: {message: `Value must be smaller than ${options.max}`}}
+    }
+    return {}
+}
 
 @NgModule({
     declarations: [
@@ -50,8 +97,13 @@ import {MomentDateModule} from '@angular/material-moment-adapter'
         ReactiveFormsModule,
         MatDatepickerModule,
         FormlyMaterialModule,
-        MomentDateModule,
+        MatMomentDateModule,
         FormlyModule.forRoot({
+            validators: [
+                {name: 'intType', validation: intTypeValidator},
+                {name: 'numType', validation: numericTypeValidator},
+                {name: 'dateType', validation: dateTypeValidator}
+            ],
             validationMessages: [
                 {name: 'required', message: 'This field is required'}
             ],
@@ -70,15 +122,23 @@ import {MomentDateModule} from '@angular/material-moment-adapter'
     ],
     providers: [
         {
-            provide: MAT_DATE_FORMATS, useValue: {
+            provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+            useValue: {
+                useUtc: true,
+                strict: true
+            }
+        },
+        {
+            provide: MAT_DATE_FORMATS,
+            useValue: {
                 parse: {
-                    dateInput: 'LL'
+                    dateInput: 'YYYY-MM-DD'
                 },
                 display: {
                     dateInput: 'YYYY-MM-DD',
-                    monthYearLabel: 'YYYY',
+                    monthYearLabel: 'MMM YYYY',
                     dateA11yLabel: 'LL',
-                    monthYearA11yLabel: 'YYYY'
+                    monthYearA11yLabel: 'LL'
                 }
             }
         }
