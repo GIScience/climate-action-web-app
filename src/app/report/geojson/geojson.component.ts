@@ -12,7 +12,7 @@ import {Vector} from 'ol/source'
 import {Artifact} from '../../artifact/artifact.interface'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import {Fill, Stroke, Style, Circle} from 'ol/style'
+import {Circle, Fill, Stroke, Style} from 'ol/style'
 import {Geometry} from 'ol/geom.js'
 
 @Component({
@@ -84,7 +84,12 @@ export class GeojsonComponent implements OnInit, AfterViewInit {
 
                 this.geojsonLayer.setStyle((feature) => {
                     const color = feature.get('color')
-                    const strokeColor = [0, 0, 0, 1]
+                    let strokeColor = [0, 0, 0, 1]
+
+                    const geom = feature.getGeometry()
+                    if (geom && (geom.getType() == 'LineString' || geom.getType() == 'MultiLineString')) {
+                        strokeColor = color
+                    }
 
                     return new Style({
                         fill: new Fill({
