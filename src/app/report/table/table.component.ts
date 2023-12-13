@@ -11,8 +11,8 @@ import {Papa} from 'ngx-papaparse'
     styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit {
-    @Input() url: string | undefined;
-    csvData: object[] = [];
+    @Input() url: string | undefined
+    csvData: object[] = []
 
     constructor(private http: HttpClient,
                 private papa: Papa) {
@@ -24,8 +24,8 @@ export class TableComponent implements OnInit {
 
         this.http.get(this.url, {responseType: 'text'})
             .subscribe((data) => {
-                this.parseCSVData(data);
-            });
+                this.parseCSVData(data)
+            })
     }
 
     private parseCSVData(csvData: string): void {
@@ -35,6 +35,6 @@ export class TableComponent implements OnInit {
             complete: (result) => {
                 this.csvData = result.data
             }
-        });
+        })
     }
 }

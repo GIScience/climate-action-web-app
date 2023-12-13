@@ -50,9 +50,9 @@ describe('ArtifactsComponent', () => {
 
         mockPluginService.getComputes.and.returnValue([])
 
-        fixture = TestBed.createComponent(ArtifactComponent);
-        component = fixture.componentInstance;
-        loader = TestbedHarnessEnvironment.loader(fixture);
+        fixture = TestBed.createComponent(ArtifactComponent)
+        component = fixture.componentInstance
+        loader = TestbedHarnessEnvironment.loader(fixture)
 
         fixture.autoDetectChanges()
     })
@@ -114,12 +114,12 @@ describe('ArtifactsComponent', () => {
 
         component.ngOnInit()
 
-        const tree = await loader.getHarness(MatTreeHarness);
-        const treeDescendants = await tree.getNodes();
-        expect(treeDescendants.length).toBe(1);
+        const tree = await loader.getHarness(MatTreeHarness)
+        const treeDescendants = await tree.getNodes()
+        expect(treeDescendants.length).toBe(1)
 
-        await treeDescendants[0].expand();
-        expect((await tree.getNodes()).length).toBe(2);
+        await treeDescendants[0].expand()
+        expect((await tree.getNodes()).length).toBe(2)
 
         expect(mockPluginService.updateRunStatus)
             .toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'completed')
@@ -154,7 +154,7 @@ describe('ArtifactsComponent', () => {
         let treeDescendants = await tree.getNodes()
         expect(treeDescendants.length).toBe(1)
 
-        await treeDescendants[0].expand();
+        await treeDescendants[0].expand()
         expect((await tree.getNodes()).length).toBe(1)
 
         notifications.next({
@@ -166,7 +166,7 @@ describe('ArtifactsComponent', () => {
 
         tree = await loader.getHarness(MatTreeHarness)
         treeDescendants = await tree.getNodes()
-        await treeDescendants[0].expand();
+        await treeDescendants[0].expand()
         expect((await tree.getNodes()).length).toBe(2)
 
         expect(mockPluginService.updateRunStatus)

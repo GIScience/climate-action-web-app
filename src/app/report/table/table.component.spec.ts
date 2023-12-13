@@ -3,7 +3,7 @@ import {TableComponent} from './table.component'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
 import {of} from 'rxjs'
 import {By} from '@angular/platform-browser'
-import SpyObj = jasmine.SpyObj;
+import SpyObj = jasmine.SpyObj
 
 describe('TableComponent', () => {
     let component: TableComponent

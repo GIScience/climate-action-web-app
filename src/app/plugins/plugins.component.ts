@@ -2,10 +2,10 @@ import {AfterViewInit, Component} from '@angular/core'
 import {Router} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
 import {CommonModule} from '@angular/common'
-import {MatCardModule} from '@angular/material/card';
-import {MatIconModule} from '@angular/material/icon';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {availableCards, PluginCard} from './plugins.interface';
+import {MatCardModule} from '@angular/material/card'
+import {MatIconModule} from '@angular/material/icon'
+import {MatTooltipModule} from '@angular/material/tooltip'
+import {availableCards, PluginCard} from './plugins.interface'
 
 @Component({
     selector: 'app-plugins',
@@ -37,7 +37,7 @@ export class PluginsComponent implements AfterViewInit {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
                 data.forEach((plugin) => {
-                    const card = availableCards.find((x) => x.plugin_id == plugin.plugin_id);
+                    const card = availableCards.find((x) => x.plugin_id == plugin.plugin_id)
                     if (card) {
                         card.enabled = true
                         card.library_version = plugin.library_version

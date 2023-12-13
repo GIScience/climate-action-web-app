@@ -3,7 +3,7 @@ import {webSocket, WebSocketSubject} from 'rxjs/webSocket'
 import {environment} from '../../environments/environment'
 import {WSMessage} from './notification.interface'
 import {map, Observable} from 'rxjs'
-import moment from 'moment/moment';
+import moment from 'moment/moment'
 
 
 @Injectable({
@@ -47,5 +47,4 @@ export class NotificationService {
                 })
         }, 5000)
     }
-
 }

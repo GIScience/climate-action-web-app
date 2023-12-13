@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing'
 import {GeojsonComponent} from './geojson.component'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
 import {of} from 'rxjs'
-import SpyObj = jasmine.SpyObj;
+import SpyObj = jasmine.SpyObj
 
 describe('GeojsonComponent', () => {
     let component: GeojsonComponent
@@ -22,7 +22,7 @@ describe('GeojsonComponent', () => {
                     useValue: httpClientSpy
                 }
             ]
-        });
+        })
         fixture = TestBed.createComponent(GeojsonComponent)
         component = fixture.componentInstance
         fixture.detectChanges()
@@ -48,7 +48,7 @@ describe('GeojsonComponent', () => {
         }
         component.ngOnInit()
         expect(component.mapDivID).toEqual('')
-    });
+    })
 
     it('should render geojson', () => {
         httpClientSpy.get.and.returnValue(of({
@@ -111,5 +111,5 @@ describe('GeojsonComponent', () => {
         fixture.detectChanges()
 
         expect(component.geojsonLayer).toBeTruthy()
-    });
+    })
 })
