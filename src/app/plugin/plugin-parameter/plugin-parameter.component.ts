@@ -335,10 +335,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     type: 'success',
                     time: 5000
                 })
-                setTimeout(() => {
-                    this.router.navigate(['dashboard'])
-                }, 1000)
-
+                this.router.navigate(['dashboard'])
             },
             error: error => {
                 console.error('Error while request to compute plugin:', error)

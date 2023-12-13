@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {BehaviorSubject, Observable} from 'rxjs'
-import {Plugin, PluginCorrelator, PluginRun} from './plugin.interface'
+import {Plugin, PluginCorrelator, PluginRun, Status} from './plugin.interface'
 import {Artifact} from '../artifact/artifact.interface'
 import {environment} from '../../environments/environment'
 import moment from 'moment/moment';
@@ -68,7 +68,7 @@ export class PluginService {
         return this.pluginRunsSubject.asObservable()
     }
 
-    updateRunStatus(correlationId: string, newStatus: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input') {
+    updateRunStatus(correlationId: string, newStatus: Status) {
         const runs = this.getComputes()
         const index = runs.findIndex((run) => run.correlation_uuid === correlationId)
 
