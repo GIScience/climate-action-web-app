@@ -1,4 +1,4 @@
-import {JSONSchema7Type} from 'json-schema';
+import {JSONSchema7Type} from 'json-schema'
 
 export interface FormlyModel {
     [key: string]: string
@@ -13,10 +13,17 @@ export interface SelectOption {
     value: JSONSchema7Type
 }
 
-export interface DatepickerOptions {
-    [key: string]: DatepickerOption[]
+export interface ValidationProperty {
+    validation: ValidatorDescription[]
 }
 
-export interface DatepickerOption {
-    format: string
+export interface ValidatorDescription {
+    name: string,
+    options: ValidatorOptions
 }
+
+export interface ValidatorOptions {
+    min?: number | string,
+    max?: number | string
+}
+
