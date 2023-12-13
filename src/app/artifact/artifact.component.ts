@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core'
 import {PluginService} from '../plugin/plugin.service'
 import {ActiveArtifactRef, Artifact, ArtifactFlatNode, ArtifactNode} from './artifact.interface'
 import {ReportService} from '../report/report.service'
-import {PluginRun, Status} from '../plugin/plugin.interface'
+import {PluginRun} from '../plugin/plugin.interface'
 import {FlatTreeControl} from '@angular/cdk/tree'
 import {MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule} from '@angular/material/tree'
 import {MatIconModule} from '@angular/material/icon'
@@ -120,7 +120,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                         const run = this.currentRuns.find(x => x.correlation_uuid === message.correlation_uuid)
                         if (run && message.status) {
                             run.status = message.status
-                            this.pluginService.updateRunStatus(run.correlation_uuid, message.status)
                             this.syncArtifact(run)
                         }
                     }
@@ -159,8 +158,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                             }
                         })
                         this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
-                    } else {
-                        this.pluginService.updateRunStatus(run.correlation_uuid, run.status as Status)
                     }
                     this.updateNode(run.correlation_uuid, node)
                 },

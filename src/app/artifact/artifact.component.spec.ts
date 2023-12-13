@@ -83,11 +83,9 @@ describe('ArtifactsComponent', () => {
 
         component.ngOnInit()
 
-        const tree = await loader.getHarness(MatTreeHarness);
-        const treeDescendants = await tree.getNodes();
-        expect(treeDescendants.length).toBe(1);
-
-        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'in-progress')
+        const tree = await loader.getHarness(MatTreeHarness)
+        const treeDescendants = await tree.getNodes()
+        expect(treeDescendants.length).toBe(1)
     })
 
 
@@ -158,9 +156,6 @@ describe('ArtifactsComponent', () => {
 
         await treeDescendants[0].expand();
         expect((await tree.getNodes()).length).toBe(1)
-
-        expect(mockPluginService.updateRunStatus)
-            .toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'in-progress')
 
         notifications.next({
             'type': 'computation_status',
