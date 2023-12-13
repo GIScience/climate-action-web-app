@@ -15,7 +15,7 @@ import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateModule} from '@angular/materi
 import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import {JSONSchema7} from 'json-schema'
-import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../app.module'
+import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../app.validators'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent

@@ -75,7 +75,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     nodes: ArtifactNode[] = []
     dataChange = new BehaviorSubject<ArtifactNode[]>([])
-    dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+    dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener)
     currentRuns: PluginRun[] = []
     activeNode?: ArtifactFlatNode
     sync?: Subscription
@@ -185,7 +185,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         this.dataChange.next(this.nodes)
     }
 
-    isParent = (_: number, node: ArtifactFlatNode) => node.level == 0;
+    isParent = (_: number, node: ArtifactFlatNode) => node.level == 0
 
     renderReport(node: ArtifactFlatNode) {
         const report_f = {

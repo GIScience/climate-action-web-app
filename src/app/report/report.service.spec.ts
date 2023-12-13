@@ -2,9 +2,9 @@ import {TestBed} from '@angular/core/testing'
 
 import {ReportService} from './report.service'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {Artifact, ChartData} from '../artifact/artifact.interface';
-import {of} from 'rxjs';
-import SpyObj = jasmine.SpyObj;
+import {Artifact, ChartData} from '../artifact/artifact.interface'
+import {of} from 'rxjs'
+import SpyObj = jasmine.SpyObj
 
 describe('ReportService', () => {
     let service: ReportService

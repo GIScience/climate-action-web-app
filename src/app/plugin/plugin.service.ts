@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable} from 'rxjs'
 import {Plugin, PluginCorrelator, PluginRun, Status} from './plugin.interface'
 import {Artifact} from '../artifact/artifact.interface'
 import {environment} from '../../environments/environment'
-import moment from 'moment/moment';
+import moment from 'moment/moment'
 
 @Injectable({
     providedIn: 'root'

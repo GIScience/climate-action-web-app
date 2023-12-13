@@ -5,7 +5,7 @@ import GeoJSON from 'ol/format/GeoJSON.js'
 import Map from 'ol/Map'
 import TileLayer from 'ol/layer/Tile'
 import OSM from 'ol/source/OSM'
-import {View} from 'ol';
+import {View} from 'ol'
 import {fromLonLat, transformExtent} from 'ol/proj'
 import {getCenter} from 'ol/extent'
 import {Vector} from 'ol/source'

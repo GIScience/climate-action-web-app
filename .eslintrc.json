@@ -19,6 +19,10 @@
         "prettier"
       ],
       "rules": {
+        "@typescript-eslint/semi": [
+          "warn",
+          "never"
+        ],
         "@typescript-eslint/ban-ts-comment": [
           "error",
           {

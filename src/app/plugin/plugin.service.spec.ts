@@ -2,9 +2,9 @@ import {TestBed} from '@angular/core/testing'
 
 import {PluginService} from './plugin.service'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {of} from 'rxjs';
+import {of} from 'rxjs'
 import {Plugin, PluginCorrelator, PluginRun} from './plugin.interface'
-import SpyObj = jasmine.SpyObj;
+import SpyObj = jasmine.SpyObj
 
 describe('PluginService', () => {
     let service: PluginService
@@ -100,7 +100,7 @@ describe('PluginService', () => {
             expect(plugins).toHaveSize(2)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1);
+        expect(httpClientSpy.get.calls.count()).toBe(1)
     })
 
     it('should get single plugin', () => {
@@ -111,7 +111,7 @@ describe('PluginService', () => {
             expect(plugins).toBe(test_plugin)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1);
+        expect(httpClientSpy.get.calls.count()).toBe(1)
     })
 
     it('should invoke plugin computation', () => {
@@ -126,7 +126,7 @@ describe('PluginService', () => {
             expect(test_correlator).toEqual(test_correlator)
         })
 
-        expect(httpClientSpy.post.calls.count()).toBe(1);
+        expect(httpClientSpy.post.calls.count()).toBe(1)
     })
 
     it('should get artifacts', () => {
@@ -137,7 +137,7 @@ describe('PluginService', () => {
             expect(artifacts).toHaveSize(2)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1);
+        expect(httpClientSpy.get.calls.count()).toBe(1)
     })
 
     it('should get computes', () => {

@@ -45,5 +45,5 @@ describe('MarkdownComponent', () => {
         const markdown = fixture.debugElement.query(By.css('markdown'))
 
         expect(markdown.nativeElement.textContent).toEqual('markdown\n')
-    });
+    })
 })
