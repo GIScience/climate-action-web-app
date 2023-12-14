@@ -23,6 +23,15 @@ const ARTIFACT_ICON_MAP = {
     'MAP_LAYER_GEOTIFF': 'map'
 }
 
+const ARTIFACT_ORDER_MAP = {
+    'description': 1,
+    'image': 2,
+    'layers': 3,
+    'map': 4,
+    'bar_chart': 5,
+    'table_chart': 6
+}
+
 const STATUS_ICON_MAP = {
     'completed': 'check_circle_outline',
     'scheduled': 'scheduled',
@@ -100,7 +109,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if(this.sync)
+        if (this.sync)
             this.sync.unsubscribe()
     }
 
@@ -156,6 +165,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                                 summary: x.summary,
                                 ref: x
                             }
+                        }).sort((a, b) => {
+                            if (a.icon == b.icon) {
+                                return a.name.localeCompare(b.name)
+                            } else if (a.icon && b.icon && a.icon in ARTIFACT_ORDER_MAP && b.icon in ARTIFACT_ORDER_MAP) {
+                                // @ts-ignore The key-presence check in the line above is not picked up by the IDE
+                                return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
+                            }
+                            return 0
                         })
                         this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
                     }
@@ -180,7 +197,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         this.nodes = this.nodes.filter((x) => x.uuid != correlation_uuid)
         this.nodes.push(node)
         this.nodes.sort((a, b) => {
-            return moment(a.timestamp) > moment(b.timestamp) ? 1 : -1
+            return moment(a.timestamp) < moment(b.timestamp) ? 1 : -1
         })
         this.dataChange.next(this.nodes)
     }
