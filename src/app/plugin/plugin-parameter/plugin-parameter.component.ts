@@ -388,7 +388,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     title: `${this.plugin.plugin_id} parameters are send to process!`,
                     body: 'Result from plugin execution will be listing on the dashboard',
                     type: 'success',
-                    time: 5000
+                    time: 1000
                 })
                 this.router.navigate(['dashboard'])
             },
@@ -398,7 +398,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     title: `Error while computing plugin ${this.plugin.name}`,
                     body: `Error while computing plugin ${this.plugin.name}`,
                     type: 'error',
-                    time: 5000
+                    time: 1000
                 })
             }
         })
