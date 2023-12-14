@@ -25,6 +25,7 @@ import {MatInputModule} from '@angular/material/input'
 import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from '@angular/material-moment-adapter'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.validators'
+import {NotificationComponent} from './notification/notification.component'
 
 
 @NgModule({
@@ -69,7 +70,8 @@ import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.v
         MarkdownModule.forRoot(),
         MatTreeModule,
         NgChartsModule,
-        ArtifactComponent
+        ArtifactComponent,
+        NotificationComponent
     ],
     providers: [
         {
