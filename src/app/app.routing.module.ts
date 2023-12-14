@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core'
 import {RouterModule, Routes} from '@angular/router'
 
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component'
-import {HelpComponent} from './help/help.component'
 import {PluginsComponent} from './plugins/plugins.component'
 import {ArtifactComponent} from './artifact/artifact.component'
 import {DashboardComponent} from './dashboard/dashboard.component'
@@ -32,11 +31,6 @@ const routes: Routes = [
         path: 'artifacts',
         pathMatch: 'full',
         component: ArtifactComponent
-    },
-    {
-        path: 'help',
-        pathMatch: 'full',
-        component: HelpComponent
     },
     {
         path: '**',
