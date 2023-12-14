@@ -10,11 +10,11 @@ describe('AppComponent', () => {
         await TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                RouterTestingModule
+                RouterTestingModule,
+                NotificationComponent
             ],
             declarations: [
                 AppComponent,
-                NotificationComponent,
                 ToastComponent
             ],
             providers: []
