@@ -14,7 +14,7 @@ import {NotificationService} from '../notification/notification.service'
 import moment from 'moment/moment'
 
 
-const ARTIFACT_ICON_MAP = {
+const ARTIFACT_ICON_MAP: { [index: string]: string } = {
     'IMAGE': 'image',
     'MARKDOWN': 'description',
     'CHART': 'bar_chart',
@@ -23,7 +23,7 @@ const ARTIFACT_ICON_MAP = {
     'MAP_LAYER_GEOTIFF': 'map'
 }
 
-const ARTIFACT_ORDER_MAP = {
+const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     'description': 1,
     'image': 2,
     'layers': 3,
@@ -32,7 +32,7 @@ const ARTIFACT_ORDER_MAP = {
     'table_chart': 6
 }
 
-const STATUS_ICON_MAP = {
+const STATUS_ICON_MAP: { [index: string]: string } = {
     'completed': 'check_circle_outline',
     'scheduled': 'scheduled',
     'in-progress': 'scheduled',
@@ -169,7 +169,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                             if (a.icon == b.icon) {
                                 return a.name.localeCompare(b.name)
                             } else if (a.icon && b.icon && a.icon in ARTIFACT_ORDER_MAP && b.icon in ARTIFACT_ORDER_MAP) {
-                                // @ts-ignore The key-presence check in the line above is not picked up by the IDE
                                 return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
                             }
                             return 0
