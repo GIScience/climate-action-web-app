@@ -25,7 +25,10 @@ const routes: Routes = [
     },
     {
         path: 'plugin/:name',
-        component: PluginComponent
+        component: PluginComponent,
+        data: {
+            reuse: false
+        }
     },
     {
         path: 'artifacts',

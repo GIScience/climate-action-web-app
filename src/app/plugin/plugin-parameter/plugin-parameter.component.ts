@@ -68,9 +68,6 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
 
     ngOnChanges(): void {
-        if (this.options.resetModel)
-            this.options.resetModel({})
-
         const schema = this.plugin.operator_schema
         if (!schema)
             return

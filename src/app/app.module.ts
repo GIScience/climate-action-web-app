@@ -26,6 +26,8 @@ import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from '@angular/material-moment-adapter'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.validators'
 import {NotificationComponent} from './notification/notification.component'
+import {RouteReuseStrategy} from '@angular/router'
+import {CustomRouteReuseStrategy} from './app.ext'
 
 
 @NgModule({
@@ -94,6 +96,10 @@ import {NotificationComponent} from './notification/notification.component'
                     monthYearA11yLabel: 'LL'
                 }
             }
+        },
+        {
+            provide: RouteReuseStrategy,
+            useClass: CustomRouteReuseStrategy
         }
     ],
     bootstrap: [AppComponent]
