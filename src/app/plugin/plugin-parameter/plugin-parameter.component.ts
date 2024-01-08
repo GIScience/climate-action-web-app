@@ -178,10 +178,6 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         }
 
         switch (property.type) {
-            case 'boolean':
-            case 'integer':
-            case 'number':
-                break
             case 'string':
                 if (property['format'] === 'date') {
                     const minMax = this.checkForMinAndMaxDateRange(property)
@@ -206,17 +202,12 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     props.placeholder = 'Choose' //select placeholder is effectively default
                     props.options = this.selectOptions[this.getRefName(property.$ref)]
                 }
-                break
-            default:
-                break
         }
         return props
     }
 
     private getValidators(property: JSONSchema7): ValidationProperty {
         switch (property.type) {
-            case'boolean':
-                break
             case 'integer':
                 return {validation: [{name: 'intType', options: this.checkForMinAndMaxRange(property)}]}
             case 'number':
@@ -225,31 +216,13 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 if (property['format'] === 'date') {
                     return {validation: [{name: 'dateType', options: this.checkForMinAndMaxDateRange(property)}]}
                 }
-                break
-            case 'array':
-            case undefined:
-            default:
-                break
-
         }
         return {'validation': []}
     }
 
     private getParsers(property: JSONSchema7) {
-        switch (property.type) {
-            case'boolean':
-            case 'integer':
-            case 'number':
-                break
-            case 'string':
-                if (property['format'] === 'date') {
-                    return [this.parseDate]
-                }
-                break
-            case 'array':
-            case undefined:
-            default:
-                break
+        if (property.type === 'string' && property['format'] === 'date') {
+            return [this.parseDate]
         }
         return []
     }
