@@ -109,6 +109,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             return []
 
         const fields: FormlyFieldConfig[] = []
+        const optionalSubgroup: FormlyFieldConfig[] = []
 
         for (const [key, value] of Object.entries(schema.properties)) {
             if (typeof value != 'boolean') {
@@ -126,11 +127,28 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 field.validators = this.getValidators(value)
                 field.parsers = this.getParsers(value)
 
-                if (schema.required && schema.required.includes(key))
+                if (schema.required && schema.required.includes(key)) {
                     field.props.required = true
-
-                fields.push(field)
+                    fields.push(field)
+                } else {
+                    optionalSubgroup.push(field)
+                }
             }
+        }
+
+        if (optionalSubgroup.length > 0) {
+            fields.push({
+                type: 'expander',
+                fieldGroup: [
+                    {
+                        props: {
+                            label: 'Optional Attributes',
+                            description: 'Click here to access more configurations.'
+                        },
+                        fieldGroup: optionalSubgroup
+                    }
+                ]
+            })
         }
 
         return fields

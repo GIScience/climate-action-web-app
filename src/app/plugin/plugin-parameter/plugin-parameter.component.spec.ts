@@ -16,6 +16,8 @@ import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import {JSONSchema7} from 'json-schema'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../app.validators'
+import {FormlyFieldExpansionPanelComponent} from '../../types/formlyFieldExpansionPanel.type'
+import {MatExpansionModule} from '@angular/material/expansion'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -23,6 +25,7 @@ describe('PluginParameterComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
+            declarations: [FormlyFieldExpansionPanelComponent],
             imports: [
                 FormlyModule.forRoot({
                     validators: [
@@ -37,7 +40,8 @@ describe('PluginParameterComponent', () => {
                         {name: 'null', component: NullTypeComponent, wrappers: ['form-field']},
                         {name: 'array', component: ArrayTypeComponent},
                         {name: 'object', component: ObjectTypeComponent},
-                        {name: 'multischema', component: MultiSchemaTypeComponent}
+                        {name: 'multischema', component: MultiSchemaTypeComponent},
+                        {name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: []}
                     ]
                 }),
                 BrowserAnimationsModule,
@@ -45,6 +49,7 @@ describe('PluginParameterComponent', () => {
                 FormlyMaterialModule,
                 MomentDateModule,
                 MatDatepickerModule,
+                MatExpansionModule,
                 PluginParameterComponent,
                 ReactiveFormsModule,
                 HttpClientModule
@@ -103,83 +108,20 @@ describe('PluginParameterComponent', () => {
 
         expect(component.highlightedFeatures).toEqual([])
         expect(component.aoiAttribute).toBe('blueprint_aoi')
-        expect(component.fields.map((x) => x.key))
-            .toEqual([
-                'blueprint_bool',
-                'blueprint_int',
-                'blueprint_float',
-                'blueprint_string',
-                'blueprint_date',
-                'blueprint_select',
-                'blueprint_select_multi'])
         expect(component.selectOptions['Option'].map((x) => x.label))
             .toEqual([
                 'Option 1',
                 'Option 2'
             ])
-        const expectedSchema: FormlyFieldConfig[] = [{
-            key: 'blueprint_bool',
-            type: 'checkbox',
-            props: {
-                label: 'Boolean Input',
-                description: 'A required boolean parameter.',
-                placeholder: 'true',
-                required: true
-            },
-            validators: {
-                validation: []
-            },
-            parsers: []
-        },
+        const expectedSchema: FormlyFieldConfig[] = [
             {
-                key: 'blueprint_int',
-                type: 'input',
+                key: 'blueprint_bool',
+                type: 'checkbox',
                 props: {
-                    label: 'Integer Input',
-                    description: 'An optional integer parameter.',
-                    placeholder: '3'
-                },
-                validators: {
-                    validation: [
-                        {
-                            name: 'intType',
-                            options: {
-                                min: 0,
-                                max: 100
-                            }
-                        }
-                    ]
-                },
-                parsers: []
-            },
-            {
-                key: 'blueprint_float',
-                type: 'input',
-                props: {
-                    label: 'Float Input',
-                    description: 'An optional floating point parameter.',
-                    placeholder: '2.1'
-                },
-                validators: {
-                    validation: [
-                        {
-                            name: 'numType',
-                            options: {
-                                min: 0.5,
-                                max: 4
-                            }
-                        }
-                    ]
-                },
-                parsers: []
-            },
-            {
-                key: 'blueprint_string',
-                type: 'input',
-                props: {
-                    label: 'String Input',
-                    description: 'An optional string parameter.',
-                    placeholder: 'John Doe'
+                    label: 'Boolean Input',
+                    description: 'A required boolean parameter.',
+                    placeholder: 'true',
+                    required: true
                 },
                 validators: {
                     validation: []
@@ -187,76 +129,144 @@ describe('PluginParameterComponent', () => {
                 parsers: []
             },
             {
-                key: 'blueprint_date',
-                type: 'datepicker',
-                props: {
-                    label: 'Date Input',
-                    description: 'An optional date parameter.',
-                    placeholder: '2020-01-01',
-                    datepickerOptions: {
-                        startAt: '2020-01-01',
-                        min: '1970-01-01',
-                        max: new Date().toISOString().split('T')[0]
+                type: 'expander',
+                fieldGroup: [
+                    {
+                        props: {
+                            label: 'Optional Attributes',
+                            description: 'Click here to access more configurations.'
+                        },
+                        fieldGroup: [
+                            {
+                                key: 'blueprint_int',
+                                type: 'input',
+                                props: {
+                                    label: 'Integer Input',
+                                    description: 'An optional integer parameter.',
+                                    placeholder: '3'
+                                },
+                                validators: {
+                                    validation: [
+                                        {
+                                            name: 'intType',
+                                            options: {
+                                                min: 0,
+                                                max: 100
+                                            }
+                                        }
+                                    ]
+                                },
+                                parsers: []
+                            },
+                            {
+                                key: 'blueprint_float',
+                                type: 'input',
+                                props: {
+                                    label: 'Float Input',
+                                    description: 'An optional floating point parameter.',
+                                    placeholder: '2.1'
+                                },
+                                validators: {
+                                    validation: [
+                                        {
+                                            name: 'numType',
+                                            options: {
+                                                min: 0.5,
+                                                max: 4
+                                            }
+                                        }
+                                    ]
+                                },
+                                parsers: []
+                            },
+                            {
+                                key: 'blueprint_string',
+                                type: 'input',
+                                props: {
+                                    label: 'String Input',
+                                    description: 'An optional string parameter.',
+                                    placeholder: 'John Doe'
+                                },
+                                validators: {
+                                    validation: []
+                                },
+                                parsers: []
+                            },
+                            {
+                                key: 'blueprint_date',
+                                type: 'datepicker',
+                                props: {
+                                    label: 'Date Input',
+                                    description: 'An optional date parameter.',
+                                    placeholder: '2020-01-01',
+                                    datepickerOptions: {
+                                        startAt: '2020-01-01',
+                                        min: '1970-01-01',
+                                        max: new Date().toISOString().split('T')[0]
+                                    }
+                                },
+                                validators: {
+                                    validation: [{
+                                        name: 'dateType',
+                                        options: {
+                                            min: '1970-01-01',
+                                            max: new Date().toISOString().split('T')[0]
+                                        }
+                                    }]
+                                },
+                                parsers: [component.parseDate]
+                            },
+                            {
+                                key: 'blueprint_select',
+                                type: 'select',
+                                props: {
+                                    label: 'Selection Input',
+                                    description: 'An optional selection parameter. The user can choose one of the available options.',
+                                    placeholder: 'Choose',
+                                    options: [
+                                        {
+                                            label: 'Option 1',
+                                            value: 'Option 1'
+                                        },
+                                        {
+                                            label: 'Option 2',
+                                            value: 'Option 2'
+                                        }
+                                    ]
+                                },
+                                validators: {
+                                    validation: []
+                                },
+                                parsers: []
+                            },
+                            {
+                                key: 'blueprint_select_multi',
+                                type: 'select',
+                                props: {
+                                    label: 'Multi-Selection Input',
+                                    description: 'An optional selection parameter. The user can choose multiple of the available options.',
+                                    placeholder: 'Option 2',
+                                    multiple: true,
+                                    options: [
+                                        {
+                                            label: 'Option 1',
+                                            value: 'Option 1'
+                                        },
+                                        {
+                                            label: 'Option 2',
+                                            value: 'Option 2'
+                                        }
+                                    ]
+                                },
+                                validators: {
+                                    validation: []
+                                },
+                                parsers: []
+                            }]
                     }
-                },
-                validators: {
-                    validation: [{
-                        name: 'dateType',
-                        options: {
-                            min: '1970-01-01',
-                            max: new Date().toISOString().split('T')[0]
-                        }
-                    }]
-                },
-                parsers: [component.parseDate]
-            },
-            {
-                key: 'blueprint_select',
-                type: 'select',
-                props: {
-                    label: 'Selection Input',
-                    description: 'An optional selection parameter. The user can choose one of the available options.',
-                    placeholder: 'Choose',
-                    options: [
-                        {
-                            label: 'Option 1',
-                            value: 'Option 1'
-                        },
-                        {
-                            label: 'Option 2',
-                            value: 'Option 2'
-                        }
-                    ]
-                },
-                validators: {
-                    validation: []
-                },
-                parsers: []
-            },
-            {
-                key: 'blueprint_select_multi',
-                type: 'select',
-                props: {
-                    label: 'Multi-Selection Input',
-                    description: 'An optional selection parameter. The user can choose multiple of the available options.',
-                    placeholder: 'Option 2',
-                    multiple: true,
-                    options: [
-                        {
-                            label: 'Option 1',
-                            value: 'Option 1'
-                        },
-                        {
-                            label: 'Option 2',
-                            value: 'Option 2'
-                        }
-                    ]
-                },
-                validators: {
-                    validation: []
-                },
-                parsers: []
-            }]
+                ]
+            }
+        ]
 
         component.fields = component.parseFields(test_schema)
         expect(component.fields).toEqual(expectedSchema)
