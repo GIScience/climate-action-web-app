@@ -1,0 +1,11 @@
+<mat-expansion-panel *ngFor="let subForm of field.fieldGroup">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            {{ subForm.props?.label }}
+        </mat-panel-title>
+        <mat-panel-description>
+            {{ subForm.props?.description }}
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <formly-field [field]="subForm"></formly-field>
+</mat-expansion-panel>

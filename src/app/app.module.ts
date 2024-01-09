@@ -28,6 +28,8 @@ import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.v
 import {NotificationComponent} from './notification/notification.component'
 import {RouteReuseStrategy} from '@angular/router'
 import {CustomRouteReuseStrategy} from './app.ext'
+import {FormlyFieldExpansionPanelComponent} from './types/formlyFieldExpansionPanel.type'
+import {MatExpansionModule} from '@angular/material/expansion'
 
 
 @NgModule({
@@ -38,7 +40,8 @@ import {CustomRouteReuseStrategy} from './app.ext'
         ObjectTypeComponent,
         MultiSchemaTypeComponent,
         NullTypeComponent,
-        ChartComponent
+        ChartComponent,
+        FormlyFieldExpansionPanelComponent
     ],
     imports: [
         MatInputModule,
@@ -52,6 +55,7 @@ import {CustomRouteReuseStrategy} from './app.ext'
         MatDatepickerModule,
         FormlyMaterialModule,
         MatMomentDateModule,
+        MatExpansionModule,
         FormlyModule.forRoot({
             validators: [
                 {name: 'intType', validation: intTypeValidator},
@@ -65,7 +69,8 @@ import {CustomRouteReuseStrategy} from './app.ext'
                 {name: 'null', component: NullTypeComponent, wrappers: ['form-field']},
                 {name: 'array', component: ArrayTypeComponent},
                 {name: 'object', component: ObjectTypeComponent},
-                {name: 'multischema', component: MultiSchemaTypeComponent}
+                {name: 'multischema', component: MultiSchemaTypeComponent},
+                {name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: []}
             ]
         }),
         FormlyMatDatepickerModule,
