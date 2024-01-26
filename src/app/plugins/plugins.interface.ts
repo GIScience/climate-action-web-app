@@ -19,8 +19,8 @@ export const availableCards = [
         image_source: 'https://unsplash.com/@sxoxm'
     }, {
         enabled: false,
-        plugin_id: 'lulcchangeemissionestimation',
-        name: 'GHG Emission from LULC',
+        plugin_id: 'lulc_change_emission_estimation',
+        name: 'GHG Emission from LULC Change',
         image: 'https://images.unsplash.com/photo-1436096290837-f876913c5d20?q=80&w=500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         image_source: 'https://unsplash.com/@bazylu'
     }, {
