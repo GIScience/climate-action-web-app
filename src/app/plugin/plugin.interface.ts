@@ -1,9 +1,16 @@
 import {JSONSchema7} from 'json-schema'
 
+export interface PluginAuthor {
+    name: string
+    affiliation: string
+    website: URL
+}
+
 export interface Plugin {
     plugin_id: string
     name: string
     icon: string
+    authors: Array<PluginAuthor>
     version: string
     concerns: Array<Concern>
     purpose: string
