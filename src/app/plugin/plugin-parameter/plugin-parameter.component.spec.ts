@@ -91,6 +91,7 @@ describe('PluginParameterComponent', () => {
         component.plugin = {
             'name': 'testplugin',
             'icon': '',
+            'authors': [],
             'version': '0.0.1',
             'concerns': [],
             'purpose': '',

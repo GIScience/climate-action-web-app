@@ -4,6 +4,11 @@
             <div class="p-10 bgc-white bd plugin-content">
                 <div class="container-fluid">
                     <h1>{{ plugin.name }}</h1>
+                    <address class="author">
+                        <div *ngFor="let author of plugin.authors">
+                            <a rel="author" href="{{author.website}}">{{ author.name }}</a>, {{ author.affiliation }}
+                        </div>
+                    </address>
                     <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
                     <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
                     <div *ngIf="plugin.sources">
