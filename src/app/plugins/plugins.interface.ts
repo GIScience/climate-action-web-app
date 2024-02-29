@@ -47,5 +47,11 @@ export const availableCards = [
         name: 'Soil Consumption',
         image: 'https://images.unsplash.com/photo-1557234195-bd9f290f0e4d?q=80&w=500&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         image_source: 'https://unsplash.com/@synkevych'
+    },{
+        enabled: false,
+        plugin_id: 'walkability',
+        name: 'Walkability',
+        image: 'https://images.unsplash.com/photo-1591635743434-b80f98fdce72?q=80&w=500&auto=format&it=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image_source: 'https://unsplash.com/@paulmelki'
     }
 ] as PluginCard[]
