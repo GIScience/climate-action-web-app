@@ -22,6 +22,7 @@ Make sure to start at least one plugin.
 Run `npm run build:{build_target}` to build the project.
 Currently available `build_target`s are 
 
+ - dev
  - staging
  - prod
 
