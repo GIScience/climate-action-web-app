@@ -32,6 +32,11 @@ docker_build_deploy:
           --context "${CI_PROJECT_DIR}" \
           --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
           --build-arg BUILD_TARGET=staging \
+          --destination "docker.io/heigit/ca-${CI_PROJECT_NAME}:staging"
+        /kaniko/executor \
+          --context "${CI_PROJECT_DIR}" \
+          --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+          --build-arg BUILD_TARGET=dev \
           --destination "docker.io/heigit/ca-${CI_PROJECT_NAME}:devel"
       else
         /kaniko/executor \
