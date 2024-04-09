@@ -30,7 +30,7 @@ export class TableComponent implements OnInit {
 
     private parseCSVData(csvData: string): void {
         this.papa.parse(csvData, {
-            header: true,
+            header: false,
             skipEmptyLines: true,
             complete: (result) => {
                 this.csvData = result.data
