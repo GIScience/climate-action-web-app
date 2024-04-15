@@ -50,6 +50,12 @@ describe('TableComponent', () => {
 
         tick(100)
 
+        const expectedHeaders = ['Username', 'Identifier', 'First name', 'Last name']
+        const renderedHeaders = fixture.debugElement.queryAll(By.css('th'))
+        .map(headerElement => headerElement.nativeElement.textContent.trim())
+
+        expect(renderedHeaders).toEqual(expectedHeaders)
+
         const ths = fixture.debugElement.queryAll(By.css('th'))
         expect(ths).toHaveSize(1 * 4)
 
