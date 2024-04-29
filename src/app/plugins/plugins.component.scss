@@ -17,7 +17,6 @@
   justify-content: center;
   margin: 0 var(--img-gap);
   overflow: hidden;
-  height: 90%;
 }
 
 .plugin-card {
@@ -49,6 +48,7 @@
 }
 
 .plugin-card > img {
+  height: 100%;
   object-fit: cover;
 }
 

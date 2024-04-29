@@ -8,6 +8,8 @@ import moment from 'moment'
 import {MatListModule} from '@angular/material/list'
 import {MatIconModule} from '@angular/material/icon'
 import {CommonModule} from '@angular/common'
+import {TuiDropdownModule} from '@taiga-ui/core'
+import {TuiActiveZoneModule} from '@taiga-ui/cdk'
 
 @Component({
     selector: 'app-runs',
@@ -15,7 +17,9 @@ import {CommonModule} from '@angular/common'
     imports: [
         MatIconModule,
         MatListModule,
-        CommonModule
+        CommonModule,
+        TuiDropdownModule,
+        TuiActiveZoneModule
     ],
     styleUrls: ['./notification.component.scss'],
     standalone: true
@@ -28,6 +32,15 @@ export class NotificationComponent implements OnInit, OnDestroy {
     protected readonly moment = moment
     protected notificationLog: WSMessage[] = []
     private sync?: Subscription
+    open = false
+
+    onClick(): void {
+        this.open = !this.open
+    }
+
+    onActiveZone(active: boolean): void {
+        this.open = active && this.open
+    }
 
     constructor(private notificationService: NotificationService, private pluginService: PluginService) {
     }

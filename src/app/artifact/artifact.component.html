@@ -2,8 +2,8 @@
     <h3 class="mx-2">Artifacts</h3>
 
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-        <mat-tree-node *matTreeNodeDef="let node;when: isParent" class="mat-tree-parent-node run-card grid">
-            <div class="col-md-2 col-lg-2">
+        <mat-tree-node *matTreeNodeDef="let node;when: isParent" class="mat-tree-parent-node run-card">
+            <div class="mX-20">
                 <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name" *ngIf="node.expandable">
                     <mat-icon class="mat-icon-rtl-mirror">
                         {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
@@ -11,24 +11,24 @@
                 </button>
                 <button mat-icon-button disabled *ngIf="!node.expandable" aria-label="Expand node"></button>
             </div>
-            <div class="col-md-8 col-lg-9 card-header">
-                <h5>{{node.name}}</h5>
-                <p class="card-subtitle">{{node.timestamp}}</p>
-                <p class="card-subtitle">{{node.uuid}}</p>
+            <div class="card-header">
+                <h3>{{node.name}}</h3>
+                <p class="card-subtitle m-0">{{node.timestamp}}</p>
+                <p class="card-subtitle m-0">{{node.uuid}}</p>
             </div>
             <mat-icon aria-hidden="false"
                       aria-label="Run progress"
                       fontIcon="{{node.icon}}"
-                      class="col-md-2 col-lg-1 run-status"
+                      class="run-status mL-a mR-30"
                       matTooltip="{{node.status}}"/>
         </mat-tree-node>
         <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding
-                       class="mat-tree-child-node grid"
+                       class="mat-tree-child-node"
                        (click)="renderReport(node); storeActivatedRef(node)"
                        (keydown)="renderReport(node); storeActivatedRef(node)"
                        [ngClass]="{ 'mat-tree-child-node-highlight': activeNode === node }"
                        tabindex="0">
-            <div class="col-lg-11 offset-1">
+            <div class="mL-35">
                 <div matTooltip="{{node.summary}}"
                      matTooltipPosition="right">
                     <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{node.icon}}"/>

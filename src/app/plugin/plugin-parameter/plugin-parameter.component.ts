@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnChanges, ViewEncapsulation} from '@angular/core'
+import {AfterViewInit, Component, Input, OnChanges, ViewEncapsulation, Inject} from '@angular/core'
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
@@ -16,7 +16,7 @@ import {regions} from '../../support/region-of-interest'
 import {FeatureLike} from 'ol/Feature.js'
 import {Geometry} from 'ol/geom.js'
 import {PluginService} from '../plugin.service'
-import {ToastService} from '../../toast/toast.service'
+import {TuiAlertService} from '@taiga-ui/core'
 import {Plugin} from '../plugin.interface'
 import {
     FormlyModel,
@@ -29,6 +29,7 @@ import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
 import moment from 'moment/moment'
+import {TuiButtonModule} from '@taiga-ui/core'
 
 
 @Component({
@@ -38,7 +39,8 @@ import moment from 'moment/moment'
     imports: [
         FormlyModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        TuiButtonModule
     ],
     standalone: true,
     encapsulation: ViewEncapsulation.None
@@ -62,7 +64,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     highlightedFeatures: Array<FeatureLike> = []
 
     constructor(private pluginService: PluginService,
-                private toastService: ToastService,
+                @Inject(TuiAlertService) private readonly alerts: TuiAlertService,
                 private router: Router) {
     }
 
@@ -372,22 +374,18 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
             next: (data) => {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
-                this.toastService.next({
-                    title: `${this.plugin.plugin_id} parameters are send to process!`,
-                    body: 'Result from plugin execution will be listing on the dashboard',
-                    type: 'success',
-                    time: 1000
-                })
+
+                this.alerts
+                .open('Result from plugin execution will be listed on the dashboard.', {label: `${this.plugin.plugin_id}` + ' parameters are sent for processing!', status: 'success', autoClose: false,})
+                .subscribe()
                 this.router.navigate(['dashboard'])
             },
             error: error => {
-                console.error('Error while request to compute plugin:', error)
-                this.toastService.next({
-                    title: `Error while computing plugin ${this.plugin.name}`,
-                    body: `Error while computing plugin ${this.plugin.name}`,
-                    type: 'error',
-                    time: 1000
-                })
+
+                this.alerts
+                .open('Please try again.', {label: 'Error while computing plugin ' + `${this.plugin.name}`, status: 'error', autoClose: false,})
+                .subscribe()
+                this.router.navigate(['dashboard'])
             }
         })
     }
@@ -413,7 +411,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     private alertUserMissingFields(missingFields: string[]) {
         let aoiBody = ''
         if (this.aoiAttribute && missingFields.includes(this.aoiAttribute)) {
-            aoiBody = 'don\'t forget to choose an area on the map.'
+            aoiBody = 'Don\'t forget to choose an area on the map.'
             missingFields = missingFields.filter(e => e !== this.aoiAttribute)
         }
 
@@ -423,12 +421,9 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
         if (aoiBody)
             body.push(aoiBody)
 
-        this.toastService.next({
-            title: 'Required fields empty!',
-            body: body.join(' and '),
-            type: 'error',
-            time: 4000
-        })
+        this.alerts
+            .open(body.join(' and '), {label: 'Required fields empty!', status: 'warning', autoClose: 7000})
+            .subscribe()
 
     }
 
