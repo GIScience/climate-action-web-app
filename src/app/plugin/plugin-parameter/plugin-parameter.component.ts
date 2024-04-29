@@ -290,6 +290,10 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     private initMap() {
+        const view = new View({
+            center: fromLonLat([8.6759928, 49.4187355]),
+            zoom: 10
+        })
         this.map = new Map({
             layers: [
                 new TileLayer({
@@ -297,10 +301,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 })
             ],
             target: 'map',
-            view: new View({
-                center: fromLonLat([8.6759928, 49.4187355]),
-                zoom: 10
-            })
+            view: view
         })
 
         this.selectedRegionLayer = new VectorLayer({
@@ -326,6 +327,9 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             dataProjection: 'EPSG:4326',
             featureProjection: 'EPSG:3857'
         }))
+
+        view.fit(regionSource.getExtent(), {padding: [100, 100, 100, 100]})
+
 
         this.map.on('click', (evt) => {
             this.selectRegions(evt.pixel)
