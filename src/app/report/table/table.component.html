@@ -1,13 +1,13 @@
 <div class="bd mY-2 table-report-item">
-    <table class="table table-bordered table-hover" *ngIf="csvData.length > 0">
+    <table class="tui-table tui-table_font-size_s table-bordered table-hover bgc-white" *ngIf="csvData.length > 0">
         <thead>
-            <tr *ngFor="let record of csvData | slice: 0 : 1">
-                <th *ngFor="let field of record | keyvalue">{{ field.value }}</th>
+            <tr class="tui-table__tr" *ngFor="let record of csvData | slice: 0 : 1">
+                <th class="tui-table__th" *ngFor="let field of record | keyvalue"><strong>{{ field.value }}</strong></th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
-        <tr *ngFor="let record of csvData | slice: 1">
-            <td *ngFor="let field of record | keyvalue">{{ field.value }}</td>
+        <tr class="tui-table__tr" *ngFor="let record of csvData | slice: 1">
+            <td class="tui-table__td" *ngFor="let field of record | keyvalue">{{ field.value }}</td>
         </tr>
         </tbody>
     </table>

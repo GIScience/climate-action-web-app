@@ -44,12 +44,13 @@
       > li {
         float: left;
 
-        > a {
+        > button {
           color: $default-text-color;
           display: block;
           line-height: $header-height;
           min-height: $header-height;
-          padding: 0 25px;
+          margin: 0 15px;
+          padding: 0 10px;
           transition: all 0.2s ease-in-out;
 
           i {

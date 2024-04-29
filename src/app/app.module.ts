@@ -9,7 +9,6 @@ import {MatTreeModule} from '@angular/material/tree'
 
 import {AppRoutingModule} from './app.routing.module'
 import {AppComponent} from './app.component'
-import {ToastComponent} from './toast/toast.component'
 import {NgOptimizedImage} from '@angular/common'
 import {ObjectTypeComponent} from './types/object.type'
 import {MultiSchemaTypeComponent} from './types/multischema.type'
@@ -30,12 +29,13 @@ import {RouteReuseStrategy} from '@angular/router'
 import {CustomRouteReuseStrategy} from './app.ext'
 import {FormlyFieldExpansionPanelComponent} from './types/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
+import {NgDompurifySanitizer} from '@tinkoff/ng-dompurify'
+import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT_POSITION} from '@taiga-ui/core'
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        ToastComponent,
         ArrayTypeComponent,
         ObjectTypeComponent,
         MultiSchemaTypeComponent,
@@ -78,7 +78,10 @@ import {MatExpansionModule} from '@angular/material/expansion'
         MatTreeModule,
         NgChartsModule,
         ArtifactComponent,
-        NotificationComponent
+        NotificationComponent,
+        TuiRootModule,
+        TuiDialogModule,
+        TuiAlertModule
     ],
     providers: [
         {
@@ -105,6 +108,14 @@ import {MatExpansionModule} from '@angular/material/expansion'
         {
             provide: RouteReuseStrategy,
             useClass: CustomRouteReuseStrategy
+        },
+        {
+            provide: TUI_SANITIZER,
+            useClass: NgDompurifySanitizer
+        },
+        {
+            provide: TUI_ALERT_POSITION,
+            useValue: 'auto 3rem 3rem auto'
         }
     ],
     bootstrap: [AppComponent]

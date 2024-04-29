@@ -1,11 +1,11 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
-    <div class="row">
-        <div class="col-12">
+    <div>
+        <div>
             <div id="map" style="height: 550px" class="bd"></div>
         </div>
     </div>
-    <div class="row">
+    <div>
         <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form" class="plugin-params-form"></formly-form>
-        <button type="submit" class="btn btn-default btn-outline-dark" [disabled]="!form.valid">Compute</button>
+        <button type="submit" appearance="primary" tuiButton class="mY-10" [disabled]="!form.valid">Compute</button>
     </div>
 </form>

@@ -12,5 +12,5 @@ body {
 }
 
 .markdown table {
-  @extend .table;
+  @extend .table !optional;
 }
