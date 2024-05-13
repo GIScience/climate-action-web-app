@@ -9,8 +9,15 @@
 
 }
 
+.download-btn {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+}
+
 .report-content {
   scrollbar-gutter: stable;
   height: calc(100vh - (25vh + 42px + 95px));
   overflow-y: scroll;
+  position: relative;
 }

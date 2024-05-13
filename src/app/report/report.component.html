@@ -1,5 +1,6 @@
 <div class="p-10 bgc-white bd h-100p report-content">
-    <h3>Dashboard </h3>
+    <h3>Dashboard</h3>
+    <button *ngIf="currentUrl || downloadJsonHref" (click)="downloadContent()" class="download-btn"><i class="ti-download"></i> Download</button>
     <div class="report" id="report-page">
         <ng-container #container></ng-container>
     </div>
