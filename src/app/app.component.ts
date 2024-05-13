@@ -10,4 +10,8 @@ export class AppComponent  {
     title = 'Climate Action Platform'
     name = 'HeiGIT'
     version: string = packageInfo.version
+
+    currentYear(): number {
+        return new Date().getFullYear()
+    }
 }
