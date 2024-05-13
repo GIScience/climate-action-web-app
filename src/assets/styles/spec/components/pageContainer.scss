@@ -13,19 +13,7 @@
 
 .page-container {
   min-height: 100vh;
-  // padding-left: $offscreen-size;
   transition: all 0.2s ease;
-
-  // @include between($breakpoint-md, $breakpoint-xl) {
-  //   padding-left: $collapsed-size;
-  // }
-  // @include from($breakpoint-md) {
-  //   padding-left: $collapsed-size;
-  // }
-
-  // @include to($breakpoint-md) {
-  //   padding-left: 0;
-  // }
 }
 
 // ---------------------------------------------------------
@@ -35,11 +23,7 @@
 .main-content {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  padding: 75px 15px 0 15px;
-  
-  // @include to($breakpoint-md) {
-  //   padding: 85px 5px 5px;
-  // }
+  padding: 60px 15px 0;
 }
 
 .remain-height {
@@ -79,10 +63,6 @@
     @include to($breakpoint-md) {
       padding-left: 0;
     }
-
-    // @include between($breakpoint-md, $breakpoint-xl) {
-    //   padding-left: $offscreen-size;
-    // }
   }
 
   .full-container {

@@ -1,6 +1,6 @@
 <tui-root>
     <div class="page-container bgc-grey-100">
-        <div class="header navbar" style="height: 65px">
+        <div class="header navbar">
             <div class="header-container">
                 <div class="nav-left">
                     <h2 [routerLink]="'/dashboard'">{{title}}</h2>
@@ -11,7 +11,7 @@
 
         <router-outlet></router-outlet>
         <footer class="footer bdT ta-c fsz-sm c-grey-600">
-            <span class="about-info"> © 2023 HeiGIT gGmbH |
+            <span class="about-info"> © {{currentYear()}} HeiGIT gGmbH |
                 <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
                 <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a></span>
             <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>

@@ -15,13 +15,19 @@
 .menu {
   display: flex;
   justify-content: center;
-  margin: 0 var(--img-gap);
   overflow: hidden;
+}
+
+.plugins-list {
+  position: absolute;
+  bottom: 15px;
+  width: 100%;
 }
 
 .plugin-card {
   min-width: 100px;
-  max-width: 300px;
+  max-width: 250px;
+  max-height: 20vh;
   background-color: #f9f9f9;
   border-radius: 0;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -34,13 +40,19 @@
 }
 
 .plugin-card .mat-mdc-card-header {
-  padding: 0 10px 0;
+  background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.85) 75%, rgba(255, 255, 255, 0) 100%);
+  padding: 10px;
   height: 60px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1;
 }
 
 .plugin-card .mat-mdc-card-title {
   font-size: small;
   color: black;
+  line-height: 1.15;
 }
 
 .plugin-card .mat-mdc-card-subtitle {
@@ -48,6 +60,7 @@
 }
 
 .plugin-card > img {
+  aspect-ratio: 1;
   height: 100%;
   object-fit: cover;
 }
@@ -59,7 +72,7 @@
 }
 
 .plugin-card.disabled-card {
-  filter: brightness(60%);
+  filter: opacity(0.75) brightness(60%) grayscale(1);
   cursor: default;
 }
 

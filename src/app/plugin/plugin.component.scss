@@ -4,7 +4,6 @@
   overflow-y: auto;
   scrollbar-gutter: stable;
   height: calc(100vh - (#{globals.$plugin-height} + #{globals.$footer-buffer} + #{globals.$header-buffer} + #{globals.$header}));
-  text-align: justify;
 }
 
 .source-item {
