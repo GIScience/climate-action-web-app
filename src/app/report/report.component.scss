@@ -20,4 +20,5 @@
   height: calc(100vh - (25vh + 42px + 95px));
   overflow-y: scroll;
   position: relative;
+  scroll-behavior: smooth;
 }
