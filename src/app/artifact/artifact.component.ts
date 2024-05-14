@@ -4,13 +4,16 @@ import {ActiveArtifactRef, Artifact, ArtifactFlatNode, ArtifactNode} from './art
 import {ReportService} from '../report/report.service'
 import {PluginRun} from '../plugin/plugin.interface'
 import {FlatTreeControl} from '@angular/cdk/tree'
+import {MatListModule} from '@angular/material/list'
 import {MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule} from '@angular/material/tree'
 import {MatIconModule} from '@angular/material/icon'
 import {MatButtonModule} from '@angular/material/button'
 import {BehaviorSubject, Subscription} from 'rxjs'
-import {NgClass, NgIf} from '@angular/common'
+import {NgClass, NgIf, CommonModule} from '@angular/common'
 import {MatTooltipModule} from '@angular/material/tooltip'
 import {NotificationService} from '../notification/notification.service'
+import {TuiDropdownModule} from '@taiga-ui/core'
+import {TuiActiveZoneModule} from '@taiga-ui/cdk'
 import moment from 'moment/moment'
 
 
@@ -47,10 +50,14 @@ const STATUS_ICON_MAP: { [index: string]: string } = {
     imports: [
         MatTreeModule,
         MatButtonModule,
+        MatListModule,
         MatIconModule,
         MatTooltipModule,
         NgIf,
-        NgClass
+        NgClass,
+        TuiDropdownModule,
+        TuiActiveZoneModule,
+        CommonModule
     ],
     standalone: true
 })
@@ -88,6 +95,8 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     currentRuns: PluginRun[] = []
     activeNode?: ArtifactFlatNode
     sync?: Subscription
+    archivedArtifacts: any[] = []
+    open = false
 
     constructor(private pluginService: PluginService,
                 private reportService: ReportService,
@@ -96,6 +105,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentRuns = this.pluginService.getComputes()
+        this.fetchArchivedArtifacts()
 
         this.dataChange.subscribe(data => {
             if (data.length > 0) {
@@ -108,6 +118,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         this.sync = this.syncRuns()
     }
 
+    onClick() {
+        this.open = !this.open
+    }
+
+    onActiveZone(active: boolean): void {
+        this.open = active && this.open
+    }
+
     ngOnDestroy() {
         if (this.sync)
             this.sync.unsubscribe()
@@ -117,6 +135,13 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         this.currentRuns.forEach(currentRun => {
             this.syncArtifact(currentRun)
         })
+    }
+
+    fetchArchivedArtifacts() {
+        const archivedItems = localStorage.getItem('archive_runs')
+        if (archivedItems) {
+            this.archivedArtifacts = JSON.parse(archivedItems)
+        }
     }
 
     syncRuns() {
@@ -246,5 +271,50 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                 }
             }
         }
+    }
+
+    archiveArtifact(correlation_uuid: string): void {
+        const artifactToArchive = this.currentRuns.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
+        const isCurrentArtifact = this.activeNode && this.activeNode.ref && this.activeNode.ref.correlation_uuid === correlation_uuid
+        
+        if (artifactToArchive) {
+            this.currentRuns = this.currentRuns.filter((run: PluginRun) => run.correlation_uuid !== correlation_uuid)
+            this.archivedArtifacts.push(artifactToArchive)
+            this.updateLocalStorage()
+            this.refreshDataSource()
+        } else {
+            console.error('Artifact to archive not found in current runs')
+        }
+
+        if (isCurrentArtifact) {
+            this.reportService.resetReports()
+        }
+    }
+
+    unarchiveArtifact(correlation_uuid: string): void {
+        const artifactToUnarchive = this.archivedArtifacts.find((artifact: any) => artifact.correlation_uuid === correlation_uuid)
+    
+        if (artifactToUnarchive) {
+            this.archivedArtifacts = this.archivedArtifacts.filter((a: any) => a.correlation_uuid !== correlation_uuid)
+            this.currentRuns.push(artifactToUnarchive)
+            this.updateLocalStorage()
+    
+            this.syncArtifact(artifactToUnarchive)
+        } else {
+            console.error('Artifact to unarchive not found in archivedArtifacts')
+        }
+    }    
+
+    private updateLocalStorage() {
+        localStorage.setItem('plugin_runs', JSON.stringify(this.currentRuns))
+        localStorage.setItem('archive_runs', JSON.stringify(this.archivedArtifacts))
+    }
+
+    private refreshDataSource() {
+        this.nodes = this.nodes.filter(node => 
+            this.currentRuns.some(run => run.correlation_uuid === node.uuid)
+        )
+        this.dataChange.next(this.nodes)
+        this.dataSource.data = this.nodes
     }
 }

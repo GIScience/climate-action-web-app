@@ -54,7 +54,7 @@ describe('ArtifactsComponent', () => {
         component = fixture.componentInstance
         loader = TestbedHarnessEnvironment.loader(fixture)
 
-        fixture.autoDetectChanges()
+        fixture.detectChanges()
     })
 
     afterEach(() => {
@@ -172,4 +172,84 @@ describe('ArtifactsComponent', () => {
         expect(mockPluginService.updateRunStatus)
             .toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'completed')
     }))
+
+    it('should archive an artifact and update the list', () => {
+        const initialRun = {
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'completed',
+            timestamp: '2023-09-27T16:42:52+01:00'
+        } as PluginRun
+    
+        component.currentRuns = [initialRun]
+        component.archivedArtifacts = []
+        localStorage.setItem('plugin_runs', JSON.stringify([initialRun]))
+        localStorage.setItem('archive_runs', JSON.stringify([]))
+    
+        component.archiveArtifact(initialRun.correlation_uuid)
+    
+        const archivedItems = JSON.parse(localStorage.getItem('archive_runs') || '[]')
+        const activeItems = JSON.parse(localStorage.getItem('plugin_runs') || '[]')
+        expect(component.archivedArtifacts.length).toBe(1)
+        expect(component.currentRuns.length).toBe(0)
+        expect(archivedItems.length).toBe(1)
+        expect(activeItems.length).toBe(0)
+    })
+    
+    it('should unarchive an artifact and update the list', () => {
+        const archivedRun = {
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'completed',
+            timestamp: '2023-09-27T16:42:52+01:00'
+        } as PluginRun
+    
+        component.currentRuns = []
+        component.archivedArtifacts = [archivedRun]
+        localStorage.setItem('plugin_runs', JSON.stringify([]))
+        localStorage.setItem('archive_runs', JSON.stringify([archivedRun]))
+    
+        mockPluginService.getArtifacts.and.returnValue(of([]))
+        component.unarchiveArtifact(archivedRun.correlation_uuid)
+    
+        const archivedItems = JSON.parse(localStorage.getItem('archive_runs') || '[]')
+        const activeItems = JSON.parse(localStorage.getItem('plugin_runs') || '[]')
+        expect(component.archivedArtifacts.length).toBe(0)
+        expect(component.currentRuns.length).toBe(1)
+        expect(archivedItems.length).toBe(0)
+        expect(activeItems.length).toBe(1)
+    })
+
+    it('should render content for non-expandable nodes correctly', async () => {
+        mockPluginService.getComputes.and.returnValue([
+            {
+                'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                'pluginId': 'blueprint_plugin',
+                'pluginName': 'Blueprint Plugin',
+                'status': 'in-progress',
+                'timestamp': '2023-09-27T16:42:52+01:00'
+            }] as PluginRun[]
+        )
+    
+        mockPluginService.getArtifacts.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(of([]))
+    
+        component.ngOnInit()
+        fixture.detectChanges()
+    
+        const tree = await loader.getHarness(MatTreeHarness)
+        const treeDescendants = await tree.getNodes()
+        expect(treeDescendants.length).toBe(1)
+    
+        const nonExpandableNode = fixture.debugElement.query(By.css('.mat-tree-parent-node a[aria-label="Node not expandable"]'))
+        expect(nonExpandableNode).toBeTruthy()
+    
+        const nameElement = nonExpandableNode.query(By.css('h3'))
+        const metaElements = fixture.debugElement.queryAll(By.css('.card-subtitle.m-0'))
+        const metaElement = metaElements[1]
+    
+        expect(nameElement.nativeElement.textContent).toContain('Blueprint Plugin')
+        expect(metaElement.nativeElement.textContent).toContain('8a897536-c4b4-4e5a-9d70-50430183ac66')
+    })
 })

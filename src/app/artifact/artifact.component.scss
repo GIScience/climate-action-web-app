@@ -1,6 +1,22 @@
 .artifact-tree {
-  overflow-y: auto;
+  overflow-y: scroll;
   height: calc(100vh - (25vh + 42px + 95px));
+
+  .artifact-tree__header {
+    display: flex;
+    align-items: center;
+
+    .archive-dropdown {
+      margin-left: auto;
+      
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+      }
+    }
+  }
 }
 
 .artifact-tree .mat-tree {
@@ -9,9 +25,24 @@
   border: 1px solid #ddd;
 }
 
+.artifact-tree a {
+  color: #000;
+  display: contents;
+  cursor: pointer;
+
+  .artifact-tree-item {
+    align-items: center;
+    display: flex;
+    padding: 15px 0;
+    width: 100%;
+  }
+}
+
 .artifact-tree .mat-tree-child-node {
+  background-color: #e9e9e9;
   min-height: 0;
   padding: 2px 0;
+  cursor: pointer;
 }
 
 .artifact-tree .mat-tree-child-node div {
@@ -24,26 +55,70 @@
 }
 
 .artifact-tree .run-card {
+  border-bottom: 1px solid #ddd;
   transition: 0.3s;
   width: 100%;
   padding: 5px 0;
 }
 
-.artifact-tree .run-card:not(:first-child) {
-  margin: 5px 0 0 0;
+.artifact-tree .run-card:hover, .artifact-tree .mat-tree-child-node:hover {
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+  background: lightgray;
 }
 
-.artifact-tree .run-card:hover, .artifact-tree .mat-tree-child-node:hover {
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  background: lightgray;
+.artifact-tree .run-card button {
   cursor: pointer;
+  visibility: hidden;
+}
+
+.artifact-tree .run-card:hover button {
+  visibility: visible;
 }
 
 .artifact-tree .mat-tree-child-node-highlight, .artifact-tree .mat-tree-child-node-highlight:hover {
   background: lightskyblue;
 }
 
+.artifact-tree .run-card .card-header h3 {
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+
 .artifact-tree .run-card .card-subtitle {
   font-size: small;
   color: gray;
+}
+
+::ng-deep .mat-mdc-list-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 20px;
+  display: flex;
+
+  .mdc-list-item__content {
+    width: 100%;
+  }
+
+  .archived-item {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+
+  button {
+    cursor: pointer;
+    margin-left: 15px;
+  }
+}
+
+.archive-dropdown-menu {
+
+  p.empty-archive {
+    padding: 20px;
+    margin: 0;
+  }
 }
