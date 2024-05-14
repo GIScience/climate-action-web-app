@@ -69,4 +69,13 @@ export class ReportService {
             artifact
         })
     }
+
+    resetReports(): void {
+        this.markdownSubject.next('')
+        this.imageSubject.next('')
+        this.tableSubject.next('')
+        this.chartSubject.next({ data: null, artifact: null })
+        this.geojsonSubject.next({ url: '', artifact: null })
+        this.geotiffSubject.next({ url: '', artifact: null })
+    }
 }

@@ -80,28 +80,34 @@ export class ReportComponent implements OnInit {
 
     ngOnInit(): void {
         this.reportService.markdown.subscribe(v => {
-            if (v === '') return
-            this.display(MarkdownComponent, 'url', v)
+            if (v === '') this.clearContainer()
+            else this.display(MarkdownComponent, 'url', v)
         })
         this.reportService.image.subscribe(v => {
-            if (v === '') return
-            this.display(ImageComponent, 'url', v)
+            if (v === '') this.clearContainer()
+            else this.display(ImageComponent, 'url', v)
         })
         this.reportService.table.subscribe(v => {
-            if (v === '') return
-            this.display(TableComponent, 'url', v)
+            if (v === '') this.clearContainer()
+            else this.display(TableComponent, 'url', v)
         })
         this.reportService.geojson.subscribe(v => {
-            if (v.url === '') return
-            this.display(GeojsonComponent, 'inputData', v)
+            if (v.url === '') this.clearContainer()
+            else this.display(GeojsonComponent, 'inputData', v)
         })
         this.reportService.geotiff.subscribe(v => {
-            if (v.url === '') return
-            this.display(GeoTiffComponent, 'inputData', v)
+            if (v.url === '') this.clearContainer()
+            else this.display(GeoTiffComponent, 'inputData', v)
         })
         this.reportService.chart.subscribe(v => {
-            if (!v.data) return
-            this.display(ChartComponent, 'inputData', v)
+            if (!v.data) this.clearContainer()
+            else this.display(ChartComponent, 'inputData', v)
         })
+    }
+
+    private clearContainer(): void {
+        if (this.container) {
+            this.container.clear()
+        }
     }
 }
