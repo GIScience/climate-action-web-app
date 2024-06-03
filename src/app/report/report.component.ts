@@ -9,6 +9,7 @@ import {GeojsonComponent} from './geojson/geojson.component'
 import {GeoTiffComponent} from './geotiff/geotiff.component'
 import {ChartComponent} from './chart/chart.component'
 import {MatGridListModule} from '@angular/material/grid-list'
+import {LegendComponent} from './legend/legend.component'
 
 @Component({
     selector: 'app-report',
@@ -32,16 +33,18 @@ export class ReportComponent implements OnInit {
         private sanitizer: DomSanitizer
     ) {}
 
-    display<C>(componentType: Type<C>, name: string, value: unknown) {
-        if(this.container)
+    display<C>(componentType: Type<C>, name: string, value: unknown, clearContainer = true) {
+        if (clearContainer && this.container)
             this.container.clear()
 
         const ref = this.container.createComponent(componentType)
         ref.setInput(name, value)
 
         if (typeof value === 'object' && value && !(value as any).url) {
-            this.generateDownloadJsonUri(value)
-            this.currentUrl = null
+            if (componentType !== LegendComponent) {
+                this.generateDownloadJsonUri(value)
+                this.currentUrl = null
+            }
         } else {
             this.currentUrl = typeof value === 'string' ? value : (value as any)?.url || null
             this.downloadJsonHref = null
@@ -98,6 +101,11 @@ export class ReportComponent implements OnInit {
         this.reportService.geotiff.subscribe(v => {
             if (v.url === '') this.clearContainer()
             else this.display(GeoTiffComponent, 'inputData', v)
+        })
+        if(this.reportService.legend)
+        this.reportService.legend.subscribe(v => {
+            if (!v) return
+            this.display(LegendComponent, 'legendData', v, false)
         })
         this.reportService.chart.subscribe(v => {
             if (!v.data) this.clearContainer()

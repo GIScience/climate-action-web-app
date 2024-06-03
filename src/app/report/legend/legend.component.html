@@ -1,0 +1,22 @@
+<div *ngIf="legendData" class="legend-container">
+	<div *ngIf="legendData.legend_type === 'DISCRETE'" class="discrete-legend">
+		<h3>Map Legend</h3>
+		<ul>
+			<li *ngFor="let item of discreteItems(); trackBy: trackByFn">
+				<span [style.backgroundColor]="item.color" class="legend-color-box"></span>
+				{{ item.name }}
+			</li>
+		</ul>
+	</div>
+	<div *ngIf="legendData.legend_type === 'CONTINUOUS'" class="continuous-legend">
+		<h3>Map Legend</h3>
+		<div #legendWrapper class="vertical-legend-wrapper">
+			<canvas id="canvas_{{legendData.legend_data.cmap_name}}" width="25" height="200"></canvas>
+			<div #ticksContainer class="ticks">
+				<span *ngFor="let item of continuousItems(); trackBy: trackByFn" [style.top]="item.position + '%'">
+					– {{ item.name }}
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

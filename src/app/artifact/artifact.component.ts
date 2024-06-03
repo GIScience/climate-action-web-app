@@ -234,8 +234,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             'MARKDOWN': (x: Artifact) => this.reportService.getMarkdown(x),
             'CHART': (x: Artifact) => this.reportService.getChart(x),
             'TABLE': (x: Artifact) => this.reportService.getTable(x),
-            'MAP_LAYER_GEOJSON': (x: Artifact) => this.reportService.getGeoJson(x),
-            'MAP_LAYER_GEOTIFF': (x: Artifact) => this.reportService.getGeoTiff(x)
+            'MAP_LAYER_GEOJSON': (x: Artifact) => {
+                this.reportService.getGeoJson(x)
+                this.reportService.getLegend(x)
+            },
+            'MAP_LAYER_GEOTIFF': (x: Artifact) => {
+                this.reportService.getGeoTiff(x)
+                this.reportService.getLegend(x)
+            }
         }
         if (node.ref) {
             return report_f[node.ref.modality](node.ref)
