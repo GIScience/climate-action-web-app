@@ -1,4 +1,4 @@
-.plugin-list {
-  margin: 0 20px;
-  height: 25vh;
+.artifacts-list,
+.artifact-report {
+	height: calc(100vh - var(--header-and-footer));
 }

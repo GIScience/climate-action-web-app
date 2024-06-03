@@ -1,106 +1,68 @@
-*, *::after, *::before {
-  box-sizing: border-box;
-}
-
-:root {
-  --handle-size: 3rem;
-  --img-gap: .25rem;
-}
-
-.plugin-container {
-  display: flex;
-  justify-content: center;
-}
-
-.menu {
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-}
-
 .plugins-list {
-  position: absolute;
-  bottom: 15px;
-  width: 100%;
-}
-
-.plugin-card {
-  min-width: 100px;
-  max-width: 250px;
-  max-height: 20vh;
-  background-color: #f9f9f9;
-  border-radius: 0;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
-}
-
-.plugin-card-highlight {
-  border: 1px solid lightskyblue;
-  box-shadow: 0 8px 16px 0 lightskyblue;
-}
-
-.plugin-card .mat-mdc-card-header {
-  background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.85) 75%, rgba(255, 255, 255, 0) 100%);
+  height: calc(100vh - var(--header-and-footer));
   padding: 10px;
-  height: 60px;
-  position: absolute;
-  top: 0;
-  width: 100%;
+  transition: all 0.5s ease-in-out;
+  position: relative;
   z-index: 1;
-}
+  
+  .plugin-title {
+    align-items: center;
+    display: flex;
 
-.plugin-card .mat-mdc-card-title {
-  font-size: small;
-  color: black;
-  line-height: 1.15;
-}
+    mat-icon {
+      margin-right: 2.5px;
+      opacity: 0.75;
+    }
+  }
 
-.plugin-card .mat-mdc-card-subtitle {
-  font-size: smaller;
-}
+  .plugin-card {
+    display: flex;
+    border-radius: 5px;
+    height: 75px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 220px;
+    
+    .plugin-card__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out 0.3s;
+      
+      & h3 {
+        margin: 0;
+        font-size: small;
+      }
+      
+      & span {
+        font-size: smaller;
+      }
+    }
+    
+    img {
+      aspect-ratio: 1;
+      border-radius: 5px;
+      height: 100%;
+      object-fit: cover;
+    }
 
-.plugin-card > img {
-  aspect-ratio: 1;
-  height: 100%;
-  object-fit: cover;
-}
+    &.plugin-card-highlight {
+      background-color: lightskyblue;
+    }
 
-.plugin-card.enabled-card:hover {
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  background: lightgray;
-  cursor: pointer;
-}
-
-.plugin-card.disabled-card {
-  filter: opacity(0.75) brightness(60%) grayscale(1);
-  cursor: default;
-}
-
-.plugin-header {
-  display: flex;
-  justify-content: space-between;
-  padding: .5rem calc(var(--img-gap) * 2 + var(--handle-size));
-  align-items: center;
-  height: 10%;
-}
-
-.plugin-title {
-  font-size: 1rem;
-  margin: 0;
-}
-
-.progress-bar {
-  display: flex;
-  gap: .25rem;
-}
-
-.progress-item {
-  flex: 0 0 1.5rem;
-  min-width: 1.5rem;
-  height: .5rem;
-  background-color: #ffffff80; // rgba(255, 255, 255, .5);
-}
-
-.progress-item.active {
-  background-color: #ffffffe6; // rgba(255, 255, 255, .9);
+    &.enabled-card {
+      cursor: pointer;
+      
+      &:hover {
+        background: lightgray;
+      }
+    }
+    
+    &.disabled-card {
+      filter: opacity(0.75) brightness(60%) grayscale(1);
+    }
+  }  
 }

@@ -1,6 +1,6 @@
 .artifact-tree {
   overflow-y: scroll;
-  height: calc(100vh - (25vh + 42px + 95px));
+  height: 100%;
 
   .artifact-tree__header {
     display: flex;

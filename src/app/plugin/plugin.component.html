@@ -1,43 +1,32 @@
 <main class="main-content bgc-grey-100">
     <ng-container *ngIf="(pluginObs$ | async) as plugin; else loading">
-        <div>
-            <div class="p-10 bgc-white bd plugin-content">
-                <div>
-                    <h1>{{ plugin.name }}</h1>
-                    <address class="author">
-                        <div *ngFor="let author of plugin.authors">
-                            <a rel="author" href="{{author.website}}">{{ author.name }}</a>, {{ author.affiliation }}
-                        </div>
-                    </address>
-                    <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
-                    <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
-                    <div *ngIf="plugin.sources">
-                        <h2>Sources</h2>
-                        <div *ngFor="let source of plugin.sources">
-                            <div class="source-item">
-                                <strong *ngIf="source.title">{{ source.title }}</strong>
-                                {{ computeSourceText(source) }}{{ source.url ? "," : "" }}
-                                <a href="{{ source.url }}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   *ngIf="source.url">{{ source.url }}</a>
-                            </div>
-                        </div>
+        <div class="pX-20 pY-10 bgc-white bd plugin-content">
+            <h1>{{ plugin.name }}</h1>
+            <address class="author">
+                <div *ngFor="let author of plugin.authors">
+                    <a rel="author" href="{{author.website}}">{{ author.name }}</a>, {{ author.affiliation }}
+                </div>
+            </address>
+            <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
+            <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
+            <div *ngIf="plugin.sources">
+                <h2>Sources</h2>
+                <div *ngFor="let source of plugin.sources">
+                    <div class="source-item">
+                        <strong *ngIf="source.title">{{ source.title }}</strong>
+                        {{ computeSourceText(source) }}{{ source.url ? "," : "" }}
+                        <a href="{{ source.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            *ngIf="source.url">{{ source.url }}</a>
                     </div>
                 </div>
             </div>
         </div>
-        <div>
-            <div class="mX-5 p-20 bgc-white bd plugin-content">
-                <ng-container *ngIf="plugin?.operator_schema; else loadingPluginParam">
-                    <app-plugin-parameter [schema]="plugin.operator_schema" [plugin]="plugin"></app-plugin-parameter>
-                </ng-container>
-                <ng-template #loadingPluginParam>
-                    <div class="d-f jc-c top-50 h-100p">
-                        <!-- TODO: Message saying No Schema-->
-                    </div>
-                </ng-template>
-            </div>
+        <div class="mX-5 p-20 bgc-white bd plugin-content">
+            <ng-container *ngIf="plugin?.operator_schema">
+                <app-plugin-parameter [schema]="plugin.operator_schema" [plugin]="plugin"></app-plugin-parameter>
+            </ng-container>
         </div>
     </ng-container>
     <ng-template #loading>
@@ -48,6 +37,3 @@
         </div>
     </ng-template>
 </main>
-<div class="bgc-grey-100">
-    <app-plugins class="plugin-list"></app-plugins>
-</div>

@@ -1,8 +1,7 @@
-import {AfterViewInit, Component} from '@angular/core'
-import {Router} from '@angular/router'
+import {AfterViewInit, Component, OnInit} from '@angular/core'
+import {Router, NavigationEnd} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
 import {CommonModule} from '@angular/common'
-import {MatCardModule} from '@angular/material/card'
 import {MatIconModule} from '@angular/material/icon'
 import {MatTooltipModule} from '@angular/material/tooltip'
 import {availableCards, PluginCard} from './plugins.interface'
@@ -13,13 +12,12 @@ import {availableCards, PluginCard} from './plugins.interface'
     styleUrls: ['./plugins.component.scss'],
     imports: [
         CommonModule,
-        MatCardModule,
         MatIconModule,
         MatTooltipModule
     ],
     standalone: true
 })
-export class PluginsComponent implements AfterViewInit {
+export class PluginsComponent implements AfterViewInit, OnInit {
 
     cards: Array<PluginCard> = availableCards
     activeCard?: PluginCard
@@ -31,6 +29,20 @@ export class PluginsComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this.loadPlugins()
+    }
+
+    ngOnInit(): void {
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd) {
+                this.syncActiveCardWithRoute();
+            }
+        })
+    }
+
+    syncActiveCardWithRoute(): void {
+        const currentUrl = this.router.url;
+        const matchingCard = this.cards.find(card => `/plugin/${card.plugin_id}` === currentUrl);
+        this.activeCard = matchingCard;
     }
 
     loadPlugins() {
@@ -56,12 +68,18 @@ export class PluginsComponent implements AfterViewInit {
     }
 
     activateCard(card: PluginCard) {
-        if (card.enabled)
-            this.activeCard = card
+        if (card.enabled) {
+            this.router.navigate(['plugin', card.plugin_id]).then(() => {
+                this.activeCard = card;
+            });
+        }
     }
 
     showPluginInfo(card: PluginCard) {
-        if (card.enabled)
-            this.router.navigate(['plugin', card.plugin_id])
+        if (card.enabled) {
+            this.router.navigate(['plugin', card.plugin_id]).then(() => {
+                this.activeCard = card;
+            });
+        }
     }
 }

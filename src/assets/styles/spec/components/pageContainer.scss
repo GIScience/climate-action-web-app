@@ -1,19 +1,8 @@
-// ---------------------------------------------------------
-// @TOC
-// ---------------------------------------------------------
-
-// + @Page Container
-// + @Main Content
-// + @Full Container
-// + @Collapsed State
-
-// ---------------------------------------------------------
-// @Page Container
-// ---------------------------------------------------------
-
 .page-container {
-  min-height: 100vh;
-  transition: all 0.2s ease;
+  display: grid;
+  grid-template-rows: 50px 1fr 25px;
+  height: 100vh;
+  overflow-x: hidden;
 }
 
 // ---------------------------------------------------------
@@ -23,7 +12,7 @@
 .main-content {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  padding: 60px 15px 0;
+  height: calc(100vh - var(--header-and-footer));
 }
 
 .remain-height {
