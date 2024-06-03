@@ -5,7 +5,6 @@ import {FormlyModule} from '@ngx-formly/core'
 import {HttpClientModule} from '@angular/common/http'
 import {MarkdownModule} from 'ngx-markdown'
 import {NgChartsModule} from 'ng2-charts'
-import {MatTreeModule} from '@angular/material/tree'
 import {PluginsComponent} from './plugins/plugins.component'
 
 import {AppRoutingModule} from './app.routing.module'
@@ -77,7 +76,6 @@ import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT
         }),
         FormlyMatDatepickerModule,
         MarkdownModule.forRoot(),
-        MatTreeModule,
         NgChartsModule,
         ArtifactComponent,
         NotificationComponent,
