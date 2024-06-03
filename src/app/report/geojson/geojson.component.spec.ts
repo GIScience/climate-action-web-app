@@ -36,6 +36,7 @@ describe('GeojsonComponent', () => {
         component.inputData = {
             url: 'http://test_url',
             artifact: {
+                primary: true,
                 name: 'geojson',
                 modality: 'MAP_LAYER_GEOJSON',
                 file_path: './',
@@ -95,6 +96,7 @@ describe('GeojsonComponent', () => {
         component.inputData = {
             url: 'http://test_url',
             artifact: {
+                primary: true,
                 name: 'geojson',
                 modality: 'MAP_LAYER_GEOJSON',
                 file_path: './',

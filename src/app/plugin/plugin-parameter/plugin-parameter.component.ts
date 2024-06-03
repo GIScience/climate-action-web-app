@@ -380,14 +380,14 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
 
                 this.alerts
-                .open('Result from plugin execution will be listed on the dashboard.', {label: `${this.plugin.plugin_id}` + ' parameters are sent for processing!', status: 'success', autoClose: false,})
+                .open('Result from plugin execution will be listed on the dashboard.', {label: `${this.plugin.plugin_id}` + ' parameters are sent for processing!', status: 'success', autoClose: 7000})
                 .subscribe()
                 this.router.navigate(['dashboard'])
             },
             error: error => {
 
                 this.alerts
-                .open('Please try again.', {label: 'Error while computing plugin ' + `${this.plugin.name}`, status: 'error', autoClose: false,})
+                .open('Please try again.', {label: 'Error while computing plugin ' + `${this.plugin.name}`, status: 'error', autoClose: 7000})
                 .subscribe()
                 this.router.navigate(['dashboard'])
             }
