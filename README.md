@@ -81,3 +81,7 @@ docker image push heigit/ca-web-app:devel
 ## Unit Tests
 
 Run `npm run test` to execute the unit and integration tests via [Karma](https://karma-runner.github.io).
+
+## References
+
+- [Matplotlib Colormaps](https://matplotlib.org/stable/users/explain/colors/colormaps.html)

@@ -26,6 +26,9 @@ export class ReportService {
     private geotiffSubject = new BehaviorSubject<{ url: string, artifact: Artifact | null }>({url: '', artifact: null})
     geotiff = this.geotiffSubject.asObservable()
 
+    private legendSubject = new BehaviorSubject<any>(null)
+    legend = this.legendSubject.asObservable()
+
     private chartSubject = new BehaviorSubject<{ data: ChartData | null, artifact: Artifact | null }>({
         data: null,
         artifact: null
@@ -77,5 +80,17 @@ export class ReportService {
         this.chartSubject.next({ data: null, artifact: null })
         this.geojsonSubject.next({ url: '', artifact: null })
         this.geotiffSubject.next({ url: '', artifact: null })
+    }
+
+    getLegend(artifact: Artifact): void {
+        const url = `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}`
+        this.http.get<any[]>(url).subscribe((response) => {
+            const mapLegend = response.find(item => item.store_id === artifact.store_id)?.attachments?.LEGEND
+            if (mapLegend) {
+              this.legendSubject.next(mapLegend)
+            } else {
+              this.legendSubject.next(null)
+            }
+        })
     }
 }
