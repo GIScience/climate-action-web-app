@@ -5,7 +5,6 @@ import {PluginService} from './plugin.service'
 import {map, Observable, switchMap, tap} from 'rxjs'
 import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
 import {CommonModule} from '@angular/common'
-import {PluginsComponent} from '../plugins/plugins.component'
 import {MarkdownModule} from 'ngx-markdown'
 
 @Component({
@@ -15,7 +14,6 @@ import {MarkdownModule} from 'ngx-markdown'
     imports: [
         CommonModule,
         MarkdownModule,
-        PluginsComponent,
         PluginParameterComponent
     ],
     standalone: true

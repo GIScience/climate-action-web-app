@@ -1,37 +1,9 @@
-// ---------------------------------------------------------
-// @TOC
-
-// + @Topbar
-// + @Collapsed State
-
-// ---------------------------------------------------------
-// @Topbar
-// ---------------------------------------------------------
-
-.header {
+header {
   background-color: $default-white;
-  border-bottom: 1px solid $border-color;
-  display: block;
-  margin-bottom: 0;
-  padding: 0;
-  position: fixed;
-  transition: all 0.2s ease;
-  // width: calc(100% - #{$offscreen-size});
-  width: 100%;
-  z-index: 800;
-
-  @include to($breakpoint-md) {
-    width: 100%;
-  }
-
-  @include between($breakpoint-md, $breakpoint-xl) {
-    // width: calc(100% - #{$collapsed-size});
-    width: 100%;
-  }
+  width: 100vw;
+  z-index: 2;
 
   .header-container {
-    @include clearfix;
-
     height: $header-height;
 
     .nav-left,

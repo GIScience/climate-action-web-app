@@ -1,25 +1,13 @@
-<div class="pX-20 pY-10 bgc-white bd plugins-list">
-    <div style="height: 100%">
-        <div class="plugin-header mx-3">
-            <h3 class="plugin-title">Plugins</h3>
-            <div class="progress-bar"></div>
-        </div>
-        <div class="plugin-container">
-            <div class="menu m-3 p-2" *ngFor="let card of cards; let i = index;">
-                <mat-card class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
-                          (click)="showPluginInfo(card); activateCard(card)"
-                          (keydown)="showPluginInfo(card); activateCard(card)"
-                          [ngClass]="{ 'plugin-card-highlight': activeCard === card }"
-                          tabindex="{{i}}"
-                          matTooltip="{{card.purpose}}">
-                    <mat-card-header>
-                        <mat-card-title>{{ card.name }}</mat-card-title>
-                        <mat-card-subtitle *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{ card.library_version }}</mat-card-subtitle>
-                         <mat-card-subtitle *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</mat-card-subtitle>
-                    </mat-card-header>
-                    <img mat-card-image [src]="card.image" alt="{{card.image_source}}">
-                </mat-card>
+<div class="plugins-list">
+    <h3 class="plugin-title"><mat-icon aria-hidden="true" aria-label="Plugins" fontIcon="extension"/> Plugins</h3>
+    <ul>
+        <li *ngFor="let card of cards; let i = index;" class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}" (click)="showPluginInfo(card); activateCard(card)" (keydown)="showPluginInfo(card); activateCard(card)" [ngClass]="{ 'plugin-card-highlight': activeCard === card }" tabindex="{{i}}" matTooltip="{{card.purpose}}" matTooltipPosition="right">
+            <img [src]="card.image" alt="{{card.image_source}}">
+            <div class="plugin-card__text">
+                <h3>{{ card.name }}</h3>
+                <span *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{ card.library_version }}</span>
+                <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
             </div>
-        </div>
-    </div>
+        </li>
+    </ul>
 </div>
