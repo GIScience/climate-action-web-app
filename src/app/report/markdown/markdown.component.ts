@@ -49,7 +49,7 @@ export class MarkdownComponent implements OnInit {
     }
 
     private rewriteFootnoteLinks(html: string){
-        const baseUrl = '/dashboard'
+        const baseUrl = location.href.split('#')[0]
         const parser = new DOMParser()
         const doc = parser.parseFromString(html, 'text/html')
 
