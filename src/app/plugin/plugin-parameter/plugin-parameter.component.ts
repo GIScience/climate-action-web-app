@@ -6,7 +6,7 @@ import {JSONSchema7, JSONSchema7Definition} from 'json-schema'
 import Map from 'ol/Map'
 import OSM from 'ol/source/OSM'
 import TileLayer from 'ol/layer/Tile'
-import {View} from 'ol'
+import {Feature, View} from 'ol'
 import {fromLonLat} from 'ol/proj'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
@@ -58,8 +58,8 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     options: FormlyFormOptions = {}
 
     map: Map | undefined
-    regionLayer: VectorLayer<VectorSource<Geometry>> | undefined
-    selectedRegionLayer!: VectorLayer<VectorSource<Geometry>>
+    regionLayer: VectorLayer<Feature<Geometry>> | undefined
+    selectedRegionLayer!: VectorLayer<Feature<Geometry>>
     jsonSchema_polygon = 'MultiPolygon'
     highlightedFeatures: Array<FeatureLike> = []
 
