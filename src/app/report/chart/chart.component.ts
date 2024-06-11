@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
-import {ChartConfiguration, ChartType} from 'chart.js'
+import {ChartConfiguration, ChartType, TooltipItem} from 'chart.js'
 
 import {Artifact, ChartData} from '../../artifact/artifact.interface'
 
@@ -19,14 +19,27 @@ export class ChartComponent implements OnInit {
     public baseChartOptions: ChartConfiguration['options']
     public baseChartType!: ChartType
 
+    pieTooltipLabelFunc(context: TooltipItem<'pie'>) {
+        let label = context.label || ''
+        if (label) {
+            const sum = context.dataset.data.reduce((sumSoFar, currVal) => sumSoFar + currVal, 0)
+            const percent = (context.parsed / sum) * 100
+            label += ': ' + context.formattedValue + ' (' + percent.toFixed(2) + '%)'
+        }
+        return label
+    }
+
+    generalTooltipLabelFuc(context: TooltipItem<any>) {
+        let label = context.label || ''
+        if (label) {
+            label += ': ' + context.formattedValue
+        }
+        return label
+    }
+
     ngOnInit(): void {
         if (!this.inputData || !this.inputData.data)
             return
-
-
-        if (this.inputData.data.chart_type === 'PIE') {
-            this.inputData.data.y = this.inputData.data.y.map(y => y * 100)
-        }
 
         this.baseChartType = (this.inputData.data.chart_type.toLowerCase()) as ChartType
 
@@ -45,8 +58,16 @@ export class ChartComponent implements OnInit {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {},
-                y: {}
+                x: {display: !(this.inputData.data.chart_type === 'PIE')},
+                y: {display: !(this.inputData.data.chart_type === 'PIE')}
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: () => '',
+                        label: (this.inputData.data.chart_type === 'PIE') ? this.pieTooltipLabelFunc : this.generalTooltipLabelFuc
+                    }
+                }
             }
         }
     }
