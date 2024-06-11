@@ -44,10 +44,17 @@
 
       &.not-expandable {
         cursor: default;
-        pointer-events: none;
+
+        &:active {
+          pointer-events: none;
+        }
 
         & .node-arrow {
           visibility: hidden;
+        }
+
+        button.archive-artifact {
+          pointer-events: all;
         }
       }
 
