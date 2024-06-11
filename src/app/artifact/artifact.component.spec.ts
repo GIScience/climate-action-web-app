@@ -432,5 +432,36 @@ describe('ArtifactComponent', () => {
         expect(childNodes[0].nativeElement.textContent).toContain('Image 1')
     
         discardPeriodicTasks()
-    }))    
+    }))
+
+    it('should display the archive button on hover even if the status is failed', fakeAsync(() => {
+        mockPluginService.getComputes.and.returnValue([
+            {
+                'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                'pluginId': 'test_plugin',
+                'pluginName': 'Test Plugin',
+                'status': 'failed',
+                'timestamp': '2023-09-27T16:42:52+01:00'
+            }
+        ] as PluginRun[])
+    
+        mockPluginService.getArtifacts.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(of([]))
+    
+        component.ngOnInit()
+        fixture.detectChanges()
+    
+        const parentNode = fixture.debugElement.query(By.css('.artifact-parent-node'))
+        expect(parentNode).toBeTruthy()
+    
+        parentNode.triggerEventHandler('mouseenter', null)
+        tick()
+        fixture.detectChanges()
+    
+        flush()
+        fixture.detectChanges()
+    
+        const archiveButton = parentNode.query(By.css('button.archive-artifact'))
+        expect(archiveButton).toBeTruthy()
+        discardPeriodicTasks()
+    }))
 })
