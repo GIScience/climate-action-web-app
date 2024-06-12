@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {BehaviorSubject} from 'rxjs'
 import {HttpClient} from '@angular/common/http'
-import {Artifact, ChartData} from '../artifact/artifact.interface'
+import {Artifact, ChartData, ArtifactData} from '../artifact/artifact.interface'
 import {environment} from '../../environments/environment'
 
 @Injectable({
@@ -11,19 +11,19 @@ export class ReportService {
 
     private apiUrl = environment.climateActionApiUrl
 
-    private markdownSubject = new BehaviorSubject<string>('')
+    private markdownSubject = new BehaviorSubject<ArtifactData | null>(null)
     markdown = this.markdownSubject.asObservable()
 
-    private imageSubject = new BehaviorSubject<string>('')
+    private imageSubject = new BehaviorSubject<ArtifactData | null>(null)
     image = this.imageSubject.asObservable()
 
-    private tableSubject = new BehaviorSubject<string>('')
+    private tableSubject = new BehaviorSubject<ArtifactData | null>(null)
     table = this.tableSubject.asObservable()
 
-    private geojsonSubject = new BehaviorSubject<{ url: string, artifact: Artifact | null }>({url: '', artifact: null})
+    private geojsonSubject = new BehaviorSubject<ArtifactData | null>(null)
     geojson = this.geojsonSubject.asObservable()
 
-    private geotiffSubject = new BehaviorSubject<{ url: string, artifact: Artifact | null }>({url: '', artifact: null})
+    private geotiffSubject = new BehaviorSubject<ArtifactData | null>(null)
     geotiff = this.geotiffSubject.asObservable()
 
     private legendSubject = new BehaviorSubject<any>(null)
@@ -39,22 +39,31 @@ export class ReportService {
     }
 
     getMarkdown(artifact: Artifact): void {
-        this.markdownSubject.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+        this.markdownSubject.next({
+            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            artifact: artifact
+        })
     }
 
     getImage(artifact: Artifact): void {
-        this.imageSubject.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+        this.imageSubject.next({
+            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            artifact: artifact
+        })
     }
 
     getTable(artifact: Artifact): void {
-        this.tableSubject.next(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+        this.tableSubject.next({
+            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            artifact: artifact
+        })
     }
 
     getChart(artifact: Artifact): void {
         this.http.get<ChartData>(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`).subscribe((data) => {
             this.chartSubject.next({
                 data: data,
-                artifact
+                artifact: artifact
             })
         })
     }
@@ -62,24 +71,24 @@ export class ReportService {
     getGeoTiff(artifact: Artifact): void {
         this.geotiffSubject.next({
             url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
-            artifact
+            artifact: artifact
         })
     }
 
     getGeoJson(artifact: Artifact): void {
         this.geojsonSubject.next({
             url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
-            artifact
+            artifact: artifact
         })
     }
 
     resetReports(): void {
-        this.markdownSubject.next('')
-        this.imageSubject.next('')
-        this.tableSubject.next('')
+        this.markdownSubject.next(null)
+        this.imageSubject.next(null)
+        this.tableSubject.next(null)
         this.chartSubject.next({ data: null, artifact: null })
-        this.geojsonSubject.next({ url: '', artifact: null })
-        this.geotiffSubject.next({ url: '', artifact: null })
+        this.geojsonSubject.next(null)
+        this.geotiffSubject.next(null)
     }
 
     getLegend(artifact: Artifact): void {

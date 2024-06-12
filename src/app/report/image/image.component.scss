@@ -1,10 +1,10 @@
 .image-report-item {
-  height: 100%;
-  display: flex;
-  justify-content: center;
+  min-width: 10rem;
+  max-width: 50rem;
+  margin: 0 auto;
 
   img {
     object-fit: contain !important;
-    max-width: 100%;
+    width: 100%;
   }
 }
