@@ -14,6 +14,7 @@ import {Remarkable} from 'remarkable'
 })
 export class MarkdownComponent implements OnInit {
     @Input() url: string | undefined
+    @Input() rawMarkdown: string | undefined
     markdownContent: SafeHtml | '' = ''
 
     private mdParser: Remarkable
@@ -29,23 +30,29 @@ export class MarkdownComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.url) {
-            this.loadMarkdown()
+            this.loadMarkdownFromUrl();
+        } else if (this.rawMarkdown) {
+            this.parseMarkdown(this.rawMarkdown);
         }
     }
 
-    private loadMarkdown(): void {
-        if (this.url){
+    private loadMarkdownFromUrl(): void {
+        if (this.url) {
             this.http.get(this.url, {responseType: 'text'}).subscribe({
                 next: (data) => {
-                    let html = this.mdParser.render(data)
-                    html = this.rewriteFootnoteLinks(html)
-                    this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html)
+                    this.parseMarkdown(data)
                 },
                 error: (error) => console.error('Error fetching markdown content:', error)
             })
         } else {
             console.error('URL is undefined')
         }
+    }
+
+    private parseMarkdown(markdown: string): void {
+        let html = this.mdParser.render(markdown);
+        html = this.rewriteFootnoteLinks(html);
+        this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html);
     }
 
     private rewriteFootnoteLinks(html: string){

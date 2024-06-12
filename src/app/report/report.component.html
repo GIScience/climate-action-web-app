@@ -1,7 +1,37 @@
-<div class="p-10 bgc-white bd h-100p report-content">
-    <h3>Dashboard</h3>
+<div class="p-10 bgc-white bd h-100p report-container">
+    <h3 class="report-name">{{ name }}</h3>
     <button *ngIf="currentUrl || downloadJsonHref" (click)="downloadContent()" class="download-btn"><i class="ti-download"></i> Download</button>
     <div class="report" id="report-page">
+        <div *ngIf="showAccordion && modality === 'MARKDOWN'" class="report-meta">
+            <tui-accordion *ngIf="summary" class="report-abstract">
+                <tui-accordion-item borders="top-bottom" size="s">
+                    Abstract
+                    <ng-template tuiAccordionItemContent>
+                        {{ summary }}
+                    </ng-template>
+                </tui-accordion-item>
+            </tui-accordion>
+        </div>
+
+        <div *ngIf="modality === 'TABLE'" class="report-meta">
+            <p class="table-summary"><span>{{ summary }}</span></p>
+        </div>
+
         <ng-container #container></ng-container>
+        <ng-container #legendContainer></ng-container>
+
+        <div *ngIf="modality !== 'MARKDOWN'" class="report-meta">
+            <p *ngIf="modality !== 'TABLE'" class="report-summary"><span>{{ summary }}</span></p>
+            <div *ngIf="showAccordion">
+                <tui-accordion *ngIf="description" class="report-description">
+                    <tui-accordion-item borders="top-bottom" size="s">
+                        Detailed Description
+                        <ng-template tuiAccordionItemContent>
+                            <app-markdown [rawMarkdown]="description"></app-markdown>
+                        </ng-template>
+                    </tui-accordion-item>
+                </tui-accordion>
+            </div>
+        </div>
     </div>
 </div>

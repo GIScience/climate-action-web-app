@@ -2,6 +2,10 @@ import {ComponentFixture, TestBed} from '@angular/core/testing'
 import {ReportComponent} from './report.component'
 import {ReportService} from './report.service'
 import {HttpClientModule} from '@angular/common/http'
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import {By} from '@angular/platform-browser'
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core'
+import {MarkdownComponent} from './markdown/markdown.component'
 
 describe('ReportComponent', () => {
     let component: ReportComponent
@@ -11,9 +15,12 @@ describe('ReportComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                ReportComponent
+                ReportComponent,
+                BrowserAnimationsModule,
+                MarkdownComponent
             ],
             providers: [ReportService],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
             declarations: []
         })
 
@@ -22,8 +29,41 @@ describe('ReportComponent', () => {
         fixture.detectChanges()
     })
 
-    it('should create', () => {
-        expect(component).toBeTruthy()
+    it('should display the name if present', () => {
+        const testName = 'Test Name'
+        component.name = testName
+        fixture.detectChanges()
+
+        const nameElement = fixture.debugElement.query(By.css('.report-name'))
+        expect(nameElement).toBeTruthy()
+        expect(nameElement.nativeElement.textContent).toContain(testName)
+    })
+
+    it('should display the summary if present', () => {
+        const testSummary = 'Test Summary'
+        component.summary = testSummary
+        fixture.detectChanges()
+
+        const summaryElement = fixture.debugElement.query(By.css('.report-summary'))
+        expect(summaryElement).toBeTruthy()
+        expect(summaryElement.nativeElement.textContent).toContain(testSummary)
+    })
+
+
+    it('should display the description if present', async () => {
+        const testDescription = 'Test Description'
+        component.description = testDescription
+        component.showAccordion = true
+        fixture.detectChanges()
+        
+        const accordionHeader = fixture.debugElement.query(By.css('.t-header'))
+        accordionHeader.nativeElement.click()
+        fixture.detectChanges()
+        await fixture.whenStable()
+
+        const markdownContent = fixture.debugElement.query(By.css('.markdown-report-item'))
+        expect(markdownContent).toBeTruthy()
+        expect(markdownContent.nativeElement.textContent).toContain(testDescription)
     })
 
     it('should create a link and trigger a download when downloadContent is called', () => {

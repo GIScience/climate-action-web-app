@@ -35,3 +35,8 @@ export interface ActiveArtifactRef {
     correlation_uuid: string
     store_uuid: string
 }
+
+export interface ArtifactData {
+    url: string
+    artifact: Artifact
+}

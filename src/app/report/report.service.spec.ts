@@ -53,7 +53,7 @@ describe('ReportService', () => {
     it('should get markdown report item', done => {
         service.getMarkdown(test_artifact)
         service.markdown.subscribe((x) => {
-            expect(x).toEqual(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
+            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, artifact: test_artifact })
             done()
         })
     })
@@ -83,7 +83,7 @@ describe('ReportService', () => {
     it('should get table report item', done => {
         service.getTable(test_artifact)
         service.table.subscribe((x) => {
-            expect(x).toEqual(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
+            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, artifact: test_artifact })
             done()
         })
     })
