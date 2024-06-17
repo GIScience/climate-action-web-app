@@ -2,9 +2,10 @@
     <div class="page-container bgc-grey-100">
         <header class="navbar">
             <div class="header-container">
-                <div class="nav-left">
-                    <h2 [routerLink]="'/dashboard'">{{title}}</h2>
+                <div class="logo-wrapper">
+                    <img src="../assets/images/HeiGIT_Logo_base.svg" alt="HeiGIT Logo" class="logo" />
                 </div>
+                <h2 [routerLink]="'/dashboard'">{{title}}</h2>
                 <app-runs></app-runs>
             </div>
         </header>
@@ -17,7 +18,9 @@
         <footer class="footer bdT ta-c fsz-sm c-grey-600">
             <span class="about-info"> © {{currentYear()}} HeiGIT gGmbH |
                 <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
-                <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a></span>
+                <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
+                <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a>
+            </span>
             <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>
         </footer>
     </div>
