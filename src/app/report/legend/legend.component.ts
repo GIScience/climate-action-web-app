@@ -1,5 +1,6 @@
 import {Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild} from '@angular/core'
 import {CommonModule} from '@angular/common'
+import {convertToTitleCase} from '../../utils/report-utils'
 
 declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]
 
@@ -49,7 +50,7 @@ export class LegendComponent implements OnInit, AfterViewInit {
 
   discreteItems() {
     return Object.entries(this.legendData.legend_data).map(([name, color]) => ({
-      name,
+      name: convertToTitleCase(name),
       color
     }))
   }
@@ -57,7 +58,7 @@ export class LegendComponent implements OnInit, AfterViewInit {
   continuousItems() {
     const ticks = this.legendData.legend_data.ticks
     return Object.entries(ticks).map(([name, value]) => ({
-      name,
+      name: convertToTitleCase(name),
       position: parseFloat(value as string) * 100
     }))
   }

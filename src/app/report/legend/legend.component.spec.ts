@@ -42,7 +42,7 @@ describe('LegendComponent', () => {
     expect(legendItems.length).toBe(3)
 
     const expectedColors = ['#000000', '#00ff00', '#ff0000']
-    const expectedNames = ['Black b', 'Green c', 'Red a']
+    const expectedNames = ['Black B', 'Green C', 'Red A']
 
     legendItems.forEach((item, index) => {
       const colorBox = item.query(By.css('.legend-color-box')).nativeElement
@@ -75,9 +75,9 @@ describe('LegendComponent', () => {
     expect(ticks.length).toBe(3)
 
     const expectedTicks = [
-      { name: 'Blue b', position: '0%' },
-      { name: 'White c', position: '50%' },
-      { name: 'Red a', position: '100%' }
+      { name: 'Blue B', position: '0%' },
+      { name: 'White C', position: '50%' },
+      { name: 'Red A', position: '100%' }
     ]
 
     ticks.forEach((tick, index) => {
