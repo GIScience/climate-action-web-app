@@ -5,6 +5,23 @@ header {
 
   .header-container {
     height: $header-height;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .logo-wrapper,
+    app-runs {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+
+    .logo-wrapper {
+      padding: 0 25px;
+
+      img.logo {
+        height: 35px;
+      }
+    }
 
     .nav-left,
     .nav-right {
@@ -71,7 +88,6 @@ header {
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
       margin: 0;
       transform-origin: top right;
-      // transform: scale(0, 0);
       transition: transform 0.15s ease-out;
 
       .divider {
@@ -93,15 +109,7 @@ header {
       }
     }
 
-    .nav-left {
-      float: left;
-      margin: 0px 0px 0px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .nav-left h2 {
+    h2 {
       color: #d60039;
       line-height: 50px;
       margin: 0;
