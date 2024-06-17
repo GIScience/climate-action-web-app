@@ -1,5 +1,6 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
 import {ChartConfiguration, ChartType, TooltipItem} from 'chart.js'
+import {convertToTitleCase} from '../../utils/report-utils'
 
 import {Artifact, ChartData} from '../../artifact/artifact.interface'
 
@@ -29,12 +30,16 @@ export class ChartComponent implements OnInit {
         return label
     }
 
-    generalTooltipLabelFuc(context: TooltipItem<any>) {
+    generalTooltipLabelFunc(context: TooltipItem<any>) {
         let label = context.label || ''
         if (label) {
             label += ': ' + context.formattedValue
         }
         return label
+    }
+
+    convertToTitleCase(str: string | number): string {
+        return convertToTitleCase(str)
     }
 
     ngOnInit(): void {
@@ -44,7 +49,7 @@ export class ChartComponent implements OnInit {
         this.baseChartType = (this.inputData.data.chart_type.toLowerCase()) as ChartType
 
         this.baseChartData = {
-            labels: this.inputData.data.x,
+            labels: this.inputData.data.x.map(label => this.convertToTitleCase(label)),
             datasets: [
                 {
                     data: this.inputData.data.y,
@@ -65,7 +70,7 @@ export class ChartComponent implements OnInit {
                 tooltip: {
                     callbacks: {
                         title: () => '',
-                        label: (this.inputData.data.chart_type === 'PIE') ? this.pieTooltipLabelFunc : this.generalTooltipLabelFuc
+                        label: (this.inputData.data.chart_type === 'PIE') ? this.pieTooltipLabelFunc : this.generalTooltipLabelFunc
                     }
                 }
             }
