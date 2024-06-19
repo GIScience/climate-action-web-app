@@ -7,7 +7,7 @@ cache:
   paths:
     - node_modules
 
-test_jasmine:
+test_jasmine_and_lint:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -17,7 +17,7 @@ test_jasmine:
     - npm install
   script:
     - npm run lint
-    - npm test --no-progress --browsers=Chrome --watch=false --code-coverage
+    - npm test
   artifacts:
     reports:
       coverage_report:
@@ -26,19 +26,24 @@ test_jasmine:
 
 test_cypress:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     NODE_ENV: 'test'
-  needs: ["test_jasmine"]
+  needs: ["test_jasmine_and_lint"]
   image:
-    name: cypress/included:10.6.0
+    name: cypress/included:cypress-13.11.0-node-20.14.0-chrome-125.0.6422.141-1-ff-126.0.1-edge-125.0.2535.85-1
+    entrypoint: [""]
   script:
+    - npm install
+    - npm install -g wait-on
+    - npm start & wait-on http://localhost:4200
     - npm run cy:run
   artifacts:
-    when: always
+    when: on_failure
     paths:
-      - cypress/screenshots
-      - cypress/videos
-      - cypress/reports
+      - cypress/screenshots/**/*.png
+    expire_in: 30 day
 
 docker_build_deploy_development:
   stage: deploy

@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host=127.0.0.1",
     "dev": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "build:prod": "ng build --configuration production --base-href /webapp/",
@@ -13,10 +13,10 @@
     "build:stats": "ng build --stats-json",
     "analyze": "webpack-bundle-analyzer dist/stats.json",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --code-coverage",
+    "test": "ng test --code-coverage --no-progress --browsers=Chrome --watch=false",
     "test-chromium-headless": "ng test --browsers=ChromiumHeadless --watch=false",
     "cy:open": "cypress open",
-    "cy:run": "cypress run",
+    "cy:run": "cypress run  --headless --browser firefox",
     "test:all": "npm run test && npm run cy:run",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix"
