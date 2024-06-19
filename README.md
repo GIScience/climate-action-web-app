@@ -78,9 +78,9 @@ To push a new version to [Docker Hub](https://hub.docker.com/orgs/heigit) run
 docker image push heigit/ca-web-app:devel
 ```
 
-## Unit Tests
+## Tests
 
-Run `npm run test` to execute the unit and integration tests via [Karma](https://karma-runner.github.io).
+Run `npm run test:all` to execute the unit & integration tests on [Jasmine](https://jasmine.github.io/) via [Karma](https://karma-runner.github.io) and E2E tests on [Cypress](https://www.cypress.io/).
 
 ## References
 
