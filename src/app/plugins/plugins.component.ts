@@ -24,8 +24,7 @@ export class PluginsComponent implements AfterViewInit, OnInit {
 
     constructor(
         private router: Router,
-        private pluginService: PluginService) {
-    }
+        private pluginService: PluginService) {}
 
     ngAfterViewInit(): void {
         this.loadPlugins()
@@ -34,32 +33,41 @@ export class PluginsComponent implements AfterViewInit, OnInit {
     ngOnInit(): void {
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) {
-                this.syncActiveCardWithRoute();
+                this.syncActiveCardWithRoute()
             }
         })
     }
 
     syncActiveCardWithRoute(): void {
-        const currentUrl = this.router.url;
-        const matchingCard = this.cards.find(card => `/plugin/${card.plugin_id}` === currentUrl);
-        this.activeCard = matchingCard;
+        const currentUrl = this.router.url
+        const matchingCard = this.cards.find(card => `/plugin/${card.plugin_id}` === currentUrl)
+        this.activeCard = matchingCard
     }
 
     loadPlugins() {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
                 data.forEach((plugin) => {
-                    const card = availableCards.find((x) => x.plugin_id == plugin.plugin_id)
+                    const card = this.cards.find((x) => x.plugin_id === plugin.plugin_id)
                     if (card) {
                         card.enabled = true
                         card.library_version = plugin.library_version
                         card.version = plugin.version
                         card.purpose = plugin.purpose
-
-                        if (this.router.url == `/plugin/${card.plugin_id}`)
-                            this.activeCard = card
+                    } else {
+                        this.cards.push({
+                            enabled: true,
+                            plugin_id: plugin.plugin_id,
+                            name: plugin.name,
+                            icon: plugin.icon,
+                            library_version: plugin.library_version,
+                            version: plugin.version,
+                            purpose: plugin.purpose
+                        })
                     }
                 })
+
+                this.syncActiveCardWithRoute()
             },
             error: error => {
                 console.error('Error fetching plugins:', error)
@@ -67,19 +75,23 @@ export class PluginsComponent implements AfterViewInit, OnInit {
         })
     }
 
-    activateCard(card: PluginCard) {
+    onImageError(event: Event) {
+        (event.target as HTMLImageElement).src = 'assets/images/plugin-icons/fallback.jpg'
+    }
+
+    activateCard(card:PluginCard) {
         if (card.enabled) {
             this.router.navigate(['plugin', card.plugin_id]).then(() => {
-                this.activeCard = card;
-            });
+                this.activeCard = card
+            })
         }
     }
 
     showPluginInfo(card: PluginCard) {
         if (card.enabled) {
             this.router.navigate(['plugin', card.plugin_id]).then(() => {
-                this.activeCard = card;
-            });
+                this.activeCard = card
+            })
         }
     }
 }
