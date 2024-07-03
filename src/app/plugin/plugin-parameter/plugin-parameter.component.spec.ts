@@ -18,6 +18,10 @@ import {JSONSchema7} from 'json-schema'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../app.validators'
 import {FormlyFieldExpansionPanelComponent} from '../../types/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
+import {Collection, Feature} from "ol";
+import TileSource from 'ol/source/Tile'
+import GeoJSON from 'ol/format/GeoJSON'
+import {MultiPolygon} from 'ol/geom'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -87,6 +91,36 @@ describe('PluginParameterComponent', () => {
         expect(component).toBeTruthy()
     })
 
+    it('should return a GEOJSON feature object', () => {
+        const inputFeature = new Feature({
+            geometry: new MultiPolygon(
+                [[[[0, 0], [111319.49079327357, 0], [111319.49079327357, 111325.1428663851], [0, 111325.1428663851], [0, 0]]]]
+            ),
+            id: '1',
+            osm_id: -285864,
+            name: 'Heidelberg'
+        })
+
+        const expectedFeature = {
+            'type': 'Feature',
+            'geometry': { 
+                'type': 'MultiPolygon',
+                'coordinates': [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+            },
+            'properties': {
+                'id': '1',
+                'osm_id': -285864,
+                'name': 'Heidelberg'
+            }
+        }
+
+        component.highlightedFeatures = new Collection([inputFeature])
+
+        const aoi = component.getSelectedRegion()
+
+        expect(aoi).toEqual(expectedFeature)
+    })
+
     it('should interpret operator schema', () => {
         component.plugin = {
             'name': 'testplugin',
@@ -107,7 +141,7 @@ describe('PluginParameterComponent', () => {
         component.ngOnChanges()
         fixture.detectChanges()
 
-        expect(component.highlightedFeatures).toEqual([])
+        expect(component.highlightedFeatures.getLength()).toEqual(0)
         expect(component.aoiAttribute).toBe('blueprint_aoi')
         expect(component.selectOptions['Option'].map((x) => x.label))
             .toEqual([

@@ -1,22 +1,21 @@
-import {AfterViewInit, Component, Input, OnChanges, ViewEncapsulation, Inject} from '@angular/core'
+import {AfterViewInit, Component, Inject, Input, OnChanges, ViewEncapsulation} from '@angular/core'
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
 import {JSONSchema7, JSONSchema7Definition} from 'json-schema'
 import Map from 'ol/Map'
 import OSM from 'ol/source/OSM'
+import Cluster from 'ol/source/Cluster'
+import Point from 'ol/geom/Point'
 import TileLayer from 'ol/layer/Tile'
-import {Feature, View} from 'ol'
+import {Collection, Feature, View} from 'ol'
+import FeatureLike from 'ol/Feature'
 import {fromLonLat} from 'ol/proj'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import {Fill, Stroke, Style} from 'ol/style'
-
-import {regions} from '../../support/region-of-interest'
-import {FeatureLike} from 'ol/Feature.js'
 import {Geometry} from 'ol/geom.js'
 import {PluginService} from '../plugin.service'
-import {TuiAlertService} from '@taiga-ui/core'
+import {TuiAlertService, TuiButtonModule} from '@taiga-ui/core'
 import {Plugin} from '../plugin.interface'
 import {
     FormlyModel,
@@ -29,7 +28,8 @@ import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
 import moment from 'moment/moment'
-import {TuiButtonModule} from '@taiga-ui/core'
+import {createEmpty, extend, getCenter} from 'ol/extent'
+import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style'
 
 
 @Component({
@@ -59,9 +59,10 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     map: Map | undefined
     regionLayer: VectorLayer<Feature<Geometry>> | undefined
-    selectedRegionLayer!: VectorLayer<Feature<Geometry>>
+    clusterLayer: VectorLayer<Feature<Geometry>> | undefined
+    highlightedFeatures: Collection<FeatureLike> = new Collection([])
+    styleCache: { [key: number]: Style } = {}
     jsonSchema_polygon = 'MultiPolygon'
-    highlightedFeatures: Array<FeatureLike> = []
 
     constructor(private pluginService: PluginService,
                 @Inject(TuiAlertService) private readonly alerts: TuiAlertService,
@@ -94,14 +95,14 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
 
     }
 
-    private getSelectedRegion(): GeoJSONFeatureCollection {
-        const features = this.selectedRegionLayer.getSource()?.getFeatures()
-        if (features && features[0]) {
-            const paramFeature = new GeoJSON().writeFeaturesObject(features, {
+    getSelectedRegion(): GeoJSONFeatureCollection {
+        const features = this.highlightedFeatures.item(0)
+        if (features) {
+            return new GeoJSON().writeFeatureObject(features, {
                 dataProjection: 'EPSG:4326',
-                featureProjection: 'EPSG:3857'
+                featureProjection: 'EPSG:3857',
+                decimals: 7
             })
-            return paramFeature.features[0]
         }
 
     }
@@ -286,26 +287,44 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.initMap()
+        this.assembleMap()
     }
 
-    private initMap() {
-        const view = new View({
-            center: fromLonLat([8.6759928, 49.4187355]),
-            zoom: 10
-        })
-        this.map = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM()
-                })
-            ],
-            target: 'map',
-            view: view
+    private assembleMap(clusterToPolygonSwitchZoom = 7) {
+        const selectedRegionLayer = this.initLayers(clusterToPolygonSwitchZoom)
+        this.initMap(selectedRegionLayer)
+    }
+
+    private initLayers(clusterToPolygonSwitchZoom: number) {
+        const ROISource = new VectorSource({
+            format: new GeoJSON(),
+            url: 'assets/geodata/regions-of-interest.json'
         })
 
-        this.selectedRegionLayer = new VectorLayer({
-            source: new VectorSource(),
+        const clusterSource = new Cluster({
+            source: ROISource,
+            // @ts-ignore docs say null can be returned!
+            geometryFunction: function (feature) {
+                const geom = feature.getGeometry()
+                if (!geom)
+                    return null
+                return new Point(getCenter(geom.getExtent()))
+            }
+        })
+
+        this.regionLayer = new VectorLayer({
+            minZoom: clusterToPolygonSwitchZoom,
+            source: ROISource,
+            style: new Style({
+                fill: new Fill({color: 'rgba(0, 0, 255, 0.1)'}),
+                stroke: new Stroke({color: 'blue', width: 2})
+            })
+        })
+
+        const selectedRegionLayer = new VectorLayer({
+            source: new VectorSource({
+                features: this.highlightedFeatures
+            }),
             map: this.map,
             style: {
                 'stroke-color': 'rgba(255, 0, 0, 0.7)',
@@ -313,48 +332,94 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             }
         })
 
-        const regionSource = new VectorSource()
-        this.regionLayer = new VectorLayer({
-            source: regionSource,
-            style: new Style({
-                fill: new Fill({color: 'rgba(0, 0, 255, 0.1)'}),
-                stroke: new Stroke({color: 'blue', width: 2})
+        this.clusterLayer = new VectorLayer({
+            maxZoom: clusterToPolygonSwitchZoom,
+            source: clusterSource,
+            //@ts-ignore typechecker error: FeatureLike down-typed to Feature<Geometry>
+            style: (clusterFeature, resolution) => this.getClusterStyle(clusterFeature, resolution)
+        })
+        return selectedRegionLayer
+    }
+
+    private initMap(selectedRegionLayer: VectorLayer<FeatureLike>) {
+        this.map = new Map({
+            layers: [
+                new TileLayer({
+                    source: new OSM()
+                })
+            ],
+            target: 'map',
+            view: new View({
+                center: fromLonLat([8.6759928, 49.4187355]),
+                zoom: 0
             })
         })
-        this.map.addLayer(this.regionLayer)
+        this.map.addLayer(this.regionLayer!)
+        this.map.addLayer(this.clusterLayer!)
+        this.map.addLayer(selectedRegionLayer)
 
-        regionSource.addFeatures(new GeoJSON().readFeatures(regions, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
-        }))
-
-        view.fit(regionSource.getExtent(), {padding: [100, 100, 100, 100]})
-
+        this.map.on('pointermove', evt => {
+            if (this.map && !evt.dragging) {
+                this.map.getTargetElement().style.cursor = this.map.hasFeatureAtPixel(this.map.getEventPixel(evt.originalEvent)) ? 'pointer' : ''
+            }
+        })
 
         this.map.on('click', (evt) => {
-            this.selectRegions(evt.pixel)
+            if (this.clusterLayer && this.clusterLayer.isVisible()) {
+                this.zoomToCluster(evt.pixel)
+            } else {
+                this.selectRegions(evt.pixel)
+            }
         })
+    }
+
+    private getClusterStyle(clusterFeature: FeatureLike) {
+        const size: number = clusterFeature.get('features').length
+        let style = this.styleCache[size]
+        if (!style) {
+            style = new Style({
+                image: new CircleStyle({
+                    radius: 15,
+                    stroke: new Stroke({color: 'blue', width: 2}),
+                    fill: new Fill({color: 'rgba(0, 0, 255, 0.5)'})
+                }),
+                text: new Text({
+                    text: size.toString(),
+                    font: 'bold 14px sans-serif',
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                    fill: new Fill({
+                        color: '#fff'
+                    })
+                })
+            })
+            this.styleCache[size] = style
+        }
+        return style
+    }
+
+    private zoomToCluster(pixel: Array<number>) {
+        if (this.clusterLayer) {
+            this.clusterLayer.getFeatures(pixel).then((clickedFeatures) => {
+                if (clickedFeatures.length) {
+                    const extent = createEmpty()
+                    const features: Feature[] = clickedFeatures[0].get('features')
+                    features.forEach(f => extend(extent, f.getGeometry()!.getExtent()))
+                    if (this.map) {
+                        this.map.getView().fit(extent, {duration: 1000, padding: [100, 100, 100, 100]})
+                    }
+                }
+            })
+        }
     }
 
     private selectRegions(pixel: Array<number>) {
         if (this.regionLayer) {
             this.regionLayer.getFeatures(pixel).then((features) => {
-                if (features) {
-                    const feature = features[0]
-                    const selIndex = this.highlightedFeatures.indexOf(feature)
-                    if (selIndex < 0) {
-                        if (feature) {
-                            this.highlightedFeatures.push(feature)
-                        }
-                    } else {
-                        this.highlightedFeatures.splice(selIndex, 1)
-                    }
-
-                    this.selectedRegionLayer.getSource()?.clear()
-                    if (this.highlightedFeatures.length > 0) {
-                        // @ts-ignore TODO possible type mismatch
-                        this.selectedRegionLayer.getSource().addFeatures(this.highlightedFeatures)
-                    }
+                if (features && features[0]) {
+                    this.highlightedFeatures.clear()
+                    //@ts-ignore typechecker error: FeatureLike down-typed to Feature<Geometry>
+                    this.highlightedFeatures.push(features[0])
                 }
             })
         }
@@ -380,15 +445,23 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 this.pluginService.storeComputes(data.correlation_uuid, this.plugin)
 
                 this.alerts
-                .open('Result from plugin execution will be listed on the dashboard.', {label: `${this.plugin.plugin_id}` + ' parameters are sent for processing!', status: 'success', autoClose: 7000})
-                .subscribe()
+                    .open('Result from plugin execution will be listed on the dashboard.', {
+                        label: `${this.plugin.plugin_id}` + ' parameters are sent for processing!',
+                        status: 'success',
+                        autoClose: 7000
+                    })
+                    .subscribe()
                 this.router.navigate(['dashboard'])
             },
             error: error => {
 
                 this.alerts
-                .open('Please try again.', {label: 'Error while computing plugin ' + `${this.plugin.name}`, status: 'error', autoClose: 7000})
-                .subscribe()
+                    .open('Please try again.', {
+                        label: 'Error while computing plugin ' + `${this.plugin.name}`,
+                        status: 'error',
+                        autoClose: 7000
+                    })
+                    .subscribe()
                 this.router.navigate(['dashboard'])
             }
         })
