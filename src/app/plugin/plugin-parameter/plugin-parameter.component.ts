@@ -96,9 +96,15 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
     }
 
     getSelectedRegion(): GeoJSONFeatureCollection {
-        const features = this.highlightedFeatures.item(0)
-        if (features) {
-            return new GeoJSON().writeFeatureObject(features, {
+        const feature = this.highlightedFeatures.item(0)
+        if (feature) {
+            if (!feature.get('id')) {
+                feature.set('id', Math.random().toString(36).substring(2, 9))
+            }
+            if (!feature.get('name')) {
+                feature.set('name', 'Unnamed Region')
+            }
+            return new GeoJSON().writeFeatureObject(feature, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857',
                 decimals: 7
@@ -418,8 +424,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
             this.regionLayer.getFeatures(pixel).then((features) => {
                 if (features && features[0]) {
                     this.highlightedFeatures.clear()
-                    //@ts-ignore typechecker error: FeatureLike down-typed to Feature<Geometry>
-                    this.highlightedFeatures.push(features[0])
+                    this.highlightedFeatures.push(features[0] as Feature<Geometry>)
                 }
             })
         }
