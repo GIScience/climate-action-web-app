@@ -21,6 +21,9 @@ module.exports = function (config) {
         jasmineHtmlReporter: {
             suppressAll: true
         },
+        preprocessors: {
+            'src/**/*.js': ['coverage']
+        },
         coverageReporter: {
             dir: require('path').join(__dirname, './coverage/'),
             subdir: '.',
@@ -30,7 +33,14 @@ module.exports = function (config) {
                 {type: 'cobertura'}
             ]
         },
-        reporters: ['progress', 'kjhtml'],
+        reporters: ['progress', 'kjhtml', 'coverage'],
+        coverageReporter: {
+            dir: 'coverage',
+            reporters: [
+              { type: 'lcov', subdir: 'report-lcov' },
+              { type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt' }
+            ]
+        },
         browsers: ['Chrome'],
         restartOnFileChange: true,
         singleRun: true
