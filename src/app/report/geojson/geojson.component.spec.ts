@@ -44,7 +44,8 @@ describe('GeojsonComponent', () => {
                 description: 'test description',
                 correlation_uuid: '6b6ea4ba-7c0c-4e5d-a2ee-0f32a743f88e',
                 params: {},
-                store_id: '606de3f8-7404-4b3a-af5d-85292848235f'
+                store_id: '606de3f8-7404-4b3a-af5d-85292848235f',
+                attachments: {}
             }
         }
         component.ngOnInit()
@@ -104,7 +105,8 @@ describe('GeojsonComponent', () => {
                 description: 'test description',
                 correlation_uuid: '6b6ea4ba-7c0c-4e5d-a2ee-0f32a743f88e',
                 params: {},
-                store_id: '606de3f8-7404-4b3a-af5d-85292848235f.geojson'
+                store_id: '606de3f8-7404-4b3a-af5d-85292848235f.geojson',
+                attachments: {}
             }
         }
         component.ngOnInit()
