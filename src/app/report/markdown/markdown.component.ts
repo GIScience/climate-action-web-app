@@ -30,9 +30,9 @@ export class MarkdownComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.url) {
-            this.loadMarkdownFromUrl();
+            this.loadMarkdownFromUrl()
         } else if (this.rawMarkdown) {
-            this.parseMarkdown(this.rawMarkdown);
+            this.parseMarkdown(this.rawMarkdown)
         }
     }
 
@@ -50,9 +50,9 @@ export class MarkdownComponent implements OnInit {
     }
 
     private parseMarkdown(markdown: string): void {
-        let html = this.mdParser.render(markdown);
-        html = this.rewriteFootnoteLinks(html);
-        this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html);
+        let html = this.mdParser.render(markdown)
+        html = this.rewriteFootnoteLinks(html)
+        this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html)
     }
 
     private rewriteFootnoteLinks(html: string){

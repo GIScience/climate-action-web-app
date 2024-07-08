@@ -85,7 +85,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     currentRuns: PluginRun[] = []
     activeNode?: ArtifactNode
     sync?: Subscription
-    archivedArtifacts: any[] = []
+    archivedArtifacts: PluginRun[] = []
     open = false
 
     constructor(private pluginService: PluginService,
@@ -312,10 +312,10 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     unarchiveArtifact(correlation_uuid: string): void {
-        const artifactToUnarchive = this.archivedArtifacts.find((artifact: any) => artifact.correlation_uuid === correlation_uuid)
+        const artifactToUnarchive = this.archivedArtifacts.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
     
         if (artifactToUnarchive) {
-            this.archivedArtifacts = this.archivedArtifacts.filter((a: any) => a.correlation_uuid !== correlation_uuid)
+            this.archivedArtifacts = this.archivedArtifacts.filter((a: PluginRun) => a.correlation_uuid !== correlation_uuid)
             this.currentRuns.push(artifactToUnarchive)
             this.updateLocalStorage()
     

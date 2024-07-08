@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
-import {ChartConfiguration, ChartType, TooltipItem} from 'chart.js'
+import {ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem} from 'chart.js'
 import {convertToTitleCase} from '../../utils/report-utils'
 
 import {Artifact, ChartData} from '../../artifact/artifact.interface'
@@ -30,7 +30,7 @@ export class ChartComponent implements OnInit {
         return label
     }
 
-    generalTooltipLabelFunc(context: TooltipItem<any>) {
+    generalTooltipLabelFunc(context: TooltipItem<keyof ChartTypeRegistry>) {
         let label = context.label || ''
         if (label) {
             label += ': ' + context.formattedValue

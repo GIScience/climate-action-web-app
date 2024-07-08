@@ -18,9 +18,7 @@ import {JSONSchema7} from 'json-schema'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../app.validators'
 import {FormlyFieldExpansionPanelComponent} from '../../types/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
-import {Collection, Feature} from "ol";
-import TileSource from 'ol/source/Tile'
-import GeoJSON from 'ol/format/GeoJSON'
+import {Collection, Feature} from 'ol'
 import {MultiPolygon} from 'ol/geom'
 
 describe('PluginParameterComponent', () => {

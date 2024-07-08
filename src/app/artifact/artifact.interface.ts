@@ -1,3 +1,25 @@
+export interface DiscreteLegendData {
+    [key: string]: string
+}
+
+export interface TicksObject {
+    [key: string]: number
+}
+
+export interface ContinuousLegendData {
+    cmap_name: string
+    ticks: TicksObject
+}
+
+export interface LegendObject {
+    legend_type: 'CONTINUOUS' | 'DISCRETE'
+    legend_data: ContinuousLegendData | DiscreteLegendData
+}
+
+export interface AttachmentsObject {
+    LEGEND?: LegendObject
+}
+
 export interface ArtifactNode {
     name: string
     uuid: string
@@ -22,6 +44,7 @@ export interface Artifact {
     params: object
     store_id: string
     primary: boolean
+    attachments: AttachmentsObject
 }
 
 export interface ChartData {

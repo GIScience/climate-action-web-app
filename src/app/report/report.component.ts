@@ -61,13 +61,13 @@ export class ReportComponent implements OnInit, AfterViewInit {
         this.displayDescription(artifact?.description || null)
         this.modality = artifact?.modality || null
 
-        if (typeof value === 'object' && value && !(value as any).url) {
+        if (typeof value === 'object' && value && !(value as {url?: string}).url) {
             if (componentType !== LegendComponent) {
                 this.generateDownloadJsonUri(value)
                 this.currentUrl = null
             }
         } else {
-            this.currentUrl = typeof value === 'string' ? value : (value as any)?.url || null
+            this.currentUrl = typeof value === 'string' ? value : (value as {url?: string})?.url || null
             this.downloadJsonHref = null
         }
         this.clearLegend()
@@ -94,7 +94,7 @@ export class ReportComponent implements OnInit, AfterViewInit {
             const a = document.createElement('a')
             document.body.appendChild(a)
             a.style.display = 'none'
-            a.href = (this.downloadJsonHref as any).changingThisBreaksApplicationSecurity
+            a.href = (this.downloadJsonHref as {changingThisBreaksApplicationSecurity: string}).changingThisBreaksApplicationSecurity
             a.download = 'data.json'
             a.click()
             document.body.removeChild(a)

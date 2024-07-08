@@ -25,7 +25,7 @@ describe('LegendComponent', () => {
 
     fixture = TestBed.createComponent(LegendComponent)
     component = fixture.componentInstance
-  });
+  })
 
   it('should render discrete legend correctly', () => {
     component.legendData = {
@@ -57,7 +57,7 @@ describe('LegendComponent', () => {
       legend_type: 'CONTINUOUS',
       legend_data: {
         cmap_name: 'seismic',
-        ticks: { 'Blue b': '0.0', 'White c': '0.5', 'Red a': '1.0' }
+        ticks: { 'Blue b': 0.0, 'White c': 0.5, 'Red a': 1.0 }
       }
     }
 

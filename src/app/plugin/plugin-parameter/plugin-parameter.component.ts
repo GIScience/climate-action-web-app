@@ -360,8 +360,13 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 zoom: 0
             })
         })
-        this.map.addLayer(this.regionLayer!)
-        this.map.addLayer(this.clusterLayer!)
+        if (this.regionLayer) {
+            this.map.addLayer(this.regionLayer)
+        }
+        
+        if (this.clusterLayer) {
+            this.map.addLayer(this.clusterLayer)
+        }
         this.map.addLayer(selectedRegionLayer)
 
         this.map.on('pointermove', evt => {
@@ -410,7 +415,12 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                 if (clickedFeatures.length) {
                     const extent = createEmpty()
                     const features: Feature[] = clickedFeatures[0].get('features')
-                    features.forEach(f => extend(extent, f.getGeometry()!.getExtent()))
+                    features.forEach(f => {
+                        const geometry = f.getGeometry()
+                        if (geometry) {
+                            extend(extent, geometry.getExtent())
+                        }
+                    })
                     if (this.map) {
                         this.map.getView().fit(extent, {duration: 1000, padding: [100, 100, 100, 100]})
                     }
@@ -458,8 +468,7 @@ export class PluginParameterComponent implements OnChanges, AfterViewInit {
                     .subscribe()
                 this.router.navigate(['dashboard'])
             },
-            error: error => {
-
+            error: () => {
                 this.alerts
                     .open('Please try again.', {
                         label: 'Error while computing plugin ' + `${this.plugin.name}`,

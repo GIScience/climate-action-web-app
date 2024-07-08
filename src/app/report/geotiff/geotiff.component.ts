@@ -6,10 +6,10 @@ import TileLayer from 'ol/layer/WebGLTile.js'
 
 import {Artifact} from '../../artifact/artifact.interface'
 import GeoTIFF from 'ol/source/GeoTIFF'
-import OSM from "ol/source/OSM";
-import {fromLonLat} from "ol/proj";
-import {getCenter} from "ol/extent";
-import {View} from "ol";
+import OSM from 'ol/source/OSM'
+import {fromLonLat} from 'ol/proj'
+import {getCenter} from 'ol/extent'
+import {View} from 'ol'
 
 @Component({
     selector: 'app-geotiff',
@@ -59,12 +59,12 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
                     blob: geoTiffBlob,
                     // The following options are due to https://github.com/openlayers/openlayers/issues/15894
                     bands: [1, 2, 3],
-                    nodata: 0,
-                },
+                    nodata: 0
+                }
             ],
             convertToRGB: true,
             interpolate: false
-        });
+        })
         const geotiffView = await geoTiffSource.getView()
         const geotiffExtend = geotiffView.extent
         const geotiffCenter = fromLonLat(geotiffExtend ? getCenter(geotiffExtend) : [8.6759928, 49.4187355])
@@ -76,14 +76,14 @@ export class GeoTiffComponent implements OnInit, AfterViewInit {
                     source: new OSM()
                 }),
                 new TileLayer({
-                    source: geoTiffSource,
-                }),
+                    source: geoTiffSource
+                })
             ],
             view: new View({
                 center: geotiffCenter,
-                zoom: 12,
-            }),
-        });
+                zoom: 12
+            })
+        })
     }
 
     getFirstPartBeforeDot(inputString: string): string | null {

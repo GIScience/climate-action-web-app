@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {BehaviorSubject} from 'rxjs'
 import {HttpClient} from '@angular/common/http'
-import {Artifact, ChartData, ArtifactData} from '../artifact/artifact.interface'
+import {Artifact, ChartData, ArtifactData, LegendObject} from '../artifact/artifact.interface'
 import {environment} from '../../environments/environment'
 
 @Injectable({
@@ -26,7 +26,7 @@ export class ReportService {
     private geotiffSubject = new BehaviorSubject<ArtifactData | null>(null)
     geotiff = this.geotiffSubject.asObservable()
 
-    private legendSubject = new BehaviorSubject<any>(null)
+    private legendSubject = new BehaviorSubject<LegendObject | null>(null)
     legend = this.legendSubject.asObservable()
 
     private chartSubject = new BehaviorSubject<{ data: ChartData | null, artifact: Artifact | null }>({
@@ -93,7 +93,7 @@ export class ReportService {
 
     getLegend(artifact: Artifact): void {
         const url = `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}`
-        this.http.get<any[]>(url).subscribe((response) => {
+        this.http.get<Artifact[]>(url).subscribe((response) => {
             const mapLegend = response.find(item => item.store_id === artifact.store_id)?.attachments?.LEGEND
             if (mapLegend) {
               this.legendSubject.next(mapLegend)
