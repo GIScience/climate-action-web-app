@@ -5,8 +5,7 @@ import {FormlyModule} from '@ngx-formly/core'
 import {HttpClientModule} from '@angular/common/http'
 import {MarkdownModule} from 'ngx-markdown'
 import {NgChartsModule} from 'ng2-charts'
-import {PluginsComponent} from './plugins/plugins.component'
-
+import {PluginCatalogComponent} from './dashboard/plugin-catalog/plugin-catalog.component'
 import {AppRoutingModule} from './app.routing.module'
 import {AppComponent} from './app.component'
 import {NgOptimizedImage} from '@angular/common'
@@ -14,8 +13,8 @@ import {ObjectTypeComponent} from './types/object.type'
 import {MultiSchemaTypeComponent} from './types/multischema.type'
 import {ArrayTypeComponent} from './types/array.type'
 import {NullTypeComponent} from './types/null.type'
-import {ChartComponent} from './report/chart/chart.component'
-import {ArtifactComponent} from './artifact/artifact.component'
+import {ChartComponent} from './dashboard/report/chart/chart.component'
+import {ArtifactComponent} from './dashboard/artifact/artifact.component'
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker'
 import {FormlyMaterialModule} from '@ngx-formly/material'
 import {MatDatepickerModule} from '@angular/material/datepicker'
@@ -24,13 +23,14 @@ import {MatInputModule} from '@angular/material/input'
 import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from '@angular/material-moment-adapter'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.validators'
-import {NotificationComponent} from './notification/notification.component'
 import {RouteReuseStrategy} from '@angular/router'
 import {CustomRouteReuseStrategy} from './app.ext'
 import {FormlyFieldExpansionPanelComponent} from './types/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
-import {NgDompurifySanitizer} from '@tinkoff/ng-dompurify'
-import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT_POSITION} from '@taiga-ui/core'
+import {MatSnackBarModule} from '@angular/material/snack-bar'
+import {MapService} from './dashboard/map/map.service'
+import {LucideAngularModule, CircleUserRound} from 'lucide-angular'
+import {MatDialogModule} from '@angular/material/dialog'
 
 
 @NgModule({
@@ -56,7 +56,9 @@ import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT
         FormlyMaterialModule,
         MatMomentDateModule,
         MatExpansionModule,
-        PluginsComponent,
+        MatSnackBarModule,
+        PluginCatalogComponent,
+        MatDialogModule,
         FormlyModule.forRoot({
             validators: [
                 {name: 'intType', validation: intTypeValidator},
@@ -78,10 +80,7 @@ import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT
         MarkdownModule.forRoot(),
         NgChartsModule,
         ArtifactComponent,
-        NotificationComponent,
-        TuiRootModule,
-        TuiDialogModule,
-        TuiAlertModule
+        LucideAngularModule.pick({CircleUserRound})
     ],
     providers: [
         {
@@ -110,12 +109,7 @@ import {TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER, TUI_ALERT
             useClass: CustomRouteReuseStrategy
         },
         {
-            provide: TUI_SANITIZER,
-            useClass: NgDompurifySanitizer
-        },
-        {
-            provide: TUI_ALERT_POSITION,
-            useValue: 'auto 3rem 3rem auto'
+            provide: MapService
         }
     ],
     bootstrap: [AppComponent]

@@ -1,8 +1,16 @@
-<main class="main-content bgc-grey-100">
-    <div class="bg-light artifacts-list">
-        <app-artifacts></app-artifacts>
+<main class="dashboard">
+    <app-map></app-map>
+    <app-plugin-catalog></app-plugin-catalog>
+
+    <div class="dashboard__left-column">
+        <div class="current-plugin-container">
+            <router-outlet></router-outlet>
+        </div>
     </div>
-    <div class="artifact-report">
-        <app-report></app-report>
+    <div class="dashboard__middle-column">
+        <app-report [hidden]="!reportService.isReportVisible"></app-report>
+    </div>
+    <div class="dashboard__right-column">
+        <div #legendContainer></div>
     </div>
 </main>

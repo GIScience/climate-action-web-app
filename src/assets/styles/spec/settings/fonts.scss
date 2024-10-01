@@ -1,34 +1,28 @@
 @font-face {
-  font-family: 'Roboto';
-  src: url('../../../fonts/roboto/Roboto-Regular.ttf') format('truetype');
+  font-family: Manrope;
+  src: url('../../../fonts/Manrope-VariableFont_wght.ttf') format('truetype');
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'Roboto';
-  src: url('../../../fonts/roboto/Roboto-Bold.ttf') format('truetype');
-  font-weight: 700;
+  font-family: Manrope;
+  src: url('../../../fonts/Manrope-VariableFont_wght.ttf') format('truetype');
+  font-weight: 600;
 }
 
 @font-face {
-  font-family: 'Roboto';
-  src: url('../../../fonts/roboto/Roboto-Medium.ttf') format('truetype');
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('../../../fonts/roboto/Roboto-Light.ttf') format('truetype');
+  font-family: Manrope;
+  src: url('../../../fonts/Manrope-VariableFont_wght.ttf') format('truetype');
   font-weight: 300;
 }
 
 @font-face {
-  font-family: 'Roboto';
-  src: url('../../../fonts/roboto/Roboto-Thin.ttf') format('truetype');
+  font-family: Manrope;
+  src: url('../../../fonts/Manrope-VariableFont_wght.ttf') format('truetype');
   font-weight: 100;
 }
 
+
 $font-primary:
-  Roboto, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-$font-secondary: $font-primary;
+  Manrope, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 $font-size-base: 0.875rem;

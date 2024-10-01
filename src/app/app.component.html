@@ -1,27 +1,28 @@
-<tui-root>
-    <div class="page-container bgc-grey-100">
-        <header class="navbar">
-            <div class="header-container">
-                <div class="logo-wrapper">
+<div class="page-container bgc-grey-100">
+    <header class="navbar">
+        <div class="header-container">
+            <div class="logo-wrapper">
+                <a href="https://heigit.org" target="_blank">
                     <img src="assets/images/HeiGIT_Logo_base.svg" alt="HeiGIT Logo" class="logo" />
-                </div>
-                <h2 [routerLink]="'/dashboard'">{{title}}</h2>
-                <app-runs></app-runs>
+                </a>
             </div>
-        </header>
-        
-        <div class="app-container">
-            <app-plugins></app-plugins>
-            <router-outlet></router-outlet>
+            <h2 [routerLink]="'/dashboard'" tabindex="0" (click)="reportService.closeReport()" (keyup.enter)="reportService.closeReport()">{{title}}</h2>
+            <div class="my-account">
+                <i-lucide name="circle-user-round" [size]="30"></i-lucide>
+            </div>
         </div>
-
-        <footer class="footer bdT ta-c fsz-sm c-grey-600">
-            <span class="about-info"> © {{currentYear()}} HeiGIT gGmbH |
-                <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
-                <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
-                <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a>
-            </span>
-            <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>
-        </footer>
+    </header>
+    
+    <div class="app-container">
+        <router-outlet></router-outlet>
     </div>
-</tui-root>
+
+    <footer class="footer bdT ta-c fsz-sm c-grey-600">
+        <span class="about-info"> © {{currentYear()}} HeiGIT gGmbH |
+            <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
+            <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
+            <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a>
+        </span>
+        <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>
+    </footer>
+</div>

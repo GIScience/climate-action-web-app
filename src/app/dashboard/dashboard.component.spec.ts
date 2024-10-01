@@ -1,10 +1,10 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
-
+import {RouterModule} from '@angular/router'
 import {DashboardComponent} from './dashboard.component'
-import {ArtifactComponent} from '../artifact/artifact.component'
+import {ArtifactComponent} from './artifact/artifact.component'
 import {HttpClientModule} from '@angular/common/http'
-import {ReportComponent} from '../report/report.component'
-import {PluginsComponent} from '../plugins/plugins.component'
+import {ReportComponent} from './report/report.component'
+import {PluginCatalogComponent} from './plugin-catalog/plugin-catalog.component'
 
 describe('DashboardComponent', () => {
     let component: DashboardComponent
@@ -17,7 +17,8 @@ describe('DashboardComponent', () => {
                 DashboardComponent,
                 HttpClientModule,
                 ReportComponent,
-                PluginsComponent
+                PluginCatalogComponent,
+                RouterModule.forRoot([])
             ]
         })
         fixture = TestBed.createComponent(DashboardComponent)
