@@ -16,6 +16,7 @@ import Point from 'ol/geom/Point'
 import {easeIn} from 'ol/easing.js'
 import {createEmpty, extend, Extent, getCenter} from 'ol/extent'
 import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style'
+import {StyleFunction} from 'ol/style/Style'
 
 @Injectable({
     providedIn: 'root'
@@ -167,40 +168,43 @@ export class MapService {
         })
 
         const geojsonLayer = new VectorLayer({
-            source: geojsonLayerSource
-        })
-
-        geojsonLayer.setStyle((feature) => {
-            const color = feature.get('color')
-            let strokeColor = [0, 0, 0, 1]
-
-            const geom = feature.getGeometry()
-            if (geom && (geom.getType() == 'LineString' || geom.getType() == 'MultiLineString')) {
-                strokeColor = color
-            }
-
-            return new Style({
-                fill: new Fill({
-                    color: color
-                }),
-                stroke: new Stroke({
-                    color: strokeColor,
-                    width: 2
-                }),
-                image: new CircleStyle({
-                    radius: 5,
-                    stroke: new Stroke({
-                        color: strokeColor
-                    }),
-                    fill: new Fill({
-                        color: color
-                    })
-                })
-            })
+            source: geojsonLayerSource,
+            style: this.styleFunction.bind(this) as StyleFunction
         })
 
         this.map?.addLayer(geojsonLayer)
         return geojsonLayer
+    }
+
+    styleFunction(feature: FeatureLike, resolution: number): Style {
+        const widthUnits = 15
+        const strokeWidth = Math.min(Math.max(Math.pow(1.25, widthUnits / resolution), 1.5), 15)
+        const color = feature.get('color')
+        let strokeColor = [0, 0, 0, 1]
+
+        const geom = feature.getGeometry()
+        if (geom && (geom.getType() == 'LineString' || geom.getType() == 'MultiLineString')) {
+            strokeColor = color
+        }
+
+        return new Style({
+            fill: new Fill({
+                color: color
+            }),
+            stroke: new Stroke({
+                color: strokeColor,
+                width: strokeWidth
+            }),
+            image: new CircleStyle({
+                radius: 5,
+                stroke: new Stroke({
+                    color: strokeColor
+                }),
+                fill: new Fill({
+                    color: color
+                })
+            })
+        })
     }
 
     async addGeoTiffLayer(blob: Blob) {
