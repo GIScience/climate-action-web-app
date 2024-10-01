@@ -1,0 +1,204 @@
+.plugin-catalog {
+  background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
+  color: #fff;
+  z-index: 1;
+  position: relative;
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  padding: 20px;
+  overflow: hidden;
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 10%);
+
+  input[type=checkbox] {
+    display: none;
+  }
+
+  #catalog-toggle:checked {
+ 
+    ~ .plugins-list {
+      width: 80px;
+    }
+    
+    ~ #catalog-header .plugin-title {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    ~ #catalog-header label[for=catalog-toggle] {
+      left: 50%;
+      transform: translate(-50%);
+    }
+
+    ~ #catalog-header #catalog-toggle-burger {
+      background: #fff;
+
+      &:before,
+      &:after {
+        width: 14px;
+        background: #eee;
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+    }
+    
+    &:hover ~ #catalog-header #catalog-toggle-burger {
+
+      &:before,
+      &:after {
+        width: 18px;
+      }
+    }
+    
+    ~ .plugins-list .plugin-card {
+      width: 100px;
+    }
+
+    ~ .plugins-list .plugin-card__text {
+      opacity: 0;
+      transition: none;
+    }
+  }
+
+  #catalog-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h3.plugin-title {
+      margin: 10px 0;
+      transition: opacity 0.25s ease-in-out;
+    }
+
+    label[for=catalog-toggle] {
+      position: absolute;
+      right: -10px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 40px;
+    }
+    
+    #catalog-toggle-burger {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      width: 18px;
+      height: 2px;
+      background-color: transparent;
+      border-radius: 99px;
+      transition: background-color .25s ease-in-out;
+    
+      &:before,
+      &:after {
+        content: '';
+        position: absolute;
+        top: -6px;
+        width: 10px;
+        height: 2px;
+        background: #eee;
+        border-radius: 99px;
+        transform: translate(2px, 9px) rotate(40deg);
+        transition: transform .25s ease-in-out, width .1s ease-in-out;
+      }
+      
+      &:after {
+        top: 6px;
+        transform: translate(2px, -9px) rotate(-40deg);
+      }
+    }
+  }
+}
+
+.plugins-list {
+  width: 200px;
+  transition: width 0.25s ease-in-out;
+
+  .plugin-card {
+    display: flex;
+    border-radius: 5px;
+    height: 75px;
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 220px;
+    transition: width 0.25s ease-in-out;
+    
+    .plugin-card__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px;
+      transition: opacity 0.3s ease-in-out 0.3s;
+      
+      h3 {
+        margin: 0;
+        font-size: small;
+      }
+      
+      span {
+        font-size: smaller;
+      }
+    }
+    
+    img {
+      aspect-ratio: 1;
+      border-radius: 5px;
+      height: 100%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+    }
+
+    &.plugin-card-highlight,
+    &.enabled-card:hover {
+      background-color: #f2f2f2;
+      color: #111;
+
+      &:before, &:after {
+        content: '';
+        position: absolute;
+        pointer-events: none;
+        right: 0;
+        bottom: 100%;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        box-shadow: 18px 18px #f2f2f2;
+      }
+
+      &:after{
+        top: 100%;
+        box-shadow: 18px -18px #f2f2f2;
+      }
+    }
+
+    &:not(.plugin-card-highlight).enabled-card:hover {
+      background-color: #cbcbcb;
+
+      &:before, &:after {
+        box-shadow: 18px 18px #cbcbcb;
+      }
+
+      &:after{
+        box-shadow: 18px -18px #cbcbcb;
+      }
+    }
+
+    &.enabled-card {
+      cursor: pointer;
+      position: relative;
+    }
+    
+    &.disabled-card {
+      
+      img {
+        filter: opacity(0.75) brightness(60%) grayscale(1);
+      }
+
+      .plugin-card__text {
+        color: #ccc;
+      }
+    }
+  }
+}

@@ -1,57 +1,16 @@
 .app-container {
   display: flex;
+  overflow: hidden;
 
   router-outlet {
     display: contents;
   }
 }
 
-app-plugins {
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: absolute;
-  width: 120px;
-  transition: width 0.5s ease-in-out;
-
-  &::before {
-    content: '';
-    display: block;
-    box-shadow: inset -25px 0px 15px -10px rgba(0 0 0 / 50%);
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    transition: box-shadow 0.5s ease-in-out;
-    z-index: 0;
-  }
-}
-
-app-dashboard,
-app-plugin {
-  
-  margin-left: 100px;
-  transition: margin 0.5s ease-in-out;
-  width: calc(100vw - 100px);
+app-dashboard {
+  width: 100%;
   position: relative;
-  z-index: 1;
-}
-
-app-plugins:hover {
-  width: 250px;
-
-  &::before {
-    box-shadow: inset -5px 0px 15px -10px rgba(0 0 0 / 50%);
-  }
-
-  &~app-dashboard,
-  &~app-plugin {
-    margin-left: 250px;
-  }
-
-  & .plugin-card .plugin-card__text {
-    opacity: 1 !important;
-  }
+  overflow: hidden;
 }
 
 footer {

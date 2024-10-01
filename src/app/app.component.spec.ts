@@ -1,7 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing'
 import {RouterTestingModule} from '@angular/router/testing'
 import {AppComponent} from './app.component'
-import {NotificationComponent} from './notification/notification.component'
 import {HttpClientModule} from '@angular/common/http'
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core'
 
@@ -13,8 +12,7 @@ describe('AppComponent', () => {
         await TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                RouterTestingModule,
-                NotificationComponent
+                RouterTestingModule
             ],
             declarations: [
                 AppComponent

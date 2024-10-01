@@ -1,0 +1,13 @@
+#map {
+	height: 100%;
+
+	::ng-deep {
+
+		.ol-zoom {
+			top: auto;
+			left: auto;
+			bottom: 2.5em;
+			right: 0.5em;
+		}
+	}
+}

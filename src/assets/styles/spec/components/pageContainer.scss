@@ -5,16 +5,6 @@
   overflow-x: hidden;
 }
 
-// ---------------------------------------------------------
-// @Main Content
-// ---------------------------------------------------------
-
-.main-content {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  height: calc(100vh - var(--header-and-footer));
-}
-
 .remain-height {
   height: calc(100vh - 126px);
 }

@@ -10,7 +10,7 @@ header {
     align-items: center;
     
     .logo-wrapper,
-    app-runs {
+    .my-account {
       flex-grow: 1;
       flex-basis: 0;
     }
@@ -57,31 +57,6 @@ header {
           }
         }
       }
-
-      .notifications {
-        position: relative;
-
-        .counter {
-          background-color: $default-danger;
-          border-radius: 50px;
-          color: $default-white;
-          font-size: 10px;
-          line-height: 1;
-          padding: 3px 5.5px;
-          position: absolute;
-          right: 6px;
-          top: 12px;
-        }
-
-        .dropdown-menu {
-          min-width: 350px;
-          padding: 0;
-
-          @include to($breakpoint-sm) {
-            max-width: 300px;
-          }
-        }
-      }
     }
 
     .dropdown-menu {
@@ -110,28 +85,18 @@ header {
     }
 
     h2 {
-      color: #d60039;
+      color: #008080;
       line-height: 50px;
       margin: 0;
       cursor: pointer;
     }
 
-    .nav-right {
-      float: right;
-
-      .dropdown-menu {
-        left: auto;
-        right: 0;
-
-        > li {
-          width: 100%;
-
-          > a {
-            line-height: 1.5;
-            min-height: auto;
-            padding: 10px 15px;
-          }
-        }
+    .my-account {
+      
+      i-lucide {
+        display: none;
+        float: right;
+        margin-right: 25px;
       }
     }
   }

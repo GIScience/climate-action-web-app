@@ -1,0 +1,144 @@
+@use 'globals';
+
+.plugin-name-wrapper {
+  background-color: rgb(231 231 231 / 85%);
+  position: relative;
+  border-radius: 15px 15px 0 0;
+  padding: 2.5px 20px;
+
+  h1 {
+    margin: 0.75rem 0 1.25rem;
+  }
+}
+
+.current-plugin {
+  background-color: rgb(255 255 255 / 85%);
+  box-shadow: 0px -5px 7.5px -5px hsl(172deg 20.75% 51.51% / 75%);
+  backdrop-filter: blur(5px);
+  border-radius: 15px 15px 0 0;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  top: -12.5px;
+
+  &.inactive {
+    max-height: 20vh;
+
+    .new-compute-container {
+      background: linear-gradient(0deg, #fff 0%, rgba(255, 255, 255, 0.8) 85%, rgba(255, 255, 255, 0) 100%);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 70%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      button.new-compute {
+        margin-bottom: 25px;
+      }
+    }
+
+    .plugin-content-wrapper {
+      filter: blur(10px);
+    }
+  }
+
+  &.compute-ready {  
+
+    .new-compute-container {
+      display: none;
+    }
+
+    &~.artifacts-list::ng-deep {
+      
+      .artifact-tree .artifact-tree-content {
+        max-height: 27.5vh;
+      }
+    }
+  }
+
+  & h2 {
+    margin-top: 0;
+  }
+
+  .plugin-content-wrapper {
+    max-height: 35vh;
+  }
+
+  ul.plugin-authors {
+    display: inline-flex;
+    flex-wrap: wrap;
+
+    li {
+      background-color: #eee;
+      border-radius: 5px;
+      padding: 0 5px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+
+      &:last-of-type {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .plugin-content {
+    position: relative;
+
+    .plugin__short-content {
+      margin-top: 10px;
+      
+      markdown {
+        display: inline;
+
+        ::ng-deep {
+          p {
+            margin: 5px 0;
+            display: inline;
+          }
+        }
+      }
+
+      a {
+        display: inline;
+        cursor: pointer;
+        margin-left: 2.5px;
+      }
+    }
+    
+  }
+}
+
+.plugin-content-dialog {
+  position: relative;
+  padding: 20px;
+
+  .plugin__full-content {
+    max-height: 50vh !important;
+    max-width: 650px !important;
+    position: relative;
+  }
+
+  button.close-dialog {
+    color: #666;
+    cursor: pointer;
+		position: absolute;
+		top: 10px;
+		right: 0;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+	}
+
+  ul.plugin-sources {
+    list-style: unset;
+    padding: 0 2em;
+
+    li {
+      margin-bottom: 0.5em;
+    }
+  }
+}

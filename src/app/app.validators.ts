@@ -1,6 +1,6 @@
 import {AbstractControl, ValidationErrors} from '@angular/forms'
 import {FormlyFieldConfig} from '@ngx-formly/core'
-import {ValidatorOptions} from './plugin/plugin-parameter/plugin-parameter.interface'
+import {ValidatorOptions} from './dashboard/plugin/plugin-parameter/plugin-parameter.interface'
 import moment from 'moment'
 
 export function intTypeValidator(control: AbstractControl,

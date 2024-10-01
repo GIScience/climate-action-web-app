@@ -11,12 +11,15 @@ a {
   box-sizing: border-box;
 }
 
+::selection {
+  background: rgb(0 128 128 / 20%);
+}
+
 body {
   font-family: $font-primary;
   font-size: 14px;
-  color: $default-text-color;
+  color: #111;
   line-height: 1.5;
-  letter-spacing: 0.2px;
   overflow-x: hidden;
 }
 
@@ -26,12 +29,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: $font-secondary;
-  letter-spacing: 0.5px;
-  line-height: 1.5;
+  font-family: $font-primary;
+  font-variation-settings: 'wght' 600;
 
   a {
-    font-family: $font-secondary;
+    font-family: $font-primary;
   }
 
   small {
@@ -50,8 +52,9 @@ p {
 }
 
 ul {
-  margin-bottom: 0;
-  list-style-type: none;
+  list-style: none;
+  padding: 0;
+  margin: 0
 }
 
 a {
