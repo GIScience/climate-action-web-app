@@ -3,6 +3,7 @@ import {RouterModule, Routes} from '@angular/router'
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component'
 import {DashboardComponent} from './dashboard/dashboard.component'
 import {PluginComponent} from './dashboard/plugin/plugin.component'
+import {LandingComponent} from './dashboard/landing/landing.component'
 
 const routes: Routes = [
     {
@@ -14,6 +15,10 @@ const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         children: [
+            {
+                path: '',
+                component: LandingComponent
+            },
             {
                 path: 'plugin/:name',
                 component: PluginComponent
