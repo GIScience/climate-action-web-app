@@ -6,14 +6,16 @@ import moment from 'moment'
 export function intTypeValidator(control: AbstractControl,
                                  _: FormlyFieldConfig,
                                  options: ValidatorOptions = {}): ValidationErrors {
+    const min = options.min !== undefined ? parseInt(options.min as string) : undefined
+    const max = options.max !== undefined ? parseInt(options.max as string) : undefined
     if (!control.value) {
         return {}
     } else if (!/^-?[0-9]*$/.test(control.value) || isNaN(parseInt(control.value))) {
         return {intType: {message: 'Not an integer!'}}
-    } else if (options.min != undefined && parseInt(control.value) < options.min) {
-        return {intType: {message: `Value must be bigger than ${options.min}`}}
-    } else if (options.max != undefined && parseInt(control.value) > options.max) {
-        return {intType: {message: `Value must be smaller than ${options.max}`}}
+    } else if (min !== undefined && parseInt(control.value) < min) {
+        return {intType: {message: `Value must be bigger than ${min}`}}
+    } else if (max !== undefined && parseInt(control.value) > max) {
+        return {intType: {message: `Value must be smaller than ${max}`}}
     }
     return {}
 }
@@ -21,14 +23,16 @@ export function intTypeValidator(control: AbstractControl,
 export function numericTypeValidator(control: AbstractControl,
                                      _: FormlyFieldConfig,
                                      options: ValidatorOptions = {}): ValidationErrors {
+    const min = options.min !== undefined ? parseFloat(options.min as string) : undefined
+    const max = options.max !== undefined ? parseFloat(options.max as string) : undefined
     if (!control.value) {
         return {}
     } else if (!/^-?[0-9]*(\.[0-9]*)?$/.test(control.value) || isNaN(parseFloat(control.value))) {
-        return {numType: {message: 'Not a number!'}}
-    } else if (options.min != undefined && parseFloat(control.value) < options.min) {
-        return {numType: {message: `Value must be bigger than ${options.min}`}}
-    } else if (options.max != undefined && parseFloat(control.value) > options.max) {
-        return {numType: {message: `Value must be smaller than ${options.max}`}}
+        return {numType: {message: 'Not a number!'} }
+    } else if (min !== undefined && parseFloat(control.value) < min) {
+        return {numType: {message: `Value must be bigger than ${min}`}}
+    } else if (max !== undefined && parseFloat(control.value) > max) {
+        return {numType: {message: `Value must be smaller than ${max}`}}
     }
     return {}
 }
@@ -36,14 +40,16 @@ export function numericTypeValidator(control: AbstractControl,
 export function dateTypeValidator(control: AbstractControl,
                                   _: FormlyFieldConfig,
                                   options: ValidatorOptions = {}): ValidationErrors {
+    const min = options.min !== undefined ? moment(options.min as string) : undefined
+    const max = options.max !== undefined ? moment(options.max as string) : undefined
     if (!control.value) {
         return {}
     } else if (!moment(control.value, moment.ISO_8601, true).isValid()) {
-        return {numType: {message: 'Not a date!'}}
-    } else if (moment(control.value) < moment(options.min)) {
-        return {numType: {message: `Value must be bigger than ${options.min}`}}
-    } else if (moment(control.value) > moment(options.max)) {
-        return {numType: {message: `Value must be smaller than ${options.max}`}}
+        return {numType: {message: 'Not a date!' } }
+    } else if (min !== undefined && moment(control.value) < min) {
+        return {numType: {message: `Value must be bigger than ${min}`}}
+    } else if (max !== undefined && moment(control.value) > max) {
+        return {numType: {message: `Value must be smaller than ${max}`}}
     }
     return {}
 }

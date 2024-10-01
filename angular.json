@@ -109,13 +109,13 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "climate-action-app:build:prod"
+              "buildTarget": "climate-action-app:build:prod"
             },
             "staging": {
-              "browserTarget": "climate-action-app:build:staging"
+              "buildTarget": "climate-action-app:build:staging"
             },
             "development": {
-              "browserTarget": "climate-action-app:build:development"
+              "buildTarget": "climate-action-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -123,7 +123,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "climate-action-app:build"
+            "buildTarget": "climate-action-app:build"
           }
         },
         "test": {
