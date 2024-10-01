@@ -207,11 +207,11 @@ export class MapService {
         })
     }
 
-    async addGeoTiffLayer(blob: Blob) {
+    async addGeoTiffLayer(sourceURL: string) {
         const geoTiffSource = new GeoTIFF({
             sources: [
                 {
-                    blob: blob,
+                    url: sourceURL,
                     // The following options are due to https://github.com/openlayers/openlayers/issues/15894
                     bands: [1, 2, 3],
                     nodata: 0

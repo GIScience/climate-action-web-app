@@ -38,13 +38,9 @@ describe('GeoTiffComponent', () => {
 
     it('should initialize map with valid input data', async () => {
         const mockUrl = 'http://test_url'
-        const mockBlob = new Blob([''], { type: 'image/tiff' })
         const mockSource: XYZ = new XYZ()
         const mockLayer = new TileLayer({ source: mockSource })
 
-        spyOn(window, 'fetch').and.returnValue(Promise.resolve({
-            blob: () => Promise.resolve(mockBlob)
-        } as Response))
         mapServiceSpy.addGeoTiffLayer.and.returnValue(Promise.resolve(mockLayer))
 
         component.inputData = {
@@ -68,8 +64,7 @@ describe('GeoTiffComponent', () => {
         
         const addGeoTiffLayerCalls = mapServiceSpy.addGeoTiffLayer.calls.all()
 
-        expect(fetch).toHaveBeenCalledWith(mockUrl)
         expect(addGeoTiffLayerCalls.length).toBeGreaterThan(0)
-        expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledWith(mockBlob)
+        expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledWith(mockUrl)
     })
 })
