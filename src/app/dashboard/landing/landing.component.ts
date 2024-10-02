@@ -1,5 +1,4 @@
 import {Component} from '@angular/core'
-import {PluginService} from '../plugin/plugin.service' 
 
 @Component({
     selector: 'app-landing',
@@ -12,10 +11,5 @@ import {PluginService} from '../plugin/plugin.service'
 export class LandingComponent {
 
     constructor(
-        private pluginService: PluginService
     ) {}
-
-    explorePlugins() {
-        this.pluginService.openPluginCatalog()
-    }
 }
