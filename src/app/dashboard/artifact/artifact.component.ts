@@ -1,20 +1,20 @@
-import {Component, OnDestroy, OnInit, Input} from '@angular/core'
-import {trigger, state, style, transition, animate, AnimationEvent} from '@angular/animations'
+import {Component, Input, OnDestroy, OnInit} from '@angular/core'
+import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations'
 import {PluginService} from '../plugin/plugin.service'
-import {ArtifactMetadata, ActiveArtifactRef, Artifact, ArtifactComputation} from './artifact.interface'
+import {ActiveArtifactRef, Artifact, ArtifactComputation, ArtifactMetadata} from './artifact.interface'
 import {ReportService} from '../report/report.service'
 import {MapService} from '../map/map.service'
 import {PluginRun} from '../plugin/plugin.interface'
 import {MatIconModule} from '@angular/material/icon'
 import {BehaviorSubject, Subscription} from 'rxjs'
-import {NgClass, NgIf, CommonModule} from '@angular/common'
+import {CommonModule, NgClass, NgIf} from '@angular/common'
 import {MatTooltipModule} from '@angular/material/tooltip'
 import {NotificationService} from '../../notification/notification.service'
 import {NgScrollbarModule} from 'ngx-scrollbar'
 import {ActivatedRoute} from '@angular/router'
 import {FilterByCriteriaPipe} from './artifact-filters.pipe'
 import moment from 'moment/moment'
-import {LucideAngularModule, Archive, ArchiveRestore, CircleArrowLeft, Clock, Hash} from 'lucide-angular'
+import {Archive, ArchiveRestore, CircleArrowLeft, Clock, Hash, LucideAngularModule} from 'lucide-angular'
 import {MatSnackBar} from '@angular/material/snack-bar'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
@@ -66,9 +66,9 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
             ])
         ]),
         trigger('fadeIn', [
-            state('in', style({ opacity: 1 })),
+            state('in', style({opacity: 1})),
             transition(':enter', [
-                style({ opacity: 0 }),
+                style({opacity: 0}),
                 animate('250ms ease-in')
             ])
         ])
@@ -97,7 +97,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     readonly CircleArrowLeft = CircleArrowLeft
     readonly Clock = Clock
     readonly Hash = Hash
-    
+
     @Input() pluginId: string = ''
 
     scheduledRunsSubscription: Subscription = new Subscription()
@@ -109,16 +109,16 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private snackBar: MatSnackBar) {
 
-                    if (this.pluginService.collapseComputations$) {
-                        this.pluginService.collapseComputations$.subscribe(() => {
-                            this.collapseComputation()
-                        })
-                    }
+        if (this.pluginService.collapseComputations$) {
+            this.pluginService.collapseComputations$.subscribe(() => {
+                this.collapseComputation()
+            })
+        }
 
-                    const storedNewRuns = localStorage.getItem('new_runs')
-                    if (storedNewRuns) {
-                        this.newRuns = JSON.parse(storedNewRuns)
-                    }
+        const storedNewRuns = localStorage.getItem('new_runs')
+        if (storedNewRuns) {
+            this.newRuns = JSON.parse(storedNewRuns)
+        }
     }
 
     formatTimestamp(timestamp: Date) {
@@ -136,17 +136,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
             this.currentRuns = this.pluginService.getComputes()
             this.fetchArchivedArtifacts()
-    
+
             this.dataChange.subscribe(data => {
                 if (data.length > 0) {
                     this.computations = data
                     this.activateComputation()
                 }
             })
-    
+
             this.fetchArtifacts()
             this.sync = this.syncRuns()
-    
+
             if (this.reportService.closeReportEvent) {
                 this.reportService.closeReportEvent.subscribe(() => this.closeReportEvent())
             }
@@ -184,18 +184,18 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             .forEach(currentRun => {
                 this.syncArtifact(currentRun)
             })
-    
+
         if (this.currentRuns.filter(run => run.pluginId === this.pluginId).length === 0) {
             this.pluginService.setPluginState('compute-ready')
         } else {
             this.pluginService.setPluginState('inactive')
         }
     }
-    
+
     fetchArchivedArtifacts() {
         const archivedItems = localStorage.getItem('archive_runs')
         if (archivedItems) {
-            this.archivedArtifacts = JSON.parse(archivedItems).filter((artifact: PluginRun) => 
+            this.archivedArtifacts = JSON.parse(archivedItems).filter((artifact: PluginRun) =>
                 (artifact.status === 'completed' || 'scheduled')
             )
         }
@@ -217,7 +217,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                             } else if (message.status === 'wrong-input' || message.status === 'failed') {
                                 this.snackBar.open(
                                     message.message || 'Error while computing plugin, please try again.',
-                                    'Close', 
+                                    'Close',
                                     {
                                         verticalPosition: 'bottom',
                                         horizontalPosition: 'center',
@@ -314,14 +314,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         }
         this.pluginService.closePluginCatalog()
         const previousActiveComputation = this.activeComputation
-    
+
         if (previousActiveComputation) {
             previousActiveComputation.isExpanded = false
             setTimeout(() => previousActiveComputation.keepInDOM = false, 300)
             this.reportService.closeReport()
             this.mapService.removeFocusedLayer()
         }
-    
+
         if (previousActiveComputation === computation) {
             this.activeComputation = undefined
             this.activeChildComputation = undefined
@@ -329,7 +329,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             computation.keepInDOM = true
             setTimeout(() => computation.isExpanded = true, 0)
             this.activeComputation = computation
-    
+
             if (computation && computation.geometry) {
                 const geometry = computation.geometry
                 const geoJsonData = {
@@ -337,11 +337,11 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                     'features': [{
                         'type': 'Feature',
                         'geometry': geometry,
-                        'properties': {}
+                        'properties': {'name': 'AOI'}
                     }]
                 }
-                const layer = this.mapService.highlightAoI(geoJsonData)
-                const extent = layer.getSource()?.getExtent()
+                const extent = this.mapService.highlightAoI(geoJsonData)
+
                 if (extent && this.mapService.map) {
                     this.mapService.map.getView().fit(extent, {
                         padding: this.mapPadding
@@ -379,7 +379,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     showLess(computation: ArtifactComputation) {
         computation.showSecondaryChildren = false
-    }    
+    }
 
     renderReport(computation: ArtifactComputation) {
         this.pluginService.closePluginCatalog()
@@ -445,7 +445,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     archiveArtifact(correlation_uuid: string): void {
         const artifactToArchive = this.currentRuns.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
         const isCurrentArtifact = this.activeComputation && this.activeComputation.ref && this.activeComputation.ref.correlation_uuid === correlation_uuid
-        
+
         if (artifactToArchive) {
             this.currentRuns = this.currentRuns.filter((run: PluginRun) => run.correlation_uuid !== correlation_uuid)
             this.archivedArtifacts.push(artifactToArchive)
@@ -462,17 +462,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     unarchiveArtifact(correlation_uuid: string): void {
         const artifactToUnarchive = this.archivedArtifacts.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
-    
+
         if (artifactToUnarchive) {
             this.archivedArtifacts = this.archivedArtifacts.filter((a: PluginRun) => a.correlation_uuid !== correlation_uuid)
             this.currentRuns.push(artifactToUnarchive)
             this.updateLocalStorage()
-    
+
             this.syncArtifact(artifactToUnarchive)
         } else {
             console.error('Artifact to unarchive not found in archivedArtifacts')
         }
-    }    
+    }
 
     private updateLocalStorage() {
         localStorage.setItem('plugin_runs', JSON.stringify(this.currentRuns))
@@ -480,7 +480,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     private refreshDataSource() {
-        this.computations = this.computations.filter(computation => 
+        this.computations = this.computations.filter(computation =>
             this.currentRuns.some(run => run.correlation_uuid === computation.uuid)
         )
         this.dataChange.next(this.computations)
