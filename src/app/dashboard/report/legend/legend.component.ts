@@ -87,7 +87,7 @@ export class LegendComponent implements OnInit, AfterViewInit {
                 for (let y = 0; y <= canvas.height; y++) {
                     const [r, g, b] = evaluate_cmap(y / canvas.height, name, reverse)
                     ctx.fillStyle = `rgb(${r},${g},${b})`
-                    ctx.fillRect(0, y, canvas.width, 1)
+                    ctx.fillRect(0, (canvas.height - y), canvas.width, 1)
                 }
             }
         }, 0)

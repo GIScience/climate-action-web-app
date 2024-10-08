@@ -57,7 +57,7 @@ describe('LegendComponent', () => {
       legend_type: 'CONTINUOUS',
       legend_data: {
         cmap_name: 'seismic',
-        ticks: { 'Blue b': 0.0, 'White c': 0.5, 'Red a': 1.0 }
+        ticks: { 'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0 }
       }
     }
 
@@ -75,13 +75,13 @@ describe('LegendComponent', () => {
     expect(ticks.length).toBe(3)
 
     const expectedTicks = [
-      { name: 'Blue B', position: '0%' },
-      { name: 'White C', position: '50%' },
-      { name: 'Red A', position: '100%' }
+      { name: 'Low B', position: '0%' },
+      { name: 'Mid C', position: '50%' },
+      { name: 'High A', position: '100%' }
     ]
 
     ticks.forEach((tick, index) => {
-      expect(tick.nativeElement.style.top).toBe(expectedTicks[index].position)
+      expect(tick.nativeElement.style.bottom).toBe(expectedTicks[index].position)
       expect(tick.nativeElement.textContent.trim()).toContain(expectedTicks[index].name)
     })
   })
