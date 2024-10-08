@@ -1,5 +1,6 @@
 import {Component} from '@angular/core'
 import {ReportService} from './dashboard/report/report.service'
+import {MapService} from './dashboard/map/map.service'
 import {default as packageInfo} from '../../package.json'
 
 @Component({
@@ -17,6 +18,12 @@ export class AppComponent  {
     }
 
     constructor(
-        public reportService: ReportService
+        public reportService: ReportService,
+        public mapService: MapService
     ) {}
+
+    resetMapState() {
+        this.reportService.closeReport()
+        this.mapService.removeFocusedLayer()
+    }
 }

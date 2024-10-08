@@ -6,7 +6,7 @@
                     <img src="assets/images/HeiGIT_Logo_base.svg" alt="HeiGIT Logo" class="logo" />
                 </a>
             </div>
-            <h2 [routerLink]="'/dashboard'" tabindex="0" (click)="reportService.closeReport()" (keyup.enter)="reportService.closeReport()">{{title}}</h2>
+            <h2 [routerLink]="'/dashboard'" tabindex="0" (click)="resetMapState()" (keyup.enter)="resetMapState()">{{title}}</h2>
             <div class="my-account">
                 <i-lucide name="circle-user-round" [size]="30"></i-lucide>
             </div>

@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core'
 import {Collection, Feature, Map, View} from 'ol'
-import {PluginService} from '../plugin/plugin.service' 
+import {PluginService} from '../plugin/plugin.service'
 import FeatureLike from 'ol/Feature'
 import TileLayer from 'ol/layer/WebGLTile.js'
 import {fromLonLat} from 'ol/proj'
-import {Geometry} from 'ol/geom.js'
+import {Geometry, Polygon} from 'ol/geom.js'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import GeoTIFF from 'ol/source/GeoTIFF'
 import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
@@ -17,6 +17,7 @@ import {easeIn} from 'ol/easing.js'
 import {createEmpty, extend, Extent, getCenter} from 'ol/extent'
 import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style'
 import {StyleFunction} from 'ol/style/Style'
+import {MultiPolygon} from 'ol/geom'
 
 @Injectable({
     providedIn: 'root'
@@ -59,8 +60,8 @@ export class MapService {
             minZoom: clusterToPolygonSwitchZoom,
             source: ROISource,
             style: new Style({
-                fill: new Fill({ color: 'rgba(0, 0, 0, 0.1)' }),
-                stroke: new Stroke({ color: 'rgba(0, 0, 0, 0.7)', width: 2 })
+                fill: new Fill({color: 'rgba(0, 0, 0, 0.1)'}),
+                stroke: new Stroke({color: 'rgba(0, 0, 0, 0.7)', width: 2})
             })
         })
 
@@ -106,7 +107,7 @@ export class MapService {
         if (this.regionLayer) {
             this.map.addLayer(this.regionLayer)
         }
-        
+
         if (this.clusterLayer) {
             this.map.addLayer(this.clusterLayer)
         }
@@ -128,7 +129,7 @@ export class MapService {
         })
     }
 
-    highlightAoI(data: object): VectorLayer<Feature<Geometry>> {
+    highlightAoI(data: object): Extent {
         this.removeComputeLayers()
 
         const features = new GeoJSON().readFeatures(data, {
@@ -136,25 +137,46 @@ export class MapService {
             featureProjection: 'EPSG:3857'
         })
 
+        const extent = features[0].getGeometry()!.getExtent()
+
+        const scissor = features[0].getGeometry()! as MultiPolygon
+        const fogOfWar = this.cutFromGlobalPolygon(scissor)
+        features.push(fogOfWar)
+
         const geojsonLayerSource = new VectorSource({
             features: features
         })
 
-        this.focusedLayer = new VectorLayer({
-            source: geojsonLayerSource
-        })
-
-        this.focusedLayer.setStyle(() => {
-            return new Style({
-                stroke: new Stroke({
-                    color: '#008080',
-                    width: 3
-                })
+        const aoiStyle = new Style({
+            stroke: new Stroke({
+                color: '#008080',
+                width: 3
             })
         })
 
+        const fowStyle = new Style({fill: new Fill({color: '#80808050'})})
+
+        this.focusedLayer = new VectorLayer({
+            source: geojsonLayerSource,
+            style: function (feature) {
+                return feature.get('name') == 'AOI' ? aoiStyle : fowStyle
+            }
+        })
+
         this.map?.addLayer(this.focusedLayer)
-        return this.focusedLayer
+        return extent
+    }
+
+    cutFromGlobalPolygon(scissor: MultiPolygon): Feature<Polygon> {
+        const global = new Polygon([[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]].map(coordinate => fromLonLat(coordinate))])
+
+        const clipped = new Polygon([
+            global.getLinearRing(0)!.getCoordinates(),
+            ...scissor.getPolygons().map(polygon => polygon.getLinearRing(0)!.getCoordinates())
+        ])
+
+        return new Feature({'name': 'FogOfWar', 'geometry': clipped})
+
     }
 
     addGeoJsonLayer(data: object): VectorLayer<Feature<Geometry>> {
@@ -230,7 +252,7 @@ export class MapService {
         this.map?.addLayer(geoTiffLayer)
         return geoTiffLayer
     }
-    
+
     removeComputeLayers(): void {
         if (this.regionLayer) {
             this.regionLayer.setVisible(false)
@@ -242,7 +264,7 @@ export class MapService {
             this.highlightedFeatures.clear()
         }
     }
-    
+
     removeFocusedLayer(): void {
         if (this.focusedLayer) {
             this.map?.removeLayer(this.focusedLayer)
@@ -261,7 +283,7 @@ export class MapService {
             if (this.regionLayer) {
                 this.regionLayer.setVisible(true)
             }
-            
+
             if (this.clusterLayer) {
                 this.clusterLayer.setVisible(true)
             }
