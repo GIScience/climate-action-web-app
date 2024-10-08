@@ -88,6 +88,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     showArchived = false
     newRuns: string[] = []
     windowWidth?: number
+    windowResolution?: number
     mapPadding?: number[]
     currentLocale = navigator.language
 
@@ -157,10 +158,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         })
 
         this.windowWidth = window.innerWidth
-        if (this.windowWidth > 1600) {
-            this.mapPadding = [200, 200, 200, 200]
+        this.windowResolution = window.devicePixelRatio
+        const horMapPadding = 250 / this.windowResolution
+        if (this.windowWidth > 2000) {
+            this.mapPadding = [horMapPadding, 200, horMapPadding, 200]
+        } else if (this.windowWidth > 1600) {
+            this.mapPadding = [horMapPadding, 100, horMapPadding, 400]
         } else {
-            this.mapPadding = [150, 100, 150, 400]
+            this.mapPadding = [horMapPadding, 100, horMapPadding, 500]
         }
     }
 
