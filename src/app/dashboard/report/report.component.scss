@@ -13,7 +13,8 @@
 
   &.minimised {
     height: 47.5px;
-    margin-top: 85vh;
+    margin-top: auto;
+    bottom: 0.5vw;
     transform: none !important;
 
     & .report-header {
