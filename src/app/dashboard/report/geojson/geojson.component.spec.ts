@@ -122,7 +122,7 @@ describe('GeojsonComponent', () => {
         fixture.detectChanges()
 
         expect(httpClientSpy.get).toHaveBeenCalledWith('http://test_url')
-        expect(mapServiceSpy.addGeoJsonLayer).toHaveBeenCalledWith(mockGeoJsonData)
+        expect(mapServiceSpy.addGeoJsonLayer).toHaveBeenCalledWith(mockGeoJsonData, 'geojson')
         expect(component.geojsonLayer).toBe(mockLayer)
     })
 })

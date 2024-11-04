@@ -29,8 +29,9 @@ export class GeojsonComponent implements OnInit, OnDestroy {
             !this.inputData['artifact'].store_id.endsWith('.geojson'))
             return
 
+        const artifactName = this.inputData.artifact?.name
         this.http.get<object>(this.inputData.url).subscribe((data) => {
-            this.geojsonLayer = this.mapService.addGeoJsonLayer(data)
+            this.geojsonLayer = this.mapService.addGeoJsonLayer(data, artifactName)
         })
     }
 

@@ -35,7 +35,7 @@ export class GeoTiffComponent implements OnInit, OnDestroy {
     private async initMap() {
         if (!this.inputData)
             return
-
-        this.geoTiffLayer = await this.mapService.addGeoTiffLayer(this.inputData.url)
+        const artifactName = this.inputData.artifact?.name
+        this.geoTiffLayer = await this.mapService.addGeoTiffLayer(this.inputData.url, artifactName)
     }
 }

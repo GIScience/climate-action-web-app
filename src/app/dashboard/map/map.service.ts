@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core'
 import {Collection, Feature, Map, View} from 'ol'
 import {PluginService} from '../plugin/plugin.service'
 import FeatureLike from 'ol/Feature'
-import TileLayer from 'ol/layer/WebGLTile.js'
+import TileLayer, {Options as TileLayerOptions} from 'ol/layer/WebGLTile.js'
 import {fromLonLat} from 'ol/proj'
 import {Geometry, Polygon} from 'ol/geom.js'
 import GeoJSON from 'ol/format/GeoJSON.js'
 import GeoTIFF from 'ol/source/GeoTIFF'
 import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
-import VectorLayer from 'ol/layer/Vector'
+import VectorLayer, {Options as VectorLayerOptions} from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import OSM from 'ol/source/OSM'
 import Cluster from 'ol/source/Cluster'
@@ -16,12 +16,38 @@ import Point from 'ol/geom/Point'
 import {easeIn} from 'ol/easing.js'
 import {createEmpty, extend, Extent, getCenter} from 'ol/extent'
 import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style'
+import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
+import XYZ from 'ol/source/XYZ'
+import TileGrid from 'ol/tilegrid/TileGrid'
 import {StyleFunction} from 'ol/style/Style'
 import {MultiPolygon} from 'ol/geom'
+
+class ExtendedTileLayer extends TileLayer {
+    name?: string
+    baseLayer?: boolean
+
+    constructor(options: TileLayerOptions & { name?: string; baseLayer?: boolean }) {
+        super(options)
+        this.name = options.name
+        this.baseLayer = options.baseLayer
+    }
+}
+
+class ExtendedVectorLayer extends VectorLayer<Feature<Geometry>> {
+    name?: string
+    displayInLayerSwitcher?: boolean
+
+    constructor(options: VectorLayerOptions<Feature<Geometry>> & { name?: string; displayInLayerSwitcher?: boolean }) {
+        super(options)
+        this.name = options.name
+        this.displayInLayerSwitcher = options.displayInLayerSwitcher
+    }
+}
 
 @Injectable({
     providedIn: 'root'
 })
+
 export class MapService {
     map: Map | undefined
     focusedLayer: VectorLayer<Feature<Geometry>> | undefined
@@ -30,6 +56,7 @@ export class MapService {
     highlightedFeatures: Collection<FeatureLike> = new Collection([])
     styleCache: { [key: number]: Style } = {}
     initialExtent!: Extent
+    layerSwitcherCollapsed: boolean = false
 
     constructor(private pluginService: PluginService) {
         this.pluginService.resetZoom$.subscribe(() => this.resetZoomLevel())
@@ -56,16 +83,17 @@ export class MapService {
             }
         })
 
-        this.regionLayer = new VectorLayer({
+        this.regionLayer = new ExtendedVectorLayer({
             minZoom: clusterToPolygonSwitchZoom,
             source: ROISource,
             style: new Style({
                 fill: new Fill({color: 'rgba(0, 0, 0, 0.1)'}),
                 stroke: new Stroke({color: 'rgba(0, 0, 0, 0.7)', width: 2})
-            })
+            }),
+            displayInLayerSwitcher: false
         })
 
-        const selectedRegionLayer = new VectorLayer({
+        const selectedRegionLayer = new ExtendedVectorLayer({
             source: new VectorSource({
                 features: this.highlightedFeatures
             }),
@@ -74,12 +102,14 @@ export class MapService {
                 'stroke-color': 'rgba(0, 0, 255, 0.7)',
                 'stroke-width': 2,
                 'fill-color': 'rgba(0, 0, 255, 0.1)'
-            }
+            },
+            displayInLayerSwitcher: false
         })
 
-        this.clusterLayer = new VectorLayer({
+        this.clusterLayer = new ExtendedVectorLayer({
             maxZoom: clusterToPolygonSwitchZoom,
             source: clusterSource,
+            displayInLayerSwitcher: false,
             //@ts-ignore typechecker error: FeatureLike down-typed to Feature<Geometry>
             style: (clusterFeature, resolution) => this.getClusterStyle(clusterFeature, resolution)
         })
@@ -88,17 +118,79 @@ export class MapService {
     }
 
     initMap(selectedRegionLayer: VectorLayer<FeatureLike>) {
+        const localStorageSelectedMapLayerKey = 'selected_map_layer'
+        const localStorageLayerSwitcherStateKey = 'layer_switcher_collapsed'
+        const osmCartoLayerName = 'OSM Carto'
+
+        const osmCarto = new ExtendedTileLayer({
+            source: new OSM(),
+            name: osmCartoLayerName,
+            baseLayer: true,
+            visible: true
+        })
+
+        const heigitCarto = new ExtendedTileLayer({
+            name: 'HeiGIT Carto',
+            baseLayer: true,
+            visible: false,
+            source: new XYZ({
+                tileGrid: new TileGrid({
+                    extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
+                    resolutions: [78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128, 2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525, 76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516, 2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974]
+                }),
+                url: 'https://maps.heigit.org/osm-wms/tms/1.0.0/osm_auto:all/webmercator/{z}/{x}/{-y}.png',
+                attributions: 'Map data © <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Service © <a href="https://heigit.org" target="_blank">HeiGIT</a> @ <a href="https://www.uni-heidelberg.de/" target="_blank">Heidelberg University</a>',
+                attributionsCollapsible: false
+            })
+        })
+
+        const aerialImagery = new ExtendedTileLayer({
+            name: 'Bing Aerial Imagery',
+            baseLayer: true,
+            visible: false,
+            source: new XYZ({
+                tileGrid: new TileGrid({
+                    extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
+                    resolutions: [78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128, 2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525, 76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516, 2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974]
+                }),
+                url: 'https://maps.heigit.org/sketch-map-tool/tms/1.0.0/world_imagery/webmercator/{z}/{x}/{-y}.png',
+                attributions: 'Satellite layer powered by ESRI. Source: Geobasis-DE / LVermGeoRP, Maxar, Microsoft',
+                attributionsCollapsible: false
+            })
+        })
+
         this.map = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM()
-                })
-            ],
+            layers: [aerialImagery, heigitCarto, osmCarto],
             target: 'map',
             view: new View({
                 center: fromLonLat([8.6759928, 49.4187355]),
                 zoom: 0
             })
+        })
+
+        const selectedMapLayer = localStorage.getItem(localStorageSelectedMapLayerKey) || osmCartoLayerName
+        this.map.getLayers().forEach(layer => {
+            layer.setVisible(layer.get('name') === selectedMapLayer)
+        })
+
+        this.layerSwitcherCollapsed = (localStorage.getItem(localStorageLayerSwitcherStateKey) === 'true')
+        const layerSwitcher = new LayerSwitcher({
+            collapsed: this.layerSwitcherCollapsed,
+            reordering: false,
+            onchangeCheck: () => {
+                const visibleBaseLayer = this.map?.getLayers().getArray().find(layer => layer.getVisible() && layer.get('baseLayer') === true)
+                if (visibleBaseLayer) {
+                    const selectedLayerName = visibleBaseLayer.get('name')
+                    localStorage.setItem(localStorageSelectedMapLayerKey, selectedLayerName || '')
+                }
+            }
+        })
+        layerSwitcher.setHeader('<h3>Layers</h3>')
+        this.map.addControl(layerSwitcher)
+
+        layerSwitcher.on('toggle', (toggleEvent) => {
+            this.layerSwitcherCollapsed = toggleEvent.collapsed
+            localStorage.setItem(localStorageLayerSwitcherStateKey, this.layerSwitcherCollapsed.toString())
         })
 
         const view = this.map.getView()
@@ -156,11 +248,12 @@ export class MapService {
 
         const fowStyle = new Style({fill: new Fill({color: '#80808050'})})
 
-        this.focusedLayer = new VectorLayer({
+        this.focusedLayer = new ExtendedVectorLayer({
             source: geojsonLayerSource,
             style: function (feature) {
                 return feature.get('name') == 'AOI' ? aoiStyle : fowStyle
-            }
+            },
+            displayInLayerSwitcher: false
         })
 
         this.map?.addLayer(this.focusedLayer)
@@ -179,7 +272,7 @@ export class MapService {
 
     }
 
-    addGeoJsonLayer(data: object): VectorLayer<Feature<Geometry>> {
+    addGeoJsonLayer(data: object, artifactName: string): VectorLayer<Feature<Geometry>> {
         const features = new GeoJSON().readFeatures(data, {
             dataProjection: 'EPSG:4326',
             featureProjection: 'EPSG:3857'
@@ -189,8 +282,9 @@ export class MapService {
             features: features
         })
 
-        const geojsonLayer = new VectorLayer({
+        const geojsonLayer = new ExtendedVectorLayer({
             source: geojsonLayerSource,
+            name: artifactName,
             style: this.styleFunction.bind(this) as StyleFunction
         })
 
@@ -229,7 +323,7 @@ export class MapService {
         })
     }
 
-    async addGeoTiffLayer(sourceURL: string) {
+    async addGeoTiffLayer(sourceURL: string, artifactName: string | undefined) {
         const geoTiffSource = new GeoTIFF({
             sources: [
                 {
@@ -245,8 +339,9 @@ export class MapService {
 
         await geoTiffSource.getView()
 
-        const geoTiffLayer = new TileLayer({
-            source: geoTiffSource
+        const geoTiffLayer = new ExtendedTileLayer({
+            source: geoTiffSource,
+            name: artifactName
         })
 
         this.map?.addLayer(geoTiffLayer)
