@@ -65,6 +65,6 @@ describe('GeoTiffComponent', () => {
         const addGeoTiffLayerCalls = mapServiceSpy.addGeoTiffLayer.calls.all()
 
         expect(addGeoTiffLayerCalls.length).toBeGreaterThan(0)
-        expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledWith(mockUrl)
+        expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledWith(mockUrl, 'geotiff')
     })
 })

@@ -3,7 +3,11 @@
 
 @import 'ol/ol.css';
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;

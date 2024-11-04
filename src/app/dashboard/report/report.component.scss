@@ -3,7 +3,7 @@
   border: 1px solid #ccc;
   border-radius: 10px;
   position: absolute;
-  top: 1vw;
+  top: 5vw;
   right: calc(50% - 17.5vw);
   min-width: 35vw;
   max-width: 35vw;
@@ -13,8 +13,8 @@
 
   &.minimised {
     height: 47.5px;
-    margin-top: auto;
-    bottom: 0.5vw;
+    margin-top: calc(98vh - 122.5px);
+    top: 0;
     transform: none !important;
 
     & .report-header {
