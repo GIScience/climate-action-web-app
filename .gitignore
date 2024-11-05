@@ -47,3 +47,6 @@ cypress/screenshots/*
 # System Files
 .DS_Store
 Thumbs.db
+
+# API Keys
+/src/environments/api-keys/*.ts
