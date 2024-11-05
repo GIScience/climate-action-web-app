@@ -14,6 +14,7 @@ test_jasmine_and_lint:
   image:
     name: trion/ng-cli-e2e:17.0.0
   before_script:
+    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
     - npm install
   script:
     - npm run lint
@@ -34,9 +35,11 @@ test_cypress:
   image:
     name: cypress/included:cypress-13.11.0-node-20.14.0-chrome-125.0.6422.141-1-ff-126.0.1-edge-125.0.2535.85-1
     entrypoint: [""]
-  script:
+  before_script:
+    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
     - npm install
     - npm install -g wait-on
+  script:
     - npm start & wait-on http://localhost:4200
     - npm run cy:run
   artifacts:
@@ -56,6 +59,7 @@ docker_build_deploy_development:
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
   script:
     - >
       /kaniko/executor \

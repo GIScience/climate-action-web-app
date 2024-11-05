@@ -1,0 +1,93 @@
+.search-locations__wrapper {
+	width: 250px;
+	text-align: right;
+
+	ng-scrollbar {
+		max-height: 500px;
+	}
+
+	form {
+		position: relative;
+
+		input.search-locations {
+			background-image: url("../../../assets/images/search.svg");
+			background-repeat: no-repeat;
+			background-size: 17.5px;
+			background-position: 7.5px center;
+			width: 75%;
+			padding: 7.5px 30px;
+			border-radius: 5px;
+			border: 1px solid #ddd;
+			transition: width 0.25s ease;
+			box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+			font-size: 16px;
+			z-index: 2;
+			position: relative;
+	
+			&:focus,
+			&:not(:placeholder-shown) {
+				width: 100%;
+			}
+
+			&:placeholder-shown~button.clear-search {
+				visibility: hidden;
+			}
+	
+			&::-webkit-search-cancel-button {
+				display: none;
+			}
+		}
+	
+		button.clear-search {
+			border: none;
+			background-color: transparent;
+			position: absolute;
+			z-index: 2;
+			top: 6.5px;
+			right: 0;
+		}
+	}
+
+	.location-suggestions {
+		text-align: left;
+		border: 1px solid #ddd;
+		background-color: rgb(255 255 255 / 85%);
+		width: 100%;
+		overflow-y: auto;
+		border-radius: 5px;
+		backdrop-filter: blur(5px);
+		margin-top: -10px;
+		padding-top: 10px;
+	}
+
+	.location-suggestion__item {
+		padding: 10px;
+		cursor: pointer;
+		border-bottom: 1px solid #ddd;
+		line-height: 18px;
+
+		&:last-of-type {
+			border-bottom: none;
+		}
+
+		&:hover {
+			background-color: #d3d3d3;
+		}
+
+		.suggestion__title {
+			font-weight: 700;
+
+			::ng-deep {
+
+				mark {
+					background-color: rgba(0 128 128 / 15%);
+				}
+			}
+		}
+
+		.suggestion__subtitle {
+			color: #666;
+			font-size: 12px;
+		}
+	}
+}

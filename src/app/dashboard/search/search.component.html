@@ -1,0 +1,17 @@
+<div class="search-locations__wrapper">
+	<form>
+		<input class="search-locations" type="search" placeholder="Search..." [formControl]="searchControl" spellcheck="false">
+		<button class="clear-search" (click)="clearSearch()"><i-lucide [img]="CircleX" size="20" title="Clear Search"></i-lucide></button>
+	</form>
+
+	<div class="location-suggestions" *ngIf="suggestions.length > 0">
+		<ng-scrollbar orientation="vertical">
+			<div class="location-suggestion__item" *ngFor="let suggestion of suggestions"
+				(click)="selectSuggestion(suggestion)" (keyup.enter)="selectSuggestion(suggestion)"
+				(mouseover)="highlightSuggestion(suggestion)" (focus)="highlightSuggestion(suggestion)" tabindex="0">
+				<span [innerHTML]="suggestion.properties.name | highlight: searchControl.value" class="suggestion__title"></span><br />
+				<span class="suggestion__subtitle">{{ formatLocation(suggestion.properties) }}</span>
+			</div>
+		</ng-scrollbar>
+	</div>
+</div>

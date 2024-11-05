@@ -1,6 +1,6 @@
 main.dashboard {
 	display: grid;
-	grid-template-columns: auto 450px 1fr 7.5%;
+	grid-template-columns: auto 450px 1fr 15%;
 	height: 100%;
 	position: relative;
 	grid-gap: 0.5vw;
@@ -22,5 +22,22 @@ main.dashboard {
 	.dashboard__middle-column {
 		position: relative;
 		pointer-events: none;
+	}
+
+	.dashboard__right-column {
+		align-items: flex-end;
+		display: flex;
+		flex-direction: column;
+
+		app-search {
+			z-index: 1;
+		}
+
+		::ng-deep {
+
+			app-legend {
+				margin-top: 10px;
+			}
+		}
 	}
 }

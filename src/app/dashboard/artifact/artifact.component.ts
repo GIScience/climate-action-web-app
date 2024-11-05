@@ -87,9 +87,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     archivedArtifacts: PluginRun[] = []
     showArchived = false
     newRuns: string[] = []
-    windowWidth?: number
-    windowResolution?: number
-    mapPadding?: number[]
     currentLocale = navigator.language
 
     readonly Archive = Archive
@@ -156,17 +153,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
             this.scheduledRuns = this.pluginService.getScheduledRuns()
         })
-
-        this.windowWidth = window.innerWidth
-        this.windowResolution = window.devicePixelRatio
-        const horMapPadding = 250 / this.windowResolution
-        if (this.windowWidth > 2000) {
-            this.mapPadding = [horMapPadding, 200, horMapPadding, 200]
-        } else if (this.windowWidth > 1600) {
-            this.mapPadding = [horMapPadding, 100, horMapPadding, 400]
-        } else {
-            this.mapPadding = [horMapPadding, 100, horMapPadding, 500]
-        }
     }
 
     toggleArchivedView(): void {
@@ -344,7 +330,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
                 if (extent && this.mapService.map) {
                     this.mapService.map.getView().fit(extent, {
-                        padding: this.mapPadding
+                        padding: this.mapService.calculateMapPadding()
                     })
                 }
             }

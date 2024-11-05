@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from '@angular/core'
 import {PluginCatalogComponent} from './plugin-catalog/plugin-catalog.component'
 import {ArtifactComponent} from './artifact/artifact.component'
+import {SearchComponent} from './search/search.component'
 import {ReportComponent} from './report/report.component'
 import {MapComponent} from './map/map.component'
 import {RouterModule} from '@angular/router'
@@ -17,6 +18,7 @@ import {Subscription} from 'rxjs'
         PluginCatalogComponent,
         ArtifactComponent,
         ReportComponent,
+        SearchComponent,
         MapComponent,
         RouterModule,
         LegendComponent

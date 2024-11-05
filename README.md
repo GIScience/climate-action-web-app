@@ -46,6 +46,8 @@ Clone the repository locally, and run `npm install` to install the dependencies.
 Run `npm run dev` or `ng serve` for a dev server and navigate to `http://localhost:4200/`.
 The application will automatically reload if you change any of the source files.
 
+For the Search function to work, you'll need to acquire an API key from our search results provider, [OpenRouteService (ORS)](https://openrouteservice.org/). Once you have the key, fill it in `src/environments/api-keys/keys.ts.example` and rename it to `keys.ts`.
+
 ### Backend Server
 
 To see more than the raw website and access the plugins, you will need to set up a local dev environment of the [Climate Action Infrastructure](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/infrastructure).
@@ -66,16 +68,16 @@ Currently available `build_target`s are
 The web app itself is also [Dockerised](Dockerfile). To start it, run the following commands
 
 ```shell
-docker build --build-arg BUILD_TARGET={build_target} . --tag heigit/ca-web-app:devel
-docker run --publish 8080:80 heigit/ca-web-app:devel
+docker build --build-arg BUILD_TARGET={build_target} . --tag repo.heigit.org/climate-action/web-app:{build_target}
+docker run --publish 8080:80 repo.heigit.org/climate-action/web-app:{build_target}
 ```
 
 Then head to [localhost:8080](localhost:8080).
 
-To push a new version to [Docker Hub](https://hub.docker.com/orgs/heigit) run
+To push a new version to [Docker Hub](https://repo.heigit.org/climate-action) run
 
 ```shell
-docker image push heigit/ca-web-app:devel
+docker image push repo.heigit.org/climate-action/web-app:{build_target}
 ```
 
 ## Tests

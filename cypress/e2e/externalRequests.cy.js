@@ -1,7 +1,8 @@
 describe('External Requests', () => {
     const allowlist = [
         'http://localhost',
-        'https://tile.openstreetmap.org'
+        'https://tile.openstreetmap.org',
+        'https://api.openrouteservice.org'
     ];
 
     const cypressInternalPatterns = [
