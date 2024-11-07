@@ -9,7 +9,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
-- Heilbronn and Karlsruhe to available ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
+- Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
 - Added Layer Switcher to map (now with HeiGIT Carto and Bing Aerial maps), with opacity slider for GeoTIFF/GeoJSON layers from artifacts
 - Search function to help with finding PoIs during compute, and locations within results ([#179](https://gitlab.heigit.org/climate-action/web-app/-/issues/179))
 
