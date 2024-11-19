@@ -26,15 +26,33 @@ import {StyleFunction} from 'ol/style/Style'
 import {MultiPolygon} from 'ol/geom'
 import {map} from 'rxjs/operators'
 import {environment} from 'src/environments/environment'
+import geojsonvt from 'geojson-vt'
+import VectorTile from 'ol/VectorTile'
+import VectorTileSource from 'ol/source/VectorTile'
+import VectorTileLayer, {Options as VectorTileLayerOptions} from 'ol/layer/VectorTile'
+import Projection from 'ol/proj/Projection'
+import RenderFeature from 'ol/render/Feature'
+import {replacer} from './utils/geojson-vt.utils'
 
 class ExtendedTileLayer extends TileLayer {
     name?: string
     baseLayer?: boolean
 
-    constructor(options: TileLayerOptions & { name?: string; baseLayer?: boolean }) {
+    constructor(options: TileLayerOptions & {name?: string; baseLayer?: boolean}) {
         super(options)
         this.name = options.name
         this.baseLayer = options.baseLayer
+    }
+}
+
+class ExtendedVectorTileLayer extends VectorTileLayer<RenderFeature> {
+    name?: string
+    displayInLayerSwitcher?: boolean
+
+    constructor(options: VectorTileLayerOptions<RenderFeature> & {name?: string; displayInLayerSwitcher?: boolean}) {
+        super(options)
+        this.name = options.name
+        this.displayInLayerSwitcher = options.displayInLayerSwitcher
     }
 }
 
@@ -385,18 +403,43 @@ export class MapService {
 
     }
 
-    addGeoJsonLayer(data: object, artifactName: string): ExtendedVectorLayer<Feature<Geometry>> {
-        const features = new GeoJSON().readFeatures(data, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
+    addGeoJsonLayer(data: object, artifactName: string): ExtendedVectorTileLayer {
+        const tileIndex = geojsonvt(data, {
+            extent: 4096,
+            maxZoom: 18
         })
-
-        const geojsonLayerSource = new VectorSource({
-            features: features
+    
+        const format = new GeoJSON({
+            dataProjection: new Projection({
+                code: 'TILE_PIXELS',
+                units: 'tile-pixels',
+                extent: [0, 0, 4096, 4096]
+            })
         })
-
-        const geojsonLayer = new ExtendedVectorLayer({
-            source: geojsonLayerSource,
+    
+        const vectorSource = new VectorTileSource({
+            tileUrlFunction: function (tileCoord) {
+                return JSON.stringify(tileCoord)
+            },
+            tileLoadFunction: (tile, url) => {
+                const tileCoord = JSON.parse(url)
+                const [x, y, zoom] = tileCoord
+                const data = tileIndex.getTile(x, y, zoom)
+                const geojson = JSON.stringify({
+                    type: 'FeatureCollection',
+                    features: data ? data.features : []
+                }, replacer)
+    
+                const tileFeatures = format.readFeatures(geojson, {
+                    extent: vectorSource.getTileGrid()?.getTileCoordExtent(tileCoord),
+                    featureProjection: 'EPSG:3857'
+                });
+                (tile as VectorTile).setFeatures(tileFeatures)
+            }
+        })
+    
+        const geojsonLayer = new ExtendedVectorTileLayer({
+            source: vectorSource,
             name: artifactName,
             style: this.styleFunction.bind(this) as StyleFunction
         })

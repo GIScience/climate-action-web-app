@@ -3,9 +3,8 @@ import {GeojsonComponent} from './geojson.component'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
 import {of} from 'rxjs'
 import {MapService} from '../../map/map.service'
-import {Feature} from 'ol'
-import {Geometry} from 'ol/geom.js'
-import VectorLayer from 'ol/layer/Vector'
+import VectorTileLayer from 'ol/layer/VectorTile'
+import RenderFeature from 'ol/render/Feature'
 import SpyObj = jasmine.SpyObj
 
 describe('GeojsonComponent', () => {
@@ -101,7 +100,7 @@ describe('GeojsonComponent', () => {
         }
 
         httpClientSpy.get.and.returnValue(of(mockGeoJsonData))
-        const mockLayer = new VectorLayer<Feature<Geometry>>
+        const mockLayer = new VectorTileLayer<RenderFeature>
         mapServiceSpy.addGeoJsonLayer.and.returnValue(mockLayer)
 
         component.inputData = {

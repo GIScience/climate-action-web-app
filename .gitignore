@@ -43,6 +43,9 @@ testem.log
 /e2e/*.js
 /e2e/*.map
 cypress/screenshots/*
+cypress/snapshots/actual/*
+cypress/snapshots/diff/*
+cypress/downloads/*
 
 # System Files
 .DS_Store

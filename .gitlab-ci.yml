@@ -46,6 +46,8 @@ test_cypress:
     when: on_failure
     paths:
       - cypress/screenshots/**/*.png
+      - cypress/snapshots/actual/**/*.png
+      - cypress/snapshots/diff/**/*.png
     expire_in: 30 day
 
 docker_build_deploy_development:

@@ -16,7 +16,7 @@
     "test": "ng test --code-coverage --no-progress --browsers=Chrome --watch=false",
     "test-chromium-headless": "ng test --browsers=ChromiumHeadless --watch=false",
     "cy:open": "cypress open",
-    "cy:run": "cypress run  --headless --browser firefox",
+    "cy:run": "cypress run --headless --browser chrome",
     "test:all": "npm run test && npm run cy:run",
     "lint": "ng lint --max-warnings 0",
     "lint:fix": "ng lint --fix"
@@ -39,7 +39,9 @@
     "@types/ol": "^7.0.0",
     "brand-colors": "^2.1.1",
     "chart.js": "^4.4.3",
+    "cypress-visual-regression": "^5.2.2",
     "dayjs": "^1.11.9",
+    "geojson-vt": "^4.0.2",
     "lodash": "^4.17.21",
     "lucide-angular": "^0.439.0",
     "marked": "^12.0.2",

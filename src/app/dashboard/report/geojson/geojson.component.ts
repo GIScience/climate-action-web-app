@@ -1,12 +1,10 @@
 import {Component, Input, OnInit, OnDestroy} from '@angular/core'
 import {CommonModule} from '@angular/common'
 import {HttpClient} from '@angular/common/http'
-import {Feature} from 'ol'
 import {Artifact} from '../../artifact/artifact.interface'
-import VectorLayer from 'ol/layer/Vector'
-import VectorSource from 'ol/source/Vector'
-import {Geometry} from 'ol/geom.js'
+import VectorTileLayer from 'ol/layer/VectorTile'
 import {MapService} from '../../map/map.service'
+import RenderFeature from 'ol/render/Feature'
 
 @Component({
     selector: 'app-geojson',
@@ -18,8 +16,7 @@ import {MapService} from '../../map/map.service'
 export class GeojsonComponent implements OnInit, OnDestroy {
 
     @Input() inputData: { url: string; artifact: Artifact | null; } | undefined
-    geojsonLayer!: VectorLayer<Feature<Geometry>>
-    geojsonLayerSource!: VectorSource
+    geojsonLayer!: VectorTileLayer<RenderFeature>
 
     constructor(private http: HttpClient, private mapService: MapService) {
     }

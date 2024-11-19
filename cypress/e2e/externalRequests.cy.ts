@@ -6,9 +6,8 @@ describe('External Requests', () => {
     ];
 
     const cypressInternalPatterns = [
-        'https://firefox.settings.services.mozilla.com',
-        'https://tracking-protection.cdn.mozilla.net',
-        'https://firefox-settings-attachments.cdn.mozilla.net'
+        'https://content-autofill.googleapis.com',
+        'https://safebrowsingohttpgateway.googleapis.com'
     ];
 
     it('should only make external calls to allowlisted URLs', () => {
