@@ -146,7 +146,6 @@ describe('PluginParameterComponent', () => {
         fixture.detectChanges()
 
         expect(mapService.highlightedFeatures.getLength()).toEqual(0)
-        expect(component.aoiAttribute).toBe('blueprint_aoi')
         expect(component.selectOptions['Option'].map((x) => x.label))
             .toEqual([
                 'Option 1',
@@ -440,55 +439,10 @@ describe('PluginParameterComponent', () => {
                     ]
                 ],
                 'title': 'Multi-Selection Input'
-            },
-            'blueprint_aoi': {
-                'allOf': [
-                    {
-                        '$ref': '#/$defs/Feature_MultiPolygon_Union_Dict__NoneType__'
-                    }
-                ],
-                'description': 'A required area of interest parameter.',
-                'examples': [
-                    {
-                        'geometry': {
-                            'coordinates': [
-                                [
-                                    [
-                                        [
-                                            12.3,
-                                            48.22
-                                        ],
-                                        [
-                                            12.3,
-                                            48.34
-                                        ],
-                                        [
-                                            12.48,
-                                            48.34
-                                        ],
-                                        [
-                                            12.48,
-                                            48.22
-                                        ],
-                                        [
-                                            12.3,
-                                            48.22
-                                        ]
-                                    ]
-                                ]
-                            ],
-                            'type': 'MultiPolygon'
-                        },
-                        'properties': {},
-                        'type': 'Feature'
-                    }
-                ],
-                'title': 'Area of Interest Input'
             }
         },
         'required': [
-            'blueprint_bool',
-            'blueprint_aoi'
+            'blueprint_bool'
         ],
         'title': 'BlueprintComputeInput',
         'type': 'object'

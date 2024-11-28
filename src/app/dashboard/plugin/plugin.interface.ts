@@ -1,4 +1,6 @@
 import {JSONSchema7} from 'json-schema'
+import {Feature} from 'ol'
+import {MultiPolygon, Polygon} from 'ol/geom'
 
 export interface PluginAuthor {
     name: string
@@ -49,6 +51,11 @@ export interface PluginRun {
 
 export interface PluginCorrelator {
     correlation_uuid: string
+}
+
+export interface ComputeRequest {
+    aoi: Feature<Polygon | MultiPolygon>
+    params: Record<string, unknown>
 }
 
 export type RunStatus = 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input'

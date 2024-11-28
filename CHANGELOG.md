@@ -15,6 +15,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Utilize `geojson-vt` library to render GeoJSON layers in a more performant way
 - Added visual regression testing with Cypress
+- Adapted compute request to the new Celery backend
 
 ## [1.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/1.3.0) - 2024-10-14
 

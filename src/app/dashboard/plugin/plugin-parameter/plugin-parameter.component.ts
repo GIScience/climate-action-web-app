@@ -7,7 +7,7 @@ import {JSONSchema7, JSONSchema7Definition} from 'json-schema'
 import {PluginService} from '../plugin.service'
 import {MapService} from '../../map/map.service'
 import {MatSnackBar} from '@angular/material/snack-bar'
-import {Plugin} from '../plugin.interface'
+import {ComputeRequest, Plugin} from '../plugin.interface'
 import {
     FormlyModel,
     SelectOption,
@@ -88,16 +88,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     onSubmit(model: FormlyModel) {
-        const selectedRegion = this.mapService.getSelectedRegion()
-        if (this.aoiAttribute && selectedRegion)
-            model[this.aoiAttribute] = selectedRegion
-
-        const missingFields = this.checkForRequiredFields(model)
-        if (missingFields.length == 0) {
+        if (this.form.valid) {
             this.requestCompute(model)
-            this.pluginService.setPluginState('inactive')
-        } else {
-            this.alertUserMissingFields(missingFields)
         }
     }
 
@@ -312,9 +304,34 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private requestCompute(model: FormlyModel) {
-        const aoiName = (model['aoi'] as {properties?: {name?: string}} | undefined)?.properties?.name
-    
-        this.pluginService.computePlugin(this.plugin.plugin_id, model).subscribe({
+        const aoi = this.mapService.getSelectedRegion()
+        const aoiName = aoi.properties?.name
+        
+        if (!aoi) {
+            this.snackBar.open(
+                'Please select an area on the map first.', 
+                'Dismiss', 
+                {
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                }
+            )
+            return
+        }
+
+        const computeRequest: ComputeRequest = {
+            aoi: aoi,
+            params: {} as Record<string, unknown>
+        }
+
+        Object.entries(model).forEach(([key, value]) => {
+            if (key !== 'aoi') {
+                computeRequest.params[key] = value
+            }
+        })
+
+        this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
             next: (data) => {
                 this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, aoiName)
     
