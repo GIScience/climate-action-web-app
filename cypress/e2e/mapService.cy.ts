@@ -1,4 +1,4 @@
-import {mockPluginsList, mockPluginBlueprint, mockGeoTiffComputation, mockGeoJsonComputation, mockGeoTiff, mockGeoJson} from '../support/interceptors'
+import {mockPluginsList, mockPluginBlueprint, mockGeoTiffComputation, mockGeoJsonComputation, mockSimpleGeoJsonComputation, mockGeoTiff, mockGeoJson, mockSimpleGeoJson} from '../support/interceptors'
 
 describe('mapService', () => {
     beforeEach(() => {
@@ -145,5 +145,67 @@ describe('mapService', () => {
         cy.wait(2500)
 
         cy.compareSnapshot('geojson', 0.01)
+    })
+
+    it('should display tooltips from a geojson layer ', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+        mockSimpleGeoJsonComputation()
+        mockSimpleGeoJson()
+
+        cy.window().then((win) => {
+            win.localStorage.setItem('plugin_runs', JSON.stringify([{
+                correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
+                pluginId: 'plugin_blueprint',
+                pluginName: 'Plugin Blueprint',
+                timestamp: '2024-08-07T12:43:08.373768',
+                status: 'completed'
+            }]))
+        })
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.wait('@getSimpleGeoJsonComputation')
+
+        cy.get('.artifact-parent-computation').eq(0).click()
+        cy.get('.artifact-child-computation').eq(0).click()
+
+        cy.wait('@getSimpleGeoJson')
+
+        cy.wait(1000)
+
+        cy.window().then((win) => {
+            const mapService = (win).ng.getComponent(win.document.querySelector('app-root')).mapService
+
+            cy.wait(1000)
+
+            const coordinate = [12952933.57136454, 4853791.28861462]
+            const pixel = mapService.map.getPixelFromCoordinate(coordinate)
+
+            const fakePointerEvent = new PointerEvent('click', {
+                clientX: pixel[0],
+                clientY: pixel[1]
+            });
+
+            const event = {
+                type: 'click',
+                target: mapService.map,
+                map: mapService.map,
+                pixel: pixel,
+                coordinate: coordinate,
+                dragging: false,
+                originalEvent: fakePointerEvent
+            }
+
+            mapService.map.dispatchEvent(event)
+        })
+
+        cy.get('#map-popup-content span').should('contain.text', 'Connectivity : 0.0167')
     })
 })

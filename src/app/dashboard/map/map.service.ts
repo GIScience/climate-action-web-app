@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
-import {Collection, Feature, Map, View} from 'ol'
+import {Collection, Feature, Map, MapBrowserEvent, Overlay, View} from 'ol'
 import {PluginService} from '../plugin/plugin.service'
 import FeatureLike from 'ol/Feature'
 import TileLayer, {Options as TileLayerOptions} from 'ol/layer/WebGLTile.js'
@@ -73,10 +73,13 @@ class ExtendedVectorLayer<T extends Feature<Geometry | Point>> extends VectorLay
 
 export class MapService {
     map: Map | undefined
+    mapPopUp: Overlay | undefined
     focusedLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     regionLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     clusterLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerLayer: ExtendedVectorLayer<Feature<Point>> | undefined
+    featureHoverOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
+    featureClickOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerFeatures: Collection<Feature<Point>> = new Collection([])
     highlightedFeatures: Collection<FeatureLike> = new Collection([])
     styleCache: { [key: number]: Style } = {}
@@ -280,13 +283,23 @@ export class MapService {
             })
         })
 
+        this.mapPopUp = new Overlay({
+            element: document.getElementById('map-popup')!,
+            autoPan: {
+                animation: {
+                    duration: 250
+                }
+            }
+        })
+
         this.map = new Map({
             layers: [aerialImagery, heigitCarto, osmCarto],
             target: 'map',
             view: new View({
                 center: fromLonLat([8.6759928, 49.4187355]),
                 zoom: 0
-            })
+            }),
+            overlays: [this.mapPopUp]
         })
 
         const selectedMapLayer = localStorage.getItem(localStorageSelectedMapLayerKey) || osmCartoLayerName
@@ -445,6 +458,38 @@ export class MapService {
         })
 
         this.map?.addLayer(geojsonLayer)
+
+        this.featureHoverOverlay = this.createFeatureOverlay(0.5)
+        this.featureClickOverlay = this.createFeatureOverlay(0.75)
+        if (this.featureHoverOverlay) { 
+            this.map?.addLayer(this.featureHoverOverlay)
+        }
+        if (this.featureClickOverlay) {
+            this.map?.addLayer(this.featureClickOverlay)
+        }
+
+        this.map?.on('pointermove', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
+            const pixel = this.map?.getEventPixel(evt.originalEvent)
+            if (!pixel) return
+            
+            geojsonLayer.getFeatures(pixel).then(features => {
+                if (this.featureHoverOverlay) {
+                    this.handleFeaturesTooltip(features, this.featureHoverOverlay)
+                }
+            })
+        }.bind(this))
+
+        this.map?.on('click', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
+            const pixel = this.map?.getEventPixel(evt.originalEvent)
+            if (!pixel) return
+            
+            geojsonLayer.getFeatures(pixel).then(features => {
+                if (this.featureClickOverlay) {
+                    this.handleFeaturesTooltip(features, this.featureClickOverlay, evt.coordinate, artifactName)
+                }
+            })
+        }.bind(this))
+
         return geojsonLayer
     }
 
@@ -611,6 +656,52 @@ export class MapService {
                 featureProjection: 'EPSG:3857',
                 decimals: 7
             })
+        }
+    }
+
+    createFeatureOverlay(opacity: number): ExtendedVectorLayer<Feature<Geometry>> {
+        const highlightStrokeWidth = 15
+        return new ExtendedVectorLayer({
+            source: new VectorSource(),
+            style: new Style({
+                stroke: new Stroke({
+                    color: `rgba(255, 255, 255, ${opacity})`,
+                    width: highlightStrokeWidth
+                }),
+                image: new CircleStyle({
+                    radius: 5,
+                    stroke: new Stroke({
+                        color: `rgba(255, 255, 255, ${opacity})`,
+                        width: highlightStrokeWidth
+                    })
+                })
+            }),
+            displayInLayerSwitcher: false
+        })
+    }
+
+    handleFeaturesTooltip(
+        features: Array<Feature<Geometry> | RenderFeature>, 
+        overlay: ExtendedVectorLayer<Feature<Geometry>>,
+        coordinate?: Coordinate,
+        artifactName?: string
+    ) {
+
+        const popupContent = document.getElementById('map-popup-content')!
+        if (features.length > 0) {
+            overlay.getSource()?.clear()
+            overlay.getSource()?.addFeatures(features as Feature<Geometry>[])
+            
+            if (coordinate) {
+                popupContent.innerHTML = '<span><strong>' + artifactName + '</strong> : ' + 
+                    features.map(feature => feature.get('label')) + '</span>'
+                this.mapPopUp?.setPosition(coordinate)
+            }
+        } else {
+            overlay.getSource()?.clear()
+            if (coordinate) {
+                this.mapPopUp?.setPosition(undefined)
+            }
         }
     }
 }

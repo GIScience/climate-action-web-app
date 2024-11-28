@@ -185,3 +185,37 @@
 		}
 	}
 }
+
+.ol-popup {
+	position: absolute;
+	background-color: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(5px);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid #ccc;
+	bottom: 12px;
+	left: -50px;
+
+	&:before {
+		top: 100%;
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+	}
+
+	&:before {
+		border-top-color: rgba(255, 255, 255, 0.85);
+		border-width: 11px;
+		left: 48px;
+		margin-left: -11px;
+	}
+
+	#map-popup-content {
+		display: inline-block;
+		white-space: nowrap;
+	}
+}
