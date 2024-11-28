@@ -115,14 +115,27 @@ describe('PluginService', () => {
     })
 
     it('should invoke plugin computation', () => {
-        const params = {
-            'compute_param_1': 1
+        const computeRequest = {
+            aoi: {
+                type: 'Feature',
+                geometry: {
+                    type: 'MultiPolygon',
+                    coordinates: [[[[null, null]]]]
+                },
+                properties: {
+                    name: 'Test Area',
+                    id: 'test-id'
+                }
+            },
+            params: {
+                compute_param_1: 1
+            }
         }
 
-        httpClientSpy.post.withArgs('/api/v1/gateway/plugin/test', params).and
+        httpClientSpy.post.withArgs('/api/v1/gateway/plugin/test', computeRequest).and
             .returnValue(of(test_correlator))
 
-        service.computePlugin('test', params).subscribe(test_correlator => {
+        service.computePlugin('test', computeRequest).subscribe(test_correlator => {
             expect(test_correlator).toEqual(test_correlator)
         })
 
