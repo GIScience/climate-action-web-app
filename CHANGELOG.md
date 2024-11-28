@@ -27,6 +27,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computations of only the currently selected plugin is now shown
 - AoI is now shown in the list of Artifacts ([#109](https://gitlab.heigit.org/climate-action/web-app/-/issues/109))
 - User is now informed about the reason behind a failed run ([133](https://gitlab.heigit.org/climate-action/web-app/-/issues/133))
+- Clicking on vector geodata (GeoJSON results) now opens a tooltip with info ([#154](https://gitlab.heigit.org/climate-action/web-app/-/issues/154))
 
 - Updated Angular (and associated libraries) to v17
 - Leverage new Artifact Metadata endpoint ([#105](https://gitlab.heigit.org/climate-action/web-app/-/issues/105))

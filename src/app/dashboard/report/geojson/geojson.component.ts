@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnDestroy} from '@angular/core'
+import {Component, Input, OnDestroy, OnInit} from '@angular/core'
 import {CommonModule} from '@angular/common'
 import {HttpClient} from '@angular/common/http'
 import {Artifact} from '../../artifact/artifact.interface'
@@ -35,6 +35,10 @@ export class GeojsonComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         if (this.geojsonLayer) {
             this.mapService.map?.removeLayer(this.geojsonLayer)
+            if (this.mapService.featureClickOverlay) {
+                this.mapService.map?.removeLayer(this.mapService.featureClickOverlay)
+                this.mapService.mapPopUp?.setPosition(undefined)
+            }
         }
     }
 }
