@@ -58,7 +58,7 @@ describe('PluginComponent', () => {
     })
 
     it('should update url when present in notes', () => {
-        expect(component.adjust(test_plugin).sources).toEqual([
+        expect(component.processSourceUrls(test_plugin).sources).toEqual([
             {
                 url: 'http://some.url.com'
             },

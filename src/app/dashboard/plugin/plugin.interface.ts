@@ -17,7 +17,7 @@ export interface Plugin {
     concerns: Array<Concern>
     purpose: string
     methodology: string
-    sources: Array<Source>
+    sources?: Array<Source>
     operator_schema: JSONSchema7
     library_version: string
     attribution: string

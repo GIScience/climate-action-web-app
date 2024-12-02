@@ -59,16 +59,18 @@ export class PluginComponent implements AfterViewInit {
             .join(', ')
     }
 
-    adjust(plugin: Plugin) {
-        plugin.sources = plugin.sources.map((y) => {
-            if (!y.url && y.note) {
-                const noteUrlMatch = y.note.match('\\url{(.*)}')
-                if (noteUrlMatch) {
-                    y.url = noteUrlMatch[1]
+    processSourceUrls(plugin: Plugin) {
+        if (plugin.sources) {
+            plugin.sources = plugin.sources.map((y) => {
+                if (!y.url && y.note) {
+                    const noteUrlMatch = y.note.match('\\url{(.*)}')
+                    if (noteUrlMatch) {
+                        y.url = noteUrlMatch[1]
+                    }
                 }
-            }
-            return y
-        })
+                return y
+            })
+        }
         return plugin
     }
 
@@ -80,7 +82,7 @@ export class PluginComponent implements AfterViewInit {
                     throw Error(`Plugin ${pluginName} does not exist`)
                 }
 
-                return this.pluginService.getPluginDetails(pluginName).pipe(tap(this.adjust))
+                return this.pluginService.getPluginDetails(pluginName).pipe(tap(this.processSourceUrls))
             })
         )
     }
