@@ -1,4 +1,5 @@
 import {mockPluginsList, mockPluginBlueprint, mockGeoTiffComputation, mockGeoJsonComputation, mockSimpleGeoJsonComputation, mockGeoTiff, mockGeoJson, mockSimpleGeoJson} from '../support/interceptors'
+import {beforeCompareSnapshots} from '../support/pre-test-cleanup'
 
 describe('mapService', () => {
     beforeEach(() => {
@@ -8,15 +9,15 @@ describe('mapService', () => {
     it('display the layerswitcher', () => {
         cy.get('.ol-layerswitcher').should('exist')
 
-        const expectedTexts = ['OSM Carto', 'Bing Aerial Imagery', 'HeiGIT Carto'];
+        const expectedTexts = ['OSM Carto', 'Bing Aerial Imagery', 'HeiGIT Carto']
 
         cy.get('.ol-layerswitcher li.baselayer label span')
             .should('have.length', 3)
             .each((item) => {
                 cy.wrap(item).invoke('text').then((text) => {
-                    expect(expectedTexts).to.include(text);
-                });
-            });
+                    expect(expectedTexts).to.include(text)
+                })
+            })
     })
 
     it('remembers the selected layer', () => {
@@ -33,10 +34,10 @@ describe('mapService', () => {
         cy.get('.ol-layerswitcher li.baselayer label span').eq(1).invoke('text').then((text) => {
             cy.location('origin').then((origin) => {
                 cy.getAllLocalStorage().then((result) => {
-                    expect(result[origin].selected_map_layer).to.equal(text);
-                });
-            });
-        });
+                    expect(result[origin].selected_map_layer).to.equal(text)
+                })
+            })
+        })
     })
 
     it('remembers the selected layer even when a geotiff is loaded', () => {
@@ -82,10 +83,10 @@ describe('mapService', () => {
         cy.get('.ol-layerswitcher li.baselayer label span').eq(1).invoke('text').then((text) => {
             cy.location('origin').then((origin) => {
                 cy.getAllLocalStorage().then((result) => {
-                    expect(result[origin].selected_map_layer).to.equal(text);
-                });
-            });
-        });
+                    expect(result[origin].selected_map_layer).to.equal(text)
+                })
+            })
+        })
     })
 
     it('remembers the collapsed state', () => {
@@ -95,21 +96,19 @@ describe('mapService', () => {
 
         cy.get('.ol-layerswitcher').should('not.have.class', 'ol-forceopen')
 
-        cy.wait(500)
-
         cy.reload(true)
 
-        cy.wait(500)
+        cy.waitForRenderComplete()
 
         cy.get('.ol-layerswitcher').should('not.have.class', 'ol-forceopen')
 
         cy.location('origin').then((origin) => {
             cy.getAllLocalStorage().then((result) => {
                 expect(result[origin]).to.deep.equal({
-                    layer_switcher_collapsed: 'true',
-                });
-            });
-        });
+                    layer_switcher_collapsed: 'true'
+                })
+            })
+        })
     })
 
     it('should render a geojson layer correctly ', () => {
@@ -117,6 +116,8 @@ describe('mapService', () => {
         mockPluginBlueprint()
         mockGeoJsonComputation()
         mockGeoJson()
+
+        beforeCompareSnapshots('app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .artifact-child-computations, .artifact-child-computations-wrapper')
 
         cy.window().then((win) => {
             win.localStorage.setItem('plugin_runs', JSON.stringify([{
@@ -142,7 +143,7 @@ describe('mapService', () => {
         cy.get('.artifact-child-computation').eq(0).click()
 
         cy.wait('@getGeoJson')
-        cy.wait(2500)
+        cy.waitForRenderComplete()
 
         cy.compareSnapshot('geojson', 0.01)
     })
@@ -178,12 +179,10 @@ describe('mapService', () => {
 
         cy.wait('@getSimpleGeoJson')
 
-        cy.wait(1000)
+        cy.waitForRenderComplete()
 
         cy.window().then((win) => {
             const mapService = (win).ng.getComponent(win.document.querySelector('app-root')).mapService
-
-            cy.wait(1000)
 
             const coordinate = [12952933.57136454, 4853791.28861462]
             const pixel = mapService.map.getPixelFromCoordinate(coordinate)
@@ -191,7 +190,7 @@ describe('mapService', () => {
             const fakePointerEvent = new PointerEvent('click', {
                 clientX: pixel[0],
                 clientY: pixel[1]
-            });
+            })
 
             const event = {
                 type: 'click',
@@ -207,5 +206,117 @@ describe('mapService', () => {
         })
 
         cy.get('#map-popup-content span').should('contain.text', 'Connectivity : 0.0167')
+    })
+
+    it('should read the boundaries from the ohsome api and display them on the map', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        let currentRegionName = ''
+        let newRegionName = ''
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.get('.ol-zoom-in').click().click().click().click().click()
+
+        cy.waitForRenderComplete()
+
+        cy.get('canvas.ol-layer').click()
+
+        cy.waitForRenderComplete()
+
+        cy.get('.selected-regions').children().should('have.class', 'region-item')
+
+        cy.get('.selected-regions').children().first().find('span.region-name').invoke('text').then((text) => {
+            currentRegionName = text
+        })
+
+        cy.get('canvas').eq(1).click(1000, 300)
+
+        cy.waitForRenderComplete()
+
+        cy.get('.selected-regions').children().first().find('span.region-name').invoke('text').then((text) => {
+            newRegionName = text
+            expect(newRegionName).to.not.equal(currentRegionName)
+        })
+
+    })
+
+    it('selected regions should be deselectable', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        let currentHighlightedFeaturesCount = 0
+        let newHighlightedFeaturesCount = 0
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.get('.ol-zoom-in').click().click().click().click().click()
+
+        cy.waitForRenderComplete()
+
+        cy.get('canvas.ol-layer').click()
+
+        cy.waitForRenderComplete()
+
+        cy.window().then((win) => {
+            const mapService = (win).ng.getComponent(win.document.querySelector('app-map')).mapService
+            currentHighlightedFeaturesCount = mapService.highlightedFeatures.getLength()
+
+            expect(currentHighlightedFeaturesCount).to.be.greaterThan(0)
+        })
+
+        cy.get('.selected-regions .deselect-region').first().click()
+
+        cy.waitForRenderComplete()
+
+        cy.window().then((win) => {
+            const mapService = (win).ng.getComponent(win.document.querySelector('app-map')).mapService
+            newHighlightedFeaturesCount = mapService.highlightedFeatures.getLength()
+
+            expect(newHighlightedFeaturesCount).to.not.equal(currentHighlightedFeaturesCount)
+        })
+    })
+
+    it('the boundaries from the ohsome api should be valid polygons or multipolygons', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.get('.ol-zoom-in').click().click().click().click().click()
+
+        cy.waitForRenderComplete()
+
+        cy.get('canvas.ol-layer').click()
+
+        cy.waitForRenderComplete()
+
+        cy.window().then((win) => {
+            const mapService = (win).ng.getComponent(win.document.querySelector('app-map')).mapService
+            const selectedFeature = mapService.getSelectedRegion()
+
+            expect(selectedFeature).to.exist
+            expect(selectedFeature.geometry.type).to.be.oneOf(['MultiPolygon', 'Polygon'])
+            expect(selectedFeature.geometry.coordinates).to.be.an('array')
+        })
     })
 })

@@ -6,14 +6,14 @@ export const mockPluginsList = () => {
                     'name': 'Plugin Blueprint',
                     'authors': [
                         {
-                            'name': 'Moritz Schott',
-                            'affiliation': 'HeiGIT gGmbH',
-                            'website': 'https://heigit.org/heigit-team/'
+                            'name': 'Max Mustermann',
+                            'affiliation': 'XYZ gGmbH',
+                            'website': 'https://example.com/'
                         },
                         {
-                            'name': 'Maciej Adamiak',
-                            'affiliation': 'Consultant at HeiGIT gGmbH',
-                            'website': 'https://heigit.org/heigit-team/'
+                            'name': 'Erika Mustermann',
+                            'affiliation': 'Consultant at XYZ gGmbH',
+                            'website': 'https://example.com/'
                         }
                     ],
                     'purpose': '',
@@ -39,38 +39,289 @@ export const mockPluginsList = () => {
 
 export const mockPluginBlueprint = () => {
     cy.intercept('/api/v1/gateway/plugin/plugin_blueprint', {
-        body: 
-            {
-                'name': 'Plugin Blueprint',
-                'authors': [
-                    {
-                        'name': 'Moritz Schott',
-                        'affiliation': 'HeiGIT gGmbH',
-                        'website': 'https://heigit.org/heigit-team/'
+        body:
+        {
+            'name': 'Plugin Blueprint',
+            'authors': [
+                {
+                    'name': 'Max Mustermann',
+                    'affiliation': 'XYZ gGmbH',
+                    'website': 'https://example.com/'
+                },
+                {
+                    'name': 'Erika Mustermann',
+                    'affiliation': 'Consultant at XYZ gGmbH',
+                    'website': 'https://example.com/'
+                }
+            ],
+            'purpose': '',
+            'sources': [
+                {
+                    'pages': '14-15',
+                    'volume': '2',
+                    'journal': 'J. Geophys. Res.',
+                    'year': '1954',
+                    'title': 'Nothing Particular',
+                    'author': 'J. G. Smith and H. K. Weston',
+                    'ENTRYTYPE': 'article',
+                    'ID': 'smit54'
+                },
+            ],
+            'methodology': '',
+            'plugin_id': 'plugin_blueprint',
+            'operator_schema': {
+                '$defs': {
+                    'Mapping': {
+                        'properties': {
+                            'good': {
+                                'default': 'John Doe',
+                                'description': 'A good string.',
+                                'examples': [
+                                    'John Doe'
+                                ],
+                                'title': 'String for Good',
+                                'type': 'string'
+                            },
+                            'mediocre': {
+                                'default': 2.1,
+                                'description': 'A mediocre float.',
+                                'examples': [
+                                    2.1
+                                ],
+                                'maximum': 4.0,
+                                'minimum': 0.5,
+                                'title': 'Mediocre Float',
+                                'type': 'number'
+                            },
+                            'bad': {
+                                'anyOf': [
+                                    {
+                                        '$ref': '#/$defs/Option'
+                                    },
+                                    {
+                                        'type': 'null'
+                                    }
+                                ],
+                                'default': 'Option 2',
+                                'description': 'A bad selection.',
+                                'examples': [
+                                    'Option 2'
+                                ],
+                                'title': 'Bad Selection'
+                            }
+                        },
+                        'title': 'Mapping',
+                        'type': 'object'
                     },
-                    {
-                        'name': 'Maciej Adamiak',
-                        'affiliation': 'Consultant at HeiGIT gGmbH',
-                        'website': 'https://heigit.org/heigit-team/'
+                    'Option': {
+                        'enum': [
+                            'Option 1',
+                            'Option 2'
+                        ],
+                        'title': 'Option',
+                        'type': 'string'
                     }
-                ],
-                'purpose': '',
-                'sources': [
-                    {
-                        'pages': '14-15',
-                        'volume': '2',
-                        'journal': 'J. Geophys. Res.',
-                        'year': '1954',
-                        'title': 'Nothing Particular',
-                        'author': 'J. G. Smith and H. K. Weston',
-                        'ENTRYTYPE': 'article',
-                        'ID': 'smit54'
+                },
+                'properties': {
+                    'bool_blueprint': {
+                        'description': 'A required boolean parameter.',
+                        'examples': [
+                            true
+                        ],
+                        'title': 'Boolean Input',
+                        'type': 'boolean'
                     },
+                    'int_blueprint': {
+                        'anyOf': [
+                            {
+                                'exclusiveMaximum': 100,
+                                'exclusiveMinimum': 0,
+                                'type': 'integer'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': 3,
+                        'description': 'An optional integer parameter.',
+                        'examples': [
+                            3
+                        ],
+                        'title': 'Integer Input'
+                    },
+                    'float_blueprint': {
+                        'anyOf': [
+                            {
+                                'maximum': 4.0,
+                                'minimum': 0.5,
+                                'type': 'number'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': 2.1,
+                        'description': 'An optional floating point parameter.',
+                        'examples': [
+                            2.1
+                        ],
+                        'title': 'Float Input'
+                    },
+                    'string_blueprint': {
+                        'anyOf': [
+                            {
+                                'type': 'string'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': 'John Doe',
+                        'description': 'An optional string parameter.',
+                        'examples': [
+                            'John Doe'
+                        ],
+                        'title': 'String Input'
+                    },
+                    'date_blueprint': {
+                        'anyOf': [
+                            {
+                                'format': 'date',
+                                'maximum': '2024-11-25',
+                                'minimum': '2005-01-01',
+                                'type': 'string'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': '2020-01-01',
+                        'description': 'An optional date parameter.',
+                        'examples': [
+                            '2020-01-01'
+                        ],
+                        'title': 'Date Input'
+                    },
+                    'select_blueprint': {
+                        'anyOf': [
+                            {
+                                '$ref': '#/$defs/Option'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': 'Option 2',
+                        'description': 'An optional selection parameter. The user can choose one of the available options.',
+                        'examples': [
+                            'Option 2'
+                        ],
+                        'title': 'Selection Input'
+                    },
+                    'select_multi_blueprint': {
+                        'anyOf': [
+                            {
+                                'items': {
+                                    '$ref': '#/$defs/Option'
+                                },
+                                'type': 'array'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': [
+                            'Option 2'
+                        ],
+                        'description': 'An optional selection parameter. The user can choose multiple of the available options.',
+                        'examples': [
+                            [
+                                'Option 2'
+                            ]
+                        ],
+                        'title': 'Multi-Selection Input'
+                    },
+                    'mapping_blueprint': {
+                        'anyOf': [
+                            {
+                                '$ref': '#/$defs/Mapping'
+                            },
+                            {
+                                'type': 'null'
+                            }
+                        ],
+                        'default': {
+                            'good': 'John Doe',
+                            'mediocre': 2.1,
+                            'bad': 'Option 2'
+                        },
+                        'description': 'An optional mapping parameter. The user can define key->value pairs representing choices/options that values/results are mapped to.',
+                        'examples': [
+                            {
+                                'bad': 'Option 2',
+                                'good': 'John Doe',
+                                'mediocre': 2.1
+                            }
+                        ],
+                        'title': 'Mapping Input'
+                    },
+                    'aoi': {
+                        'allOf': [
+                            {
+                                '$ref': '#/$defs/Feature_MultiPolygon_AoiProperties_'
+                            }
+                        ],
+                        'description': 'The geographic area of interest for this plugin\'s indicator computation.',
+                        'examples': [
+                            {
+                                'geometry': {
+                                    'coordinates': [
+                                        [
+                                            [
+                                                [
+                                                    12.3,
+                                                    48.22
+                                                ],
+                                                [
+                                                    12.3,
+                                                    48.34
+                                                ],
+                                                [
+                                                    12.48,
+                                                    48.34
+                                                ],
+                                                [
+                                                    12.48,
+                                                    48.22
+                                                ],
+                                                [
+                                                    12.3,
+                                                    48.22
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                    'type': 'MultiPolygon'
+                                },
+                                'properties': {
+                                    'name': 'Heidelberg',
+                                    'id': 'Q12345'
+                                },
+                                'type': 'Feature'
+                            }
+                        ],
+                        'title': 'Area of Interest'
+                    }
+                },
+                'required': [
+                    'bool_blueprint',
+                    'aoi'
                 ],
-                'methodology': '',
-                'plugin_id': 'plugin_blueprint',
-                'library_version': '5.1.0'
-            }
+                'title': 'ComputeInput',
+                'type': 'object'
+            },
+            'library_version': '5.1.0'
+        }
     }).as('getPluginBlueprint')
 }
 

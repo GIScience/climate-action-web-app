@@ -13,6 +13,6 @@ export class MapComponent implements AfterViewInit {
     constructor(private mapService: MapService) {}
 
     ngAfterViewInit(): void {
-        this.mapService.assembleMap()
+        this.mapService.initMap()
     }
 }

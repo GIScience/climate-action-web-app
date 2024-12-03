@@ -12,6 +12,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
 - Added Layer Switcher to map (now with HeiGIT Carto and Bing Aerial maps), with opacity slider for GeoTIFF/GeoJSON layers from artifacts
 - Search function to help with finding PoIs during compute, and locations within results ([#179](https://gitlab.heigit.org/climate-action/web-app/-/issues/179))
+- Compute for any region or locality in the world! Boundaries are now read from the Ohsome API server ([#78](https://gitlab.heigit.org/climate-action/web-app/-/issues/78))
 
 - Utilize `geojson-vt` library to render GeoJSON layers in a more performant way
 - Added visual regression testing with Cypress
