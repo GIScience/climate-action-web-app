@@ -1,4 +1,5 @@
 import {Component, Input, OnChanges, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core'
+import {CommonModule} from '@angular/common'
 import {NgIf} from '@angular/common'
 import {Router} from '@angular/router'
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
@@ -18,7 +19,9 @@ import {
 import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
 import {Subscription, fromEventPattern} from 'rxjs'
 import moment from 'moment/moment'
-import {LucideAngularModule, CirclePlay, MapPinPlusInside} from 'lucide-angular'
+import {LucideAngularModule, CirclePlay, MapPinPlusInside, TriangleAlert, CircleAlert} from 'lucide-angular'
+import {getArea} from 'ol/sphere'
+import Feature from 'ol/Feature'
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -29,7 +32,8 @@ import {LucideAngularModule, CirclePlay, MapPinPlusInside} from 'lucide-angular'
         FormsModule,
         ReactiveFormsModule,
         NgIf,
-        LucideAngularModule
+        LucideAngularModule,
+        CommonModule
     ],
     standalone: true,
     encapsulation: ViewEncapsulation.None
@@ -40,14 +44,19 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() plugin!: Plugin
 
     aoiAttribute: string | undefined = undefined
+    selectedRegions: {name: string; area: number; feature: Feature}[] = []
     selectOptions: SelectOptions = {}
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
     model: FormlyModel = {}
     options: FormlyFormOptions = {}
 
+    static readonly sqmToSqkmFactor = 1 / 1000000
+
     readonly CirclePlay = CirclePlay
     readonly MapPinPlusInside = MapPinPlusInside
+    readonly TriangleAlert = TriangleAlert
+    readonly CircleAlert = CircleAlert
 
     jsonSchema_polygon = 'MultiPolygon'
 
@@ -66,6 +75,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
                     this.highlightedFeaturesSubscription = highlightedFeaturesAddObservable.subscribe(() => {
                         this.toggleFormState()
+                        this.showSelectedAreaInfo()
                     })
     }
 
@@ -96,6 +106,28 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     ngOnDestroy() {
         if (this.highlightedFeaturesSubscription) {
             this.highlightedFeaturesSubscription.unsubscribe()
+        }
+    }
+
+    showSelectedAreaInfo(): void {
+        const selectedRegions = this.mapService.highlightedFeatures.getArray()
+        this.selectedRegions = selectedRegions.map(feature => {
+            const geometry = feature.getGeometry()
+            
+            return {
+                name: feature.get('name') || 'Unnamed Region',
+                area: geometry ? Number((getArea(geometry) * PluginParameterComponent.sqmToSqkmFactor).toFixed(2)) : 0,
+                feature: feature
+            }
+        })
+    }
+
+    deselectRegion(region: { name: string; area: number; feature: Feature }): void {
+        this.mapService.highlightedFeatures.remove(region.feature)
+        this.selectedRegions = this.selectedRegions.filter(r => r !== region)
+        
+        if (this.selectedRegions.length === 0) {
+            this.toggleFormState()
         }
     }
 

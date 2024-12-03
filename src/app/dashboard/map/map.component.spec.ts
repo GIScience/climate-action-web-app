@@ -8,7 +8,7 @@ describe('MapComponent', () => {
 	let mockMapService: jasmine.SpyObj<MapService>
 
 	beforeEach(async () => {
-		mockMapService = jasmine.createSpyObj<MapService>('MapService', ['assembleMap'])
+		mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
 		
 		await TestBed.configureTestingModule({
 			imports: [MapComponent],
