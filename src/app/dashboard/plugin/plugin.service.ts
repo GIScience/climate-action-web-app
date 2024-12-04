@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
-import {BehaviorSubject, Observable, Subject, throwError, of} from 'rxjs'
-import {catchError, retryWhen, delay, timeout, concatMap } from 'rxjs/operators'
+import {BehaviorSubject, Observable, of, Subject, throwError} from 'rxjs'
+import {catchError, concatMap, delay, retryWhen, timeout} from 'rxjs/operators'
 import {Plugin, PluginCorrelator, PluginRun, PluginState} from './plugin.interface'
 import {RunStatus} from '../common/status.types'
 import {ArtifactMetadata} from '../artifact/artifact.interface'
@@ -28,6 +28,10 @@ export class PluginService {
     private catalogToggleInput!: HTMLInputElement
 
     constructor(private http: HttpClient) {
+    }
+
+    getIconUrl(pluginId: string, pluginVersion: string): string {
+        return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon?plugin_version=${pluginVersion}`
     }
 
     getPlugins(): Observable<Plugin[]> {

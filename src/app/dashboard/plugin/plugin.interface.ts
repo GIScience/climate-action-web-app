@@ -9,10 +9,13 @@ export interface PluginAuthor {
     website: URL
 }
 
+export interface PluginAssets {
+    icon: string
+}
+
 export interface Plugin {
     plugin_id: string
     name: string
-    icon: string
     authors: Array<PluginAuthor>
     version: string
     concerns: Array<Concern>
@@ -22,6 +25,7 @@ export interface Plugin {
     operator_schema: JSONSchema7
     library_version: string
     attribution: string
+    assets: PluginAssets
 }
 
 export interface Concern {

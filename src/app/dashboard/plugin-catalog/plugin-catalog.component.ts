@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core'
-import {Router, NavigationEnd} from '@angular/router'
+import {NavigationEnd, Router} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
 import {ReportService} from '../report/report.service'
 import {CommonModule} from '@angular/common'
@@ -27,7 +27,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     constructor(
         private router: Router,
         private pluginService: PluginService,
-        private reportService: ReportService) {}
+        private reportService: ReportService) {
+    }
 
     ngAfterViewInit(): void {
         if (this.catalogToggle) {
@@ -79,7 +80,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                             enabled: true,
                             plugin_id: plugin.plugin_id,
                             name: plugin.name,
-                            icon: plugin.icon,
+                            icon: this.pluginService.getIconUrl(plugin.plugin_id, plugin.version),
                             library_version: plugin.library_version,
                             version: plugin.version,
                             purpose: plugin.purpose
