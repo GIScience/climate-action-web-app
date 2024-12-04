@@ -24,9 +24,19 @@
                     </div>
                 </div>
                 <div *ngFor="let computation of computations | filterByCriteria: pluginId" class="artifact-computation">
-                    <div class="artifact-parent-computation computation-{{ computation.isExpanded ? 'expanded' : 'collapsed' }} {{ newRuns.includes(computation.uuid) ? 'is-new' : '' }}" [ngClass]="{'not-expandable': computation.children.length === 0}" (click)="toggleComputation(computation)" (keyup.enter)="toggleComputation(computation)" tabindex="0">
+                    <div [ngClass]="{
+                        'artifact-parent-computation': true,
+                        'computation-expanded': computation.isExpanded,
+                        'computation-collapsed': !computation.isExpanded,
+                        'is-new': newRuns.includes(computation.uuid),
+                        'no-results': computation.status === 'no-results',
+                        'not-expandable': computation.children.length === 0
+                    }" (click)="toggleComputation(computation)" (keyup.enter)="toggleComputation(computation)" tabindex="0">
                         <div class="computation-arrow">
-                            <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
+                            <mat-icon *ngIf="computation.children.length > 0" aria-hidden="true" fontIcon="chevron_right"></mat-icon>
+                            <div *ngIf="computation.status === 'no-results'" class="no-results-alert">
+                                <i-lucide [img]="FileWarning" size="25" [strokeWidth]="1.5" color="#ff8c00"></i-lucide>
+                            </div>
                         </div>
                         <div class="card-header">
                             <h3>{{computation.aoiName}}</h3>
@@ -38,20 +48,25 @@
                         <div *ngIf="newRuns.includes(computation.uuid)" class="new-run-dot"></div>
                     </div>
                     <div [@expandCollapse]="computation.isExpanded ? 'expanded' : 'collapsed'" class="artifact-child-computations-wrapper" (@expandCollapse.done)="onAnimationEvent($event, computation)">
-                        <ul *ngIf="computation.isExpanded || computation.keepInDOM" class="artifact-child-computations">
-                            <ng-container *ngFor="let child of computation.children; let i = index">
-                                <li *ngIf="child.ref?.primary || computation.showSecondaryChildren" [@fadeIn]="computation.showSecondaryChildren || child.ref?.primary ? 'in' : null" class="artifact-child-computation" (click)="renderReport(child); storeActivatedRef(child)" (keyup.enter)="renderReport(child); storeActivatedRef(child)" [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary }" matTooltip="{{child.summary}}"matTooltipPosition="right" tabindex="0">
-                                    <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{child.icon}}"></mat-icon>
-                                    <div>{{child.name}}</div>
-                                </li>
-                            </ng-container>
-                        </ul>
-                        <button *ngIf="!computation.showSecondaryChildren && hasSecondaryChildren(computation)" class="show-more btn-alt btn-small" (click)="showMore(computation)" (keyup.enter)="showMore(computation)" @fadeIn tabindex="0">
-                            Show more...
-                        </button>
-                        <button *ngIf="computation.showSecondaryChildren && hasSecondaryChildren(computation)" class="show-less btn-alt btn-small" (click)="showLess(computation)" (keyup.enter)="showLess(computation)" @fadeIn tabindex="0">
-                            Show less...
-                        </button>
+                        <div *ngIf="computation.isExpanded || computation.keepInDOM">
+                            <ul *ngIf="computation.children.length > 0" class="artifact-child-computations">
+                                <ng-container *ngFor="let child of computation.children; let i = index">
+                                    <li *ngIf="child.ref?.primary || computation.showSecondaryChildren" [@fadeIn]="computation.showSecondaryChildren || child.ref?.primary ? 'in' : null" class="artifact-child-computation" (click)="renderReport(child); storeActivatedRef(child)" (keyup.enter)="renderReport(child); storeActivatedRef(child)" [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary }" matTooltip="{{child.summary}}"matTooltipPosition="right" tabindex="0">
+                                        <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{child.icon}}"></mat-icon>
+                                        <div>{{child.name}}</div>
+                                    </li>
+                                </ng-container>
+                            </ul>
+                            <button *ngIf="!computation.showSecondaryChildren && hasSecondaryChildren(computation)" class="show-more btn-alt btn-small" (click)="showMore(computation)" (keyup.enter)="showMore(computation)" @fadeIn tabindex="0">
+                                Show more...
+                            </button>
+                            <button *ngIf="computation.showSecondaryChildren && hasSecondaryChildren(computation)" class="show-less btn-alt btn-small" (click)="showLess(computation)" (keyup.enter)="showLess(computation)" @fadeIn tabindex="0">
+                                Show less...
+                            </button>
+                            <div *ngIf="computation.children.length === 0" class="no-results-message">
+                                This run created no results. If you think that is an error, please contact the plugin developers.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </ng-scrollbar>

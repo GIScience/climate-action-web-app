@@ -392,49 +392,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         })
     }
 
-    private checkForRequiredFields(model: FormlyModel): string[] {
-        const required = this.schema.required
-        if (!required) return []
-        let missingFields: string[] = required.filter(key => !Object.keys(model).includes(key))
-
-        missingFields = missingFields.map(key => {
-            if (this.schema.properties && key != this.aoiAttribute) {
-                const property = this.schema.properties[key]
-                if (property && typeof property != 'boolean') {
-                    if (property.title)
-                        return property.title
-                }
-            }
-            return key
-        })
-        return missingFields
-    }
-
-    private alertUserMissingFields(missingFields: string[]) {
-        let aoiBody = ''
-        if (this.aoiAttribute && missingFields.includes(this.aoiAttribute)) {
-            aoiBody = 'Don\'t forget to choose an area on the map.'
-            missingFields = missingFields.filter(e => e !== this.aoiAttribute)
-        }
-
-        const body: string[] = []
-        if (missingFields[0])
-            body.push(`Please enter values to the required fields "${missingFields.join(' and ')}"`)
-        if (aoiBody)
-            body.push(aoiBody)
-
-        this.snackBar.open(
-            body.join(' and '), 
-            'Dismiss',
-            {
-                duration: 7000,
-                verticalPosition: 'bottom',
-                horizontalPosition: 'center',
-                panelClass: ['warning-snackbar']
-            }
-        )
-    }
-
     parseDate(value: moment.Moment): string {
         if (moment.isMoment(value)) {
             return value.format('YYYY-MM-DD')

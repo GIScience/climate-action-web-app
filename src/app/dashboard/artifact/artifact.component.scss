@@ -143,15 +143,6 @@
       }
 
       &.not-expandable {
-        cursor: default;
-
-        &:active {
-          pointer-events: none;
-        }
-
-        & .computation-arrow {
-          visibility: hidden;
-        }
 
         button.archive-artifact {
           pointer-events: all;
@@ -242,6 +233,10 @@
       button.show-more,
       button.show-less {
         margin: 0 auto 10px;
+      }
+
+      .no-results-message {
+        margin: 10px 45px 20px;
       }
     }
   }
