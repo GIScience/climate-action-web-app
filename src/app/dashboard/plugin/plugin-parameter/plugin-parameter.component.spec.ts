@@ -128,7 +128,9 @@ describe('PluginParameterComponent', () => {
     it('should interpret operator schema', () => {
         component.plugin = {
             'name': 'testplugin',
-            'icon': '',
+            'assets': {
+                'icon': '...'
+            },
             'authors': [],
             'version': '0.0.1',
             'concerns': [],

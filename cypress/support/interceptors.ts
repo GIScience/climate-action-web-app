@@ -16,6 +16,8 @@ export const mockPluginsList = () => {
                             'website': 'https://example.com/'
                         }
                     ],
+                    'version': '0.0.1',
+                    'concerns': [],
                     'purpose': '',
                     'methodology': '',
                     'sources': [
@@ -30,6 +32,9 @@ export const mockPluginsList = () => {
                             'ID': 'smit54'
                         }
                     ],
+                    'assets': {
+                        'icon': 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
+                    },
                     'plugin_id': 'plugin_blueprint',
                     'library_version': '5.1.0'
                 }
@@ -54,7 +59,10 @@ export const mockPluginBlueprint = () => {
                     'website': 'https://example.com/'
                 }
             ],
+            'version': '0.0.1',
+            'concerns': [],
             'purpose': '',
+            'methodology': '',
             'sources': [
                 {
                     'pages': '14-15',
@@ -65,9 +73,11 @@ export const mockPluginBlueprint = () => {
                     'author': 'J. G. Smith and H. K. Weston',
                     'ENTRYTYPE': 'article',
                     'ID': 'smit54'
-                },
+                }
             ],
-            'methodology': '',
+            'assets': {
+                'icon': 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
+            },
             'plugin_id': 'plugin_blueprint',
             'operator_schema': {
                 '$defs': {
@@ -323,6 +333,12 @@ export const mockPluginBlueprint = () => {
             'library_version': '5.1.0'
         }
     }).as('getPluginBlueprint')
+}
+
+export const mockPluginIcon = () => {
+    cy.intercept('/api/v1/gateway/store/plugin_blueprint/icon?plugin_version=0.0.1', {
+        fixture: 'plugin_bp_icon.jpeg'
+    }).as('getPluginIcon')
 }
 
 export const mockGeoTiffComputation = () => {

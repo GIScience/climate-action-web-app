@@ -12,7 +12,9 @@ describe('PluginComponent', () => {
 
     const test_plugin = {
         name: 'Test 1',
-        icon: '...',
+        assets: {
+            icon: '...'
+        },
         version: '0.0.1',
         concerns: [
             {

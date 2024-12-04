@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, ViewChild, TemplateRef, ChangeDetectorRef} from '@angular/core'
+import {AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild} from '@angular/core'
 import {ActivatedRoute} from '@angular/router'
-import {Plugin, Source, PluginState} from './plugin.interface'
+import {Plugin, PluginState, Source} from './plugin.interface'
 import {PluginService} from './plugin.service'
 import {map, Observable, switchMap, tap} from 'rxjs'
 import {MatTooltipModule} from '@angular/material/tooltip'
@@ -9,7 +9,7 @@ import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.comp
 import {CommonModule} from '@angular/common'
 import {MarkdownModule} from 'ngx-markdown'
 import {NgScrollbarModule} from 'ngx-scrollbar'
-import {LucideAngularModule, RedoDot, CircleX} from 'lucide-angular'
+import {CircleX, LucideAngularModule, RedoDot} from 'lucide-angular'
 import {MatDialog} from '@angular/material/dialog'
 
 @Component({
@@ -34,7 +34,11 @@ export class PluginComponent implements AfterViewInit {
     readonly RedoDot = RedoDot
     readonly CircleX = CircleX
 
-    @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<{purpose: string, methodology: string, sources: Source[]}>
+    @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<{
+        purpose: string,
+        methodology: string,
+        sources: Source[]
+    }>
 
     constructor(
         private pluginService: PluginService,
@@ -82,7 +86,13 @@ export class PluginComponent implements AfterViewInit {
                     throw Error(`Plugin ${pluginName} does not exist`)
                 }
 
-                return this.pluginService.getPluginDetails(pluginName).pipe(tap(this.processSourceUrls))
+                let pluginDetails = this.pluginService.getPluginDetails(pluginName)
+                pluginDetails = pluginDetails.pipe(tap(this.processSourceUrls))
+                pluginDetails = pluginDetails.pipe(tap(plugin => {
+                    plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id, plugin.version)
+                    return plugin
+                }))
+                return pluginDetails
             })
         )
     }

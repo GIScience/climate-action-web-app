@@ -27,7 +27,6 @@ describe('PluginService', () => {
 
     const test_plugin = {
         name: 'Test 1',
-        icon: '...',
         version: '0.0.1',
         concerns: [
             {
@@ -61,7 +60,8 @@ describe('PluginService', () => {
         ],
         plugin_id: 'blueprint_plugin',
         operator_schema: {},
-        library_version: '2.6.4'
+        library_version: '2.6.4',
+        assets: {icon: '...'}
     } as Plugin
 
     const test_plugin_run = {
