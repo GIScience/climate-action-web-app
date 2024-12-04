@@ -1,5 +1,6 @@
 import {GeoJSONFeature} from 'ol/format/GeoJSON'
 import {MultiPolygon} from 'ol/geom'
+import {RunStatus} from '../common/status.types'
 
 export interface DiscreteLegendData {
     [key: string]: string
@@ -26,7 +27,7 @@ export interface AttachmentsObject {
 export interface ArtifactParams {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any
-    aoi: GeoJSONFeature
+    aoi?: GeoJSONFeature // Keeping this for now for backwards compatibility
 }
 
 export interface PluginInfo {
@@ -40,7 +41,8 @@ export interface ArtifactMetadata {
     params: ArtifactParams
     artifacts: Artifact[]
     plugin_info: PluginInfo
-    status: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input'
+    status: RunStatus
+    aoi?: GeoJSONFeature
 }
 
 export interface ArtifactComputation {
@@ -50,7 +52,7 @@ export interface ArtifactComputation {
     timestamp?: Date
     icon?: string
     summary?: string
-    status?: 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input'
+    status?: RunStatus
     ref?: Artifact
     isExpanded?: boolean
     keepInDOM?: boolean

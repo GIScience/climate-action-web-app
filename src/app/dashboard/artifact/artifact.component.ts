@@ -14,7 +14,7 @@ import {NgScrollbarModule} from 'ngx-scrollbar'
 import {ActivatedRoute} from '@angular/router'
 import {FilterByCriteriaPipe} from './artifact-filters.pipe'
 import moment from 'moment/moment'
-import {Archive, ArchiveRestore, CircleArrowLeft, Clock, Hash, LucideAngularModule} from 'lucide-angular'
+import {Archive, ArchiveRestore, CircleArrowLeft, Clock, FileWarning, Hash, LucideAngularModule} from 'lucide-angular'
 import {MatSnackBar} from '@angular/material/snack-bar'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
@@ -94,6 +94,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     readonly CircleArrowLeft = CircleArrowLeft
     readonly Clock = Clock
     readonly Hash = Hash
+    readonly FileWarning = FileWarning
 
     @Input() pluginId: string = ''
 
@@ -166,7 +167,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     fetchArtifacts() {
         this.currentRuns
-            .filter(currentRun => (currentRun.status === 'completed' || 'scheduled'))
+            .filter(currentRun => currentRun.status === 'completed' || currentRun.status === 'scheduled' || currentRun.status === 'no-results')
             .forEach(currentRun => {
                 this.syncArtifact(currentRun)
             })
@@ -182,7 +183,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         const archivedItems = localStorage.getItem('archive_runs')
         if (archivedItems) {
             this.archivedArtifacts = JSON.parse(archivedItems).filter((artifact: PluginRun) =>
-                (artifact.status === 'completed' || 'scheduled')
+                (artifact.status === 'completed' || 'scheduled' || 'no-results')
             )
         }
     }
@@ -226,15 +227,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             next: (response: ArtifactMetadata) => {
                 const artifacts = response.artifacts
                 if (!artifacts) return
-
                 const computation: ArtifactComputation = {
                     name: run.pluginName,
                     uuid: run.correlation_uuid,
                     children: [],
                     status: run.status || 'scheduled',
                     timestamp: new Date(run.timestamp),
-                    aoiName: response.params.aoi?.properties.name,
-                    geometry: response.params.aoi?.geometry,
+                    aoiName: response.aoi?.properties.name || response.params?.aoi?.properties.name,
+                    geometry: response.aoi?.geometry || response.params?.aoi?.geometry,
                     pluginId: response.plugin_info?.plugin_id
                 }
 
@@ -257,6 +257,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                         return 0
                     })
                     this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
+                } else if (artifacts.length === 0 && run.status !== 'no-results') {
+                    this.snackBar.open(
+                        'This run created no results. If you think that is an error, please contact the plugin developers.',
+                        'Close',
+                        {
+                            verticalPosition: 'bottom',
+                            horizontalPosition: 'center',
+                            panelClass: ['error-snackbar']
+                        }
+                    )
+                    this.pluginService.updateRunStatus(run.correlation_uuid, 'no-results')
                 }
                 this.updateComputation(run.correlation_uuid, computation)
             },
@@ -275,7 +286,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     updateComputation(correlation_uuid: string, computation: ArtifactComputation) {
-        if (computation.status === 'completed' || computation.status === 'scheduled') {
+        if (computation.status === 'completed' || computation.status === 'scheduled' || computation.status === 'no-results') {
             this.computations = this.computations.filter((x) => x.uuid != correlation_uuid)
             this.computations.push(computation)
             this.computations.sort((a, b) => {
