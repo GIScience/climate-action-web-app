@@ -31,9 +31,9 @@ export const availableCards = [
         icon: 'assets/images/plugin-icons/drinking-water.jpg',
         icon_credit: 'https://unsplash.com/@dantakesphotos'
     }, {
-        plugin_id: 'soil_consumption',
-        name: 'Soil Consumption',
-        icon: 'assets/images/plugin-icons/soil-consumption.jpg',
+        plugin_id: 'land_consumption',
+        name: 'Land Consumption',
+        icon: 'assets/images/plugin-icons/land-consumption.jpg',
         icon_credit: 'https://unsplash.com/@synkevych'
     },{
         plugin_id: 'walkability',

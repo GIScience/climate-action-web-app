@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/1.3.0...main)
 
+### Fix
+
+- Rename default soil consumption to land consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
+
 ### Added
 
 - Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))

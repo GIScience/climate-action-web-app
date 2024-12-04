@@ -15,7 +15,7 @@ https://images.unsplash.com/photo-1561840884-9dda41ed54e4
 * Drinking Water:
 https://images.unsplash.com/photo-1592103634714-c738838b03c1
 
-* Soil Consumption:
+* Land Consumption:
 https://images.unsplash.com/photo-1557234195-bd9f290f0e4d
 
 * Walkability:
