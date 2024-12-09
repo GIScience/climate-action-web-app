@@ -366,6 +366,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
             next: (data) => {
                 this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, aoiName)
+                this.pluginService.triggerSyncTasks()
+                this.pluginService.setPluginState('inactive')
     
                 this.snackBar.open(
                     'Compute request sent, results will be displayed soon.', 

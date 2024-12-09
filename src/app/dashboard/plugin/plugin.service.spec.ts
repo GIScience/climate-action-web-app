@@ -156,7 +156,7 @@ describe('PluginService', () => {
     it('should get computes', () => {
         expect(localStorage.getItem('plugin_runs')).toBe(null)
         localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run, test_plugin_run]))
-        expect(service.getComputes()).toHaveSize(2)
+        expect(service.getComputesFromLS()).toHaveSize(2)
     })
 
     it('should store computes', () => {
@@ -172,7 +172,7 @@ describe('PluginService', () => {
 
     it('should refresh compute', () => {
         expect(localStorage.getItem('plugin_runs')).toBe(null)
-        service.refreshCompute([test_plugin_run] as PluginRun[])
+        service.refreshComputesInLS([test_plugin_run] as PluginRun[])
 
         const item = localStorage.getItem('plugin_runs')
         if (item) {
@@ -191,11 +191,11 @@ describe('PluginService', () => {
             fail()
         }
 
-        service.updateRunStatus('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'in-progress')
+        service.updateRunStatus('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
 
         item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('in-progress')
+            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
         } else {
             fail()
         }
@@ -210,7 +210,7 @@ describe('PluginService', () => {
             fail()
         }
 
-        service.updateRunStatus('2fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'in-progress')
+        service.updateRunStatus('2fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
 
         item = localStorage.getItem('plugin_runs')
         if (item) {

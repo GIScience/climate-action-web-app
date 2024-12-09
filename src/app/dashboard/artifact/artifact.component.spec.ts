@@ -6,12 +6,10 @@ import {ActivatedRoute, convertToParamMap} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
 import {MapService} from '../map/map.service'
 import {ReportService} from '../report/report.service'
-import {NotificationService} from '../../notification/notification.service'
-import {BehaviorSubject, of, Subject} from 'rxjs'
+import {BehaviorSubject, of} from 'rxjs'
 import {PluginRun} from '../plugin/plugin.interface'
 import {ArtifactMetadata} from './artifact.interface'
 import {By} from '@angular/platform-browser'
-import {WSMessage} from '../../notification/notification.interface'
 import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
 
 describe('ArtifactComponent', () => {
@@ -20,19 +18,26 @@ describe('ArtifactComponent', () => {
 
     let mockPluginService: jasmine.SpyObj<PluginService>
     let mockReportService: jasmine.SpyObj<ReportService>
-    let mockNotificationService: jasmine.SpyObj<NotificationService>
     let mockMapService: jasmine.SpyObj<MapService>
-
-    let notifications: Subject<WSMessage>
 
     let pluginRuns$: BehaviorSubject<PluginRun[]>
 
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<PluginRun[]>([])
 
-        mockPluginService = jasmine.createSpyObj<PluginService>('PluginService', ['getComputes', 'updateRunStatus', 'getArtifactsMetadata', 'getScheduledRuns', 'getPluginRuns', 'closePluginCatalog', 'setPluginState'])
+        mockPluginService = jasmine.createSpyObj<PluginService>('PluginService', [
+            'getComputesFromLS', 
+            'updateRunStatus', 
+            'getArtifactsMetadata', 
+            'getScheduledRuns', 
+            'getPluginRuns', 
+            'closePluginCatalog', 
+            'setPluginState'
+        ], {
+            syncTasks$: new BehaviorSubject<void>(undefined)
+        })
+
         mockReportService = jasmine.createSpyObj<ReportService>('ReportService', ['getImage', 'closeReport'])
-        mockNotificationService = jasmine.createSpyObj<NotificationService>('NotificationService', ['startWebSocket'])
         mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
 
         await TestBed.configureTestingModule({
@@ -44,7 +49,6 @@ describe('ArtifactComponent', () => {
             providers: [
                 {provide: PluginService, useValue: mockPluginService},
                 {provide: ReportService, useValue: mockReportService},
-                {provide: NotificationService, useValue: mockNotificationService},
                 {provide: MapService, useValue: mockMapService},
                 {provide: ActivatedRoute,
                     useValue: {
@@ -67,37 +71,40 @@ describe('ArtifactComponent', () => {
     })
 
     beforeEach(fakeAsync(() => {
-        notifications = new Subject<WSMessage>()
-        mockNotificationService.startWebSocket.and.returnValue(notifications.asObservable())
-
-        mockPluginService.getComputes.and.returnValue([])
+        mockPluginService.getComputesFromLS.and.returnValue([])
         mockPluginService.getScheduledRuns.and.returnValue([])
 
         fixture = TestBed.createComponent(ArtifactComponent)
         component = fixture.componentInstance
 
         fixture.detectChanges()
+        tick()
+        discardPeriodicTasks()
     }))
 
-    afterEach(() => {
+    afterEach(fakeAsync(() => {
         expect(fixture.debugElement.queryAll(By.css('.artifact-tree-content')).length).toBe(1)
-    })
+        tick()
+        discardPeriodicTasks()
+    }))
 
-    it('given no runs should create an empty artifact tree view', () => {
+    it('given no runs should create an empty artifact tree view', fakeAsync(() => {
         expect(component).toBeTruthy()
         expect(mockPluginService.updateRunStatus).not.toHaveBeenCalled()
 
         expect(fixture.debugElement.queryAll(By.css('.artifact-parent-computation')).length).toBe(0)
         expect(fixture.debugElement.queryAll(By.css('.artifact-child-computation')).length).toBe(0)
-    })
 
-    it('given a scheduled run when no artifacts are available should create a non-expandable computation', () => {
+        discardPeriodicTasks()
+    }))
+
+    it('given a scheduled run when no artifacts are available should create a non-expandable computation', fakeAsync(() => {
         mockPluginService.getScheduledRuns.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'scheduled',
+                'status': 'PENDING',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])
@@ -106,18 +113,21 @@ describe('ArtifactComponent', () => {
 
         component.ngOnInit()
         fixture.detectChanges()
+        tick()
 
         const parentNode = fixture.debugElement.query(By.css('.scheduled-parent-computation'))
         expect(parentNode).toBeTruthy()
-    })
+        
+        discardPeriodicTasks()
+    }))
 
-    it('given a completed run should create an expandable tree', () => {
-        mockPluginService.getComputes.and.returnValue([
+    it('given a completed run should create an expandable tree', fakeAsync(() => {
+        mockPluginService.getComputesFromLS.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'completed',
+                'status': 'SUCCESS',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])
@@ -145,24 +155,29 @@ describe('ArtifactComponent', () => {
 
         component.ngOnInit()
         fixture.detectChanges()
+        tick()
 
         const parentComputation = fixture.debugElement.query(By.css('.artifact-parent-computation'))
         expect(parentComputation).toBeTruthy()
         parentComputation.triggerEventHandler('click', null)
         fixture.detectChanges()
+        tick()
 
         const childComputations = fixture.debugElement.queryAll(By.css('.artifact-child-computation'))
         expect(childComputations.length).toBe(1)
 
-        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'completed')
-    })
+        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'SUCCESS')
 
-    it('should archive an artifact and update the list', () => {
+        tick(2000)
+        discardPeriodicTasks()
+    }))
+
+    it('should archive an artifact and update the list', fakeAsync(() => {
         const initialRun = {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
-            status: 'completed',
+            status: 'SUCCESS',
             timestamp: new Date('2023-09-27T16:42:52+01:00')
         } as PluginRun
     
@@ -179,14 +194,16 @@ describe('ArtifactComponent', () => {
         expect(component.currentRuns.length).toBe(0)
         expect(archivedItems.length).toBe(1)
         expect(activeItems.length).toBe(0)
-    })
+
+        discardPeriodicTasks()
+    }))
     
-    it('should unarchive an artifact and update the list', () => {
+    it('should unarchive an artifact and update the list', fakeAsync(() => {
         const archivedRun = {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
-            status: 'completed',
+            status: 'SUCCESS',
             timestamp: new Date('2023-09-27T16:42:52+01:00')
         } as PluginRun
     
@@ -204,15 +221,17 @@ describe('ArtifactComponent', () => {
         expect(component.currentRuns.length).toBe(1)
         expect(archivedItems.length).toBe(0)
         expect(activeItems.length).toBe(1)
-    })
 
-    it('should render content for non-expandable computations correctly', () => {
+        discardPeriodicTasks()
+    }))
+
+    it('should render content for non-expandable computations correctly', fakeAsync(() => {
         mockPluginService.getScheduledRuns.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'scheduled',
+                'status': 'SUCCESS',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])
@@ -226,15 +245,17 @@ describe('ArtifactComponent', () => {
         expect(parentNode).toBeTruthy()
         const metaElements = fixture.debugElement.queryAll(By.css('.card-subtitle.m-0'))
         expect(metaElements).toBeTruthy()
-    })
+
+        discardPeriodicTasks()
+    }))
 
     it('should display only primary children initially', fakeAsync(() => {
-        mockPluginService.getComputes.and.returnValue([
+        mockPluginService.getComputesFromLS.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'completed',
+                'status': 'SUCCESS',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])
@@ -287,12 +308,12 @@ describe('ArtifactComponent', () => {
     }))
     
     it('should display non-primary children when Show More is clicked', fakeAsync(() => {
-        mockPluginService.getComputes.and.returnValue([
+        mockPluginService.getComputesFromLS.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'completed',
+                'status': 'SUCCESS',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])
@@ -353,12 +374,12 @@ describe('ArtifactComponent', () => {
     }))
 
     it('should hide non-primary children when Show Less is clicked', fakeAsync(() => {
-        mockPluginService.getComputes.and.returnValue([
+        mockPluginService.getComputesFromLS.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
                 'pluginName': 'Test Plugin',
-                'status': 'completed',
+                'status': 'SUCCESS',
                 'timestamp': new Date('2023-09-27T16:42:52+01:00')
             }
         ] as PluginRun[])

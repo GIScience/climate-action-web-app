@@ -6,15 +6,14 @@ import {ReportService} from '../report/report.service'
 import {MapService} from '../map/map.service'
 import {PluginRun} from '../plugin/plugin.interface'
 import {MatIconModule} from '@angular/material/icon'
-import {BehaviorSubject, Subscription} from 'rxjs'
+import {BehaviorSubject, Subscription, timer} from 'rxjs'
 import {CommonModule, NgClass, NgIf} from '@angular/common'
 import {TippyDirective} from '@ngneat/helipopper'
-import {NotificationService} from '../../notification/notification.service'
 import {NgScrollbarModule} from 'ngx-scrollbar'
 import {ActivatedRoute} from '@angular/router'
 import {FilterByCriteriaPipe} from './artifact-filters.pipe'
 import moment from 'moment/moment'
-import {Archive, ArchiveRestore, CircleArrowLeft, Clock, FileWarning, Hash, LucideAngularModule} from 'lucide-angular'
+import {Archive, ArchiveRestore, CircleArrowLeft, Clock, Hash, LucideAngularModule} from 'lucide-angular'
 import {MatSnackBar} from '@angular/material/snack-bar'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
@@ -83,7 +82,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     scheduledRuns: PluginRun[] = []
     activeComputation?: ArtifactComputation
     activeChildComputation?: ArtifactComputation
-    sync?: Subscription
     archivedArtifacts: PluginRun[] = []
     showArchived = false
     newRuns: string[] = []
@@ -94,15 +92,16 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     readonly CircleArrowLeft = CircleArrowLeft
     readonly Clock = Clock
     readonly Hash = Hash
-    readonly FileWarning = FileWarning
 
     @Input() pluginId: string = ''
 
     scheduledRunsSubscription: Subscription = new Subscription()
+    private syncSubscription?: Subscription
+    private readonly INITIAL_INTERVAL = 2500
+    private readonly MAX_INTERVAL = 1800000
 
     constructor(private pluginService: PluginService,
                 public reportService: ReportService,
-                private notificationService: NotificationService,
                 private mapService: MapService,
                 private route: ActivatedRoute,
                 private snackBar: MatSnackBar) {
@@ -132,8 +131,9 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             const pluginId = params['name']
             this.pluginId = pluginId
 
-            this.currentRuns = this.pluginService.getComputes()
+            this.currentRuns = this.pluginService.getComputesFromLS()
             this.fetchArchivedArtifacts()
+            this.startPeriodicSync()
 
             this.dataChange.subscribe(data => {
                 if (data.length > 0) {
@@ -142,8 +142,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                 }
             })
 
-            this.fetchArtifacts()
-            this.sync = this.syncRuns()
+            this.initializeSuccessfulRuns()
 
             if (this.reportService.closeReportEvent) {
                 this.reportService.closeReportEvent.subscribe(() => this.closeReportEvent())
@@ -152,7 +151,13 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
         this.scheduledRuns = this.pluginService.getScheduledRuns()
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
+            this.currentRuns = this.pluginService.getComputesFromLS()
             this.scheduledRuns = this.pluginService.getScheduledRuns()
+        })
+
+        this.pluginService.syncTasks$.subscribe(() => {
+            this.currentRuns = this.pluginService.getComputesFromLS()
+            this.startPeriodicSync()
         })
     }
 
@@ -161,15 +166,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.sync) this.sync.unsubscribe()
         if (this.scheduledRunsSubscription) this.scheduledRunsSubscription.unsubscribe()
+        if (this.syncSubscription) {
+            this.syncSubscription.unsubscribe()
+        }
     }
 
-    fetchArtifacts() {
+    initializeSuccessfulRuns() {
         this.currentRuns
-            .filter(currentRun => currentRun.status === 'completed' || currentRun.status === 'scheduled' || currentRun.status === 'no-results')
+            .filter(currentRun => currentRun.status === 'SUCCESS')
             .forEach(currentRun => {
-                this.syncArtifact(currentRun)
+                this.fetchAndProcessArtifacts(currentRun)
             })
 
         if (this.currentRuns.filter(run => run.pluginId === this.pluginId).length === 0) {
@@ -183,46 +190,45 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         const archivedItems = localStorage.getItem('archive_runs')
         if (archivedItems) {
             this.archivedArtifacts = JSON.parse(archivedItems).filter((artifact: PluginRun) =>
-                (artifact.status === 'completed' || 'scheduled' || 'no-results')
+                (artifact.status === 'PENDING' || artifact.status === 'STARTED' || artifact.status === 'SUCCESS')
             )
         }
     }
 
     syncRuns() {
-        return this.notificationService.startWebSocket().subscribe({
-            next: (message) => {
-                switch (message.type) {
-                    case undefined:
-                    case 'computation_status': {
-                        this.currentRuns = this.pluginService.getComputes()
-                        const run = this.currentRuns.find(x => x.correlation_uuid === message.correlation_uuid)
-                        if (run && message.status) {
-                            run.status = message.status
-                            if (message.status === 'completed') {
-                                this.newRuns.push(run.correlation_uuid)
-                                this.updateNewRunsStorage()
-                            } else if (message.status === 'wrong-input' || message.status === 'failed') {
-                                this.snackBar.open(
-                                    message.message || 'Error while computing plugin, please try again.',
-                                    'Close',
-                                    {
-                                        verticalPosition: 'bottom',
-                                        horizontalPosition: 'center',
-                                        panelClass: ['error-snackbar']
-                                    }
-                                )
+        this.currentRuns
+        .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
+        .forEach(run => {
+            this.pluginService.getComputationState(run.correlation_uuid).subscribe({
+                next: (status) => {
+                    if (status === 'SUCCESS') {
+                            this.newRuns.push(run.correlation_uuid)
+                            this.updateNewRunsStorage()
+                            this.fetchAndProcessArtifacts(run)
+                            if (this.syncSubscription) {
+                                this.syncSubscription.unsubscribe()
                             }
-                            this.syncArtifact(run)
+                        } else if (status === 'FAILURE') {
+                            this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
+                            this.snackBar.open(
+                                'Error while computing plugin, please try again.',
+                                'Close',
+                                {
+                                    verticalPosition: 'bottom',
+                                    horizontalPosition: 'center',
+                                    panelClass: ['error-snackbar']
+                                }
+                            )
                         }
+                    },
+                    error: (error) => {
+                        console.error('Error checking state for run:', run.correlation_uuid, error)
                     }
-                }
-            },
-            error: (error) => console.error('WebSocket error:', error),
-            complete: () => console.debug('WebSocket connection closed')
-        })
+                })
+            })
     }
 
-    syncArtifact(run: PluginRun) {
+    fetchAndProcessArtifacts(run: PluginRun) {
         this.pluginService.getArtifactsMetadata(run.correlation_uuid).subscribe({
             next: (response: ArtifactMetadata) => {
                 const artifacts = response.artifacts
@@ -231,7 +237,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                     name: run.pluginName,
                     uuid: run.correlation_uuid,
                     children: [],
-                    status: run.status || 'scheduled',
+                    status: run.status || 'PENDING',
                     timestamp: new Date(run.timestamp),
                     aoiName: response.aoi?.properties.name || response.params?.aoi?.properties.name,
                     geometry: response.aoi?.geometry || response.params?.aoi?.geometry,
@@ -256,37 +262,18 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                         }
                         return 0
                     })
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'completed')
-                } else if (artifacts.length === 0 && run.status !== 'no-results') {
-                    this.snackBar.open(
-                        'This run created no results. If you think that is an error, please contact the plugin developers.',
-                        'Close',
-                        {
-                            verticalPosition: 'bottom',
-                            horizontalPosition: 'center',
-                            panelClass: ['error-snackbar']
-                        }
-                    )
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'no-results')
+                    this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
                 }
                 this.updateComputation(run.correlation_uuid, computation)
             },
             error: () => {
-                const computation: ArtifactComputation = {
-                    name: run.pluginName,
-                    uuid: run.correlation_uuid,
-                    children: [],
-                    status: 'failed',
-                    timestamp: run.timestamp
-                }
-                this.updateComputation(run.correlation_uuid, computation)
-                this.pluginService.updateRunStatus(run.correlation_uuid, 'failed')
+                console.error('Error fetching artifacts for:', run.correlation_uuid)
             }
         })
     }
 
     updateComputation(correlation_uuid: string, computation: ArtifactComputation) {
-        if (computation.status === 'completed' || computation.status === 'scheduled' || computation.status === 'no-results') {
+        if (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS') {
             this.computations = this.computations.filter((x) => x.uuid != correlation_uuid)
             this.computations.push(computation)
             this.computations.sort((a, b) => {
@@ -465,7 +452,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             this.currentRuns.push(artifactToUnarchive)
             this.updateLocalStorage()
 
-            this.syncArtifact(artifactToUnarchive)
+            this.fetchAndProcessArtifacts(artifactToUnarchive)
         } else {
             console.error('Artifact to unarchive not found in archivedArtifacts')
         }
@@ -485,5 +472,28 @@ export class ArtifactComponent implements OnInit, OnDestroy {
 
     hasSecondaryChildren(computation: ArtifactComputation): boolean {
         return computation.children.some(child => !child.ref?.primary)
+    }
+
+    private startPeriodicSync() {
+        let retryCount = 0
+        
+        const checkAndScheduleNext = () => {
+            const hasPendingRuns = this.currentRuns.some(
+                run => run.status === 'PENDING' || run.status === 'STARTED'
+            )
+            const nextInterval = Math.min(
+                this.INITIAL_INTERVAL * Math.pow(2, retryCount),
+                this.MAX_INTERVAL
+            )
+
+            if (hasPendingRuns) {
+                this.syncRuns()
+                retryCount++
+                this.syncSubscription = timer(nextInterval)
+                    .subscribe(() => checkAndScheduleNext())
+            }
+        }
+
+        checkAndScheduleNext()
     }
 }
