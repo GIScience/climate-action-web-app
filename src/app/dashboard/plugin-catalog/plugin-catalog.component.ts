@@ -35,7 +35,6 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
             this.pluginService.setCatalogToggleInput(this.catalogToggle.nativeElement)
             this.loadPlugins()
         }
-        this.loadPlugins()
     }
 
     ngOnInit(): void {
@@ -69,22 +68,22 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
                 data.forEach((plugin) => {
-                    const card = this.cards.find((x) => x.plugin_id === plugin.plugin_id)
-                    if (card) {
-                        card.enabled = true
-                        card.library_version = plugin.library_version
-                        card.version = plugin.version
-                        card.purpose = plugin.purpose
+
+                    const pluginCard = {
+                        enabled: true,
+                        plugin_id: plugin.plugin_id,
+                        name: plugin.name,
+                        icon: this.pluginService.getIconUrl(plugin.plugin_id, plugin.version),
+                        library_version: plugin.library_version,
+                        version: plugin.version,
+                        purpose: plugin.purpose
+                    } as PluginCard
+
+                    const existingCard = this.cards.find((x) => x.plugin_id === plugin.plugin_id)
+                    if (existingCard) {
+                        Object.assign(existingCard, pluginCard)
                     } else {
-                        this.cards.push({
-                            enabled: true,
-                            plugin_id: plugin.plugin_id,
-                            name: plugin.name,
-                            icon: this.pluginService.getIconUrl(plugin.plugin_id, plugin.version),
-                            library_version: plugin.library_version,
-                            version: plugin.version,
-                            purpose: plugin.purpose
-                        })
+                        this.cards.push(pluginCard)
                     }
                 })
                 this.sortCards()

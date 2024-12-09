@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fix
 
 - Rename default soil consumption to land consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
+- Always override the default icons in the plugin catalog ([#64](https://gitlab.heigit.org/climate-action/web-app/-/issues/64))
 
 ### Added
 
