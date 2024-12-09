@@ -12,7 +12,7 @@
                 class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
                 (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
                 [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="{{i}}"
-                matTooltip="{{card.purpose}}" matTooltipPosition="right">
+                [tp]="tpl" tpPlacement="right">
                 <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
                 <div class="plugin-card__text">
                     <h3>{{ card.name }}</h3>
@@ -20,6 +20,10 @@
                         }}</span>
                     <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
                 </div>
+                <ng-template #tpl>
+                    <strong>{{card.name}}</strong>
+                    <p *ngIf="card.purpose">{{card.purpose}}</p>
+                </ng-template>
             </li>
         </ul>
     </div>

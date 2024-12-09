@@ -4,8 +4,8 @@ import {PluginService} from '../plugin/plugin.service'
 import {ReportService} from '../report/report.service'
 import {CommonModule} from '@angular/common'
 import {MatIconModule} from '@angular/material/icon'
-import {MatTooltipModule} from '@angular/material/tooltip'
 import {availableCards, PluginCard} from './plugins.interface'
+import {TippyDirective} from '@ngneat/helipopper'
 
 @Component({
     selector: 'app-plugin-catalog',
@@ -14,7 +14,7 @@ import {availableCards, PluginCard} from './plugins.interface'
     imports: [
         CommonModule,
         MatIconModule,
-        MatTooltipModule
+        TippyDirective
     ],
     standalone: true
 })

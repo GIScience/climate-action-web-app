@@ -11,7 +11,7 @@ import {ChartComponent} from './chart/chart.component'
 import {MatGridListModule} from '@angular/material/grid-list'
 import {Artifact} from '../artifact/artifact.interface'
 import {MatExpansionModule} from '@angular/material/expansion'
-import {MatTooltipModule} from '@angular/material/tooltip'
+import {TippyDirective} from '@ngneat/helipopper'
 import {NgScrollbarModule} from 'ngx-scrollbar'
 import {CdkDrag, CdkDragHandle} from '@angular/cdk/drag-drop'
 import {LucideAngularModule, GripHorizontal, Maximize2, Minimize2, X, Download} from 'lucide-angular'
@@ -24,7 +24,7 @@ import {LucideAngularModule, GripHorizontal, Maximize2, Minimize2, X, Download} 
         MatGridListModule,
         CommonModule,
         MatExpansionModule,
-        MatTooltipModule,
+        TippyDirective,
         NgScrollbarModule,
         MarkdownComponent,
         CdkDrag,

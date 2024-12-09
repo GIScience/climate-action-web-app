@@ -34,6 +34,7 @@
     "@angular/platform-browser": "^17.3.11",
     "@angular/platform-browser-dynamic": "^17.3.11",
     "@angular/router": "^17.3.11",
+    "@ngneat/helipopper": "^10.1.0-alpha.0",
     "@ngx-formly/core": "^6.2.1",
     "@ngx-formly/material": "^6.0.0",
     "@types/ol": "^7.0.0",

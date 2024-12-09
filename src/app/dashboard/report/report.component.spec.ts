@@ -6,6 +6,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import {By} from '@angular/platform-browser'
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core'
 import {MarkdownComponent} from './markdown/markdown.component'
+import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
 
 describe('ReportComponent', () => {
     let component: ReportComponent
@@ -19,7 +20,17 @@ describe('ReportComponent', () => {
                 BrowserAnimationsModule,
                 MarkdownComponent
             ],
-            providers: [ReportService],
+            providers: [
+                ReportService,
+                provideTippyLoader(() => import('tippy.js')),
+                provideTippyConfig({
+                    defaultVariation: 'tooltip',
+                    variations: {
+                        tooltip: tooltipVariation,
+                        popper: popperVariation
+                    }
+                })
+            ],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             declarations: []
         })

@@ -3,6 +3,9 @@
 
 @import 'ol/ol.css';
 
+@import 'tippy.js/dist/tippy.css';
+@import 'tippy.js/themes/material.css';
+
 html,
 body {
   height: 100%;
@@ -16,4 +19,14 @@ body {
 
 .markdown table {
   @extend .table !optional;
+}
+
+.tippy-content {
+  font-size: 13px;
+
+  p {
+    line-height: 1.5;
+    font-weight: 400;
+    margin-bottom: 0;
+  }
 }

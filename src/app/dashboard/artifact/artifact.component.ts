@@ -8,7 +8,7 @@ import {PluginRun} from '../plugin/plugin.interface'
 import {MatIconModule} from '@angular/material/icon'
 import {BehaviorSubject, Subscription} from 'rxjs'
 import {CommonModule, NgClass, NgIf} from '@angular/common'
-import {MatTooltipModule} from '@angular/material/tooltip'
+import {TippyDirective} from '@ngneat/helipopper'
 import {NotificationService} from '../../notification/notification.service'
 import {NgScrollbarModule} from 'ngx-scrollbar'
 import {ActivatedRoute} from '@angular/router'
@@ -41,7 +41,7 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     styleUrls: ['./artifact.component.scss'],
     imports: [
         MatIconModule,
-        MatTooltipModule,
+        TippyDirective,
         NgIf,
         NgClass,
         CommonModule,
