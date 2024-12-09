@@ -9,20 +9,26 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fix
 
-- Rename default soil consumption to land consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
+- Rename default soil consumption to land
+  consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
 - Always override the default icons in the plugin catalog ([#64](https://gitlab.heigit.org/climate-action/web-app/-/issues/64))
+- Utilises new 'computation/state' endpoint to check computation state, to fix scheduled runs disappearing
+  randomly ([#238](https://gitlab.heigit.org/climate-action/web-app/-/issues/238))
 
 ### Added
 
-- Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
-- Added Layer Switcher to map (now with HeiGIT Carto and Bing Aerial maps), with opacity slider for GeoTIFF/GeoJSON layers from artifacts
-- Search function to help with finding PoIs during compute, and locations within results ([#179](https://gitlab.heigit.org/climate-action/web-app/-/issues/179))
-- Compute for any region or locality in the world! Boundaries are now read from the Ohsome API server ([#78](https://gitlab.heigit.org/climate-action/web-app/-/issues/78))
+- Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available
+  ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
+- Added Layer Switcher to map (now with HeiGIT Carto and Bing Aerial maps), with opacity slider for GeoTIFF/GeoJSON
+  layers from artifacts
+- Search function to help with finding PoIs during compute, and locations within
+  results ([#179](https://gitlab.heigit.org/climate-action/web-app/-/issues/179))
+- Compute for any region or locality in the world! Boundaries are now read from the Ohsome API
+  server ([#78](https://gitlab.heigit.org/climate-action/web-app/-/issues/78))
 
 - Utilize `geojson-vt` library to render GeoJSON layers in a more performant way
 - Added visual regression testing with Cypress
 - Adapted compute request to the new Celery backend
-- Computations can now handle no results, and display an appropriate message
 - Icons are now fetched from a dedicated endpoint
 - In plugin catalog, add plugin name to hover info
 
@@ -35,8 +41,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Reorganized the structure of the components to match what's shown in the frontend
 - Computations of only the currently selected plugin is now shown
 - AoI is now shown in the list of Artifacts ([#109](https://gitlab.heigit.org/climate-action/web-app/-/issues/109))
-- User is now informed about the reason behind a failed run ([133](https://gitlab.heigit.org/climate-action/web-app/-/issues/133))
-- Clicking on vector geodata (GeoJSON results) now opens a tooltip with info ([#154](https://gitlab.heigit.org/climate-action/web-app/-/issues/154))
+- User is now informed about the reason behind a failed
+  run ([133](https://gitlab.heigit.org/climate-action/web-app/-/issues/133))
+- Clicking on vector geodata (GeoJSON results) now opens a tooltip with
+  info ([#154](https://gitlab.heigit.org/climate-action/web-app/-/issues/154))
 
 - Updated Angular (and associated libraries) to v17
 - Leverage new Artifact Metadata endpoint ([#105](https://gitlab.heigit.org/climate-action/web-app/-/issues/105))
@@ -54,7 +62,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - New Landing Page ([#170](https://gitlab.heigit.org/climate-action/web-app/-/issues/170))
 - Many new ROIs to select from ([#22](https://gitlab.heigit.org/climate-action/web-app/-/issues/22))
-- Fog of War layer on the map to focus the content on the currently selected area of interest ([#158](https://gitlab.heigit.org/climate-action/web-app/-/issues/158))
+- Fog of War layer on the map to focus the content on the currently selected area of
+  interest ([#158](https://gitlab.heigit.org/climate-action/web-app/-/issues/158))
 
 ## [1.2.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/1.2.0) - 2024-06-20
 
@@ -64,11 +73,13 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
-- Automatically title-case labels in legends and charts ([#124](https://gitlab.heigit.org/climate-action/web-app/-/issues/124))
+- Automatically title-case labels in legends and
+  charts ([#124](https://gitlab.heigit.org/climate-action/web-app/-/issues/124))
 
 ### Added
 
-- HeiGIT Logo and other formalities required for public access ([#126](https://gitlab.heigit.org/climate-action/web-app/-/issues/126))
+- HeiGIT Logo and other formalities required for public
+  access ([#126](https://gitlab.heigit.org/climate-action/web-app/-/issues/126))
 - Introduced Cypress, an E2E testing framework
 
 ## [1.1.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/1.1.1) - 2024-06-17

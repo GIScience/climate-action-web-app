@@ -52,7 +52,7 @@ describe('mapService', () => {
                 pluginId: 'plugin_blueprint',
                 pluginName: 'Plugin Blueprint',
                 timestamp: '2024-08-07T12:43:08.373768',
-                status: 'completed'
+                status: 'SUCCESS'
             }]))
         })
 
@@ -125,7 +125,7 @@ describe('mapService', () => {
                 pluginId: 'plugin_blueprint',
                 pluginName: 'Plugin Blueprint',
                 timestamp: '2024-08-07T12:43:08.373768',
-                status: 'completed'
+                status: 'SUCCESS'
             }]))
         })
 
@@ -160,7 +160,7 @@ describe('mapService', () => {
                 pluginId: 'plugin_blueprint',
                 pluginName: 'Plugin Blueprint',
                 timestamp: '2024-08-07T12:43:08.373768',
-                status: 'completed'
+                status: 'SUCCESS'
             }]))
         })
 

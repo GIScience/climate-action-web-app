@@ -20,10 +20,12 @@ export class PluginService {
     private pluginStateSubject = new BehaviorSubject<PluginState>('inactive')
     private resetZoomSubject = new Subject<void>()
     private collapseComputationsSubject = new Subject<void>()
+    private syncTasksSubject = new Subject<void>()
 
     public pluginState$ = this.pluginStateSubject.asObservable()
     public resetZoom$ = this.resetZoomSubject.asObservable()
     public collapseComputations$ = this.collapseComputationsSubject.asObservable()
+    public syncTasks$ = this.syncTasksSubject.asObservable()
 
     private catalogToggleInput!: HTMLInputElement
 
@@ -44,6 +46,10 @@ export class PluginService {
 
     computePlugin(pluginId: string, params: object): Observable<PluginCorrelator> {
         return this.http.post<PluginCorrelator>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
+    }
+
+    getComputationState(id: string): Observable<RunStatus> {
+        return this.http.get<RunStatus>(`${this.apiUrl}/api/v1/gateway/computation/${id}/state`)
     }
 
     getArtifactsMetadata(id: string): Observable<ArtifactMetadata> {
@@ -85,7 +91,7 @@ export class PluginService {
         }
     }
 
-    getComputes(): PluginRun[] {
+    getComputesFromLS(): PluginRun[] {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs)
             return []
@@ -99,7 +105,7 @@ export class PluginService {
             return []
 
         const scheduled_runs: PluginRun[] = JSON.parse(plugin_runs)
-        return scheduled_runs.filter(run => run.status === 'scheduled')
+        return scheduled_runs.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
     }
 
     setPluginState(pluginState: PluginState): void {
@@ -115,13 +121,13 @@ export class PluginService {
     }
 
     storeNewComputes(id: string, plugin: Plugin, aoiName?: string) {
-        const runs: Array<PluginRun> = this.getComputes()
+        const runs: Array<PluginRun> = this.getComputesFromLS()
         const currentRunInfo = {
             correlation_uuid: id,
             pluginId: plugin.plugin_id,
             pluginName: plugin.name,
             timestamp: new Date(),
-            status: 'scheduled' as RunStatus,
+            status: 'PENDING' as RunStatus,
             aoiName: aoiName
         }
         runs.push(currentRunInfo)
@@ -130,7 +136,7 @@ export class PluginService {
         this.pluginRunsSubject.next([...runs])
     }
 
-    refreshCompute(runs: PluginRun[]) {
+    refreshComputesInLS(runs: PluginRun[]) {
         localStorage.setItem('plugin_runs', JSON.stringify(runs))
     }
 
@@ -139,13 +145,17 @@ export class PluginService {
     }
 
     updateRunStatus(correlationId: string, newStatus: RunStatus) {
-        const runs = this.getComputes()
+        const runs = this.getComputesFromLS()
         const index = runs.findIndex((run) => run.correlation_uuid === correlationId)
 
         if (index !== -1) {
             runs[index].status = newStatus
-            this.refreshCompute(runs)
+            this.refreshComputesInLS(runs)
             this.pluginRunsSubject.next([...runs])
         }
+    }
+
+    triggerSyncTasks() {
+        this.syncTasksSubject.next()
     }
 }

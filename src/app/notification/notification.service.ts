@@ -1,3 +1,5 @@
+// Unused for now, will restore once the websocket is re-enabled.
+
 import {Injectable} from '@angular/core'
 import {webSocket, WebSocketSubject} from 'rxjs/webSocket'
 import {environment} from '../../environments/environment'

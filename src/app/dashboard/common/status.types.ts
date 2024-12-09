@@ -1,1 +1,1 @@
-export type RunStatus = 'scheduled' | 'in-progress' | 'completed' | 'failed' | 'wrong-input' | 'no-results'
+export type RunStatus = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE'
