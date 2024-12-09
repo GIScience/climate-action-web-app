@@ -31,6 +31,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar'
 import {MapService} from './dashboard/map/map.service'
 import {LucideAngularModule, CircleUserRound} from 'lucide-angular'
 import {MatDialogModule} from '@angular/material/dialog'
+import {provideTippyLoader, provideTippyConfig, popperVariation} from '@ngneat/helipopper/config'
+import {tooltipVariation} from './utils/tooltip-variations'
 
 
 @NgModule({
@@ -110,7 +112,15 @@ import {MatDialogModule} from '@angular/material/dialog'
         },
         {
             provide: MapService
-        }
+        },
+        provideTippyLoader(() => import('tippy.js')),
+        provideTippyConfig({
+            defaultVariation: 'tooltip',
+            variations: {
+                tooltip: tooltipVariation,
+                popper: popperVariation
+            }
+        })
     ],
     bootstrap: [AppComponent]
 })

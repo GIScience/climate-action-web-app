@@ -12,6 +12,7 @@ import {PluginRun} from '../plugin/plugin.interface'
 import {ArtifactMetadata} from './artifact.interface'
 import {By} from '@angular/platform-browser'
 import {WSMessage} from '../../notification/notification.interface'
+import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
 
 describe('ArtifactComponent', () => {
     let component: ArtifactComponent
@@ -50,7 +51,15 @@ describe('ArtifactComponent', () => {
                         paramMap: of(convertToParamMap({name: 'test_plugin'})),
                         params: of({name: 'test_plugin'})
                     }
-                }
+                },
+                provideTippyLoader(() => import('tippy.js')),
+                provideTippyConfig({
+                    defaultVariation: 'tooltip',
+                    variations: {
+                        tooltip: tooltipVariation,
+                        popper: popperVariation
+                    }
+                })
             ]
         }).compileComponents()
 

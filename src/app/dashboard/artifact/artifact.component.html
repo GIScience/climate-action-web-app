@@ -2,8 +2,8 @@
     <div class="artifact-tree__header">
         <h2 class="mx-2"><span *ngIf="showArchived">Archived </span>Reports</h2>
         <button class="archive-dropdown-toggle" (click)="toggleArchivedView()">
-            <i-lucide *ngIf="!showArchived" [img]="Archive" size="20" title="Archived Artifacts" matTooltip="Archived Artifacts"></i-lucide>
-            <i-lucide *ngIf="showArchived" [img]="CircleArrowLeft" size="20" title="Back to all reports" matTooltip="Back to all reports"></i-lucide>
+            <i-lucide *ngIf="!showArchived" [img]="Archive" size="20" tp="Archived Artifacts"></i-lucide>
+            <i-lucide *ngIf="showArchived" [img]="CircleArrowLeft" size="20" tp="Back to all reports"></i-lucide>
         </button>
     </div>
 
@@ -42,7 +42,7 @@
                             <h3>{{computation.aoiName}}</h3>
                             <p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide> {{formatTimestamp(computation.timestamp || '')}} • <i-lucide [img]="Hash" size="12"></i-lucide>{{formatUUID(computation.uuid)}}</p>
                         </div>
-                        <button (click)="archiveArtifact(computation.uuid)" aria-label="Archive Artifact" matTooltip="Archive Artifact" class="pX-5 pY-3 mL-a mR-5 archive-artifact btn-onlyicon">
+                        <button (click)="archiveArtifact(computation.uuid)" aria-label="Archive Artifact" tp="Archive Artifact" class="pX-5 pY-3 mL-a mR-5 archive-artifact btn-onlyicon">
                             <i-lucide [img]="Archive" size="15"></i-lucide>
                         </button>
                         <div *ngIf="newRuns.includes(computation.uuid)" class="new-run-dot"></div>
@@ -51,7 +51,14 @@
                         <div *ngIf="computation.isExpanded || computation.keepInDOM">
                             <ul *ngIf="computation.children.length > 0" class="artifact-child-computations">
                                 <ng-container *ngFor="let child of computation.children; let i = index">
-                                    <li *ngIf="child.ref?.primary || computation.showSecondaryChildren" [@fadeIn]="computation.showSecondaryChildren || child.ref?.primary ? 'in' : null" class="artifact-child-computation" (click)="renderReport(child); storeActivatedRef(child)" (keyup.enter)="renderReport(child); storeActivatedRef(child)" [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary }" matTooltip="{{child.summary}}"matTooltipPosition="right" tabindex="0">
+                                    <li *ngIf="child.ref?.primary || computation.showSecondaryChildren"
+                                        [@fadeIn]="computation.showSecondaryChildren || child.ref?.primary ? 'in' : null"
+                                        class="artifact-child-computation"
+                                        (click)="renderReport(child); storeActivatedRef(child)"
+                                        (keyup.enter)="renderReport(child); storeActivatedRef(child)"
+                                        [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary }"
+                                        tp="{{child.summary}}" tpPlacement="right"
+                                        tabindex="0">
                                         <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{child.icon}}"></mat-icon>
                                         <div>{{child.name}}</div>
                                     </li>
@@ -87,7 +94,7 @@
                                     <h4>{{archivedArtifact.aoiName}}</h4>
                                     <p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide> {{formatTimestamp(archivedArtifact.timestamp || '')}} • <i-lucide [img]="Hash" size="12"></i-lucide>{{formatUUID(archivedArtifact.correlation_uuid)}}</p>
                                 </div>
-                                <button (click)="unarchiveArtifact(archivedArtifact.correlation_uuid)" aria-label="Un-archive Report" matTooltip="Un-archive Artifact" class="pX-5 pY-3 btn-onlyicon">
+                                <button (click)="unarchiveArtifact(archivedArtifact.correlation_uuid)" aria-label="Un-archive Report" tp="Un-archive Artifact" class="pX-5 pY-3 btn-onlyicon">
                                     <i-lucide [img]="ArchiveRestore" size="15"></i-lucide>
                                 </button>
                             </div>

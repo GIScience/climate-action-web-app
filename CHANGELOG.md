@@ -23,6 +23,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Adapted compute request to the new Celery backend
 - Computations can now handle no results, and display an appropriate message
 - Icons are now fetched from a dedicated endpoint
+- In plugin catalog, add plugin name to hover info
 
 ## [1.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/1.3.0) - 2024-10-14
 

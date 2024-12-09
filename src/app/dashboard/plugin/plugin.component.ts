@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router'
 import {Plugin, PluginState, Source} from './plugin.interface'
 import {PluginService} from './plugin.service'
 import {map, Observable, switchMap, tap} from 'rxjs'
-import {MatTooltipModule} from '@angular/material/tooltip'
+import {TippyDirective} from '@ngneat/helipopper'
 import {ArtifactComponent} from '../artifact/artifact.component'
 import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
 import {CommonModule} from '@angular/common'
@@ -21,7 +21,7 @@ import {MatDialog} from '@angular/material/dialog'
         MarkdownModule,
         ArtifactComponent,
         PluginParameterComponent,
-        MatTooltipModule,
+        TippyDirective,
         NgScrollbarModule,
         LucideAngularModule
     ],
