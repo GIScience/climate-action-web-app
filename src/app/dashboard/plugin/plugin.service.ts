@@ -18,13 +18,9 @@ export class PluginService {
     private pluginRunsSubject = new BehaviorSubject<PluginRun[]>(this.pluginRuns)
 
     private pluginStateSubject = new BehaviorSubject<PluginState>('inactive')
-    private resetZoomSubject = new Subject<void>()
-    private collapseComputationsSubject = new Subject<void>()
     private syncTasksSubject = new Subject<void>()
 
     public pluginState$ = this.pluginStateSubject.asObservable()
-    public resetZoom$ = this.resetZoomSubject.asObservable()
-    public collapseComputations$ = this.collapseComputationsSubject.asObservable()
     public syncTasks$ = this.syncTasksSubject.asObservable()
 
     private catalogToggleInput!: HTMLInputElement
@@ -110,10 +106,6 @@ export class PluginService {
 
     setPluginState(pluginState: PluginState): void {
         this.pluginStateSubject.next(pluginState)
-        if (pluginState === 'compute-ready') {
-            this.resetZoomSubject.next()
-            this.collapseComputationsSubject.next()
-        }
     }
 
     getPluginState(): Observable<PluginState> {

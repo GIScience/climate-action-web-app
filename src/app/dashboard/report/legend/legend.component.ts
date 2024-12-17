@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@a
 import {CommonModule} from '@angular/common'
 import {convertToTitleCase} from '../../../utils/report-utils'
 import {LegendObject} from '../../artifact/artifact.interface'
+import {NgScrollbar} from 'ngx-scrollbar' 
 
 declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]
 
@@ -12,7 +13,7 @@ interface LegendItem {
 @Component({
     selector: 'app-legend',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, NgScrollbar],
     templateUrl: './legend.component.html',
     styleUrls: ['./legend.component.scss']
 })

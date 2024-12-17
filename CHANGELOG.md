@@ -14,6 +14,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Always override the default icons in the plugin catalog ([#64](https://gitlab.heigit.org/climate-action/web-app/-/issues/64))
 - Utilises new 'computation/state' endpoint to check computation state, to fix scheduled runs disappearing
   randomly ([#238](https://gitlab.heigit.org/climate-action/web-app/-/issues/238))
+- Fix multiple usability issues concerning starting a new computation ([#183](https://gitlab.heigit.org/climate-action/web-app/-/issues/183))
 
 ### Added
 

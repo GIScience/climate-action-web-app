@@ -2,9 +2,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core'
 import {CommonModule} from '@angular/common'
 import {HttpClient} from '@angular/common/http'
 import {Artifact} from '../../artifact/artifact.interface'
-import VectorTileLayer from 'ol/layer/VectorTile'
 import {MapService} from '../../map/map.service'
-import RenderFeature from 'ol/render/Feature'
 
 @Component({
     selector: 'app-geojson',
@@ -16,7 +14,6 @@ import RenderFeature from 'ol/render/Feature'
 export class GeojsonComponent implements OnInit, OnDestroy {
 
     @Input() inputData: { url: string; artifact: Artifact | null; } | undefined
-    geojsonLayer!: VectorTileLayer<RenderFeature>
 
     constructor(private http: HttpClient, private mapService: MapService) {
     }
@@ -28,14 +25,15 @@ export class GeojsonComponent implements OnInit, OnDestroy {
 
         const artifactName = this.inputData.artifact?.name
         this.http.get<object>(this.inputData.url).subscribe((data) => {
-            this.geojsonLayer = this.mapService.addGeoJsonLayer(data, artifactName)
+            this.mapService.addGeoJsonLayer(data, artifactName)
         })
     }
 
     ngOnDestroy(): void {
-        if (this.geojsonLayer) {
-            this.mapService.map?.removeLayer(this.geojsonLayer)
-            if (this.mapService.featureClickOverlay) {
+        if (this.mapService.geojsonLayer) {
+            this.mapService.map?.removeLayer(this.mapService.geojsonLayer)
+            if (this.mapService.featureHoverOverlay && this.mapService.featureClickOverlay) {
+                this.mapService.map?.removeLayer(this.mapService.featureHoverOverlay)
                 this.mapService.map?.removeLayer(this.mapService.featureClickOverlay)
                 this.mapService.mapPopUp?.setPosition(undefined)
             }

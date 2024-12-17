@@ -3,8 +3,6 @@ import {GeojsonComponent} from './geojson.component'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
 import {of} from 'rxjs'
 import {MapService} from '../../map/map.service'
-import VectorTileLayer from 'ol/layer/VectorTile'
-import RenderFeature from 'ol/render/Feature'
 import SpyObj = jasmine.SpyObj
 
 describe('GeojsonComponent', () => {
@@ -59,7 +57,7 @@ describe('GeojsonComponent', () => {
         expect(mapServiceSpy.addGeoJsonLayer).not.toHaveBeenCalled()
     })
 
-    it('should render geojson', () => {
+    it('should pass geojson to map service', () => {
         const mockGeoJsonData = {
             'type': 'FeatureCollection',
             'features': [
@@ -100,8 +98,6 @@ describe('GeojsonComponent', () => {
         }
 
         httpClientSpy.get.and.returnValue(of(mockGeoJsonData))
-        const mockLayer = new VectorTileLayer<RenderFeature>
-        mapServiceSpy.addGeoJsonLayer.and.returnValue(mockLayer)
 
         component.inputData = {
             url: 'http://test_url',
@@ -122,6 +118,5 @@ describe('GeojsonComponent', () => {
 
         expect(httpClientSpy.get).toHaveBeenCalledWith('http://test_url')
         expect(mapServiceSpy.addGeoJsonLayer).toHaveBeenCalledWith(mockGeoJsonData, 'geojson')
-        expect(component.geojsonLayer).toBe(mockLayer)
     })
 })

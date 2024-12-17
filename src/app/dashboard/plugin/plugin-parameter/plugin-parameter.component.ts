@@ -69,11 +69,11 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 private mapService: MapService,
                 private cdr: ChangeDetectorRef) {
 
-                    const highlightedFeaturesAddObservable = fromEventPattern(
-                        (handler) => this.mapService.highlightedFeatures.on('add', handler)
+                    const highlightedFeaturesObservable = fromEventPattern(
+                        (handler) => this.mapService.highlightedFeatures.on('change:length', handler)
                     )
 
-                    this.highlightedFeaturesSubscription = highlightedFeaturesAddObservable.subscribe(() => {
+                    this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
                         this.toggleFormState()
                         this.showSelectedAreaInfo()
                     })
@@ -129,6 +129,11 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         if (this.selectedRegions.length === 0) {
             this.toggleFormState()
         }
+    }
+
+    deactivateCompute(): void {
+        this.form.reset()
+        this.pluginService.setPluginState('inactive')
     }
 
     toggleFormState(): void {

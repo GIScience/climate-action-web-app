@@ -6,6 +6,10 @@
     backdrop-filter: blur(5px);
 	min-width: 100px;
 
+	ng-scrollbar {
+		max-height: 35vh;
+	}
+
 	h3 {
 		margin-top: 0;
 		margin-bottom: 10px;
@@ -23,12 +27,22 @@
 		vertical-align: middle;
 	}
 
-	.discrete-legend ul {
-		list-style-type: none;
-		padding: 0;
+	.discrete-legend {
+		padding-right: 5px;
 		
-		li {
-			margin-bottom: 5px;
+		ul {
+			
+			list-style-type: none;
+			padding: 0;
+			
+			li {
+				align-items: center;
+				display: grid;
+				column-gap: 7.5px;
+				margin-bottom: 7.5px;
+				grid-template-columns: 20px 1fr;
+				line-height: 1.25rem;
+			}
 		}
 	}
 
