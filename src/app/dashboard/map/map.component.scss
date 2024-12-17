@@ -2,25 +2,16 @@
 	height: 100%;
 
 	::ng-deep {
-
-		.ol-zoom {
-			top: auto;
-			left: auto;
-			bottom: calc(50% - 20px);
-			right: 0.5vw;
-		}
-
-		.ol-attribution {
-			bottom: 0.5em;
-			right: 0.5vw;
-			border-radius: 5px;
-		}
-
+		
 		.ol-control {
 
 			button {
 				border: 1px solid #e1eae8;
 				transition: background-color 0.25s ease;
+				width: 27.5px;
+				height: 27.5px;
+				border-radius: 2.5px;
+				cursor: pointer;
 
 				&:hover {
 					outline: none;
@@ -30,6 +21,31 @@
 				&:focus {
 					outline: none;
 				}
+			}
+		}
+
+		.ol-zoom {
+			top: calc(0.5vw + 3.75px);
+			left: auto;
+			right: calc(0.5vw + 30px);
+			display: flex;
+		}
+
+		.ol-attribution {
+			bottom: 0.5em;
+			right: 0.5vw;
+			border-radius: 5px;
+		}
+
+		.ol-zoom-extent {
+			top: calc(0.5vw + 3.75px);
+			right: 0.5vw;
+			left: auto;
+
+			button {
+				display: flex;
+				align-items: flex-end;
+				justify-content: center;
 			}
 		}
 

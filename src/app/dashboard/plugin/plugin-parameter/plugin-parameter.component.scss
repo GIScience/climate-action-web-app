@@ -97,7 +97,13 @@
     margin-top: -20px;
   }
 
-  button.btn-primary {
-    margin: 15px auto; 
+  .btn-container {
+    display: flex;
+    margin: 15px auto;
+    justify-content: center;
+
+    button {
+      margin: 0 5px;
+    }
   }
 }

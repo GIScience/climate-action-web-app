@@ -16,10 +16,10 @@ import VectorLayer, {Options as VectorLayerOptions} from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import OSM from 'ol/source/OSM'
 import Point from 'ol/geom/Point'
-import {easeIn} from 'ol/easing.js'
 import {createEmpty, extend, Extent} from 'ol/extent'
-import {Circle as CircleStyle, Fill, Stroke, Style, Icon} from 'ol/style'
+import {Circle as CircleStyle, Fill, Icon, Stroke, Style} from 'ol/style'
 import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
+import {defaults as defaultControls, ZoomToExtent} from 'ol/control.js'
 import XYZ from 'ol/source/XYZ'
 import TileGrid from 'ol/tilegrid/TileGrid'
 import {StyleFunction} from 'ol/style/Style'
@@ -39,7 +39,7 @@ class ExtendedTileLayer extends TileLayer {
     baseLayer?: boolean
     displayInLayerSwitcher?: boolean
 
-    constructor(options: TileLayerOptions & {name?: string; baseLayer?: boolean; displayInLayerSwitcher?: boolean}) {
+    constructor(options: TileLayerOptions & { name?: string; baseLayer?: boolean; displayInLayerSwitcher?: boolean }) {
         super(options)
         this.name = options.name
         this.baseLayer = options.baseLayer
@@ -51,7 +51,7 @@ class ExtendedVectorTileLayer extends VectorTileLayer<RenderFeature> {
     name?: string
     displayInLayerSwitcher?: boolean
 
-    constructor(options: VectorTileLayerOptions<RenderFeature> & {name?: string; displayInLayerSwitcher?: boolean}) {
+    constructor(options: VectorTileLayerOptions<RenderFeature> & { name?: string; displayInLayerSwitcher?: boolean }) {
         super(options)
         this.name = options.name
         this.displayInLayerSwitcher = options.displayInLayerSwitcher
@@ -62,7 +62,7 @@ class ExtendedVectorLayer<T extends Feature<Geometry | Point>> extends VectorLay
     name?: string
     displayInLayerSwitcher?: boolean
 
-    constructor(options: VectorLayerOptions<T> & {name?: string; displayInLayerSwitcher?: boolean}) {
+    constructor(options: VectorLayerOptions<T> & { name?: string; displayInLayerSwitcher?: boolean }) {
         super(options)
         this.name = options.name
         this.displayInLayerSwitcher = options.displayInLayerSwitcher
@@ -78,13 +78,13 @@ export class MapService {
     mapPopUp: Overlay | undefined
     focusedLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     regionLayer: ExtendedTileLayer | undefined
+    selectedRegionLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerLayer: ExtendedVectorLayer<Feature<Point>> | undefined
+    geojsonLayer: ExtendedVectorTileLayer | undefined
     featureHoverOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     featureClickOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerFeatures: Collection<Feature<Point>> = new Collection([])
     highlightedFeatures: Collection<FeatureLike> = new Collection([])
-    styleCache: { [key: number]: Style } = {}
-    initialExtent!: Extent
     layerSwitcherCollapsed: boolean = false
     windowWidth?: number
     windowResolution?: number
@@ -96,12 +96,18 @@ export class MapService {
         private pluginService: PluginService,
         private http: HttpClient
     ) {
-        this.pluginService.resetZoom$.subscribe(() => this.resetZoomLevel())
+        this.pluginService.pluginState$.subscribe((value) => {
+            if (value === 'compute-ready') {
+                this.enableComputeLayers()
+            } else if (value === 'inactive') {
+                this.removeComputeLayers()
+            }
+        })
     }
 
     searchLocation(query: string) {
         const orsUrl = `https://api.openrouteservice.org/geocode/search?api_key=${this.orsAPIKey}&text=${query}`
-    
+
         this.http.get<GeoJSONFeatureCollection>(orsUrl).subscribe(results => {
             if (results.features) {
                 const result = results.features[0]
@@ -113,7 +119,7 @@ export class MapService {
             }
         })
     }
-    
+
     getAutoCompleteSuggestions(query: string): Observable<GeoJSONFeatureCollection[]> {
         const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
         return this.http.get<GeoJSONFeatureCollection>(orsUrl).pipe(
@@ -125,14 +131,14 @@ export class MapService {
         const coord = fromLonLat(coordinates) as [number, number]
         this.addMarker(coord)
     }
-    
+
     addMarker(coord: Coordinate) {
         this.markerFeatures.clear()
-    
+
         const markerFeature = new Feature({
             geometry: new Point(coord)
         })
-    
+
         this.markerFeatures.push(markerFeature)
     }
 
@@ -171,7 +177,7 @@ export class MapService {
             return [horMapPadding, 100, horMapPadding, 500]
         }
     }
-    
+
     initLayers() {
         this.regionLayer = new ExtendedTileLayer({
             source: new TileWMS({
@@ -186,7 +192,7 @@ export class MapService {
             displayInLayerSwitcher: false
         })
 
-        const selectedRegionLayer = new ExtendedVectorLayer({
+        this.selectedRegionLayer = new ExtendedVectorLayer({
             source: new VectorSource({
                 features: this.highlightedFeatures
             }),
@@ -213,8 +219,8 @@ export class MapService {
             }),
             displayInLayerSwitcher: false
         })
-    
-        return selectedRegionLayer
+
+        return this.selectedRegionLayer
     }
 
     initMap() {
@@ -269,14 +275,27 @@ export class MapService {
             }
         })
 
+        const heidelbergCoords = [8.6759928, 49.4187355]
+        const initialView = new View({
+            center: fromLonLat(heidelbergCoords),
+            zoom: 0
+        })
+
+        const customZoomOutLabel = document.createElement('span')
+        customZoomOutLabel.innerHTML = '<img src="assets/images/globe.svg" style="width: 16px; height: 16px;">'
+
         this.map = new Map({
             layers: [aerialImagery, heigitCarto, osmCarto],
             target: 'map',
-            view: new View({
-                center: fromLonLat([8.6759928, 49.4187355]),
-                zoom: 0
-            }),
-            overlays: [this.mapPopUp]
+            view: initialView,
+            overlays: [this.mapPopUp],
+            controls: defaultControls().extend([
+                new ZoomToExtent({
+                    extent: initialView.calculateExtent(),
+                    label: customZoomOutLabel,
+                    tipLabel: 'Zoom out max'
+                })
+            ])
         })
 
         const selectedMapLayer = localStorage.getItem(localStorageSelectedMapLayerKey) || osmCartoLayerName
@@ -304,9 +323,6 @@ export class MapService {
             localStorage.setItem(localStorageLayerSwitcherStateKey, this.layerSwitcherCollapsed.toString())
         })
 
-        const view = this.map.getView()
-        this.initialExtent = view.calculateExtent()
-
         if (this.regionLayer) {
             this.map.addLayer(this.regionLayer)
         }
@@ -323,8 +339,13 @@ export class MapService {
             }
 
             const pixel = this.map.getEventPixel(evt.originalEvent)
-            const showPointer = this.map.hasFeatureAtPixel(pixel) || this.regionLayer?.getVisible()
+            const hasValidFeature = this.map.hasFeatureAtPixel(pixel, {
+                layerFilter: (layer) => {
+                    return layer === this.geojsonLayer
+                }
+            })
 
+            const showPointer = hasValidFeature || this.regionLayer?.getVisible()
             this.map.getTargetElement().style.cursor = showPointer ? 'pointer' : ''
         })
 
@@ -395,7 +416,7 @@ export class MapService {
             extent: 4096,
             maxZoom: 18
         })
-    
+
         const format = new GeoJSON({
             dataProjection: new Projection({
                 code: 'TILE_PIXELS',
@@ -403,7 +424,7 @@ export class MapService {
                 extent: [0, 0, 4096, 4096]
             })
         })
-    
+
         const vectorSource = new VectorTileSource({
             tileUrlFunction: function (tileCoord) {
                 return JSON.stringify(tileCoord)
@@ -416,7 +437,7 @@ export class MapService {
                     type: 'FeatureCollection',
                     features: data ? data.features : []
                 }, replacer)
-    
+
                 const tileFeatures = format.readFeatures(geojson, {
                     extent: vectorSource.getTileGrid()?.getTileCoordExtent(tileCoord),
                     featureProjection: 'EPSG:3857'
@@ -424,14 +445,14 @@ export class MapService {
                 (tile as VectorTile).setFeatures(tileFeatures)
             }
         })
-    
-        const geojsonLayer = new ExtendedVectorTileLayer({
+
+        this.geojsonLayer = new ExtendedVectorTileLayer({
             source: vectorSource,
             name: artifactName,
             style: this.styleFunction.bind(this) as StyleFunction
         })
 
-        this.map?.addLayer(geojsonLayer)
+        this.map?.addLayer(this.geojsonLayer)
 
         this.featureHoverOverlay = this.createFeatureOverlay(0.5)
         this.featureClickOverlay = this.createFeatureOverlay(0.75)
@@ -446,7 +467,7 @@ export class MapService {
             const pixel = this.map?.getEventPixel(evt.originalEvent)
             if (!pixel) return
 
-            geojsonLayer.getFeatures(pixel).then(features => {
+            this.geojsonLayer?.getFeatures(pixel).then(features => {
                 if (this.featureHoverOverlay) {
                     this.handleFeaturesTooltip(features, this.featureHoverOverlay)
                 }
@@ -457,14 +478,14 @@ export class MapService {
             const pixel = this.map?.getEventPixel(evt.originalEvent)
             if (!pixel) return
 
-            geojsonLayer.getFeatures(pixel).then(features => {
+            this.geojsonLayer?.getFeatures(pixel).then(features => {
                 if (this.featureClickOverlay) {
                     this.handleFeaturesTooltip(features, this.featureClickOverlay, evt.coordinate, artifactName)
                 }
             })
         }.bind(this))
 
-        return geojsonLayer
+        return this.geojsonLayer
     }
 
     styleFunction(feature: FeatureLike, resolution: number): Style {
@@ -527,6 +548,9 @@ export class MapService {
         if (this.regionLayer) {
             this.regionLayer.setVisible(false)
         }
+        if (this.selectedRegionLayer) {
+            this.selectedRegionLayer.setVisible(false)
+        }
         if (this.highlightedFeatures.getLength() > 0) {
             this.highlightedFeatures.clear()
         }
@@ -539,27 +563,23 @@ export class MapService {
         }
     }
 
-    resetZoomLevel() {
+    enableComputeLayers() {
         if (this.map) {
-            this.map.getView().fit(this.initialExtent, {
-                duration: 1000,
-                easing: easeIn,
-                maxZoom: 1
-            })
-
             if (this.regionLayer) {
                 this.regionLayer.setVisible(true)
             }
-
+            if (this.selectedRegionLayer) {
+                this.selectedRegionLayer.setVisible(true)
+            }
         }
     }
 
     selectRegions(pixel: Array<number>) {
-        if (this.regionLayer && this.map) {
+        if (this.regionLayer?.getVisible() && this.map) {
             const source = this.regionLayer.getSource() as TileWMS
             const resolution = this.map.getView().getResolution()
             const projection = this.map.getView().getProjection()
-            
+
             if (resolution) {
                 const url = source.getFeatureInfoUrl(
                     this.map.getCoordinateFromPixel(pixel),
@@ -567,7 +587,7 @@ export class MapService {
                     projection,
                     {'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 10}
                 )
-                
+
                 if (url) {
                     this.http.get<GeoJSONFeatureCollection>(url).subscribe(response => {
                         if (response.features && response.features.length > 0) {

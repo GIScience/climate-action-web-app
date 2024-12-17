@@ -8,7 +8,7 @@ main.dashboard {
 	width: 100vw;
 	
 	@media (max-width: 1600px) {
-		grid-template-columns: auto 425px 1fr 7.5%;
+		grid-template-columns: auto 425px 1fr 12.5%;
 	}
 
 	app-map {
@@ -28,10 +28,6 @@ main.dashboard {
 		align-items: flex-end;
 		display: flex;
 		flex-direction: column;
-
-		app-search {
-			z-index: 1;
-		}
 
 		::ng-deep {
 

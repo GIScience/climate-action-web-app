@@ -1,4 +1,4 @@
-import {ComponentFixture, fakeAsync, TestBed, tick, discardPeriodicTasks} from '@angular/core/testing'
+import {ComponentFixture, fakeAsync, flush, TestBed, tick, discardPeriodicTasks} from '@angular/core/testing'
 import {ArtifactComponent} from './artifact.component'
 import {NoopAnimationsModule} from '@angular/platform-browser/animations'
 import {HttpClientModule} from '@angular/common/http'
@@ -86,6 +86,7 @@ describe('ArtifactComponent', () => {
         expect(fixture.debugElement.queryAll(By.css('.artifact-tree-content')).length).toBe(1)
         tick()
         discardPeriodicTasks()
+        flush()
     }))
 
     it('given no runs should create an empty artifact tree view', fakeAsync(() => {

@@ -106,9 +106,11 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private snackBar: MatSnackBar) {
 
-        if (this.pluginService.collapseComputations$) {
-            this.pluginService.collapseComputations$.subscribe(() => {
-                this.collapseComputation()
+        if (this.pluginService.pluginState$) {
+            this.pluginService.pluginState$.subscribe((value) => {
+                if (value === 'compute-ready') {
+                    this.collapseComputation()
+                }
             })
         }
 

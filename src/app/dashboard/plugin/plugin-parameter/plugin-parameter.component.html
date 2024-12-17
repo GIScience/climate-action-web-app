@@ -20,7 +20,10 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
         <div>
             <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form" class="plugin-params-form"></formly-form>
-            <button type="submit" appearance="primary" class="btn-primary btn-withtext" [disabled]="!form.valid || selectedRegions.length !== 1"><i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute</button>
+            <div class="btn-container">
+                <button type="submit" appearance="primary" class="btn-primary btn-withtext" [disabled]="!form.valid || selectedRegions.length !== 1"><i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute</button>
+                <button type="button" class="btn-light btn-withtext" (click)="deactivateCompute()">Cancel</button>
+            </div>
         </div>
     </form>
 </div>
