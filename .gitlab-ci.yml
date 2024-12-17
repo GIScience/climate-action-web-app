@@ -94,6 +94,7 @@ docker_build_deploy_release:
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
   script:
     - >
       /kaniko/executor \
