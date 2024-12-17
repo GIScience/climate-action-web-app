@@ -5,9 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project mostly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/1.3.0...main)
+## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.0.0...main)
 
-### Fix
+## [2.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.0.0) - 2024-12-17
+
+### Fixed
 
 - Rename default soil consumption to land
   consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
@@ -18,8 +20,6 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
-- Heilbronn (DE), Karlsruhe (DE) and Vienna (AT) to available
-  ROIs ([#149](https://gitlab.heigit.org/climate-action/web-app/-/issues/149))
 - Added Layer Switcher to map (now with HeiGIT Carto and Bing Aerial maps), with opacity slider for GeoTIFF/GeoJSON
   layers from artifacts
 - Search function to help with finding PoIs during compute, and locations within

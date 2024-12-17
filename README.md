@@ -4,7 +4,7 @@
 
 # Climate Action Frontend
 
-![Alt text](/screenshot.jpg?raw=true "Platform Screenshot")
+![Alt text](docs/screenshot.jpg?raw=true "Platform Screenshot")
 
 <!-- TABLE OF CONTENTS -->
 <details>
