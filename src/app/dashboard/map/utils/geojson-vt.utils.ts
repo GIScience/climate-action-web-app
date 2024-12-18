@@ -3,7 +3,8 @@ export interface GeoJSONVTFeature {
     // Allow for 'any' since GeoJSONVTFeature's type defs clash with those of OL
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     geometry?: any
-    tags?: Record<string, unknown>
+    tags?: Record<string, unknown>,
+    id?: string
 }
 
 export const replacer = function (key: string, value: GeoJSONVTFeature) {
@@ -48,6 +49,7 @@ export const replacer = function (key: string, value: GeoJSONVTFeature) {
     return {
         type: 'Feature',
         geometry: {type: type, coordinates: geometry},
-        properties: value.tags
+        properties: value.tags,
+        id: value.id
     }
 } 
