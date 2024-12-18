@@ -454,6 +454,19 @@ export class MapService {
 
         this.map?.addLayer(this.geojsonLayer)
 
+        const features = format.readFeatures(data, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+        })
+
+        const geojsonLayerSource = new VectorSource({
+            features: features
+        })
+
+        const originalGeojsonLayer = new VectorLayer({
+            source: geojsonLayerSource
+        })
+
         this.featureHoverOverlay = this.createFeatureOverlay(0.5)
         this.featureClickOverlay = this.createFeatureOverlay(0.75)
         if (this.featureHoverOverlay) {
@@ -464,14 +477,10 @@ export class MapService {
         }
 
         this.map?.on('pointermove', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
-            const pixel = this.map?.getEventPixel(evt.originalEvent)
-            if (!pixel) return
-
-            this.geojsonLayer?.getFeatures(pixel).then(features => {
-                if (this.featureHoverOverlay) {
-                    this.handleFeaturesTooltip(features, this.featureHoverOverlay)
-                }
-            })
+            if (!this.featureHoverOverlay) return
+            
+            const features = this.getFeaturesAtPixel(evt.pixel, originalGeojsonLayer)
+            this.handleFeaturesTooltip(features, this.featureHoverOverlay)
         }.bind(this))
 
         this.map?.on('click', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
@@ -669,5 +678,20 @@ export class MapService {
                 this.mapPopUp?.setPosition(undefined)
             }
         }
+    }
+
+    getFeaturesAtPixel(pixel: number[], originalGeojsonLayer: ExtendedVectorLayer<Feature<Geometry>>): Array<Feature<Geometry>> {
+        const features: Array<Feature<Geometry>> = []
+        
+        this.map?.forEachFeatureAtPixel(pixel, (feature) => {
+            if (feature.getId()) {
+                const originalFeature = originalGeojsonLayer.getSource()?.getFeatureById(feature.getId() as number)
+                if (originalFeature) {
+                    features.push(originalFeature as Feature<Geometry>)
+                }
+            }
+        })
+        
+        return features
     }
 }
