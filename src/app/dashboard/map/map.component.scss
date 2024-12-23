@@ -25,7 +25,7 @@
 		}
 
 		.ol-zoom {
-			top: calc(0.5vw + 3.75px);
+			top: calc(0.5vw + 40px);
 			left: auto;
 			right: calc(0.5vw + 30px);
 			display: flex;
@@ -38,7 +38,7 @@
 		}
 
 		.ol-zoom-extent {
-			top: calc(0.5vw + 3.75px);
+			top: calc(0.5vw + 40px);
 			right: 0.5vw;
 			left: auto;
 
@@ -46,6 +46,20 @@
 				display: flex;
 				align-items: flex-end;
 				justify-content: center;
+			}
+		}
+
+		.ol-scale-line {
+			border: 1.5px solid rgb(128 128 128 / 50%);
+			top: calc(0.5vw + 40px);
+			right: calc(0.5vw + 95px);
+			left: auto;
+			bottom: auto;
+			height: 30px;
+			display: flex;
+
+			.ol-scale-line-inner {
+				font-size: 12px;
 			}
 		}
 
