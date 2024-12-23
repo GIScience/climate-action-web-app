@@ -20,6 +20,7 @@ import {createEmpty, extend, Extent} from 'ol/extent'
 import {Circle as CircleStyle, Fill, Icon, Stroke, Style} from 'ol/style'
 import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
 import {defaults as defaultControls, ZoomToExtent} from 'ol/control.js'
+import {ScaleLine} from 'ol/control'
 import XYZ from 'ol/source/XYZ'
 import TileGrid from 'ol/tilegrid/TileGrid'
 import {StyleFunction} from 'ol/style/Style'
@@ -290,6 +291,7 @@ export class MapService {
             view: initialView,
             overlays: [this.mapPopUp],
             controls: defaultControls().extend([
+                new ScaleLine(),
                 new ZoomToExtent({
                     extent: initialView.calculateExtent(),
                     label: customZoomOutLabel,

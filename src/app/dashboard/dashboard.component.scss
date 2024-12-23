@@ -1,6 +1,6 @@
 main.dashboard {
 	display: grid;
-	grid-template-columns: auto 450px 1fr 15%;
+	grid-template-columns: auto 425px 1fr 15%;
 	height: 100%;
 	position: relative;
 	grid-gap: 0.5vw;
@@ -8,7 +8,7 @@ main.dashboard {
 	width: 100vw;
 	
 	@media (max-width: 1600px) {
-		grid-template-columns: auto 425px 1fr 12.5%;
+		grid-template-columns: auto 400px 1fr 12.5%;
 	}
 
 	app-map {
@@ -32,7 +32,7 @@ main.dashboard {
 		::ng-deep {
 
 			app-legend {
-				margin-top: 10px;
+				margin-top: 40px;
 			}
 		}
 	}
