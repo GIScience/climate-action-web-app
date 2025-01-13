@@ -279,7 +279,8 @@ export class MapService {
         const heidelbergCoords = [8.6759928, 49.4187355]
         const initialView = new View({
             center: fromLonLat(heidelbergCoords),
-            zoom: 0
+            zoom: 0,
+            maxZoom: 20
         })
 
         const customZoomOutLabel = document.createElement('span')
@@ -416,7 +417,7 @@ export class MapService {
     addGeoJsonLayer(data: object, artifactName: string): ExtendedVectorTileLayer {
         const tileIndex = geojsonvt(data, {
             extent: 4096,
-            maxZoom: 18
+            maxZoom: 20
         })
 
         const format = new GeoJSON({
@@ -501,7 +502,7 @@ export class MapService {
 
     styleFunction(feature: FeatureLike, resolution: number): Style {
         const widthUnits = 15
-        const strokeWidth = Math.min(Math.max(Math.pow(1.25, widthUnits / resolution), 1.5), 15)
+        const strokeWidth = Math.min(Math.max(Math.pow(1.15, widthUnits / resolution), 1.5), 5)
         const color = feature.get('color')
         let strokeColor = [0, 0, 0, 1]
 
