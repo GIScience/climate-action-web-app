@@ -185,7 +185,8 @@ export class MapService {
                 },
                 attributions: 'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
             }),
-            displayInLayerSwitcher: false
+            displayInLayerSwitcher: false,
+            visible: false
         })
 
         this.selectedRegionLayer = new ExtendedVectorLayer({

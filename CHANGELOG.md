@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.0.0...main)
 
+### Added
+
+- Landing page now displays a summary for revisiting users ([#182](https://gitlab.heigit.org/climate-action/web-app/-/issues/182))
+
 ## [2.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.0.0) - 2024-12-17
 
 ### Fixed

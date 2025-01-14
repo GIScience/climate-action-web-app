@@ -25,5 +25,6 @@ export class AppComponent  {
     resetMapState() {
         this.reportService.closeReport()
         this.mapService.removeFocusedLayer()
+        this.mapService.removeComputeLayers()
     }
 }
