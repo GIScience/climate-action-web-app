@@ -48,7 +48,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     syncActiveCardWithRoute(): void {
         const currentUrl = this.router.url
-        const matchingCard = this.cards.find(card => `/plugin/${card.plugin_id}` === currentUrl)
+        const matchingCard = this.cards.find(card => currentUrl.includes(`plugin/${card.plugin_id}`))
         this.activeCard = matchingCard
     }
 

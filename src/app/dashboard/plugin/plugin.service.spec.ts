@@ -68,7 +68,7 @@ describe('PluginService', () => {
         correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
         pluginId: 'test_plugin',
         pluginName: 'test plugin',
-        status: 'scheduled',
+        status: 'PENDING',
         timestamp: new Date('2023-09-27T16:42:52+01:00')
     }
 
@@ -156,7 +156,7 @@ describe('PluginService', () => {
     it('should get computes', () => {
         expect(localStorage.getItem('plugin_runs')).toBe(null)
         localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run, test_plugin_run]))
-        expect(service.getComputesFromLS()).toHaveSize(2)
+        expect(service.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])).toHaveSize(2)
     })
 
     it('should store computes', () => {
@@ -186,7 +186,7 @@ describe('PluginService', () => {
         localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run]))
         let item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('scheduled')
+            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
         } else {
             fail()
         }
@@ -205,7 +205,7 @@ describe('PluginService', () => {
         localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run]))
         let item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('scheduled')
+            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
         } else {
             fail()
         }
@@ -214,7 +214,7 @@ describe('PluginService', () => {
 
         item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('scheduled')
+            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
         } else {
             fail()
         }

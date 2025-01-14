@@ -29,10 +29,11 @@ describe('ArtifactComponent', () => {
             'getComputesFromLS', 
             'updateRunStatus', 
             'getArtifactsMetadata', 
-            'getScheduledRuns', 
+            'getComputesFromLS', 
             'getPluginRuns', 
             'closePluginCatalog', 
-            'setPluginState'
+            'setPluginState',
+            'getComputationState'
         ], {
             syncTasks$: new BehaviorSubject<void>(undefined)
         })
@@ -72,7 +73,6 @@ describe('ArtifactComponent', () => {
 
     beforeEach(fakeAsync(() => {
         mockPluginService.getComputesFromLS.and.returnValue([])
-        mockPluginService.getScheduledRuns.and.returnValue([])
 
         fixture = TestBed.createComponent(ArtifactComponent)
         component = fixture.componentInstance
@@ -96,29 +96,6 @@ describe('ArtifactComponent', () => {
         expect(fixture.debugElement.queryAll(By.css('.artifact-parent-computation')).length).toBe(0)
         expect(fixture.debugElement.queryAll(By.css('.artifact-child-computation')).length).toBe(0)
 
-        discardPeriodicTasks()
-    }))
-
-    it('given a scheduled run when no artifacts are available should create a non-expandable computation', fakeAsync(() => {
-        mockPluginService.getScheduledRuns.and.returnValue([
-            {
-                'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                'pluginId': 'test_plugin',
-                'pluginName': 'Test Plugin',
-                'status': 'PENDING',
-                'timestamp': new Date('2023-09-27T16:42:52+01:00')
-            }
-        ] as PluginRun[])
-
-        mockPluginService.getArtifactsMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(of())
-
-        component.ngOnInit()
-        fixture.detectChanges()
-        tick()
-
-        const parentNode = fixture.debugElement.query(By.css('.scheduled-parent-computation'))
-        expect(parentNode).toBeTruthy()
-        
         discardPeriodicTasks()
     }))
 
@@ -227,7 +204,7 @@ describe('ArtifactComponent', () => {
     }))
 
     it('should render content for non-expandable computations correctly', fakeAsync(() => {
-        mockPluginService.getScheduledRuns.and.returnValue([
+        mockPluginService.getComputesFromLS.and.returnValue([
             {
                 'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 'pluginId': 'test_plugin',
