@@ -582,6 +582,89 @@ export const mockPluginWalkabilitytIcon = () => {
     }).as('getPluginWalkabiityIcon')
 }
 
+export const mockPluginBlueprintComputation = () => {
+    cy.intercept('/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/metadata/', {
+        body: {
+            'correlation_uuid': '8649e714-f29d-423f-85ce-cd55f4e5022a',
+            'timestamp': '2024-12-17T08:55:23.807074Z',
+            'params':
+            {
+                'bool_showcase': true
+            },
+            'aoi':
+            {
+                'type': 'Feature',
+                'geometry':
+                {
+                    'type': 'MultiPolygon',
+                    'coordinates':
+                    [
+                        [
+                            [
+                                [
+                                    0.0,
+                                    0.0
+                                ],
+                                [
+                                    1.0,
+                                    0.0
+                                ],
+                                [
+                                    1.0,
+                                    1.0
+                                ],
+                                [
+                                    0.0,
+                                    0.0
+                                ]
+
+                            ]
+                        ]
+                    ]
+                },
+                'properties':
+                {
+                    'name': 'Heidelberg',
+                    'id': '-285864'
+                },
+                'id': 'admin_world_water.-285864'
+            },
+            'artifacts':
+            [
+                {
+                    'name': 'A Text',
+                    'modality': 'MARKDOWN',
+                    'primary': true,
+                    'tags':
+                    [
+                        'input'
+                    ],
+                    'file_path': '/tmp/8649e714-f29d-423f-85ce-cd55f4e5022aqsjobeas/markdown.md',
+                    'summary': 'A JSON-block of the input parameters',
+                    'description': null,
+                    'correlation_uuid': '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                    'store_id': '73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md',
+                    'attachments':
+                    {}
+                }
+            ],
+            'plugin_info':
+            {
+                'plugin_id': 'plugin_blueprint',
+                'plugin_version': '0.3.0'
+            },
+            'status': 'SUCCESS',
+            'message': '-'
+        }
+    }).as('getPluginBlueprintComputation')
+}
+
+export const mockMarkdown = () => {
+    cy.intercept('/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md', {
+        fixture: 'sample_markdown_blueprint.md'
+    }).as('getMarkdown')
+}
+
 export const mockGeoTiffComputation = () => {
     cy.intercept('/api/v1/gateway/store/8a897536-c4b4-4e5a-9d70-50430183ac66/metadata/', {
         body: {

@@ -133,7 +133,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             const pluginId = params['name']
             this.pluginId = pluginId
 
-            this.currentRuns = this.pluginService.getComputesFromLS()
+            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
             this.fetchArchivedArtifacts()
             this.startPeriodicSync()
 
@@ -151,14 +151,14 @@ export class ArtifactComponent implements OnInit, OnDestroy {
             }
         })
 
-        this.scheduledRuns = this.pluginService.getScheduledRuns()
+        this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS()
-            this.scheduledRuns = this.pluginService.getScheduledRuns()
+            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+            this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS()
+            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
             this.startPeriodicSync()
         })
     }

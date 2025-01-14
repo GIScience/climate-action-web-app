@@ -87,21 +87,13 @@ export class PluginService {
         }
     }
 
-    getComputesFromLS(): PluginRun[] {
+    getComputesFromLS(status: RunStatus[]): PluginRun[] {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs)
             return []
 
-        return JSON.parse(plugin_runs)
-    }
-
-    getScheduledRuns(): PluginRun[] {
-        const plugin_runs: string | null = localStorage.getItem('plugin_runs')
-        if (!plugin_runs)
-            return []
-
-        const scheduled_runs: PluginRun[] = JSON.parse(plugin_runs)
-        return scheduled_runs.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
+        const parsed_runs: PluginRun[] = JSON.parse(plugin_runs)
+        return parsed_runs.filter(run => status.includes(run.status as RunStatus))
     }
 
     setPluginState(pluginState: PluginState): void {
@@ -113,7 +105,7 @@ export class PluginService {
     }
 
     storeNewComputes(id: string, plugin: Plugin, aoiName?: string) {
-        const runs: Array<PluginRun> = this.getComputesFromLS()
+        const runs: Array<PluginRun> = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         const currentRunInfo = {
             correlation_uuid: id,
             pluginId: plugin.plugin_id,
@@ -124,7 +116,7 @@ export class PluginService {
         }
         runs.push(currentRunInfo)
 
-        localStorage.setItem('plugin_runs', JSON.stringify(runs))
+        this.refreshComputesInLS(runs)
         this.pluginRunsSubject.next([...runs])
     }
 
@@ -137,7 +129,7 @@ export class PluginService {
     }
 
     updateRunStatus(correlationId: string, newStatus: RunStatus) {
-        const runs = this.getComputesFromLS()
+        const runs = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         const index = runs.findIndex((run) => run.correlation_uuid === correlationId)
 
         if (index !== -1) {
