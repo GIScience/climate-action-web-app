@@ -56,11 +56,12 @@
                                     class="artifact-child-computation"
                                     (click)="renderReport(child); storeActivatedRef(child)"
                                     (keyup.enter)="renderReport(child); storeActivatedRef(child)"
-                                    [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary }"
+                                    [ngClass]="{ 'artifact-child-computation-highlight': activeChildComputation === child, 'primary-child': child.ref?.primary, 'secondary-child': !child.ref?.primary, 'loading': child.isLoading }"
                                     tp="{{child.summary}}" tpPlacement="right"
                                     tabindex="0">
                                     <mat-icon aria-hidden="false" aria-label="Artifact" fontIcon="{{child.icon}}"></mat-icon>
                                     <div>{{child.name}}</div>
+                                    <div *ngIf="child.isLoading" class="loading-circle"></div>
                                 </li>
                             </ng-container>
                         </ul>
