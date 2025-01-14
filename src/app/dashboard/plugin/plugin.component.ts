@@ -99,7 +99,7 @@ export class PluginComponent implements AfterViewInit {
 
     enableCompute() {
         this.pluginService.setPluginState('compute-ready')
-        this.pluginService.closePluginCatalog()
+        this.pluginService.collapsePluginCatalog()
     }
 
     openDialog(plugin: Plugin): void {

@@ -81,7 +81,7 @@ export class PluginService {
         }
     }
 
-    closePluginCatalog() {
+    collapsePluginCatalog() {
         if (this.catalogToggleInput && !this.catalogToggleInput.checked) {
             this.catalogToggleInput.checked = true
         }

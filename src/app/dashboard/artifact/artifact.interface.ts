@@ -61,6 +61,7 @@ export interface ArtifactComputation {
     geometry?: MultiPolygon
     pluginId?: string
     params?: ArtifactParams
+    isLoading?: boolean
 }
 
 export interface Artifact {

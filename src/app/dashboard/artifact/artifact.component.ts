@@ -6,7 +6,7 @@ import {ReportService} from '../report/report.service'
 import {MapService} from '../map/map.service'
 import {PluginRun} from '../plugin/plugin.interface'
 import {MatIconModule} from '@angular/material/icon'
-import {BehaviorSubject, Subscription, timer} from 'rxjs'
+import {BehaviorSubject, Observable, Subscription, timer} from 'rxjs'
 import {CommonModule, NgClass, NgIf} from '@angular/common'
 import {TippyDirective} from '@ngneat/helipopper'
 import {NgScrollbarModule} from 'ngx-scrollbar'
@@ -307,7 +307,7 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         if (this.pluginService.pluginState$) {
             this.pluginService.setPluginState('inactive')
         }
-        this.pluginService.closePluginCatalog()
+        this.pluginService.collapsePluginCatalog()
         const previousActiveComputation = this.activeComputation
 
         if (previousActiveComputation) {
@@ -377,25 +377,62 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     }
 
     renderReport(computation: ArtifactComputation) {
-        this.pluginService.closePluginCatalog()
+        this.pluginService.collapsePluginCatalog()
+        computation.isLoading = true
+        this.reportService.resetReports()
+
+        const waitForMapRender = (artifact: Artifact): Promise<void> => {
+            return new Promise<void>((resolve) => {
+                this.mapService.map?.once('rendercomplete', () => {
+                    this.reportService.getLegend(artifact)
+                    computation.isLoading = false
+                    resolve()
+                })
+            })
+        }
+
+        // Allow for any type of report
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const waitForReportFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
+            const subscription = observable.subscribe((data) => {
+                if (dataCheck(data)) {
+                    computation.isLoading = false
+                    subscription.unsubscribe()
+                }
+            })
+        }
+
         const report_f = {
-            'IMAGE': (x: Artifact) => this.reportService.getImage(x),
-            'MARKDOWN': (x: Artifact) => this.reportService.getMarkdown(x),
-            'CHART': (x: Artifact) => this.reportService.getChart(x),
-            'TABLE': (x: Artifact) => this.reportService.getTable(x),
+            'IMAGE': (x: Artifact) => {
+                this.reportService.getImage(x)
+                waitForReportFetch(this.reportService.image, data => !!data?.url)
+            },
+            'MARKDOWN': (x: Artifact) => {
+                this.reportService.getMarkdown(x)
+                waitForReportFetch(this.reportService.markdown, data => !!data?.url)
+            },
+            'CHART': (x: Artifact) => {
+                this.reportService.getChart(x)
+                waitForReportFetch(this.reportService.chart, data => !!data?.data)
+            },
+            'TABLE': (x: Artifact) => {
+                this.reportService.getTable(x)
+                waitForReportFetch(this.reportService.table, data => !!data?.url)
+            },
             'MAP_LAYER_GEOJSON': (x: Artifact) => {
                 this.reportService.getGeoJson(x)
-                this.reportService.getLegend(x)
+                return waitForMapRender(x)
             },
             'MAP_LAYER_GEOTIFF': (x: Artifact) => {
                 this.reportService.getGeoTiff(x)
-                this.reportService.getLegend(x)
+                return waitForMapRender(x)
             }
         }
+        
         this.reportService.clearLegend()
         if (computation.ref) {
             this.reportService.isReportVisible = true
-            return report_f[computation.ref.modality](computation.ref)
+            report_f[computation.ref.modality](computation.ref)
         }
     }
 
@@ -431,9 +468,6 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                     this.activeChildComputation = parentComputation.children.find((x) => x.uuid === activeArtifactRef.store_uuid)
                     if (this.activeChildComputation) {
                         this.renderReport(this.activeChildComputation)
-                        if (!this.activeChildComputation.ref?.primary) {
-                            parentComputation.showSecondaryChildren = true
-                        }
                     }
                 }
             }

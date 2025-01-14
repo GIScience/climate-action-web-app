@@ -31,9 +31,10 @@ describe('ArtifactComponent', () => {
             'getArtifactsMetadata', 
             'getComputesFromLS', 
             'getPluginRuns', 
-            'closePluginCatalog', 
             'setPluginState',
-            'getComputationState'
+            'getComputationState',
+            'collapsePluginCatalog', 
+            'setPluginState'
         ], {
             syncTasks$: new BehaviorSubject<void>(undefined)
         })
