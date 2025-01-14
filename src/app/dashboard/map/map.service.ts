@@ -106,19 +106,14 @@ export class MapService {
         })
     }
 
-    searchLocation(query: string) {
-        const orsUrl = `https://api.openrouteservice.org/geocode/search?api_key=${this.orsAPIKey}&text=${query}`
-
-        this.http.get<GeoJSONFeatureCollection>(orsUrl).subscribe(results => {
-            if (results.features) {
-                const result = results.features[0]
-                const lon = result.geometry.coordinates[0]
-                const lat = result.geometry.coordinates[1]
-                const coord = fromLonLat([lon, lat]) as [number, number]
-                this.addMarker(coord)
-                this.fitMapViewToSearchResult(result, coord)
-            }
-        })
+    goToLocation(suggestion: GeoJSONFeature) {    
+        if (suggestion) {
+            const lon = suggestion.geometry.coordinates[0]
+            const lat = suggestion.geometry.coordinates[1]
+            const coord = fromLonLat([lon, lat]) as [number, number]
+            this.addMarker(coord)
+            this.fitMapViewToSearchResult(suggestion, coord)
+        }
     }
 
     getAutoCompleteSuggestions(query: string): Observable<GeoJSONFeatureCollection[]> {
@@ -143,7 +138,7 @@ export class MapService {
         this.markerFeatures.push(markerFeature)
     }
 
-    fitMapViewToSearchResult(result: GeoJSONFeatureCollection, coord: [number, number]) {
+    fitMapViewToSearchResult(result: GeoJSONFeature, coord: [number, number]) {
         if (result.bbox) {
             const extent = [
                 ...fromLonLat([result.bbox[0], result.bbox[1]]),

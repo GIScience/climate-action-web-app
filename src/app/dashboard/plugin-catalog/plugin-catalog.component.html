@@ -11,7 +11,7 @@
             <li *ngFor="let card of cards; let i = index;"
                 class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
                 (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
-                [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="{{i}}"
+                [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="0"
                 [tp]="tpl" tpPlacement="right">
                 <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
                 <div class="plugin-card__text">

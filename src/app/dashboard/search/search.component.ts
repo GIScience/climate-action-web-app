@@ -28,25 +28,48 @@ import {LucideAngularModule, CircleX} from 'lucide-angular'
 export class SearchComponent implements OnInit {
     searchControl = new FormControl()
     suggestions: GeoJSONFeatureCollection[] = []
+    firstSuggestionItem: HTMLElement | null = null
+    searchInput: HTMLInputElement | null = null
+    isFetchingSuggestions = false
+    isSearchActive = false
 
     readonly CircleX = CircleX
 
     constructor(private mapService: MapService) { }
 
     ngOnInit(): void {
+        setTimeout(() => {
+            this.searchInput = document.querySelector('.search-locations')
+        })
+
         this.searchControl.valueChanges.pipe(
             debounceTime(300),
             distinctUntilChanged(),
             switchMap(query => {
                 if (query) {
+                    this.isFetchingSuggestions = true
+                    this.isSearchActive = true
                     return this.mapService.getAutoCompleteSuggestions(query)
                 } else {
                     this.suggestions = []
+                    this.isSearchActive = false
                     return []
                 }
             })
-        ).subscribe((results: GeoJSONFeatureCollection[]) => {
-            this.suggestions = results
+        ).subscribe({
+            next: (results: GeoJSONFeatureCollection[]) => {
+                this.suggestions = results
+                this.isFetchingSuggestions = false
+                if (results.length > 0) {
+                    setTimeout(() => {
+                        this.firstSuggestionItem = document.querySelector('.location-suggestion__item')
+                        this.firstSuggestionItem?.focus()
+                    })
+                }
+            },
+            error: () => {
+                this.isFetchingSuggestions = false
+            }
         })
     }
 
@@ -77,12 +100,38 @@ export class SearchComponent implements OnInit {
     selectSuggestion(suggestion: GeoJSONFeatureCollection) {
         this.searchControl.setValue(suggestion.properties.label, {emitEvent: false})
         this.suggestions = []
-        this.mapService.searchLocation(suggestion.properties.label)
+        this.isSearchActive = false
+        this.mapService.goToLocation(suggestion)
     }
 
     clearSearch() {
         this.searchControl.setValue('')
         this.suggestions = []
+        this.isSearchActive = false
         this.mapService.markerFeatures.clear()
+    }
+
+    onSuggestionKeydown(event: KeyboardEvent) {
+        if (event.key.length === 1 || event.key === 'Backspace' || event.key === 'Delete') {
+            this.searchInput?.focus()
+            return
+        }
+
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault()
+            
+            const currentElement = event.target as HTMLElement
+            const items = Array.from(document.querySelectorAll('.location-suggestion__item'))
+            const currentIndex = items.indexOf(currentElement)
+            
+            let nextIndex
+            if (event.key === 'ArrowDown') {
+                nextIndex = currentIndex + 1 >= items.length ? 0 : currentIndex + 1
+            } else {
+                nextIndex = currentIndex - 1 < 0 ? items.length - 1 : currentIndex - 1
+            }
+            
+            (items[nextIndex] as HTMLElement).focus()
+        }
     }
 }
