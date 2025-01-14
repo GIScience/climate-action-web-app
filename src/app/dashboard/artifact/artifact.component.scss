@@ -97,7 +97,7 @@
 
     .artifact-parent-computation {
       display: grid;
-      grid-template-columns: 40px 1fr 40px;
+      grid-template-columns: 40px 1fr 65px;
       align-items: center;
       border-radius: 10px;
       padding: 10px 5px;
@@ -107,11 +107,11 @@
 
       &.is-new {
 
-        & button.archive-artifact {
+        .computation-actions {
           display: none;
         }
 
-        & .new-run-dot {
+        .new-run-dot {
           display: block;
           width: 15px;
           height: 15px;
@@ -137,7 +137,7 @@
       &:hover {
         background-color: #d3d3d3;
 
-        button.archive-artifact {
+        .computation-actions {
           visibility: visible;
         }
       }
@@ -149,11 +149,11 @@
           pointer-events: none;
         }
 
-        & .computation-arrow {
+        .computation-arrow {
           visibility: hidden;
         }
 
-        button.archive-artifact {
+        .computation-actions {
           pointer-events: all;
         }
       }
@@ -190,11 +190,12 @@
         }
       }
 
-      button.archive-artifact {
-        cursor: pointer;
-        margin-left: auto;
+      .computation-actions {
         visibility: hidden;
-      }    
+        margin-left: auto;
+        display: flex;
+        gap: 2.5px;
+      }  
     }
 
     .artifact-child-computations-wrapper {
@@ -284,4 +285,57 @@
       }
     }
   }
+}
+
+.parameters-dialog {
+  position: relative;
+  padding: 20px;
+
+  h3 {
+    margin-top: 0;
+  }
+
+  .parameters-dialog__content {
+    max-height: 50vh !important;
+    min-width: 500px;
+    max-width: 650px !important;
+    position: relative;
+
+    .parameters-table {
+      width: 100%;
+      border-collapse: collapse;
+      
+      td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #ccc;
+        
+        &.parameter-name {
+          border-right: 1px solid #ccc;
+          font-variation-settings: 'wght' 500;
+          color: #666;
+          width: 40%;
+        }
+      }
+      
+      tr:last-child td {
+        border-bottom: none;
+      }
+    }
+
+    .no-params-message {
+      text-align: center;
+      padding: 20px;
+    }
+  }
+
+  button.close-dialog {
+    color: #666;
+    cursor: pointer;
+		position: absolute;
+		top: 10px;
+		right: 0;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+	}
 }

@@ -60,6 +60,7 @@ export interface ArtifactComputation {
     aoiName?: string
     geometry?: MultiPolygon
     pluginId?: string
+    params?: ArtifactParams
 }
 
 export interface Artifact {
