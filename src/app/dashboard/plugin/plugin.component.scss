@@ -116,6 +116,10 @@
   position: relative;
   padding: 20px;
 
+  h3 {
+    margin-top: 0;
+  }
+
   .plugin__full-content {
     max-height: 50vh !important;
     max-width: 650px !important;

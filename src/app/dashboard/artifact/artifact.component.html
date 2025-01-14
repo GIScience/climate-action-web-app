@@ -20,7 +20,7 @@
                             <h3>{{scheduledRun.aoiName}}</h3>
                             <p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide> {{formatTimestamp(scheduledRun.timestamp) || ''}} • Scheduled</p>
                         </div>
-                        <div  class="scheduled-run-dot"></div>
+                        <div class="scheduled-run-dot"></div>
                     </div>
                 </div>
                 <div *ngFor="let computation of computations | filterByCriteria: pluginId" class="artifact-computation">
@@ -38,9 +38,14 @@
                             <h3>{{computation.aoiName}}</h3>
                             <p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide> {{formatTimestamp(computation.timestamp || '')}} • <i-lucide [img]="Hash" size="12"></i-lucide>{{formatUUID(computation.uuid)}}</p>
                         </div>
-                        <button (click)="archiveArtifact(computation.uuid)" aria-label="Archive Artifact" tp="Archive Artifact" class="pX-5 pY-3 mL-a mR-5 archive-artifact btn-onlyicon">
-                            <i-lucide [img]="Archive" size="15"></i-lucide>
-                        </button>
+                        <div class="computation-actions">
+                            <button (click)="viewParameters(computation)" aria-label="View Parameters" tp="View Parameters"  class="btn-onlyicon">
+                                <i-lucide [img]="ListTodo" size="15"></i-lucide>
+                            </button>
+                            <button (click)="archiveArtifact(computation.uuid)" aria-label="Archive Artifact" tp="Archive Artifact" class="archive-artifact btn-onlyicon">
+                                <i-lucide [img]="Archive" size="15"></i-lucide>
+                            </button>
+                        </div>
                         <div *ngIf="newRuns.includes(computation.uuid)" class="new-run-dot"></div>
                     </div>
                     <div [@expandCollapse]="computation.isExpanded ? 'expanded' : 'collapsed'" class="artifact-child-computations-wrapper" (@expandCollapse.done)="onAnimationEvent($event, computation)">
@@ -99,3 +104,29 @@
         </div>
     </div>
 </div>
+
+<ng-template #parametersDialog let-data>
+    <div class="parameters-dialog">
+        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
+            <div mat-dialog-content class="parameters-dialog__content" scrollViewport>
+                <h3>Computation Parameters</h3>
+                <ng-container *ngIf="getParameterEntries(data.parameters).length > 0; else noParams">
+                    <table class="parameters-table">
+                        <tbody>
+                            <tr *ngFor="let item of getParameterEntries(data.parameters)">
+                                <td class="parameter-name">{{formatParameterName(item[0])}}</td>
+                                <td class="parameter-value">{{item[1]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </ng-container>
+                <ng-template #noParams>
+                    <p class="no-params-message">This computation used no parameters.</p>
+                </ng-template>
+            </div>
+        </ng-scrollbar>
+        <button mat-button (click)="closeDialog()" class="close-dialog">
+            <i-lucide [img]="CircleX" size="30"></i-lucide>
+        </button>
+    </div>
+</ng-template>

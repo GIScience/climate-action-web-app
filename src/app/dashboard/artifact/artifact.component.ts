@@ -1,7 +1,7 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core'
+import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core'
 import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations'
 import {PluginService} from '../plugin/plugin.service'
-import {ActiveArtifactRef, Artifact, ArtifactComputation, ArtifactMetadata} from './artifact.interface'
+import {ActiveArtifactRef, Artifact, ArtifactComputation, ArtifactMetadata, ArtifactParams} from './artifact.interface'
 import {ReportService} from '../report/report.service'
 import {MapService} from '../map/map.service'
 import {PluginRun} from '../plugin/plugin.interface'
@@ -13,8 +13,9 @@ import {NgScrollbarModule} from 'ngx-scrollbar'
 import {ActivatedRoute} from '@angular/router'
 import {FilterByCriteriaPipe} from './artifact-filters.pipe'
 import moment from 'moment/moment'
-import {Archive, ArchiveRestore, CircleArrowLeft, Clock, Hash, LucideAngularModule} from 'lucide-angular'
+import {Archive, ArchiveRestore, CircleArrowLeft, CircleX, Clock, Hash, ListTodo, LucideAngularModule} from 'lucide-angular'
 import {MatSnackBar} from '@angular/material/snack-bar'
+import {MatDialog} from '@angular/material/dialog'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
     'IMAGE': 'image',
@@ -90,10 +91,16 @@ export class ArtifactComponent implements OnInit, OnDestroy {
     readonly Archive = Archive
     readonly ArchiveRestore = ArchiveRestore
     readonly CircleArrowLeft = CircleArrowLeft
+    readonly CircleX = CircleX
     readonly Clock = Clock
     readonly Hash = Hash
+    readonly ListTodo = ListTodo
 
     @Input() pluginId: string = ''
+
+    @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
+        params: ArtifactParams
+    }>
 
     scheduledRunsSubscription: Subscription = new Subscription()
     private syncSubscription?: Subscription
@@ -104,7 +111,8 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                 public reportService: ReportService,
                 private mapService: MapService,
                 private route: ActivatedRoute,
-                private snackBar: MatSnackBar) {
+                private snackBar: MatSnackBar,
+                private dialog: MatDialog) {
 
         if (this.pluginService.pluginState$) {
             this.pluginService.pluginState$.subscribe((value) => {
@@ -243,7 +251,8 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                     timestamp: new Date(run.timestamp),
                     aoiName: response.aoi?.properties.name || response.params?.aoi?.properties.name,
                     geometry: response.aoi?.geometry || response.params?.aoi?.geometry,
-                    pluginId: response.plugin_info?.plugin_id
+                    pluginId: response.plugin_info?.plugin_id,
+                    params: response.params
                 }
 
                 if (Array.isArray(artifacts) && artifacts.length > 0) {
@@ -431,6 +440,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         }
     }
 
+    viewParameters(computation: ArtifactComputation) {
+        this.dialog.open(this.parametersDialog, {
+            data: {parameters: JSON.stringify(computation.params)},
+            autoFocus: false
+        })
+    }
+
+    closeDialog() {
+        this.dialog.closeAll()
+    }
+
     archiveArtifact(correlation_uuid: string): void {
         const artifactToArchive = this.currentRuns.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
         const isCurrentArtifact = this.activeComputation && this.activeComputation.ref && this.activeComputation.ref.correlation_uuid === correlation_uuid
@@ -500,5 +520,17 @@ export class ArtifactComponent implements OnInit, OnDestroy {
         }
 
         checkAndScheduleNext()
+    }
+
+    getParameterEntries(params: string | object): [string, string][] {
+        const obj = typeof params === 'string' ? JSON.parse(params) : params
+        return Object.entries(obj)
+    }
+
+    formatParameterName(name: string): string {
+        return name
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
     }
 }
