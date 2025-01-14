@@ -422,6 +422,9 @@ export class ArtifactComponent implements OnInit, OnDestroy {
                     this.activeChildComputation = parentComputation.children.find((x) => x.uuid === activeArtifactRef.store_uuid)
                     if (this.activeChildComputation) {
                         this.renderReport(this.activeChildComputation)
+                        if (!this.activeChildComputation.ref?.primary) {
+                            parentComputation.showSecondaryChildren = true
+                        }
                     }
                 }
             }
