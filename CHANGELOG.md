@@ -7,6 +7,14 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.0.0...main)
 
+### Changed
+
+- Removed backwards compatibility for AoI with the old backend
+
+### Fixed
+
+- Refactored types and names of interfaces to match the backend
+
 ### Added
 
 - Landing page now displays a summary for revisiting users ([#182](https://gitlab.heigit.org/climate-action/web-app/-/issues/182))

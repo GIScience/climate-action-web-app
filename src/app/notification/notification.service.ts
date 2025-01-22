@@ -29,7 +29,7 @@ export class NotificationService {
         if (this.websocketSubject) {
             this.websocketSubject.next(JSON.stringify(message))
         } else {
-            console.error('WebSocket connection has not bee established.')
+            console.error('WebSocket connection has not been established.')
         }
     }
 

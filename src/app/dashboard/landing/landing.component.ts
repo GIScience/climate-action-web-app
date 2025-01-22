@@ -2,7 +2,7 @@ import {Component, OnInit, ChangeDetectorRef} from '@angular/core'
 import {CommonModule} from '@angular/common'
 import {RouterModule} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
-import {PluginRun} from '../plugin/plugin.interface'
+import {ComputationEntity} from '../computations-index/computation.interface'
 import {pickRandomGradient} from '../../utils/style-utils'
 
 @Component({
@@ -14,7 +14,7 @@ import {pickRandomGradient} from '../../utils/style-utils'
 })
 
 export class LandingComponent implements OnInit {
-    currentRuns: PluginRun[] = []
+    currentRuns: ComputationEntity[] = []
     pluginCounts: { pluginName: string; pluginId: string; count: number }[] = []
     private gradientCache: { [key: string]: string } = {}
 
@@ -41,10 +41,12 @@ export class LandingComponent implements OnInit {
 
     private calculatePluginCounts() {
         const counts = this.currentRuns.reduce((acc, run) => {
-            acc[run.pluginId] = {
-                pluginName: run.pluginName,
-                pluginId: run.pluginId,
-                count: (acc[run.pluginId]?.count || 0) + 1
+            if (run.pluginId) {
+                acc[run.pluginId] = {
+                    pluginName: run.pluginName || '',
+                    pluginId: run.pluginId,
+                    count: (acc[run.pluginId]?.count || 0) + 1
+                }
             }
             return acc
         }, {} as Record<string, { pluginName: string, pluginId: string, count: number }>)

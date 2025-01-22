@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core'
 import {NavigationEnd, Router} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
-import {ReportService} from '../report/report.service'
+import {ArtifactService} from '../artifact/artifact.service'
 import {CommonModule} from '@angular/common'
 import {MatIconModule} from '@angular/material/icon'
-import {availableCards, PluginCard} from './plugins.interface'
+import {availableCards, PluginCard} from './plugin-catalog.interface'
 import {TippyDirective} from '@ngneat/helipopper'
 
 @Component({
@@ -27,7 +27,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     constructor(
         private router: Router,
         private pluginService: PluginService,
-        private reportService: ReportService) {
+        private artifactService: ArtifactService) {
     }
 
     ngAfterViewInit(): void {
@@ -109,7 +109,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     showPlugin(card: PluginCard) {
         if (card.enabled) {
-            this.reportService.closeReport()
+            this.artifactService.closeArtifact()
             this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
                 this.activeCard = card
             })

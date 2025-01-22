@@ -1,5 +1,5 @@
 import {Component} from '@angular/core'
-import {ReportService} from './dashboard/report/report.service'
+import {ArtifactService} from './dashboard/artifact/artifact.service'
 import {MapService} from './dashboard/map/map.service'
 import {default as packageInfo} from '../../package.json'
 
@@ -18,12 +18,12 @@ export class AppComponent  {
     }
 
     constructor(
-        public reportService: ReportService,
+        public artifactService: ArtifactService,
         public mapService: MapService
     ) {}
 
     resetMapState() {
-        this.reportService.closeReport()
+        this.artifactService.closeArtifact()
         this.mapService.removeFocusedLayer()
         this.mapService.removeComputeLayers()
     }

@@ -671,89 +671,85 @@ export const mockGeoTiffComputation = () => {
             'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
             'timestamp': new Date('2023-09-27T16:42:52+01:00'),
             'params': {
-                'bool_blueprint': true,
-                'aoi': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'MultiPolygon',
-                        'coordinates': [
+                'bool_blueprint': true
+            },
+            'aoi': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [
                             [
                                 [
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ],
-                                    [
-                                        116.3505557,
-                                        39.9109802
-                                    ],
-                                    [
-                                        116.3502807,
-                                        39.9081009
-                                    ],
-                                    [
-                                        116.3503101,
-                                        39.9056782
-                                    ],
-                                    [
-                                        116.3505186,
-                                        39.901277
-                                    ],
-                                    [
-                                        116.3509736,
-                                        39.9004266
-                                    ],
-                                    [
-                                        116.3518984,
-                                        39.8993272
-                                    ],
-                                    [
-                                        116.3527821,
-                                        39.8986917
-                                    ],
-                                    [
-                                        116.3540159,
-                                        39.8981715
-                                    ],
-                                    [
-                                        116.3540312,
-                                        39.8978679
-                                    ],
-                                    [
-                                        116.3681236,
-                                        39.8983514
-                                    ],
-                                    [
-                                        116.3672525,
-                                        39.9226073
-                                    ],
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ]
+                                    116.3500629,
+                                    39.9222736
+                                ],
+                                [
+                                    116.3505557,
+                                    39.9109802
+                                ],
+                                [
+                                    116.3502807,
+                                    39.9081009
+                                ],
+                                [
+                                    116.3503101,
+                                    39.9056782
+                                ],
+                                [
+                                    116.3505186,
+                                    39.901277
+                                ],
+                                [
+                                    116.3509736,
+                                    39.9004266
+                                ],
+                                [
+                                    116.3518984,
+                                    39.8993272
+                                ],
+                                [
+                                    116.3527821,
+                                    39.8986917
+                                ],
+                                [
+                                    116.3540159,
+                                    39.8981715
+                                ],
+                                [
+                                    116.3540312,
+                                    39.8978679
+                                ],
+                                [
+                                    116.3681236,
+                                    39.8983514
+                                ],
+                                [
+                                    116.3672525,
+                                    39.9226073
+                                ],
+                                [
+                                    116.3500629,
+                                    39.9222736
                                 ]
                             ]
                         ]
-                    },
-                    'properties': {
-                        'osm_id': -13210713,
-                        'boundary': 'administrative',
-                        'admin_level': 8,
-                        'parents': [
-                            -15887483,
-                            -912940,
-                            -270056
-                        ],
-                        'name': '金融街街道',
-                        'local_name': '金融街街道',
-                        'name_en': null,
-                        'id': 'uzyj1dj'
-                    }
+                    ]
+                },
+                'properties': {
+                    'osm_id': -13210713,
+                    'boundary': 'administrative',
+                    'admin_level': 8,
+                    'parents': [
+                        -15887483,
+                        -912940,
+                        -270056
+                    ],
+                    'name': '金融街街道',
+                    'local_name': '金融街街道',
+                    'name_en': null,
+                    'id': 'uzyj1dj'
                 }
-            },
-            'plugin_info': {
-                'name': 'Plugin Blueprint',
-                'plugin_id': 'plugin_blueprint'
             },
             'artifacts': [
                 {
@@ -780,7 +776,13 @@ export const mockGeoTiffComputation = () => {
                         }
                     }
                 }
-            ]
+            ],
+            'plugin_info': {
+                'name': 'Plugin Blueprint',
+                'plugin_id': 'plugin_blueprint'
+            },
+            'status': 'SUCCESS',
+            'message': '-'
         }
     }).as('getGeoTiffComputation')
 }
@@ -791,89 +793,85 @@ export const mockGeoJsonComputation = () => {
             'correlation_uuid': '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
             'timestamp': new Date('2023-09-27T16:42:52+01:00'),
             'params': {
-                'bool_blueprint': true,
-                'aoi': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'MultiPolygon',
-                        'coordinates': [
+                'bool_blueprint': true
+            },
+            'aoi': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [
                             [
                                 [
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ],
-                                    [
-                                        116.3505557,
-                                        39.9109802
-                                    ],
-                                    [
-                                        116.3502807,
-                                        39.9081009
-                                    ],
-                                    [
-                                        116.3503101,
-                                        39.9056782
-                                    ],
-                                    [
-                                        116.3505186,
-                                        39.901277
-                                    ],
-                                    [
-                                        116.3509736,
-                                        39.9004266
-                                    ],
-                                    [
-                                        116.3518984,
-                                        39.8993272
-                                    ],
-                                    [
-                                        116.3527821,
-                                        39.8986917
-                                    ],
-                                    [
-                                        116.3540159,
-                                        39.8981715
-                                    ],
-                                    [
-                                        116.3540312,
-                                        39.8978679
-                                    ],
-                                    [
-                                        116.3681236,
-                                        39.8983514
-                                    ],
-                                    [
-                                        116.3672525,
-                                        39.9226073
-                                    ],
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ]
+                                    116.3500629,
+                                    39.9222736
+                                ],
+                                [
+                                    116.3505557,
+                                    39.9109802
+                                ],
+                                [
+                                    116.3502807,
+                                    39.9081009
+                                ],
+                                [
+                                    116.3503101,
+                                    39.9056782
+                                ],
+                                [
+                                    116.3505186,
+                                    39.901277
+                                ],
+                                [
+                                    116.3509736,
+                                    39.9004266
+                                ],
+                                [
+                                    116.3518984,
+                                    39.8993272
+                                ],
+                                [
+                                    116.3527821,
+                                    39.8986917
+                                ],
+                                [
+                                    116.3540159,
+                                    39.8981715
+                                ],
+                                [
+                                    116.3540312,
+                                    39.8978679
+                                ],
+                                [
+                                    116.3681236,
+                                    39.8983514
+                                ],
+                                [
+                                    116.3672525,
+                                    39.9226073
+                                ],
+                                [
+                                    116.3500629,
+                                    39.9222736
                                 ]
                             ]
-                        ],
-                    },
-                    'properties': {
-                        'osm_id': -13210713,
-                        'boundary': 'administrative',
-                        'admin_level': 8,
-                        'parents': [
-                            -15887483,
-                            -912940,
-                            -270056
-                        ],
-                        'name': 'Jinrongjie',
-                        'local_name': 'Jinrongjie',
-                        'name_en': null,
-                        'id': 'uzyj1dj'
-                    }
+                        ]
+                    ],
+                },
+                'properties': {
+                    'osm_id': -13210713,
+                    'boundary': 'administrative',
+                    'admin_level': 8,
+                    'parents': [
+                        -15887483,
+                        -912940,
+                        -270056
+                    ],
+                    'name': 'Jinrongjie',
+                    'local_name': 'Jinrongjie',
+                    'name_en': null,
+                    'id': 'uzyj1dj'
                 }
-            },
-            'plugin_info': {
-                'name': 'Plugin Blueprint',
-                'plugin_id': 'plugin_blueprint'
             },
             'artifacts': [
                 {
@@ -899,7 +897,13 @@ export const mockGeoJsonComputation = () => {
                         }
                     }
                 }
-            ]
+            ],
+            'plugin_info': {
+                'name': 'Plugin Blueprint',
+                'plugin_id': 'plugin_blueprint'
+            },
+            'status': 'SUCCESS',
+            'message': '-'
         }
     }).as('getGeoJsonComputation')
 }
@@ -910,89 +914,85 @@ export const mockSimpleGeoJsonComputation = () => {
             'correlation_uuid': '1cfd2634-1724-43a2-ab1e-6466ba433364',
             'timestamp': new Date('2023-09-27T16:42:52+01:00'),
             'params': {
-                'bool_blueprint': true,
-                'aoi': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'MultiPolygon',
-                        'coordinates': [
+                'bool_blueprint': true  
+            },
+            'aoi': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [
                             [
                                 [
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ],
-                                    [
-                                        116.3505557,
-                                        39.9109802
-                                    ],
-                                    [
-                                        116.3502807,
-                                        39.9081009
-                                    ],
-                                    [
-                                        116.3503101,
-                                        39.9056782
-                                    ],
-                                    [
-                                        116.3505186,
-                                        39.901277
-                                    ],
-                                    [
-                                        116.3509736,
-                                        39.9004266
-                                    ],
-                                    [
-                                        116.3518984,
-                                        39.8993272
-                                    ],
-                                    [
-                                        116.3527821,
-                                        39.8986917
-                                    ],
-                                    [
-                                        116.3540159,
-                                        39.8981715
-                                    ],
-                                    [
-                                        116.3540312,
-                                        39.8978679
-                                    ],
-                                    [
-                                        116.3681236,
-                                        39.8983514
-                                    ],
-                                    [
-                                        116.3672525,
-                                        39.9226073
-                                    ],
-                                    [
-                                        116.3500629,
-                                        39.9222736
-                                    ]
+                                    116.3500629,
+                                    39.9222736
+                                ],
+                                [
+                                    116.3505557,
+                                    39.9109802
+                                ],
+                                [
+                                    116.3502807,
+                                    39.9081009
+                                ],
+                                [
+                                    116.3503101,
+                                    39.9056782
+                                ],
+                                [
+                                    116.3505186,
+                                    39.901277
+                                ],
+                                [
+                                    116.3509736,
+                                    39.9004266
+                                ],
+                                [
+                                    116.3518984,
+                                    39.8993272
+                                ],
+                                [
+                                    116.3527821,
+                                    39.8986917
+                                ],
+                                [
+                                    116.3540159,
+                                    39.8981715
+                                ],
+                                [
+                                    116.3540312,
+                                    39.8978679
+                                ],
+                                [
+                                    116.3681236,
+                                    39.8983514
+                                ],
+                                [
+                                    116.3672525,
+                                    39.9226073
+                                ],
+                                [
+                                    116.3500629,
+                                    39.9222736
                                 ]
                             ]
-                        ],
-                    },
-                    'properties': {
-                        'osm_id': -13210713,
-                        'boundary': 'administrative',
-                        'admin_level': 8,
-                        'parents': [
-                            -15887483,
-                            -912940,
-                            -270056
-                        ],
-                        'name': 'Jinrongjie',
-                        'local_name': 'Jinrongjie',
-                        'name_en': null,
-                        'id': 'uzyj1dj'
-                    }
+                        ]
+                    ],
+                },
+                'properties': {
+                    'osm_id': -13210713,
+                    'boundary': 'administrative',
+                    'admin_level': 8,
+                    'parents': [
+                        -15887483,
+                        -912940,
+                        -270056
+                    ],
+                    'name': 'Jinrongjie',
+                    'local_name': 'Jinrongjie',
+                    'name_en': null,
+                    'id': 'uzyj1dj'
                 }
-            },
-            'plugin_info': {
-                'name': 'Plugin Blueprint',
-                'plugin_id': 'plugin_blueprint'
             },
             'artifacts': [
                 {
@@ -1018,7 +1018,13 @@ export const mockSimpleGeoJsonComputation = () => {
                         }
                     }
                 }
-            ]
+            ],
+            'plugin_info': {
+                'name': 'Plugin Blueprint',
+                'plugin_id': 'plugin_blueprint'
+            },
+            'status': 'SUCCESS',
+            'message': '-'
         }
     }).as('getSimpleGeoJsonComputation')
 }

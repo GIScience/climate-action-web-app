@@ -3,19 +3,20 @@ import {TestBed} from '@angular/core/testing'
 import {PluginService} from './plugin.service'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
 import {of} from 'rxjs'
-import {Plugin, PluginCorrelator, PluginRun} from './plugin.interface'
+import {Plugin} from './plugin.interface'
+import {ComputationID, ComputationEntity} from '../computations-index/computation.interface'
 import SpyObj = jasmine.SpyObj
 
 describe('PluginService', () => {
     let service: PluginService
     let httpClientSpy: SpyObj<HttpClient>
 
-    const test_artifact = {
-        name: 'test_artifact',
+    const test_computation = {
+        name: 'test_computation',
         modality: 'IMAGE',
         file_path: './',
-        summary: 'artifact summary',
-        description: 'artifact description',
+        summary: 'computation summary',
+        description: 'computation description',
         correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
         params: {},
         store_id: '2fbeed00-e9b7-4f54-bae7-18f64bd33ea6'
@@ -23,7 +24,7 @@ describe('PluginService', () => {
 
     const test_correlator = {
         correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6'
-    } as PluginCorrelator
+    } as ComputationID
 
     const test_plugin = {
         name: 'Test 1',
@@ -35,7 +36,6 @@ describe('PluginService', () => {
         ],
         purpose: 'This Plugin serves no purpose besides being a blueprint for real plugins.',
         methodology: 'This Plugin uses no methodology because it does nothing.',
-        attribution: '',
         sources: [
             {
                 pages: '14-15',
@@ -142,12 +142,12 @@ describe('PluginService', () => {
         expect(httpClientSpy.post.calls.count()).toBe(1)
     })
 
-    it('should get artifacts', () => {
+    it('should get computations', () => {
         httpClientSpy.get.withArgs('/api/v1/gateway/store/1fbeed00-e9b7-4f54-bae7-18f64bd33ea6/metadata/').and
-            .returnValue(of([test_correlator, test_artifact]))
+            .returnValue(of([test_correlator, test_computation]))
 
-        service.getArtifactsMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(artifacts => {
-            expect(artifacts).toHaveSize(2)
+        service.getComputationMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(computations => {
+            expect(computations).toHaveSize(2)
         })
 
         expect(httpClientSpy.get.calls.count()).toBe(1)
@@ -172,7 +172,7 @@ describe('PluginService', () => {
 
     it('should refresh compute', () => {
         expect(localStorage.getItem('plugin_runs')).toBe(null)
-        service.refreshComputesInLS([test_plugin_run] as PluginRun[])
+        service.refreshComputesInLS([test_plugin_run] as ComputationEntity[])
 
         const item = localStorage.getItem('plugin_runs')
         if (item) {

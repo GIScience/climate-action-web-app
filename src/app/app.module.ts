@@ -9,12 +9,13 @@ import {PluginCatalogComponent} from './dashboard/plugin-catalog/plugin-catalog.
 import {AppRoutingModule} from './app.routing.module'
 import {AppComponent} from './app.component'
 import {NgOptimizedImage} from '@angular/common'
-import {ObjectTypeComponent} from './types/object.type'
-import {MultiSchemaTypeComponent} from './types/multischema.type'
-import {ArrayTypeComponent} from './types/array.type'
-import {NullTypeComponent} from './types/null.type'
-import {ChartComponent} from './dashboard/report/chart/chart.component'
-import {ArtifactComponent} from './dashboard/artifact/artifact.component'
+import {ObjectTypeComponent} from './types/object/object.type'
+import {MultiSchemaTypeComponent} from './types/multischema/multischema.type'
+import {ArrayTypeComponent} from './types/array/array.type'
+import {NullTypeComponent} from './types/null/null.type'
+import {ChartComponent} from './dashboard/artifact/chart/chart.component'
+import {ComputationsIndexComponent} from './dashboard/computations-index/computations-index.component'
+import {ComputationComponent} from './dashboard/computation/computation.component'
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker'
 import {FormlyMaterialModule} from '@ngx-formly/material'
 import {MatDatepickerModule} from '@angular/material/datepicker'
@@ -25,7 +26,7 @@ import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from '@angular/mat
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from './app.validators'
 import {RouteReuseStrategy} from '@angular/router'
 import {CustomRouteReuseStrategy} from './app.ext'
-import {FormlyFieldExpansionPanelComponent} from './types/formlyFieldExpansionPanel.type'
+import {FormlyFieldExpansionPanelComponent} from './types/expansion-panel/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
 import {MatSnackBarModule} from '@angular/material/snack-bar'
 import {MapService} from './dashboard/map/map.service'
@@ -81,7 +82,8 @@ import {tooltipVariation} from './utils/tooltip-variations'
         FormlyMatDatepickerModule,
         MarkdownModule.forRoot(),
         NgChartsModule,
-        ArtifactComponent,
+        ComputationsIndexComponent,
+        ComputationComponent,
         LucideAngularModule.pick({CircleUserRound})
     ],
     providers: [
