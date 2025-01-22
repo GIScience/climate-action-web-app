@@ -1,0 +1,27 @@
+<div [@expandCollapse]="computation.isExpanded ? 'expanded' : 'collapsed'" class="child-computations-wrapper" (@expandCollapse.done)="onAnimationEvent($event, computation)">
+    <ul *ngIf="computation.isExpanded || computation.keepInDOM" class="child-computations">
+        <ng-container *ngFor="let artifact of computation.artifacts; let i = index">
+            <li *ngIf="artifact.primary || computation.showSecondaryArtifacts"
+                [@fadeIn]="computation.showSecondaryArtifacts || artifact.primary ? 'in' : null"
+                class="child-computation"
+                (click)="renderArtifact(artifact); storeActiveArtifact(artifact)"
+                (keyup.enter)="renderArtifact(artifact); storeActiveArtifact(artifact)"
+                [ngClass]="{ 'child-computation-highlight': activeArtifact === artifact, 'primary-child': artifact.primary, 'secondary-child': !artifact.primary, 'loading': artifact.isLoading }"
+                tp="{{artifact.summary}}" tpPlacement="right"
+                tabindex="0">
+                <mat-icon aria-hidden="false" aria-label="Computation" fontIcon="{{artifact.icon}}"></mat-icon>
+                <div>{{artifact.name}}</div>
+                <div *ngIf="artifact.isLoading" class="loading-circle"></div>
+            </li>
+        </ng-container>
+    </ul>
+    <button *ngIf="!computation.showSecondaryArtifacts && hasSecondaryArtifacts(computation)" class="show-more btn-alt btn-small" (click)="showMore(computation)" (keyup.enter)="showMore(computation)" @fadeIn tabindex="0">
+        Show more...
+    </button>
+    <button *ngIf="computation.showSecondaryArtifacts && hasSecondaryArtifacts(computation)" class="show-less btn-alt btn-small" (click)="showLess(computation)" (keyup.enter)="showLess(computation)" @fadeIn tabindex="0">
+        Show less...
+    </button>
+    <div *ngIf="computation.artifacts.length === 0" class="no-results-message">
+        This run created no results. If you think that is an error, please contact the plugin developers.
+    </div>
+</div>

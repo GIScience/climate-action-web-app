@@ -1,570 +1,190 @@
-import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core'
-import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations'
-import {PluginService} from '../plugin/plugin.service'
-import {ActiveArtifactRef, Artifact, ArtifactComputation, ArtifactMetadata, ArtifactParams} from './artifact.interface'
-import {ReportService} from '../report/report.service'
-import {MapService} from '../map/map.service'
-import {PluginRun} from '../plugin/plugin.interface'
-import {MatIconModule} from '@angular/material/icon'
-import {BehaviorSubject, Observable, Subscription, timer} from 'rxjs'
-import {CommonModule, NgClass, NgIf} from '@angular/common'
+import {Component, OnInit, AfterViewInit, Type, ViewChild, ViewContainerRef, ChangeDetectorRef, ViewEncapsulation} from '@angular/core'
+import {CommonModule} from '@angular/common'
+import {ArtifactService} from './artifact.service'
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
+import {MarkdownComponent} from './markdown/markdown.component'
+import {ImageComponent} from './image/image.component'
+import {TableComponent} from './table/table.component'
+import {GeojsonComponent} from './geojson/geojson.component'
+import {GeoTiffComponent} from './geotiff/geotiff.component'
+import {ChartComponent} from './chart/chart.component'
+import {MatGridListModule} from '@angular/material/grid-list'
+import {Artifact} from './artifact.interface'
+import {MatExpansionModule} from '@angular/material/expansion'
 import {TippyDirective} from '@ngneat/helipopper'
 import {NgScrollbarModule} from 'ngx-scrollbar'
-import {ActivatedRoute} from '@angular/router'
-import {FilterByCriteriaPipe} from './artifact-filters.pipe'
-import moment from 'moment/moment'
-import {Archive, ArchiveRestore, CircleArrowLeft, CircleX, Clock, Hash, ListTodo, LucideAngularModule} from 'lucide-angular'
-import {MatSnackBar} from '@angular/material/snack-bar'
-import {MatDialog} from '@angular/material/dialog'
-
-const ARTIFACT_ICON_MAP: { [index: string]: string } = {
-    'IMAGE': 'image',
-    'MARKDOWN': 'description',
-    'CHART': 'bar_chart',
-    'TABLE': 'table_chart',
-    'MAP_LAYER_GEOJSON': 'layers',
-    'MAP_LAYER_GEOTIFF': 'map'
-}
-
-const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
-    'description': 1,
-    'image': 2,
-    'layers': 3,
-    'map': 4,
-    'bar_chart': 5,
-    'table_chart': 6
-}
+import {CdkDrag, CdkDragHandle} from '@angular/cdk/drag-drop'
+import {LucideAngularModule, GripHorizontal, Maximize2, Minimize2, X, Download} from 'lucide-angular'
 
 @Component({
-    selector: 'app-artifacts',
+    selector: 'app-artifact',
     templateUrl: './artifact.component.html',
     styleUrls: ['./artifact.component.scss'],
     imports: [
-        MatIconModule,
-        TippyDirective,
-        NgIf,
-        NgClass,
+        MatGridListModule,
         CommonModule,
+        MatExpansionModule,
+        TippyDirective,
         NgScrollbarModule,
-        FilterByCriteriaPipe,
+        MarkdownComponent,
+        CdkDrag,
+        CdkDragHandle,
         LucideAngularModule
     ],
-    animations: [
-        trigger('expandCollapse', [
-            state('collapsed', style({
-                height: '0',
-                padding: '0',
-                visibility: 'hidden'
-            })),
-            state('expanded', style({
-                height: '*',
-                padding: '*',
-                visibility: 'visible'
-            })),
-            transition('expanded <=> collapsed', [
-                animate('250ms ease-in-out')
-            ])
-        ]),
-        trigger('fadeIn', [
-            state('in', style({opacity: 1})),
-            transition(':enter', [
-                style({opacity: 0}),
-                animate('250ms ease-in')
-            ])
-        ])
-    ],
-    standalone: true
+    standalone: true,
+    encapsulation: ViewEncapsulation.None
 })
-export class ArtifactComponent implements OnInit, OnDestroy {
+export class ArtifactComponent implements OnInit, AfterViewInit {
 
-    computations: ArtifactComputation[] = []
-    dataChange = new BehaviorSubject<ArtifactComputation[]>([])
-    currentRuns: PluginRun[] = []
-    scheduledRuns: PluginRun[] = []
-    activeComputation?: ArtifactComputation
-    activeChildComputation?: ArtifactComputation
-    archivedArtifacts: PluginRun[] = []
-    showArchived = false
-    newRuns: string[] = []
-    currentLocale = navigator.language
+    @ViewChild('container', {read: ViewContainerRef})
+    container!: ViewContainerRef
+    @ViewChild('descriptionContainer', {read: ViewContainerRef})
+    descriptionContainer!: ViewContainerRef
 
-    readonly Archive = Archive
-    readonly ArchiveRestore = ArchiveRestore
-    readonly CircleArrowLeft = CircleArrowLeft
-    readonly CircleX = CircleX
-    readonly Clock = Clock
-    readonly Hash = Hash
-    readonly ListTodo = ListTodo
+    currentUrl: string | null = null
+    downloadJsonHref: SafeUrl | null = null
+    name: string | null = null
+    summary: string | null = null
+    description: string | null = null
+    showAccordion = false
+    minimised = false
+    modality: string | null = null
 
-    @Input() pluginId: string = ''
+    readonly GripHorizontal = GripHorizontal
+    readonly Download = Download
+    readonly Maximize2 = Maximize2
+    readonly Minimize2 = Minimize2
+    readonly X = X
 
-    @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
-        params: ArtifactParams
-    }>
+    constructor(
+        public artifactService: ArtifactService,
+        private sanitizer: DomSanitizer,
+        private changeDetector: ChangeDetectorRef
+    ) {}
 
-    scheduledRunsSubscription: Subscription = new Subscription()
-    private syncSubscription?: Subscription
-    private readonly INITIAL_INTERVAL = 2500
-    private readonly MAX_INTERVAL = 1800000
+    display<C>(componentType: Type<C>, name: string, value: unknown, artifact: Artifact | null) {
+        if (this.container)
+            this.container.clear()
 
-    constructor(private pluginService: PluginService,
-                public reportService: ReportService,
-                private mapService: MapService,
-                private route: ActivatedRoute,
-                private snackBar: MatSnackBar,
-                private dialog: MatDialog) {
+        const ref = this.container.createComponent(componentType)
+        ref.setInput(name, value)
 
-        if (this.pluginService.pluginState$) {
-            this.pluginService.pluginState$.subscribe((value) => {
-                if (value === 'compute-ready') {
-                    this.collapseComputation()
-                }
-            })
+        this.displayName(artifact?.name || null)
+        this.displaySummary(artifact?.summary || null)
+        this.displayDescription(artifact?.description || null)
+        this.modality = artifact?.modality || null
+
+        if (typeof value === 'object' && value && !(value as {url?: string}).url) {
+            this.generateDownloadJsonUri(value)
+            this.currentUrl = null
+        } else {
+            this.currentUrl = typeof value === 'string' ? value : (value as {url?: string})?.url || null
+            this.downloadJsonHref = null
         }
+        this.refreshAccordion()
 
-        const storedNewRuns = localStorage.getItem('new_runs')
-        if (storedNewRuns) {
-            this.newRuns = JSON.parse(storedNewRuns)
+        if (this.modality === 'MAP_LAYER_GEOJSON' || this.modality === 'MAP_LAYER_GEOTIFF') {
+            this.minimised = true
+        } else {
+            this.minimised = false
         }
     }
 
-    formatTimestamp(timestamp: Date) {
-        return moment(timestamp).locale(this.currentLocale).format('lll')
+    generateDownloadJsonUri(jsonData: object) {
+        const theJSON = JSON.stringify(jsonData)
+        this.downloadJsonHref = this.sanitizer.bypassSecurityTrustUrl(
+            'data:application/json;charset=UTF-8,' + encodeURIComponent(theJSON)
+        )
     }
 
-    formatUUID(uuid: string): string {
-        return uuid.substring(0, 8)
+    downloadContent(): void {
+        if (this.downloadJsonHref) {
+            const a = document.createElement('a')
+            document.body.appendChild(a)
+            a.style.display = 'none'
+            a.href = (this.downloadJsonHref as {changingThisBreaksApplicationSecurity: string}).changingThisBreaksApplicationSecurity
+            a.download = 'data.json'
+            a.click()
+            document.body.removeChild(a)
+        } else if (this.currentUrl) {
+            const a = document.createElement('a')
+            a.href = this.currentUrl
+            a.download = this.getFileName(this.currentUrl)
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+        }
+    }
+
+    getFileName(url: string): string {
+        return url.split('/').pop() || 'download'
+    }
+    
+    private displayName(name: string | null) {
+        this.name = name
+    }
+    
+    private displaySummary(summary: string | null) {
+        this.summary = summary
+    }
+
+    private displayDescription(description: string | null) {
+        this.description = description
+        this.showAccordion = false
+        this.detectChanges()
+        this.showAccordion = true
+    }
+
+    refreshAccordion() {
+        this.showAccordion = false
+        this.detectChanges()
+        this.showAccordion = true
+    }
+
+    toggleMinimise(): void {
+        this.minimised = !this.minimised
     }
 
     ngOnInit(): void {
-        this.route.params.subscribe(params => {
-            const pluginId = params['name']
-            this.pluginId = pluginId
-
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-            this.fetchArchivedArtifacts()
-            this.startPeriodicSync()
-
-            this.dataChange.subscribe(data => {
-                if (data.length > 0) {
-                    this.computations = data
-                    this.activateComputation()
-                }
-            })
-
-            this.initializeSuccessfulRuns()
-
-            if (this.reportService.closeReportEvent) {
-                this.reportService.closeReportEvent.subscribe(() => this.closeReportEvent())
-            }
+        this.artifactService.markdown.subscribe(v => {
+            if (!v) this.clearContainer()
+            else this.display(MarkdownComponent, 'url', v.url, v)
         })
-
-        this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
-        this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-            this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
+        this.artifactService.image.subscribe(v => {
+            if (!v) this.clearContainer()
+            else this.display(ImageComponent, 'url', v.url, v)
         })
-
-        this.pluginService.syncTasks$.subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-            this.startPeriodicSync()
+        this.artifactService.table.subscribe(v => {
+            if (!v) this.clearContainer()
+            else this.display(TableComponent, 'url', v.url, v)
+        })
+        this.artifactService.geojson.subscribe(v => {
+            if (!v) this.clearContainer()
+            else this.display(GeojsonComponent, 'inputData', { url: v.url, artifact: v }, v)
+        })
+        this.artifactService.geotiff.subscribe(v => {
+            if (!v) this.clearContainer()
+            else this.display(GeoTiffComponent, 'inputData', { url: v.url, artifact: v }, v)
+        })
+        this.artifactService.chart.subscribe(v => {
+            if (!v.data) this.clearContainer()
+            else this.display(ChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
         })
     }
 
-    toggleArchivedView(): void {
-        this.showArchived = !this.showArchived
+    ngAfterViewInit(): void {
+        this.detectChanges()
     }
 
-    ngOnDestroy() {
-        if (this.scheduledRunsSubscription) this.scheduledRunsSubscription.unsubscribe()
-        if (this.syncSubscription) {
-            this.syncSubscription.unsubscribe()
+    private detectChanges(): void {
+        this.changeDetector.detectChanges()
+    }
+
+    private clearContainer(): void {
+        if (this.container) {
+            this.container.clear()
         }
-    }
-
-    initializeSuccessfulRuns() {
-        this.currentRuns
-            .filter(currentRun => currentRun.status === 'SUCCESS')
-            .forEach(currentRun => {
-                this.fetchAndProcessArtifacts(currentRun)
-            })
-
-        if (this.currentRuns.filter(run => run.pluginId === this.pluginId).length === 0) {
-            this.pluginService.setPluginState('compute-ready')
-        } else {
-            this.pluginService.setPluginState('inactive')
-        }
-    }
-
-    fetchArchivedArtifacts() {
-        const archivedItems = localStorage.getItem('archive_runs')
-        if (archivedItems) {
-            this.archivedArtifacts = JSON.parse(archivedItems).filter((artifact: PluginRun) =>
-                (artifact.status === 'PENDING' || artifact.status === 'STARTED' || artifact.status === 'SUCCESS')
-            )
-        }
-    }
-
-    syncRuns() {
-        this.currentRuns
-        .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
-        .forEach(run => {
-            this.pluginService.getComputationState(run.correlation_uuid).subscribe({
-                next: (status) => {
-                    if (status === 'SUCCESS') {
-                            this.newRuns.push(run.correlation_uuid)
-                            this.updateNewRunsStorage()
-                            this.fetchAndProcessArtifacts(run)
-                            if (this.syncSubscription) {
-                                this.syncSubscription.unsubscribe()
-                            }
-                        } else if (status === 'FAILURE') {
-                            this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.snackBar.open(
-                                'Error while computing plugin, please try again.',
-                                'Close',
-                                {
-                                    verticalPosition: 'bottom',
-                                    horizontalPosition: 'center',
-                                    panelClass: ['error-snackbar']
-                                }
-                            )
-                        }
-                    },
-                    error: (error) => {
-                        console.error('Error checking state for run:', run.correlation_uuid, error)
-                    }
-                })
-            })
-    }
-
-    fetchAndProcessArtifacts(run: PluginRun) {
-        this.pluginService.getArtifactsMetadata(run.correlation_uuid).subscribe({
-            next: (response: ArtifactMetadata) => {
-                const artifacts = response.artifacts
-                if (!artifacts) return
-                const computation: ArtifactComputation = {
-                    name: run.pluginName,
-                    uuid: run.correlation_uuid,
-                    children: [],
-                    status: run.status || 'PENDING',
-                    timestamp: new Date(run.timestamp),
-                    aoiName: response.aoi?.properties.name || response.params?.aoi?.properties.name,
-                    geometry: response.aoi?.geometry || response.params?.aoi?.geometry,
-                    pluginId: response.plugin_info?.plugin_id,
-                    params: response.params
-                }
-
-                if (Array.isArray(artifacts) && artifacts.length > 0) {
-                    computation.children = artifacts.map<ArtifactComputation>((x) => {
-                        return {
-                            name: x.name,
-                            uuid: x.store_id,
-                            children: [],
-                            icon: ARTIFACT_ICON_MAP[x.modality],
-                            summary: x.summary,
-                            ref: x
-                        }
-                    }).sort((a, b) => {
-                        if (a.icon == b.icon) {
-                            return a.name.localeCompare(b.name)
-                        } else if (a.icon && b.icon && a.icon in ARTIFACT_ORDER_MAP && b.icon in ARTIFACT_ORDER_MAP) {
-                            return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
-                        }
-                        return 0
-                    })
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
-                }
-                this.updateComputation(run.correlation_uuid, computation)
-            },
-            error: () => {
-                console.error('Error fetching artifacts for:', run.correlation_uuid)
-            }
-        })
-    }
-
-    updateComputation(correlation_uuid: string, computation: ArtifactComputation) {
-        if (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS') {
-            this.computations = this.computations.filter((x) => x.uuid != correlation_uuid)
-            this.computations.push(computation)
-            this.computations.sort((a, b) => {
-                return moment(a.timestamp?.valueOf()) < moment(b.timestamp?.valueOf()) ? 1 : -1
-            })
-            this.dataChange.next(this.computations)
-        }
-    }
-
-    removeNewRunMark(correlation_uuid: string) {
-        this.newRuns = this.newRuns.filter(uuid => uuid !== correlation_uuid)
-        this.updateNewRunsStorage()
-    }
-
-    updateNewRunsStorage() {
-        localStorage.setItem('new_runs', JSON.stringify(this.newRuns))
-    }
-
-    toggleComputation(computation: ArtifactComputation) {
-        if (this.pluginService.pluginState$) {
-            this.pluginService.setPluginState('inactive')
-        }
-        this.pluginService.collapsePluginCatalog()
-        const previousActiveComputation = this.activeComputation
-
-        if (previousActiveComputation) {
-            previousActiveComputation.isExpanded = false
-            setTimeout(() => previousActiveComputation.keepInDOM = false, 300)
-            this.reportService.closeReport()
-            this.mapService.removeFocusedLayer()
-        }
-
-        if (previousActiveComputation === computation) {
-            this.activeComputation = undefined
-            this.activeChildComputation = undefined
-        } else {
-            computation.keepInDOM = true
-            setTimeout(() => computation.isExpanded = true, 0)
-            this.activeComputation = computation
-
-            if (computation && computation.geometry) {
-                const geometry = computation.geometry
-                const geoJsonData = {
-                    'type': 'FeatureCollection',
-                    'features': [{
-                        'type': 'Feature',
-                        'geometry': geometry,
-                        'properties': {'name': 'AOI'}
-                    }]
-                }
-                const extent = this.mapService.highlightAoI(geoJsonData)
-
-                if (extent && this.mapService.map) {
-                    this.mapService.map.getView().fit(extent, {
-                        padding: this.mapService.calculateMapPadding()
-                    })
-                }
-            }
-
-            if (this.newRuns.includes(computation.uuid)) {
-                this.removeNewRunMark(computation.uuid)
-            }
-        }
-    }
-
-    collapseComputation() {
-        const previousActiveComputation = this.activeComputation
-
-        if (previousActiveComputation) {
-            previousActiveComputation.isExpanded = false
-            setTimeout(() => previousActiveComputation.keepInDOM = false, 300)
-            this.reportService.closeReport()
-            this.mapService.removeFocusedLayer()
-            this.activeComputation = undefined
-        }
-    }
-
-    onAnimationEvent(event: AnimationEvent, computation: ArtifactComputation) {
-        if (event.toState === 'collapsed') {
-            computation.keepInDOM = false
-        }
-    }
-
-    showMore(computation: ArtifactComputation) {
-        computation.showSecondaryChildren = true
-    }
-
-    showLess(computation: ArtifactComputation) {
-        computation.showSecondaryChildren = false
-    }
-
-    renderReport(computation: ArtifactComputation) {
-        this.pluginService.collapsePluginCatalog()
-        computation.isLoading = true
-        this.reportService.resetReports()
-
-        const waitForMapRender = (artifact: Artifact): Promise<void> => {
-            return new Promise<void>((resolve) => {
-                this.mapService.map?.once('rendercomplete', () => {
-                    this.reportService.getLegend(artifact)
-                    computation.isLoading = false
-                    resolve()
-                })
-            })
-        }
-
-        // Allow for any type of report
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const waitForReportFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
-            const subscription = observable.subscribe((data) => {
-                if (dataCheck(data)) {
-                    computation.isLoading = false
-                    subscription.unsubscribe()
-                }
-            })
-        }
-
-        const report_f = {
-            'IMAGE': (x: Artifact) => {
-                this.reportService.getImage(x)
-                waitForReportFetch(this.reportService.image, data => !!data?.url)
-            },
-            'MARKDOWN': (x: Artifact) => {
-                this.reportService.getMarkdown(x)
-                waitForReportFetch(this.reportService.markdown, data => !!data?.url)
-            },
-            'CHART': (x: Artifact) => {
-                this.reportService.getChart(x)
-                waitForReportFetch(this.reportService.chart, data => !!data?.data)
-            },
-            'TABLE': (x: Artifact) => {
-                this.reportService.getTable(x)
-                waitForReportFetch(this.reportService.table, data => !!data?.url)
-            },
-            'MAP_LAYER_GEOJSON': (x: Artifact) => {
-                this.reportService.getGeoJson(x)
-                return waitForMapRender(x)
-            },
-            'MAP_LAYER_GEOTIFF': (x: Artifact) => {
-                this.reportService.getGeoTiff(x)
-                return waitForMapRender(x)
-            }
-        }
-        
-        this.reportService.clearLegend()
-        if (computation.ref) {
-            this.reportService.isReportVisible = true
-            report_f[computation.ref.modality](computation.ref)
-        }
-    }
-
-    closeReportEvent(): void {
-        this.reportService.isReportVisible = false
-        if (this.activeChildComputation) {
-            this.activeChildComputation = undefined
-        }
-    }
-
-    storeActivatedRef(computation: ArtifactComputation) {
-        if (computation.ref) {
-            this.activeChildComputation = computation
-
-            localStorage.setItem('active_child_computation', JSON.stringify({
-                correlation_uuid: computation.ref.correlation_uuid,
-                store_uuid: computation.ref.store_id
-            } as ActiveArtifactRef))
-
-        } else {
-            console.error('Cannot persist active computation: ', computation.uuid)
-        }
-    }
-
-    activateComputation() {
-        if (this.computations.length == this.currentRuns.length) {
-            const storedItem = localStorage.getItem('active_child_computation')
-            if (storedItem) {
-                const activeArtifactRef = JSON.parse(storedItem) as ActiveArtifactRef
-                const parentComputation = this.computations.find((x) => x.uuid === activeArtifactRef.correlation_uuid)
-                if (parentComputation) {
-                    this.toggleComputation(parentComputation)
-                    this.activeChildComputation = parentComputation.children.find((x) => x.uuid === activeArtifactRef.store_uuid)
-                    if (this.activeChildComputation) {
-                        this.renderReport(this.activeChildComputation)
-                    }
-                }
-            }
-        }
-    }
-
-    viewParameters(computation: ArtifactComputation) {
-        this.dialog.open(this.parametersDialog, {
-            data: {parameters: JSON.stringify(computation.params)},
-            autoFocus: false
-        })
-    }
-
-    closeDialog() {
-        this.dialog.closeAll()
-    }
-
-    archiveArtifact(correlation_uuid: string): void {
-        const artifactToArchive = this.currentRuns.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
-        const isCurrentArtifact = this.activeComputation && this.activeComputation.ref && this.activeComputation.ref.correlation_uuid === correlation_uuid
-
-        if (artifactToArchive) {
-            this.currentRuns = this.currentRuns.filter((run: PluginRun) => run.correlation_uuid !== correlation_uuid)
-            this.archivedArtifacts.push(artifactToArchive)
-            this.updateLocalStorage()
-            this.refreshDataSource()
-        } else {
-            console.error('Artifact to archive not found in current runs')
-        }
-
-        if (isCurrentArtifact) {
-            this.reportService.resetReports()
-        }
-    }
-
-    unarchiveArtifact(correlation_uuid: string): void {
-        const artifactToUnarchive = this.archivedArtifacts.find((artifact: PluginRun) => artifact.correlation_uuid === correlation_uuid)
-
-        if (artifactToUnarchive) {
-            this.archivedArtifacts = this.archivedArtifacts.filter((a: PluginRun) => a.correlation_uuid !== correlation_uuid)
-            this.currentRuns.push(artifactToUnarchive)
-            this.updateLocalStorage()
-
-            this.fetchAndProcessArtifacts(artifactToUnarchive)
-        } else {
-            console.error('Artifact to unarchive not found in archivedArtifacts')
-        }
-    }
-
-    private updateLocalStorage() {
-        localStorage.setItem('plugin_runs', JSON.stringify(this.currentRuns))
-        localStorage.setItem('archive_runs', JSON.stringify(this.archivedArtifacts))
-    }
-
-    private refreshDataSource() {
-        this.computations = this.computations.filter(computation =>
-            this.currentRuns.some(run => run.correlation_uuid === computation.uuid)
-        )
-        this.dataChange.next(this.computations)
-    }
-
-    hasSecondaryChildren(computation: ArtifactComputation): boolean {
-        return computation.children.some(child => !child.ref?.primary)
-    }
-
-    private startPeriodicSync() {
-        let retryCount = 0
-        
-        const checkAndScheduleNext = () => {
-            const hasPendingRuns = this.currentRuns.some(
-                run => run.status === 'PENDING' || run.status === 'STARTED'
-            )
-            const nextInterval = Math.min(
-                this.INITIAL_INTERVAL * Math.pow(2, retryCount),
-                this.MAX_INTERVAL
-            )
-
-            if (hasPendingRuns) {
-                this.syncRuns()
-                retryCount++
-                this.syncSubscription = timer(nextInterval)
-                    .subscribe(() => checkAndScheduleNext())
-            }
-        }
-
-        checkAndScheduleNext()
-    }
-
-    getParameterEntries(params: string | object): [string, string][] {
-        const obj = typeof params === 'string' ? JSON.parse(params) : params
-        return Object.entries(obj)
-    }
-
-    formatParameterName(name: string): string {
-        return name
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
+        this.description = null
+        this.showAccordion = false
     }
 }

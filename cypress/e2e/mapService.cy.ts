@@ -51,8 +51,9 @@ describe('mapService', () => {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 pluginId: 'plugin_blueprint',
                 pluginName: 'Plugin Blueprint',
+                status: 'SUCCESS',
                 timestamp: '2024-08-07T12:43:08.373768',
-                status: 'SUCCESS'
+                aoiName: '金融街街道'
             }]))
         })
 
@@ -69,8 +70,8 @@ describe('mapService', () => {
         cy.get('.ol-layerswitcher li.baselayer label span').eq(1).click()
         cy.get('.ol-layerswitcher li.baselayer').eq(1).should('have.class', 'ol-visible')
 
-        cy.get('.artifact-parent-computation').eq(0).click()
-        cy.get('.artifact-child-computation').eq(0).click()
+        cy.get('.parent-computation').eq(0).click()
+        cy.get('.child-computation').eq(0).click()
 
         cy.wait('@getGeoTiff')
 
@@ -117,7 +118,7 @@ describe('mapService', () => {
         mockGeoJsonComputation()
         mockGeoJson()
 
-        beforeCompareSnapshots('app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .artifact-child-computations, .artifact-child-computations-wrapper')
+        beforeCompareSnapshots('app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .child-computations, .child-computations-wrapper')
 
         cy.window().then((win) => {
             win.localStorage.setItem('plugin_runs', JSON.stringify([{
@@ -139,8 +140,8 @@ describe('mapService', () => {
 
         cy.wait('@getGeoJsonComputation')
 
-        cy.get('.artifact-parent-computation').eq(0).click()
-        cy.get('.artifact-child-computation').eq(0).click()
+        cy.get('.parent-computation').eq(0).click()
+        cy.get('.child-computation').eq(0).click()
 
         cy.wait('@getGeoJson')
         cy.waitForRenderComplete()
@@ -174,8 +175,8 @@ describe('mapService', () => {
 
         cy.wait('@getSimpleGeoJsonComputation')
 
-        cy.get('.artifact-parent-computation').eq(0).click()
-        cy.get('.artifact-child-computation').eq(0).click()
+        cy.get('.parent-computation').eq(0).click()
+        cy.get('.child-computation').eq(0).click()
 
         cy.wait('@getSimpleGeoJson')
 

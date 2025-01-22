@@ -4,10 +4,10 @@ import {PluginParameterComponent} from './plugin-parameter.component'
 import {HttpClientModule} from '@angular/common/http'
 import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core'
 import {ReactiveFormsModule} from '@angular/forms'
-import {NullTypeComponent} from '../../../types/null.type'
-import {ArrayTypeComponent} from '../../../types/array.type'
-import {ObjectTypeComponent} from '../../../types/object.type'
-import {MultiSchemaTypeComponent} from '../../../types/multischema.type'
+import {NullTypeComponent} from '../../../types/null/null.type'
+import {ArrayTypeComponent} from '../../../types/array/array.type'
+import {ObjectTypeComponent} from '../../../types/object/object.type'
+import {MultiSchemaTypeComponent} from '../../../types/multischema/multischema.type'
 import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker'
 import {FormlyMaterialModule} from '@ngx-formly/material'
 import {MatDatepickerModule} from '@angular/material/datepicker'
@@ -16,7 +16,7 @@ import {MAT_DATE_FORMATS} from '@angular/material/core'
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import {JSONSchema7} from 'json-schema'
 import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../../app.validators'
-import {FormlyFieldExpansionPanelComponent} from '../../../types/formlyFieldExpansionPanel.type'
+import {FormlyFieldExpansionPanelComponent} from '../../../types/expansion-panel/formlyFieldExpansionPanel.type'
 import {MatExpansionModule} from '@angular/material/expansion'
 import {Feature} from 'ol'
 import {MultiPolygon} from 'ol/geom'
@@ -128,20 +128,19 @@ describe('PluginParameterComponent', () => {
     it('should interpret operator schema', () => {
         component.plugin = {
             'name': 'testplugin',
-            'assets': {
-                'icon': '...'
-            },
             'authors': [],
             'version': '0.0.1',
             'concerns': [],
             'purpose': '',
             'methodology': '',
             'sources': [],
+            'assets': {
+                'icon': '...'
+            },
             'plugin_id': 'testplugin',
             // @ts-ignore possible type mismatch
             'operator_schema': test_schema,
-            'library_version': '2.6.2',
-            'attribution': 'I don"t know what this is'
+            'library_version': '2.6.2'
         }
 
         component.ngOnChanges()

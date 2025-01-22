@@ -1,9 +1,7 @@
-import {GeoJSONFeature} from 'ol/format/GeoJSON'
-import {MultiPolygon} from 'ol/geom'
-import {RunStatus} from '../common/status.types'
+import {HexColor} from '../../types/color/color.type'
 
 export interface DiscreteLegendData {
-    [key: string]: string
+    [key: string]: HexColor
 }
 
 export interface TicksObject {
@@ -24,71 +22,32 @@ export interface AttachmentsObject {
     LEGEND?: LegendObject
 }
 
-export interface ArtifactParams {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any
-    aoi?: GeoJSONFeature // Keeping this for now for backwards compatibility
-}
-
-export interface PluginInfo {
-    name: string
-    plugin_id: string
-}
-
-export interface ArtifactMetadata {
-    correlation_uuid: string
-    timestamp: Date
-    params: ArtifactParams
-    artifacts: Artifact[]
-    plugin_info: PluginInfo
-    status: RunStatus
-    aoi?: GeoJSONFeature
-}
-
-export interface ArtifactComputation {
-    name: string
-    uuid: string
-    children: ArtifactComputation[]
-    timestamp?: Date
-    icon?: string
-    summary?: string
-    status?: RunStatus
-    ref?: Artifact
-    isExpanded?: boolean
-    keepInDOM?: boolean
-    showSecondaryChildren?: boolean
-    aoiName?: string
-    geometry?: MultiPolygon
-    pluginId?: string
-    params?: ArtifactParams
-    isLoading?: boolean
-}
-
 export interface Artifact {
     name: string
     modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
+    primary: boolean
     file_path: string
     summary: string
     description: string
     correlation_uuid: string
     store_id: string
-    primary: boolean
     attachments: AttachmentsObject
 }
 
+export interface ArtifactEntity extends Artifact {
+    isLoading?: boolean
+    icon?: string
+}
+
 export interface ChartData {
-    chart_type: string
-    color: string | string[]
+    chart_type: 'SCATTER' | 'LINE' | 'BAR' | 'PIE'
+    color: HexColor | HexColor[]
     x: string[] | number[]
     y: number[]
 }
 
-export interface ActiveArtifactRef {
-    correlation_uuid: string
-    store_uuid: string
-}
+export type ActiveArtifactRef = Pick<Artifact, 'correlation_uuid' | 'store_id'>
 
-export interface ArtifactData {
-    url: string
-    artifact: Artifact
+export interface ArtifactData extends Artifact {
+    url: string // Contains the presigned url for the artifact
 }

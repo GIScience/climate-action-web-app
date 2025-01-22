@@ -1,10 +1,11 @@
 import {AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild} from '@angular/core'
 import {ActivatedRoute} from '@angular/router'
-import {Plugin, PluginState, Source} from './plugin.interface'
+import {Plugin, PluginState} from './plugin.interface'
+import {Source} from '../../types/sources/sources.type'
 import {PluginService} from './plugin.service'
 import {map, Observable, switchMap, tap} from 'rxjs'
 import {TippyDirective} from '@ngneat/helipopper'
-import {ArtifactComponent} from '../artifact/artifact.component'
+import {ComputationsIndexComponent} from '../computations-index/computations-index.component'
 import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
 import {CommonModule} from '@angular/common'
 import {MarkdownModule} from 'ngx-markdown'
@@ -19,7 +20,7 @@ import {MatDialog} from '@angular/material/dialog'
     imports: [
         CommonModule,
         MarkdownModule,
-        ArtifactComponent,
+        ComputationsIndexComponent,
         PluginParameterComponent,
         TippyDirective,
         NgScrollbarModule,
@@ -34,11 +35,7 @@ export class PluginComponent implements AfterViewInit {
     readonly RedoDot = RedoDot
     readonly CircleX = CircleX
 
-    @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<{
-        purpose: string,
-        methodology: string,
-        sources: Source[]
-    }>
+    @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<Plugin>
 
     constructor(
         private pluginService: PluginService,
@@ -58,9 +55,25 @@ export class PluginComponent implements AfterViewInit {
     }
 
     computeSourceText(source: Source) {
-        return [source.author, source.journal, source.year, source.volume, source.pages]
-            .flatMap(f => f ? [f] : [])
-            .join(', ')
+        const commonFields = [source.author, source.year]
+        
+        switch (source.ENTRYTYPE) {
+            case 'article':
+                return [...commonFields, source.journal, source.volume, source.pages]
+                    .filter(Boolean)
+                    .join(', ')
+            case 'inbook':
+            case 'inproceedings':
+                return [...commonFields, source.pages]
+                    .filter(Boolean)
+                    .join(', ')
+            case 'misc':
+                return [...commonFields]
+                    .filter(Boolean)
+                    .join(', ')
+            default:
+                return ''
+        }
     }
 
     processSourceUrls(plugin: Plugin) {
@@ -104,7 +117,7 @@ export class PluginComponent implements AfterViewInit {
 
     openDialog(plugin: Plugin): void {
         this.dialog.open(this.pluginContentDialog, {
-            data: {purpose: plugin.purpose, methodology: plugin.methodology, sources: plugin.sources},
+            data: plugin,
             autoFocus: false
         })
     }

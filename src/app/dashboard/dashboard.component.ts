@@ -1,13 +1,13 @@
 import {Component, OnInit, ViewChild, ViewContainerRef} from '@angular/core'
 import {PluginCatalogComponent} from './plugin-catalog/plugin-catalog.component'
-import {ArtifactComponent} from './artifact/artifact.component'
+import {ComputationsIndexComponent} from './computations-index/computations-index.component'
 import {SearchComponent} from './search/search.component'
-import {ReportComponent} from './report/report.component'
+import {ArtifactComponent} from './artifact/artifact.component'
 import {MapComponent} from './map/map.component'
 import {RouterModule} from '@angular/router'
-import {LegendComponent} from './report/legend/legend.component'
+import {LegendComponent} from './artifact/legend/legend.component'
 import {LegendObject} from './artifact/artifact.interface'
-import {ReportService} from './report/report.service'
+import {ArtifactService} from './artifact/artifact.service'
 import {Subscription} from 'rxjs'
 
 @Component({
@@ -16,8 +16,8 @@ import {Subscription} from 'rxjs'
     styleUrls: ['./dashboard.component.scss'],
     imports: [
         PluginCatalogComponent,
+        ComputationsIndexComponent,
         ArtifactComponent,
-        ReportComponent,
         SearchComponent,
         MapComponent,
         RouterModule,
@@ -26,16 +26,16 @@ import {Subscription} from 'rxjs'
     standalone: true
 })
 export class DashboardComponent implements OnInit {
-    @ViewChild(ArtifactComponent) artifactComponent?: ArtifactComponent
+    @ViewChild(ComputationsIndexComponent) computationsIndexComponent?: ComputationsIndexComponent
     @ViewChild('legendContainer', {read: ViewContainerRef, static: false})
 
     legendContainer!: ViewContainerRef
     private legendSubscription!: Subscription
 
-    constructor(public reportService: ReportService) {}
+    constructor(public artifactService: ArtifactService) {}
 
     ngOnInit(): void {
-        this.legendSubscription = this.reportService.legend.subscribe(legend => {
+        this.legendSubscription = this.artifactService.legend.subscribe(legend => {
             if (legend) {
                 this.displayLegend(legend)
             } else {

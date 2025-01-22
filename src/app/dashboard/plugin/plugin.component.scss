@@ -52,9 +52,9 @@
       display: none;
     }
 
-    &~.artifacts-list::ng-deep {
+    &~.computations-list::ng-deep {
       
-      .artifact-tree .artifact-tree-content {
+      .computations-index .computations-index-content {
         max-height: 27.5vh;
       }
     }
