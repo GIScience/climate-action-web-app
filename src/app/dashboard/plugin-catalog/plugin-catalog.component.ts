@@ -6,6 +6,7 @@ import {CommonModule} from '@angular/common'
 import {MatIconModule} from '@angular/material/icon'
 import {availableCards, PluginCard} from './plugin-catalog.interface'
 import {TippyDirective} from '@ngneat/helipopper'
+import {NgScrollbarModule} from 'ngx-scrollbar'
 
 @Component({
     selector: 'app-plugin-catalog',
@@ -14,7 +15,8 @@ import {TippyDirective} from '@ngneat/helipopper'
     imports: [
         CommonModule,
         MatIconModule,
-        TippyDirective
+        TippyDirective,
+        NgScrollbarModule
     ],
     standalone: true
 })
