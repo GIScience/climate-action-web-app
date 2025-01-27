@@ -20,6 +20,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Landing page now displays a summary for revisiting users ([#182](https://gitlab.heigit.org/climate-action/web-app/-/issues/182))
 - Display computation parameters in a dialog ([#206](https://gitlab.heigit.org/climate-action/web-app/-/issues/206))
 - Default opacity of GeoJSON and GeoTIFF layers is now set to 0.6 (instead of 1.0) ([#253](https://gitlab.heigit.org/climate-action/web-app/-/issues/253))
+- Greyscale basemap option ([#252](https://gitlab.heigit.org/climate-action/web-app/-/issues/252))
 
 ## [2.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.0.0) - 2024-12-17
 

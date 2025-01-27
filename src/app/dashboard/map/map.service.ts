@@ -263,6 +263,17 @@ export class MapService {
             })
         })
 
+        const greyscaleBase = new ExtendedTileLayer({
+            name: 'Carto Positron',
+            baseLayer: true,
+            visible: false,
+            source: new XYZ({
+                url: 'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                attributions: '<a href="https://carto.com/" target="_blank">© CARTO</a> <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>.',
+                attributionsCollapsible: false
+            })
+        })
+
         this.mapPopUp = new Overlay({
             element: document.getElementById('map-popup')!,
             autoPan: {
@@ -283,7 +294,7 @@ export class MapService {
         customZoomOutLabel.innerHTML = '<img src="assets/images/globe.svg" style="width: 16px; height: 16px;">'
 
         this.map = new Map({
-            layers: [aerialImagery, heigitCarto, osmCarto],
+            layers: [greyscaleBase, aerialImagery, heigitCarto, osmCarto],
             target: 'map',
             view: initialView,
             overlays: [this.mapPopUp],
