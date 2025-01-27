@@ -7,24 +7,27 @@
         </label>
     </div>
     <div class="plugins-list">
-        <ul>
-            <li *ngFor="let card of cards; let i = index;"
-                class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
-                (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
-                [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="0"
-                [tp]="tpl" tpPlacement="right">
-                <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
-                <div class="plugin-card__text">
-                    <h3>{{ card.name }}</h3>
-                    <span *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{ card.library_version
-                        }}</span>
-                    <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
-                </div>
-                <ng-template #tpl>
-                    <strong>{{card.name}}</strong>
-                    <p *ngIf="card.purpose">{{card.purpose}}</p>
-                </ng-template>
-            </li>
-        </ul>
+        <ng-scrollbar visibility="hover" orientation="vertical" position="invertY">
+            <ul>
+                <li *ngFor="let card of cards; let i = index;"
+                    class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
+                    (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
+                    [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="0" [tp]="tpl"
+                    tpPlacement="right">
+                    <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
+                    <div class="plugin-card__text">
+                        <h3>{{ card.name }}</h3>
+                        <span *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{
+                            card.library_version
+                            }}</span>
+                        <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
+                    </div>
+                    <ng-template #tpl>
+                        <strong>{{card.name}}</strong>
+                        <p *ngIf="card.purpose">{{card.purpose}}</p>
+                    </ng-template>
+                </li>
+            </ul>
+        </ng-scrollbar>
     </div>
 </div>
