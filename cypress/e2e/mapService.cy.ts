@@ -9,10 +9,10 @@ describe('mapService', () => {
     it('display the layerswitcher', () => {
         cy.get('.ol-layerswitcher').should('exist')
 
-        const expectedTexts = ['OSM Carto', 'Bing Aerial Imagery', 'HeiGIT Carto']
+        const expectedTexts = ['OSM Carto', 'Bing Aerial Imagery', 'HeiGIT Carto', 'Carto Positron']
 
         cy.get('.ol-layerswitcher li.baselayer label span')
-            .should('have.length', 3)
+            .should('have.length', 4)
             .each((item) => {
                 cy.wrap(item).invoke('text').then((text) => {
                     expect(expectedTexts).to.include(text)
