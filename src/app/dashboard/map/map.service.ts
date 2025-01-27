@@ -450,6 +450,7 @@ export class MapService {
             name: artifactName,
             style: this.styleFunction.bind(this) as StyleFunction
         })
+        this.geojsonLayer.setOpacity(0.6)
 
         this.map?.addLayer(this.geojsonLayer)
 
@@ -547,7 +548,8 @@ export class MapService {
             source: geoTiffSource,
             name: artifactName
         })
-
+        geoTiffLayer.setOpacity(0.6)
+        
         this.map?.addLayer(geoTiffLayer)
         return geoTiffLayer
     }
