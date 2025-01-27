@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Removed backwards compatibility for AoI with the old backend
+- Change visual anchor for continuous legend ticks to triangle markers instead of hyphens ([#250](https://gitlab.heigit.org/climate-action/web-app/-/issues/250))
 
 ### Fixed
 
