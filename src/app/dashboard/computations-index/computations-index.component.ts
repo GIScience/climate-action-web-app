@@ -398,7 +398,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 const parentComputation = this.computations.find((x) => x.correlation_uuid === activeArtifactRef.correlation_uuid)
                 if (parentComputation) {
                     this.toggleComputation(parentComputation)
-                    this.activeArtifact = parentComputation.artifacts.find((x) => x.correlation_uuid === activeArtifactRef.correlation_uuid)
+                    this.activeArtifact = parentComputation.artifacts.find((x) => x.store_id === activeArtifactRef.store_id)
                     if (this.activeArtifact) {
                         this.computationComponent.renderArtifact(this.activeArtifact)
                     }

@@ -646,6 +646,22 @@ export const mockPluginBlueprintComputation = () => {
                     'store_id': '73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md',
                     'attachments':
                     {}
+                },
+                {
+                    'name': 'Character Count',
+                    'modality': 'TABLE',
+                    'primary': true,
+                    'tags':
+                    [
+                        'input'
+                    ],
+                    'file_path': '/tmp/8649e714-f29d-423f-85ce-cd55f4e5022aqsjobeas/table.csv',
+                    'summary': 'The table lists the number of occurrences for each character in the input parameters.',
+                    'description': 'A table with two columns.',
+                    'correlation_uuid': '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                    'store_id': '2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv',
+                    'attachments':
+                    {}
                 }
             ],
             'plugin_info':
@@ -659,10 +675,10 @@ export const mockPluginBlueprintComputation = () => {
     }).as('getPluginBlueprintComputation')
 }
 
-export const mockMarkdown = () => {
-    cy.intercept('/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md', {
-        fixture: 'sample_markdown_blueprint.md'
-    }).as('getMarkdown')
+export const mockBlueprintTable = () => {
+    cy.intercept('/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv', {
+        fixture: 'sample_table_blueprint.csv'
+    }).as('getBlueprintTable')
 }
 
 export const mockGeoTiffComputation = () => {

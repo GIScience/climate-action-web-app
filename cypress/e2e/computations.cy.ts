@@ -1,4 +1,4 @@
-import {mockPluginsList, mockPluginBlueprint, mockPluginBlueprintComputation, mockMarkdown} from '../support/interceptors'
+import {mockPluginsList, mockPluginBlueprint, mockPluginBlueprintComputation, mockBlueprintTable} from '../support/interceptors'
 
 describe('computations', () => {
     beforeEach(() => {
@@ -9,7 +9,7 @@ describe('computations', () => {
         mockPluginsList()
         mockPluginBlueprint()
         mockPluginBlueprintComputation()
-        mockMarkdown()
+        mockBlueprintTable()
 
         cy.window().then((win) => {
             win.localStorage.setItem('plugin_runs', JSON.stringify([{
@@ -34,12 +34,12 @@ describe('computations', () => {
         cy.get('.computations-index-content').should('exist')
 
         cy.get('.parent-computation').eq(0).click()
-        cy.get('.child-computation').eq(0).click()
+        cy.get('.child-computation').eq(1).click()
 
-        cy.wait('@getMarkdown')
+        cy.wait('@getBlueprintTable')
 
         cy.reload(true)
 
-        cy.get('.markdown-artifact-item').should('exist')
+        cy.get('.table-artifact-item').should('exist')
     })
 })
