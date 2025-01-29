@@ -14,6 +14,8 @@ export interface ContinuousLegendData {
 }
 
 export interface LegendObject {
+    title?: string
+    unit?: string
     legend_type: 'CONTINUOUS' | 'DISCRETE'
     legend_data: ContinuousLegendData | DiscreteLegendData
 }
