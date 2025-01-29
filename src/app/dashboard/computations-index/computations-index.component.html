@@ -1,127 +1,162 @@
 <div class="computations-index">
-	<div class="computations-index__header">
-		<h2 class="mx-2"><span *ngIf="showArchived">Archived </span>Computations</h2>
-		<button class="archive-dropdown-toggle" (click)="toggleArchivedView()">
-			<i-lucide *ngIf="!showArchived" [img]="Archive" size="20" tp="Archived Computations"></i-lucide>
-			<i-lucide *ngIf="showArchived" [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
-		</button>
-	</div>
+    <div class="computations-index__header">
+        <h2 class="mx-2"><span *ngIf="showArchived">Archived </span>Computations</h2>
+        <button class="archive-dropdown-toggle" (click)="toggleArchivedView()">
+            <i-lucide *ngIf="!showArchived" [img]="Archive" size="20" tp="Archived Computations"></i-lucide>
+            <i-lucide *ngIf="showArchived" [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
+        </button>
+    </div>
 
-	<div class="computations-index-content">
-		<div *ngIf="(computations | filterByCriteria: pluginId).length === 0 && (scheduledRuns | filterByCriteria: pluginId).length === 0 && !showArchived"
-			class="empty-computations">
-			<p>No computations found.</p>
-		</div>
+    <div class="computations-index-content">
+        <div
+            *ngIf="
+                (computations | filterByCriteria: pluginId).length === 0 &&
+                (scheduledRuns | filterByCriteria: pluginId).length === 0 &&
+                !showArchived
+            "
+            class="empty-computations">
+            <p>No computations found.</p>
+        </div>
 
-		<div *ngIf="!showArchived && ((computations | filterByCriteria: pluginId).length > 0 || (scheduledRuns | filterByCriteria: pluginId).length > 0)"
-			class="computations-container">
-			<ng-scrollbar visibility="hover" orientation="vertical">
-				<div *ngFor="let scheduledRun of scheduledRuns | filterByCriteria: pluginId"
-					class="scheduled-computation">
-					<div class="scheduled-parent-computation">
-						<div class="card-header">
-							<h3>{{scheduledRun.aoiName}}</h3>
-							<p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide>
-								{{formatTimestamp(scheduledRun.timestamp)}} • Scheduled</p>
-						</div>
-						<div class="scheduled-run-dot"></div>
-					</div>
-				</div>
-				<div *ngFor="let computation of computations | filterByCriteria: pluginId" class="computation">
-					<div [ngClass]="{
-						'parent-computation': true,
-						'computation-expanded': computation.isExpanded,
-						'computation-collapsed': !computation.isExpanded,
-						'is-new': newRuns.includes(computation.correlation_uuid),
-						'not-expandable': computation.artifacts.length === 0
-					}" (click)="toggleComputation(computation)" (keyup.enter)="toggleComputation(computation)" tabindex="0">
-						<div class="computation-arrow">
-							<mat-icon *ngIf="computation.artifacts.length > 0" aria-hidden="true"
-								fontIcon="chevron_right"></mat-icon>
-						</div>
-						<div class="card-header">
-							<h3>{{computation.aoiName}}</h3>
-							<p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide>
-								{{formatTimestamp(computation.timestamp)}} • <i-lucide [img]="Hash"
-									size="12"></i-lucide>{{formatUUID(computation.correlation_uuid)}}</p>
-						</div>
-						<div class="computation-actions">
-							<button (click)="viewParameters(computation)" aria-label="View Parameters"
-								tp="View Parameters" class="btn-onlyicon">
-								<i-lucide [img]="ListTodo" size="15"></i-lucide>
-							</button>
-							<button (click)="archiveComputation(computation.correlation_uuid)" aria-label="Archive Computation"
-								tp="Archive Computation" class="archive-computation btn-onlyicon">
-								<i-lucide [img]="Archive" size="15"></i-lucide>
-							</button>
-						</div>
-						<div *ngIf="newRuns.includes(computation.correlation_uuid)" class="new-run-dot"></div>
-					</div>
-					<app-computation 
-						[computation]="computation"
-						[activeArtifact]="activeArtifact"
-						(artifactActivated)="storeActiveArtifact($event)">
-					</app-computation>
-				</div>
-			</ng-scrollbar>
-		</div>
+        <div
+            *ngIf="
+                !showArchived &&
+                ((computations | filterByCriteria: pluginId).length > 0 ||
+                    (scheduledRuns | filterByCriteria: pluginId).length > 0)
+            "
+            class="computations-container">
+            <ng-scrollbar visibility="hover" orientation="vertical">
+                <div
+                    *ngFor="let scheduledRun of scheduledRuns | filterByCriteria: pluginId"
+                    class="scheduled-computation">
+                    <div class="scheduled-parent-computation">
+                        <div class="card-header">
+                            <h3>{{ scheduledRun.aoiName }}</h3>
+                            <p class="card-subtitle m-0">
+                                <i-lucide [img]="Clock" size="12"></i-lucide>
+                                {{ formatTimestamp(scheduledRun.timestamp) }} • Scheduled
+                            </p>
+                        </div>
+                        <div class="scheduled-run-dot"></div>
+                    </div>
+                </div>
+                <div *ngFor="let computation of computations | filterByCriteria: pluginId" class="computation">
+                    <div
+                        [ngClass]="{
+                            'parent-computation': true,
+                            'computation-expanded': computation.isExpanded,
+                            'computation-collapsed': !computation.isExpanded,
+                            'is-new': newRuns.includes(computation.correlation_uuid),
+                            'not-expandable': computation.artifacts.length === 0
+                        }"
+                        (click)="toggleComputation(computation)"
+                        (keyup.enter)="toggleComputation(computation)"
+                        tabindex="0">
+                        <div class="computation-arrow">
+                            <mat-icon
+                                *ngIf="computation.artifacts.length > 0"
+                                aria-hidden="true"
+                                fontIcon="chevron_right"></mat-icon>
+                        </div>
+                        <div class="card-header">
+                            <h3>{{ computation.aoiName }}</h3>
+                            <p class="card-subtitle m-0">
+                                <i-lucide [img]="Clock" size="12"></i-lucide>
+                                {{ formatTimestamp(computation.timestamp) }} •
+                                <i-lucide [img]="Hash" size="12"></i-lucide
+                                >{{ formatUUID(computation.correlation_uuid) }}
+                            </p>
+                        </div>
+                        <div class="computation-actions">
+                            <button
+                                (click)="viewParameters(computation)"
+                                aria-label="View Parameters"
+                                tp="View Parameters"
+                                class="btn-onlyicon">
+                                <i-lucide [img]="ListTodo" size="15"></i-lucide>
+                            </button>
+                            <button
+                                (click)="archiveComputation(computation.correlation_uuid)"
+                                aria-label="Archive Computation"
+                                tp="Archive Computation"
+                                class="archive-computation btn-onlyicon">
+                                <i-lucide [img]="Archive" size="15"></i-lucide>
+                            </button>
+                        </div>
+                        <div *ngIf="newRuns.includes(computation.correlation_uuid)" class="new-run-dot"></div>
+                    </div>
+                    <app-computation
+                        [computation]="computation"
+                        [activeArtifact]="activeArtifact"
+                        (artifactActivated)="storeActiveArtifact($event)">
+                    </app-computation>
+                </div>
+            </ng-scrollbar>
+        </div>
 
-		<div *ngIf="showArchived" class="archive-container">
-			<ng-container *ngIf="(archivedComputations | filterByCriteria: pluginId).length === 0; else archivedItems">
-				<div class="empty-archive">
-					<p>No archived computations found.</p>
-				</div>
-			</ng-container>
-			<ng-template #archivedItems>
-				<ng-scrollbar visibility="hover" orientation="vertical">
-					<ul class="archive-list">
-						<li *ngFor="let archivedComputation of archivedComputations | filterByCriteria: pluginId; let i = index;"
-							class="archived-computation">
-							<div class="archived-item">
-								<div>
-									<h4>{{archivedComputation.aoiName}}</h4>
-									<p class="card-subtitle m-0"><i-lucide [img]="Clock" size="12"></i-lucide>
-										{{formatTimestamp(archivedComputation.timestamp)}} • <i-lucide
-											[img]="Hash"
-											size="12"></i-lucide>{{formatUUID(archivedComputation.correlation_uuid)}}
-									</p>
-								</div>
-								<button (click)="unarchiveComputation(archivedComputation.correlation_uuid)"
-									aria-label="Un-archive Computation" tp="Un-archive Computation"
-									class="pX-5 pY-3 btn-onlyicon">
-									<i-lucide [img]="ArchiveRestore" size="15"></i-lucide>
-								</button>
-							</div>
-						</li>
-					</ul>
-				</ng-scrollbar>
-			</ng-template>
-		</div>
-	</div>
+        <div *ngIf="showArchived" class="archive-container">
+            <ng-container *ngIf="(archivedComputations | filterByCriteria: pluginId).length === 0; else archivedItems">
+                <div class="empty-archive">
+                    <p>No archived computations found.</p>
+                </div>
+            </ng-container>
+            <ng-template #archivedItems>
+                <ng-scrollbar visibility="hover" orientation="vertical">
+                    <ul class="archive-list">
+                        <li
+                            *ngFor="
+                                let archivedComputation of archivedComputations | filterByCriteria: pluginId;
+                                let i = index
+                            "
+                            class="archived-computation">
+                            <div class="archived-item">
+                                <div>
+                                    <h4>{{ archivedComputation.aoiName }}</h4>
+                                    <p class="card-subtitle m-0">
+                                        <i-lucide [img]="Clock" size="12"></i-lucide>
+                                        {{ formatTimestamp(archivedComputation.timestamp) }} •
+                                        <i-lucide [img]="Hash" size="12"></i-lucide
+                                        >{{ formatUUID(archivedComputation.correlation_uuid) }}
+                                    </p>
+                                </div>
+                                <button
+                                    (click)="unarchiveComputation(archivedComputation.correlation_uuid)"
+                                    aria-label="Un-archive Computation"
+                                    tp="Un-archive Computation"
+                                    class="pX-5 pY-3 btn-onlyicon">
+                                    <i-lucide [img]="ArchiveRestore" size="15"></i-lucide>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </ng-scrollbar>
+            </ng-template>
+        </div>
+    </div>
 </div>
 
 <ng-template #parametersDialog let-data>
-	<div class="parameters-dialog">
-		<ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-			<div mat-dialog-content class="parameters-dialog__content" scrollViewport>
-				<h3>Computation Parameters</h3>
-				<ng-container *ngIf="getParameterEntries(data.parameters).length > 0; else noParams">
-					<table class="parameters-table">
-						<tbody>
-							<tr *ngFor="let item of getParameterEntries(data.parameters)">
-								<td class="parameter-name">{{formatParameterName(item[0])}}</td>
-								<td class="parameter-value">{{item[1]}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</ng-container>
-				<ng-template #noParams>
-					<p class="no-params-message">This computation used no parameters.</p>
-				</ng-template>
-			</div>
-		</ng-scrollbar>
-		<button mat-button (click)="closeDialog()" class="close-dialog">
-			<i-lucide [img]="CircleX" size="30"></i-lucide>
-		</button>
-	</div>
+    <div class="parameters-dialog">
+        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
+            <div mat-dialog-content class="parameters-dialog__content" scrollViewport>
+                <h3>Computation Parameters</h3>
+                <ng-container *ngIf="getParameterEntries(data.parameters).length > 0; else noParams">
+                    <table class="parameters-table">
+                        <tbody>
+                            <tr *ngFor="let item of getParameterEntries(data.parameters)">
+                                <td class="parameter-name">{{ formatParameterName(item[0]) }}</td>
+                                <td class="parameter-value">{{ item[1] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </ng-container>
+                <ng-template #noParams>
+                    <p class="no-params-message">This computation used no parameters.</p>
+                </ng-template>
+            </div>
+        </ng-scrollbar>
+        <button mat-button (click)="closeDialog()" class="close-dialog">
+            <i-lucide [img]="CircleX" size="30"></i-lucide>
+        </button>
+    </div>
 </ng-template>

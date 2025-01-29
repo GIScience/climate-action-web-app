@@ -6,23 +6,26 @@
                     <img src="assets/images/HeiGIT_Logo_base.svg" alt="HeiGIT Logo" class="logo" />
                 </a>
             </div>
-            <h2 [routerLink]="'/dashboard'" tabindex="0" (click)="resetMapState()" (keyup.enter)="resetMapState()">{{title}}</h2>
+            <h2 [routerLink]="'/dashboard'" tabindex="0" (click)="resetMapState()" (keyup.enter)="resetMapState()">
+                {{ title }}
+            </h2>
             <div class="my-account">
                 <i-lucide name="circle-user-round" [size]="30"></i-lucide>
             </div>
         </div>
     </header>
-    
+
     <div class="app-container">
         <router-outlet></router-outlet>
     </div>
 
     <footer class="footer bdT ta-c fsz-sm c-grey-600">
-        <span class="about-info"> © {{currentYear()}} HeiGIT gGmbH |
+        <span class="about-info">
+            © {{ currentYear() }} HeiGIT gGmbH |
             <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
             <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
             <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a>
         </span>
-        <span class="demo-info">Demo website v{{version}} - changes can occur at any time</span>
+        <span class="demo-info">Demo website v{{ version }} - changes can occur at any time</span>
     </footer>
 </div>

@@ -1,4 +1,4 @@
-import {FilterByCriteriaPipe} from './computation-filters.pipe'
+import { FilterByCriteriaPipe } from './computation-filters.pipe'
 
 describe('ComputationFiltersPipe', () => {
     it('create an instance', () => {

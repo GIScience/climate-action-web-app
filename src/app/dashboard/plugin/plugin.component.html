@@ -7,13 +7,21 @@
     </div>
 </div>
 
-<ng-container *ngIf="(pluginObs$ | async) as plugin">
+<ng-container *ngIf="pluginObs$ | async as plugin">
     <div *ngIf="!loading">
-        <div class="plugin-name-wrapper" style="background-image: linear-gradient(225deg, rgb(207 217 223 / 65%) 0%, rgb(226, 235, 240) 85%), url('{{plugin.assets.icon}}')">
+        <div
+            class="plugin-name-wrapper"
+            style="background-image: linear-gradient(225deg, rgb(207 217 223 / 65%) 0%, rgb(226, 235, 240) 85%), url('{{
+                plugin.assets.icon
+            }}')">
             <h1>{{ plugin.name }}</h1>
-            <i-lucide [img]="CloudOff" size="25" color="#ff7800" *ngIf="plugin.status === 'unavailable'"
-            tp="This plugin is currently offline. Previous computations are still available."
-            tpPlacement="bottom"></i-lucide>
+            <i-lucide
+                [img]="CloudOff"
+                size="25"
+                color="#ff7800"
+                *ngIf="plugin.status === 'unavailable'"
+                tp="This plugin is currently offline. Previous computations are still available."
+                tpPlacement="bottom"></i-lucide>
         </div>
         <div class="current-plugin" *ngIf="plugin.status !== 'unavailable'" [ngClass]="computeState">
             <h2>Compute</h2>
@@ -21,17 +29,34 @@
                 <div class="plugin-content-wrapper" scrollViewport>
                     <ul class="plugin-authors">
                         <li *ngFor="let author of plugin.authors">
-                            <a rel="author" href="{{author.website}}" tp="Affiliated to {{ author.affiliation }}" target="_blank">{{ author.name }}</a>
+                            <a
+                                rel="author"
+                                href="{{ author.website }}"
+                                tp="Affiliated to {{ author.affiliation }}"
+                                target="_blank"
+                                >{{ author.name }}</a
+                            >
                         </li>
-                    </ul> 
+                    </ul>
                     <div class="plugin-content">
                         <div class="plugin__short-content">
-                            <markdown [data]="extractFirstSentence(plugin.purpose)" ngPreserveWhitespaces class="markdown"></markdown>
-                            <a class="read-more" (click)="openDialog(plugin)" (keyup.enter)="openDialog(plugin)" tabindex="0">Read more »</a>
+                            <markdown
+                                [data]="extractFirstSentence(plugin.purpose)"
+                                ngPreserveWhitespaces
+                                class="markdown"></markdown>
+                            <a
+                                class="read-more"
+                                (click)="openDialog(plugin)"
+                                (keyup.enter)="openDialog(plugin)"
+                                tabindex="0"
+                                >Read more »</a
+                            >
                         </div>
                     </div>
                     <ng-container *ngIf="plugin?.operator_schema">
-                        <app-plugin-parameter [schema]="plugin.operator_schema" [plugin]="plugin"></app-plugin-parameter>
+                        <app-plugin-parameter
+                            [schema]="plugin.operator_schema"
+                            [plugin]="plugin"></app-plugin-parameter>
                     </ng-container>
                 </div>
             </ng-scrollbar>
@@ -48,21 +73,28 @@
                                 <ul class="plugin-sources">
                                     <li *ngFor="let source of plugin.sources" class="plugin-sources">
                                         <strong *ngIf="source.title">{{ source.title }}</strong>
-                                        {{ processSourceText(source) }}{{ source.url ? "," : "" }}
-                                        <a href="{{ source.url }}"
+                                        {{ processSourceText(source) }}{{ source.url ? ',' : '' }}
+                                        <a
+                                            href="{{ source.url }}"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            *ngIf="source.url">{{ source.url }}</a>
+                                            *ngIf="source.url"
+                                            >{{ source.url }}</a
+                                        >
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </ng-scrollbar>
-                    <button mat-button (click)="closeDialog()" class="close-dialog"><i-lucide [img]="CircleX" size="30"></i-lucide></button>
+                    <button mat-button (click)="closeDialog()" class="close-dialog">
+                        <i-lucide [img]="CircleX" size="30"></i-lucide>
+                    </button>
                 </div>
             </ng-template>
             <div class="new-compute-container">
-                <button class="new-compute btn-alt btn-withtext" (click)="enableCompute()"><i-lucide [img]="RedoDot" size="20"></i-lucide> Do a new computation</button>
+                <button class="new-compute btn-alt btn-withtext" (click)="enableCompute()">
+                    <i-lucide [img]="RedoDot" size="20"></i-lucide> Do a new computation
+                </button>
             </div>
         </div>
         <div class="computations-list">

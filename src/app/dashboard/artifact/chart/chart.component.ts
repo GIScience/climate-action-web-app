@@ -1,8 +1,8 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
-import {ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem} from 'chart.js'
-import {convertToTitleCase} from '../../../utils/artifact-utils'
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem } from 'chart.js'
+import { convertToTitleCase } from '../../../utils/artifact-utils'
 
-import {Artifact, ChartData} from '../artifact.interface'
+import { Artifact, ChartData } from '../artifact.interface'
 
 @Component({
     selector: 'app-chart',
@@ -10,9 +10,8 @@ import {Artifact, ChartData} from '../artifact.interface'
     styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnInit {
-
     @ViewChild('chartCanvas') chartCanvas?: ElementRef
-    @Input() inputData: { data: ChartData | null, artifact: Artifact | null } | undefined
+    @Input() inputData: { data: ChartData | null; artifact: Artifact | null } | undefined
 
     public baseChartLegend = true
     public baseChartPlugins = []
@@ -43,10 +42,9 @@ export class ChartComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (!this.inputData || !this.inputData.data)
-            return
+        if (!this.inputData || !this.inputData.data) return
 
-        this.baseChartType = (this.inputData.data.chart_type.toLowerCase()) as ChartType
+        this.baseChartType = this.inputData.data.chart_type.toLowerCase() as ChartType
 
         this.baseChartData = {
             labels: this.inputData.data.x.map(label => this.convertToTitleCase(label)),
@@ -63,14 +61,17 @@ export class ChartComponent implements OnInit {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {display: !(this.inputData.data.chart_type === 'PIE')},
-                y: {display: !(this.inputData.data.chart_type === 'PIE')}
+                x: { display: !(this.inputData.data.chart_type === 'PIE') },
+                y: { display: !(this.inputData.data.chart_type === 'PIE') }
             },
             plugins: {
                 tooltip: {
                     callbacks: {
                         title: () => '',
-                        label: (this.inputData.data.chart_type === 'PIE') ? this.pieTooltipLabelFunc : this.generalTooltipLabelFunc
+                        label:
+                            this.inputData.data.chart_type === 'PIE'
+                                ? this.pieTooltipLabelFunc
+                                : this.generalTooltipLabelFunc
                     }
                 }
             }

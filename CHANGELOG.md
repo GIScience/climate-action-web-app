@@ -28,6 +28,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Greyscale basemap option ([#252](https://gitlab.heigit.org/climate-action/web-app/-/issues/252))
 - Change legend title to layer name ([#239](https://gitlab.heigit.org/climate-action/web-app/-/issues/239))
 
+- Use Prettier for code formatting
+
 ## [2.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.0.0) - 2024-12-17
 
 ### Fixed

@@ -27,4 +27,4 @@ export interface MiscType extends BaseSource {
     url: string
 }
 
-export type Source = (ArticleType | IncollectionType | MiscType)
+export type Source = ArticleType | IncollectionType | MiscType

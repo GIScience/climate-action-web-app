@@ -1,15 +1,15 @@
-import {ComponentFixture, fakeAsync, TestBed, tick, discardPeriodicTasks, flush} from '@angular/core/testing'
-import {By} from '@angular/platform-browser'
-import {ComputationsIndexComponent} from './computations-index.component'
-import {PluginService} from '../plugin/plugin.service'
-import {BehaviorSubject, of} from 'rxjs'
-import {ComputationEntity} from './computation.interface'
-import {HttpClientTestingModule} from '@angular/common/http/testing'
-import {NoopAnimationsModule} from '@angular/platform-browser/animations'
-import {RouterModule} from '@angular/router'
-import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
-import {MapService} from '../map/map.service'
-import {ArtifactService} from '../artifact/artifact.service'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, flush, tick } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { RouterModule } from '@angular/router'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { BehaviorSubject, of } from 'rxjs'
+import { ArtifactService } from '../artifact/artifact.service'
+import { MapService } from '../map/map.service'
+import { PluginService } from '../plugin/plugin.service'
+import { ComputationEntity } from './computation.interface'
+import { ComputationsIndexComponent } from './computations-index.component'
 
 describe('ComputationsIndexComponent', () => {
     let component: ComputationsIndexComponent
@@ -24,21 +24,31 @@ describe('ComputationsIndexComponent', () => {
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<ComputationEntity[]>([])
 
-        mockPluginService = jasmine.createSpyObj<PluginService>('PluginService', [
-            'getComputesFromLS',
-            'updateRunStatus',
-            'getComputationMetadata',
-            'getPluginRuns',
-            'setComputeState',
-            'getComputationState',
-            'collapsePluginCatalog',
-            'setComputeState'
-        ], {
-            syncTasks$: new BehaviorSubject<void>(undefined)
-        })
+        mockPluginService = jasmine.createSpyObj<PluginService>(
+            'PluginService',
+            [
+                'getComputesFromLS',
+                'updateRunStatus',
+                'getComputationMetadata',
+                'getPluginRuns',
+                'setComputeState',
+                'getComputationState',
+                'collapsePluginCatalog',
+                'setComputeState'
+            ],
+            {
+                syncTasks$: new BehaviorSubject<void>(undefined)
+            }
+        )
 
         mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage', 'closeArtifact'])
-        mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
+        mockMapService = jasmine.createSpyObj<MapService>('MapService', [
+            'initMap',
+            'highlightAoI',
+            'removeFocusedLayer'
+        ])
+
+        mockMapService.highlightAoI.and.returnValue([0, 0, 1, 1])
 
         await TestBed.configureTestingModule({
             imports: [
@@ -95,50 +105,60 @@ describe('ComputationsIndexComponent', () => {
 
     it('given a completed run should create an expandable computation', fakeAsync(() => {
         const testRun = {
-            'aoiName': 'Test AOI',
-            'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
-            'pluginId': 'test_plugin',
-            'pluginName': 'Test Plugin',
-            'status': 'SUCCESS',
-            'timestamp': new Date('2023-09-27T16:42:52+01:00')
+            aoiName: 'Test AOI',
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'SUCCESS',
+            timestamp: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationEntity
 
         mockPluginService.getComputesFromLS.and.returnValue([testRun])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(of({
-            'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
-            'timestamp': new Date('2023-09-27T16:42:52+01:00'),
-            'params': {},
-            'aoi': {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Polygon',
-                    'coordinates': [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
+        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(
+            of({
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                params: {},
+                aoi: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [
+                                [0, 0],
+                                [1, 0],
+                                [1, 1],
+                                [0, 1],
+                                [0, 0]
+                            ]
+                        ]
+                    },
+                    properties: {
+                        name: 'Test AOI'
+                    }
                 },
-                'properties': {
-                    'name': 'Test AOI'
-                }
-            },
-            'artifacts': [
-                {
-                    'name': 'Image',
-                    'modality': 'IMAGE',
-                    'primary': true,
-                    'file_path': 'test_image.png',
-                    'summary': 'An image.',
-                    'description': 'The image is under CC0 license.',
-                    'correlation_uuid': '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    'store_id': '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
-                    'attachments': {}
-                }
-            ],
-            'plugin_info': {
-                'plugin_id': 'test_plugin',
-                'plugin_version': '1.0.0'
-            },
-            'status': 'SUCCESS',
-            'message': ''
-        }))
+                artifacts: [
+                    {
+                        name: 'Image',
+                        modality: 'IMAGE',
+                        primary: true,
+                        file_path: 'test_image.png',
+                        summary: 'An image.',
+                        description: 'The image is under CC0 license.',
+                        correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                        store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                        attachments: {}
+                    }
+                ],
+                plugin_info: {
+                    plugin_id: 'test_plugin',
+                    plugin_version: '1.0.0'
+                },
+                status: 'SUCCESS',
+                message: ''
+            })
+        )
 
         component.ngOnInit()
         fixture.detectChanges()
@@ -153,7 +173,10 @@ describe('ComputationsIndexComponent', () => {
         const childComputations = fixture.debugElement.queryAll(By.css('.child-computation'))
         expect(childComputations.length).toBe(1)
 
-        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66', 'SUCCESS')
+        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith(
+            '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            'SUCCESS'
+        )
 
         tick(2000)
         discardPeriodicTasks()

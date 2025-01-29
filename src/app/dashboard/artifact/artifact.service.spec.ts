@@ -1,9 +1,8 @@
-import {TestBed} from '@angular/core/testing'
-
-import {ArtifactService} from './artifact.service'
-import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {Artifact, ChartData, LegendObject} from './artifact.interface'
-import {of} from 'rxjs'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { TestBed } from '@angular/core/testing'
+import { of } from 'rxjs'
+import { Artifact, ChartData, LegendObject } from './artifact.interface'
+import { ArtifactService } from './artifact.service'
 import SpyObj = jasmine.SpyObj
 
 describe('ArtifactService', () => {
@@ -23,7 +22,7 @@ describe('ArtifactService', () => {
         store_id: store_uuid
     } as Artifact
 
-    const test_legend = {legend_type: 'DISCRETE', legend_data: {a: '#ffffff'}} as LegendObject
+    const test_legend = { legend_type: 'DISCRETE', legend_data: { a: '#ffffff' } } as LegendObject
 
     const test_geojson = {
         name: 'test_artifact',
@@ -33,7 +32,7 @@ describe('ArtifactService', () => {
         description: 'artifact description',
         correlation_uuid: correlation_uuid,
         store_id: store_uuid,
-        attachments: {LEGEND: test_legend}
+        attachments: { LEGEND: test_legend }
     } as Artifact
 
     const test_chart = {
@@ -64,15 +63,15 @@ describe('ArtifactService', () => {
 
     it('should get markdown artifact item', done => {
         service.getMarkdown(test_artifact)
-        service.markdown.subscribe((x) => {
-            expect(x).toEqual({url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact})
+        service.markdown.subscribe(x => {
+            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
             done()
         })
     })
 
     it('should get geojson artifact item', done => {
         service.getGeoJson(test_artifact)
-        service.geojson.subscribe((x) => {
+        service.geojson.subscribe(x => {
             expect(x).toEqual({
                 url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`,
                 ...test_artifact
@@ -83,7 +82,7 @@ describe('ArtifactService', () => {
 
     it('should get geotiff artifact item', done => {
         service.getGeoTiff(test_artifact)
-        service.geotiff.subscribe((x) => {
+        service.geotiff.subscribe(x => {
             expect(x).toEqual({
                 url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`,
                 ...test_artifact
@@ -94,18 +93,19 @@ describe('ArtifactService', () => {
 
     it('should get table artifact item', done => {
         service.getTable(test_artifact)
-        service.table.subscribe((x) => {
-            expect(x).toEqual({url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact})
+        service.table.subscribe(x => {
+            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
             done()
         })
     })
 
     it('should get chart artifact item', done => {
-        httpClientSpy.get.withArgs(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`).and
-            .returnValue(of(test_chart))
+        httpClientSpy.get
+            .withArgs(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
+            .and.returnValue(of(test_chart))
 
         service.getChart(test_artifact)
-        service.chart.subscribe((x) => {
+        service.chart.subscribe(x => {
             expect(x).toEqual({
                 data: test_chart,
                 artifact: test_artifact
@@ -116,7 +116,7 @@ describe('ArtifactService', () => {
 
     it('should augment legend', done => {
         service.getLegend(test_geojson)
-        service.legend.subscribe((x) => {
+        service.legend.subscribe(x => {
             expect(x?.title).toEqual('test_artifact')
             done()
         })

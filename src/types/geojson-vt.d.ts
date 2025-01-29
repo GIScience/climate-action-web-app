@@ -3,4 +3,4 @@ declare module 'geojson-vt' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const geojsonvt: any
     export default geojsonvt
-} 
+}

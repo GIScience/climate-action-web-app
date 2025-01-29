@@ -1,4 +1,4 @@
-import {SearchTermHighlightPipe} from './search-highlight.pipe'
+import { SearchTermHighlightPipe } from './search-highlight.pipe'
 
 describe('SearchHighlightPipe', () => {
     it('create an instance', () => {

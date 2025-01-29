@@ -1,10 +1,10 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {GeoTiffComponent} from './geotiff.component'
-import {HttpClientModule} from '@angular/common/http'
-import {MapService} from '../../map/map.service'
-import SpyObj = jasmine.SpyObj
+import { HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import TileLayer from 'ol/layer/WebGLTile.js'
-import {XYZ} from 'ol/source'
+import { XYZ } from 'ol/source'
+import { MapService } from '../../map/map.service'
+import { GeoTiffComponent } from './geotiff.component'
+import SpyObj = jasmine.SpyObj
 
 describe('GeoTiffComponent', () => {
     let component: GeoTiffComponent
@@ -16,9 +16,7 @@ describe('GeoTiffComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [GeoTiffComponent, HttpClientModule],
-            providers: [
-                { provide: MapService, useValue: mapServiceSpy }
-            ]
+            providers: [{ provide: MapService, useValue: mapServiceSpy }]
         }).compileComponents()
 
         fixture = TestBed.createComponent(GeoTiffComponent)
@@ -61,7 +59,7 @@ describe('GeoTiffComponent', () => {
         component.ngOnInit()
         await fixture.whenStable()
         await new Promise(resolve => setTimeout(resolve, 0))
-        
+
         const addGeoTiffLayerCalls = mapServiceSpy.addGeoTiffLayer.calls.all()
 
         expect(addGeoTiffLayerCalls.length).toBeGreaterThan(0)

@@ -1,8 +1,8 @@
-import {Component, Input, OnInit, OnDestroy} from '@angular/core'
-import {CommonModule} from '@angular/common'
+import { CommonModule } from '@angular/common'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import TileLayer from 'ol/layer/WebGLTile.js'
-import {Artifact} from '../artifact.interface'
-import {MapService} from '../../map/map.service'
+import { MapService } from '../../map/map.service'
+import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geotiff',
@@ -12,16 +12,13 @@ import {MapService} from '../../map/map.service'
     styleUrls: ['./geotiff.component.scss']
 })
 export class GeoTiffComponent implements OnInit, OnDestroy {
-
-    @Input() inputData: { url: string, artifact: Artifact | null } | undefined
+    @Input() inputData: { url: string; artifact: Artifact | null } | undefined
     private geoTiffLayer: TileLayer | undefined
 
-    constructor(private mapService: MapService) {
-    }
+    constructor(private mapService: MapService) {}
 
     ngOnInit(): void {
-        if (!this.inputData || !this.inputData['artifact'])
-            return
+        if (!this.inputData || !this.inputData['artifact']) return
 
         this.initMap()
     }
@@ -33,8 +30,7 @@ export class GeoTiffComponent implements OnInit, OnDestroy {
     }
 
     private async initMap() {
-        if (!this.inputData)
-            return
+        if (!this.inputData) return
         const artifactName = this.inputData.artifact?.name
         this.geoTiffLayer = await this.mapService.addGeoTiffLayer(this.inputData.url, artifactName)
     }

@@ -1,105 +1,105 @@
 stages:
-  - test
-  - deploy
+    - test
+    - deploy
 
 cache:
-  key: $CI_COMMIT_REF_NAME
-  paths:
-    - node_modules
+    key: $CI_COMMIT_REF_NAME
+    paths:
+        - node_modules
 
 test_jasmine_and_lint:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  image:
-    name: trion/ng-cli-e2e:17.0.0
-  before_script:
-    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
-    - npm install
-  script:
-    - npm run lint
-    - npm test
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/cobertura-coverage.xml
+    stage: test
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    image:
+        name: trion/ng-cli-e2e:17.0.0
+    before_script:
+        - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
+        - npm install
+    script:
+        - npm run lint
+        - npm test
+    artifacts:
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage/cobertura-coverage.xml
 
 test_cypress:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  variables:
-    NODE_ENV: 'test'
-  needs: ["test_jasmine_and_lint"]
-  image:
-    name: cypress/included:cypress-13.11.0-node-20.14.0-chrome-125.0.6422.141-1-ff-126.0.1-edge-125.0.2535.85-1
-    entrypoint: [""]
-  before_script:
-    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
-    - npm install
-    - npm install -g wait-on
-  script:
-    - npm start & wait-on http://localhost:4200
-    - npm run cy:run
-  artifacts:
-    when: on_failure
-    paths:
-      - cypress/screenshots/**/*.png
-      - cypress/snapshots/actual/**/*.png
-      - cypress/snapshots/diff/**/*.png
-    expire_in: 30 day
+    stage: test
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    variables:
+        NODE_ENV: 'test'
+    needs: ['test_jasmine_and_lint']
+    image:
+        name: cypress/included:cypress-13.11.0-node-20.14.0-chrome-125.0.6422.141-1-ff-126.0.1-edge-125.0.2535.85-1
+        entrypoint: ['']
+    before_script:
+        - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
+        - npm install
+        - npm install -g wait-on
+    script:
+        - npm start & wait-on http://localhost:4200
+        - npm run cy:run
+    artifacts:
+        when: on_failure
+        paths:
+            - cypress/screenshots/**/*.png
+            - cypress/snapshots/actual/**/*.png
+            - cypress/snapshots/diff/**/*.png
+        expire_in: 30 day
 
 docker_build_deploy_development:
-  stage: deploy
-  cache: []
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
-  image:
-    name: gcr.io/kaniko-project/executor:v1.14.0-debug
-    entrypoint: [ "" ]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
-    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
-  script:
-    - >
-      /kaniko/executor \
-          --context "${CI_PROJECT_DIR}" \
-          --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-          --cache \
-          --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
-          --cache-copy-layers \
-          --build-arg BUILD_TARGET=dev \
-          --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel" \
-          --cleanup
-      /kaniko/executor \
-          --context "${CI_PROJECT_DIR}" \
-          --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-          --cache \
-          --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
-          --cache-copy-layers \
-          --build-arg BUILD_TARGET=staging \
-          --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging" \
-          --cleanup
+    stage: deploy
+    cache: []
+    rules:
+        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+    image:
+        name: gcr.io/kaniko-project/executor:v1.14.0-debug
+        entrypoint: ['']
+    before_script:
+        - mkdir -p /kaniko/.docker
+        - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+        - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
+    script:
+        - >
+            /kaniko/executor \
+                --context "${CI_PROJECT_DIR}" \
+                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+                --cache \
+                --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
+                --cache-copy-layers \
+                --build-arg BUILD_TARGET=dev \
+                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel" \
+                --cleanup
+            /kaniko/executor \
+                --context "${CI_PROJECT_DIR}" \
+                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+                --cache \
+                --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
+                --cache-copy-layers \
+                --build-arg BUILD_TARGET=staging \
+                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging" \
+                --cleanup
 
 docker_build_deploy_release:
-  stage: deploy
-  cache: []
-  rules:
-    - if: $CI_COMMIT_TAG
-  image:
-    name: gcr.io/kaniko-project/executor:v1.14.0-debug
-    entrypoint: [ "" ]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
-    - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
-  script:
-    - >
-      /kaniko/executor \
-          --context "${CI_PROJECT_DIR}" \
-          --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-          --build-arg BUILD_TARGET=prod \
-          --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}" \
-          --cleanup
+    stage: deploy
+    cache: []
+    rules:
+        - if: $CI_COMMIT_TAG
+    image:
+        name: gcr.io/kaniko-project/executor:v1.14.0-debug
+        entrypoint: ['']
+    before_script:
+        - mkdir -p /kaniko/.docker
+        - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+        - echo "export const ORS_API_KEY = '${ORS_API_KEY}'" > "./src/environments/api-keys/keys.ts"
+    script:
+        - >
+            /kaniko/executor \
+                --context "${CI_PROJECT_DIR}" \
+                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+                --build-arg BUILD_TARGET=prod \
+                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}" \
+                --cleanup

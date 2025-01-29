@@ -1,17 +1,16 @@
-import {Injectable} from '@angular/core'
-import {HttpClient} from '@angular/common/http'
-import {BehaviorSubject, Observable, of, Subject, throwError} from 'rxjs'
-import {catchError, concatMap, delay, retryWhen, timeout} from 'rxjs/operators'
-import {Plugin, ComputeState} from './plugin.interface'
-import {RunStatus} from '../common/status.types'
-import {ComputationID, ComputationMetadata, ComputationEntity} from '../computations-index/computation.interface'
-import {environment} from '../../../environments/environment'
+import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+import { BehaviorSubject, Observable, of, Subject, throwError } from 'rxjs'
+import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
+import { environment } from '../../../environments/environment'
+import { RunStatus } from '../common/status.types'
+import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
+import { ComputeState, Plugin } from './plugin.interface'
 
 @Injectable({
     providedIn: 'root'
 })
 export class PluginService {
-
     private apiUrl = environment.climateActionApiUrl
 
     private pluginRuns: ComputationEntity[] = []
@@ -25,8 +24,7 @@ export class PluginService {
 
     private catalogToggleInput!: HTMLInputElement
 
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) {}
 
     getIconUrl(pluginId: string, pluginVersion: string): string {
         return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon?plugin_version=${pluginVersion}`
@@ -60,7 +58,9 @@ export class PluginService {
                             console.warn(`Retrying request for computation ${id} (${index + 1})...`)
                             return of(error).pipe(delay((index + 1) * 1000))
                         }
-                        return throwError(() => `Error fetching computation ${id} after several retries: ${error.message}`)
+                        return throwError(
+                            () => `Error fetching computation ${id} after several retries: ${error.message}`
+                        )
                     })
                 )
             ),
@@ -89,8 +89,7 @@ export class PluginService {
 
     getComputesFromLS(status: RunStatus[]): ComputationEntity[] {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
-        if (!plugin_runs)
-            return []
+        if (!plugin_runs) return []
 
         const parsed_runs: ComputationEntity[] = JSON.parse(plugin_runs)
         return parsed_runs.filter(run => status.includes(run.status as RunStatus))
@@ -130,7 +129,7 @@ export class PluginService {
 
     updateRunStatus(correlationId: string, newStatus: RunStatus) {
         const runs = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-        const index = runs.findIndex((run) => run.correlation_uuid === correlationId)
+        const index = runs.findIndex(run => run.correlation_uuid === correlationId)
 
         if (index !== -1) {
             runs[index].status = newStatus

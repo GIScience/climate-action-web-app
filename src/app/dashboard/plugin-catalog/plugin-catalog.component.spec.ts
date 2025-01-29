@@ -1,7 +1,7 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {PluginCatalogComponent} from './plugin-catalog.component'
-import {HttpClientModule} from '@angular/common/http'
-import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
+import { HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { PluginCatalogComponent } from './plugin-catalog.component'
 
 describe('PluginCatalogComponent', () => {
     let component: PluginCatalogComponent
@@ -9,10 +9,7 @@ describe('PluginCatalogComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientModule,
-                PluginCatalogComponent
-            ],
+            imports: [HttpClientModule, PluginCatalogComponent],
             providers: [
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({

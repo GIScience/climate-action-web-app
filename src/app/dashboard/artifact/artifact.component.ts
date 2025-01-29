@@ -1,20 +1,29 @@
-import {Component, OnInit, AfterViewInit, Type, ViewChild, ViewContainerRef, ChangeDetectorRef, ViewEncapsulation} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {ArtifactService} from './artifact.service'
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
-import {MarkdownComponent} from './markdown/markdown.component'
-import {ImageComponent} from './image/image.component'
-import {TableComponent} from './table/table.component'
-import {GeojsonComponent} from './geojson/geojson.component'
-import {GeoTiffComponent} from './geotiff/geotiff.component'
-import {ChartComponent} from './chart/chart.component'
-import {MatGridListModule} from '@angular/material/grid-list'
-import {Artifact} from './artifact.interface'
-import {MatExpansionModule} from '@angular/material/expansion'
-import {TippyDirective} from '@ngneat/helipopper'
-import {NgScrollbarModule} from 'ngx-scrollbar'
-import {CdkDrag, CdkDragHandle} from '@angular/cdk/drag-drop'
-import {LucideAngularModule, GripHorizontal, Maximize2, Minimize2, X, Download} from 'lucide-angular'
+import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop'
+import { CommonModule } from '@angular/common'
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    OnInit,
+    Type,
+    ViewChild,
+    ViewContainerRef,
+    ViewEncapsulation
+} from '@angular/core'
+import { MatExpansionModule } from '@angular/material/expansion'
+import { MatGridListModule } from '@angular/material/grid-list'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { TippyDirective } from '@ngneat/helipopper'
+import { Download, GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
+import { NgScrollbarModule } from 'ngx-scrollbar'
+import { Artifact } from './artifact.interface'
+import { ArtifactService } from './artifact.service'
+import { ChartComponent } from './chart/chart.component'
+import { GeojsonComponent } from './geojson/geojson.component'
+import { GeoTiffComponent } from './geotiff/geotiff.component'
+import { ImageComponent } from './image/image.component'
+import { MarkdownComponent } from './markdown/markdown.component'
+import { TableComponent } from './table/table.component'
 
 @Component({
     selector: 'app-artifact',
@@ -35,10 +44,9 @@ import {LucideAngularModule, GripHorizontal, Maximize2, Minimize2, X, Download} 
     encapsulation: ViewEncapsulation.None
 })
 export class ArtifactComponent implements OnInit, AfterViewInit {
-
-    @ViewChild('container', {read: ViewContainerRef})
+    @ViewChild('container', { read: ViewContainerRef })
     container!: ViewContainerRef
-    @ViewChild('descriptionContainer', {read: ViewContainerRef})
+    @ViewChild('descriptionContainer', { read: ViewContainerRef })
     descriptionContainer!: ViewContainerRef
 
     currentUrl: string | null = null
@@ -63,8 +71,7 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
     ) {}
 
     display<C>(componentType: Type<C>, name: string, value: unknown, artifact: Artifact | null) {
-        if (this.container)
-            this.container.clear()
+        if (this.container) this.container.clear()
 
         const ref = this.container.createComponent(componentType)
         ref.setInput(name, value)
@@ -74,11 +81,11 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         this.displayDescription(artifact?.description || null)
         this.modality = artifact?.modality || null
 
-        if (typeof value === 'object' && value && !(value as {url?: string}).url) {
+        if (typeof value === 'object' && value && !(value as { url?: string }).url) {
             this.generateDownloadJsonUri(value)
             this.currentUrl = null
         } else {
-            this.currentUrl = typeof value === 'string' ? value : (value as {url?: string})?.url || null
+            this.currentUrl = typeof value === 'string' ? value : (value as { url?: string })?.url || null
             this.downloadJsonHref = null
         }
         this.refreshAccordion()
@@ -102,7 +109,9 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
             const a = document.createElement('a')
             document.body.appendChild(a)
             a.style.display = 'none'
-            a.href = (this.downloadJsonHref as {changingThisBreaksApplicationSecurity: string}).changingThisBreaksApplicationSecurity
+            a.href = (
+                this.downloadJsonHref as { changingThisBreaksApplicationSecurity: string }
+            ).changingThisBreaksApplicationSecurity
             a.download = 'data.json'
             a.click()
             document.body.removeChild(a)
@@ -119,11 +128,11 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
     getFileName(url: string): string {
         return url.split('/').pop() || 'download'
     }
-    
+
     private displayName(name: string | null) {
         this.name = name
     }
-    
+
     private displaySummary(summary: string | null) {
         this.summary = summary
     }

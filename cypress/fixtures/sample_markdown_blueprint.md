@@ -12,9 +12,7 @@ Be aware that if you did not specify a value, some of the optional parameters ma
     "string_showcase": "John Doe",
     "date_showcase": "2020-01-01",
     "select_showcase": "Option 2",
-    "select_multi_showcase": [
-        "Option 2"
-    ],
+    "select_multi_showcase": ["Option 2"],
     "mapping_showcase": {
         "good": "John Doe",
         "mediocre": 2.1,

@@ -1,7 +1,7 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {LegendComponent} from './legend.component'
-import {CommonModule} from '@angular/common'
-import {By} from '@angular/platform-browser'
+import { CommonModule } from '@angular/common'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { LegendComponent } from './legend.component'
 
 function rgbToHex(rgb: string): string {
     const rgbValues = rgb.match(/\d+/g)
@@ -30,7 +30,7 @@ describe('LegendComponent', () => {
     it('should render discrete legend correctly', () => {
         component.legendData = {
             legend_type: 'DISCRETE',
-            legend_data: {'Black b': '#000000', 'Green c': '#00ff00', 'Red a': '#ff0000'}
+            legend_data: { 'Black b': '#000000', 'Green c': '#00ff00', 'Red a': '#ff0000' }
         }
 
         fixture.detectChanges()
@@ -57,7 +57,7 @@ describe('LegendComponent', () => {
             legend_type: 'CONTINUOUS',
             legend_data: {
                 cmap_name: 'seismic',
-                ticks: {'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0}
+                ticks: { 'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0 }
             }
         }
 
@@ -75,9 +75,9 @@ describe('LegendComponent', () => {
         expect(ticks.length).toBe(3)
 
         const expectedTicks = [
-            {name: 'Low B', position: '0%'},
-            {name: 'Mid C', position: '50%'},
-            {name: 'High A', position: '100%'}
+            { name: 'Low B', position: '0%' },
+            { name: 'Mid C', position: '50%' },
+            { name: 'High A', position: '100%' }
         ]
 
         ticks.forEach((tick, index) => {
@@ -92,7 +92,7 @@ describe('LegendComponent', () => {
             legend_type: 'CONTINUOUS',
             legend_data: {
                 cmap_name: 'seismic',
-                ticks: {'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0}
+                ticks: { 'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0 }
             }
         }
 
@@ -110,7 +110,7 @@ describe('LegendComponent', () => {
             legend_type: 'CONTINUOUS',
             legend_data: {
                 cmap_name: 'seismic',
-                ticks: {'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0}
+                ticks: { 'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0 }
             }
         }
 

@@ -1,39 +1,39 @@
-import {Injectable} from '@angular/core'
-import {HttpClient} from '@angular/common/http'
-import {Collection, Feature, Map, MapBrowserEvent, Overlay, View} from 'ol'
-import {PluginService} from '../plugin/plugin.service'
-import FeatureLike from 'ol/Feature'
-import TileLayer, {Options as TileLayerOptions} from 'ol/layer/WebGLTile.js'
-import TileWMS from 'ol/source/TileWMS'
-import {fromLonLat} from 'ol/proj'
-import {Geometry, Polygon} from 'ol/geom.js'
-import {Observable} from 'rxjs'
-import {Coordinate} from 'ol/coordinate'
-import GeoJSON, {GeoJSONFeature} from 'ol/format/GeoJSON.js'
-import GeoTIFF from 'ol/source/GeoTIFF'
-import {GeoJSONFeatureCollection} from 'ol/format/GeoJSON'
-import VectorLayer, {Options as VectorLayerOptions} from 'ol/layer/Vector'
-import VectorSource from 'ol/source/Vector'
-import OSM from 'ol/source/OSM'
-import Point from 'ol/geom/Point'
-import {createEmpty, extend, Extent} from 'ol/extent'
-import {Circle as CircleStyle, Fill, Icon, Stroke, Style} from 'ol/style'
-import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
-import {defaults as defaultControls, ZoomToExtent} from 'ol/control.js'
-import {ScaleLine} from 'ol/control'
-import XYZ from 'ol/source/XYZ'
-import TileGrid from 'ol/tilegrid/TileGrid'
-import {StyleFunction} from 'ol/style/Style'
-import {MultiPolygon} from 'ol/geom'
-import {map} from 'rxjs/operators'
-import {environment} from 'src/environments/environment'
+import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 import geojsonvt from 'geojson-vt'
+import { Collection, Feature, Map, MapBrowserEvent, Overlay, View } from 'ol'
+import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
+import FeatureLike from 'ol/Feature'
 import VectorTile from 'ol/VectorTile'
-import VectorTileSource from 'ol/source/VectorTile'
-import VectorTileLayer, {Options as VectorTileLayerOptions} from 'ol/layer/VectorTile'
+import { ScaleLine } from 'ol/control'
+import { ZoomToExtent, defaults as defaultControls } from 'ol/control.js'
+import { Coordinate } from 'ol/coordinate'
+import { Extent, createEmpty, extend } from 'ol/extent'
+import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
+import GeoJSON, { GeoJSONFeature } from 'ol/format/GeoJSON.js'
+import { MultiPolygon } from 'ol/geom'
+import { Geometry, Polygon } from 'ol/geom.js'
+import Point from 'ol/geom/Point'
+import VectorLayer, { Options as VectorLayerOptions } from 'ol/layer/Vector'
+import VectorTileLayer, { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'
+import TileLayer, { Options as TileLayerOptions } from 'ol/layer/WebGLTile.js'
+import { fromLonLat } from 'ol/proj'
 import Projection from 'ol/proj/Projection'
 import RenderFeature from 'ol/render/Feature'
-import {replacer} from './utils/geojson-vt.utils'
+import GeoTIFF from 'ol/source/GeoTIFF'
+import OSM from 'ol/source/OSM'
+import TileWMS from 'ol/source/TileWMS'
+import VectorSource from 'ol/source/Vector'
+import VectorTileSource from 'ol/source/VectorTile'
+import XYZ from 'ol/source/XYZ'
+import { Circle as CircleStyle, Fill, Icon, Stroke, Style } from 'ol/style'
+import { StyleFunction } from 'ol/style/Style'
+import TileGrid from 'ol/tilegrid/TileGrid'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { environment } from 'src/environments/environment'
+import { PluginService } from '../plugin/plugin.service'
+import { replacer } from './utils/geojson-vt.utils'
 
 class ExtendedTileLayer extends TileLayer {
     name?: string
@@ -73,7 +73,6 @@ class ExtendedVectorLayer<T extends Feature<Geometry | Point>> extends VectorLay
 @Injectable({
     providedIn: 'root'
 })
-
 export class MapService {
     map: Map | undefined
     mapPopUp: Overlay | undefined
@@ -97,7 +96,7 @@ export class MapService {
         private pluginService: PluginService,
         private http: HttpClient
     ) {
-        this.pluginService.computeState$.subscribe((value) => {
+        this.pluginService.computeState$.subscribe(value => {
             if (value === 'compute-ready') {
                 this.enableComputeLayers()
             } else if (value === 'inactive') {
@@ -106,7 +105,7 @@ export class MapService {
         })
     }
 
-    goToLocation(suggestion: GeoJSONFeature) {    
+    goToLocation(suggestion: GeoJSONFeature) {
         if (suggestion) {
             const lon = suggestion.geometry.coordinates[0]
             const lat = suggestion.geometry.coordinates[1]
@@ -118,9 +117,7 @@ export class MapService {
 
     getAutoCompleteSuggestions(query: string): Observable<GeoJSONFeatureCollection[]> {
         const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
-        return this.http.get<GeoJSONFeatureCollection>(orsUrl).pipe(
-            map(results => results.features)
-        )
+        return this.http.get<GeoJSONFeatureCollection>(orsUrl).pipe(map(results => results.features))
     }
 
     highlightLocationOnMap(coordinates: Coordinate) {
@@ -179,11 +176,12 @@ export class MapService {
             source: new TileWMS({
                 url: 'https://maps.heigit.org/ohsome/service/wms',
                 params: {
-                    'LAYERS': 'ohsome:admin_world_water',
-                    'TRANSPARENT': true,
-                    'FORMAT': 'image/png'
+                    LAYERS: 'ohsome:admin_world_water',
+                    TRANSPARENT: true,
+                    FORMAT: 'image/png'
                 },
-                attributions: 'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
+                attributions:
+                    'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
             }),
             displayInLayerSwitcher: false,
             visible: false
@@ -240,10 +238,16 @@ export class MapService {
             source: new XYZ({
                 tileGrid: new TileGrid({
                     extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
-                    resolutions: [78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128, 2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525, 76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516, 2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974]
+                    resolutions: [
+                        78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128,
+                        2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525,
+                        76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516,
+                        2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974
+                    ]
                 }),
                 url: 'https://maps.heigit.org/osm-wms/tms/1.0.0/osm_auto:all/webmercator/{z}/{x}/{-y}.png',
-                attributions: 'Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Service © <a href="https://heigit.org" target="_blank">HeiGIT</a> @ <a href="https://www.uni-heidelberg.de/" target="_blank">Heidelberg University</a>.',
+                attributions:
+                    'Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Service © <a href="https://heigit.org" target="_blank">HeiGIT</a> @ <a href="https://www.uni-heidelberg.de/" target="_blank">Heidelberg University</a>.',
                 attributionsCollapsible: false
             })
         })
@@ -255,7 +259,12 @@ export class MapService {
             source: new XYZ({
                 tileGrid: new TileGrid({
                     extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
-                    resolutions: [78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128, 2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525, 76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516, 2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974]
+                    resolutions: [
+                        78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128,
+                        2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525,
+                        76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516,
+                        2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974
+                    ]
                 }),
                 url: 'https://maps.heigit.org/sketch-map-tool/tms/1.0.0/world_imagery/webmercator/{z}/{x}/{-y}.png',
                 attributions: 'Satellite layer powered by ESRI, Source: Geobasis-DE / LVermGeoRP, Maxar, Microsoft.',
@@ -269,7 +278,8 @@ export class MapService {
             visible: false,
             source: new XYZ({
                 url: 'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                attributions: '<a href="https://carto.com/" target="_blank">© CARTO</a> <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>.',
+                attributions:
+                    '<a href="https://carto.com/" target="_blank">© CARTO</a> <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>.',
                 attributionsCollapsible: false
             })
         })
@@ -313,12 +323,15 @@ export class MapService {
             layer.setVisible(layer.get('name') === selectedMapLayer)
         })
 
-        this.layerSwitcherCollapsed = (localStorage.getItem(localStorageLayerSwitcherStateKey) === 'true')
+        this.layerSwitcherCollapsed = localStorage.getItem(localStorageLayerSwitcherStateKey) === 'true'
         const layerSwitcher = new LayerSwitcher({
             collapsed: this.layerSwitcherCollapsed,
             reordering: false,
             onchangeCheck: () => {
-                const visibleBaseLayer = this.map?.getLayers().getArray().find(layer => layer.getVisible() && layer.get('baseLayer') === true)
+                const visibleBaseLayer = this.map
+                    ?.getLayers()
+                    .getArray()
+                    .find(layer => layer.getVisible() && layer.get('baseLayer') === true)
                 if (visibleBaseLayer) {
                     const selectedLayerName = visibleBaseLayer.get('name')
                     localStorage.setItem(localStorageSelectedMapLayerKey, selectedLayerName || '')
@@ -328,7 +341,7 @@ export class MapService {
         layerSwitcher.setHeader('<h3>Layers</h3>')
         this.map.addControl(layerSwitcher)
 
-        layerSwitcher.on('toggle', (toggleEvent) => {
+        layerSwitcher.on('toggle', toggleEvent => {
             this.layerSwitcherCollapsed = toggleEvent.collapsed
             localStorage.setItem(localStorageLayerSwitcherStateKey, this.layerSwitcherCollapsed.toString())
         })
@@ -350,7 +363,7 @@ export class MapService {
 
             const pixel = this.map.getEventPixel(evt.originalEvent)
             const hasValidFeature = this.map.hasFeatureAtPixel(pixel, {
-                layerFilter: (layer) => {
+                layerFilter: layer => {
                     return layer === this.geojsonLayer
                 }
             })
@@ -359,14 +372,14 @@ export class MapService {
             this.map.getTargetElement().style.cursor = showPointer ? 'pointer' : ''
         })
 
-        this.map.on('click', (evt) => {
+        this.map.on('click', evt => {
             this.selectRegions(evt.pixel)
         })
 
         if (!environment.production) {
             // Allow flexibility in window object for debugging in Cypress
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (window as any).olMap = this.map
+            ;(window as any).olMap = this.map
         }
     }
 
@@ -395,7 +408,7 @@ export class MapService {
             })
         })
 
-        const fowStyle = new Style({fill: new Fill({color: '#80808050'})})
+        const fowStyle = new Style({ fill: new Fill({ color: '#80808050' }) })
 
         this.focusedLayer = new ExtendedVectorLayer({
             source: geojsonLayerSource,
@@ -410,15 +423,22 @@ export class MapService {
     }
 
     cutFromGlobalPolygon(scissor: MultiPolygon): Feature<Polygon> {
-        const global = new Polygon([[[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]].map(coordinate => fromLonLat(coordinate))])
+        const global = new Polygon([
+            [
+                [-180, -90],
+                [180, -90],
+                [180, 90],
+                [-180, 90],
+                [-180, -90]
+            ].map(coordinate => fromLonLat(coordinate))
+        ])
 
         const clipped = new Polygon([
             global.getLinearRing(0)!.getCoordinates(),
             ...scissor.getPolygons().map(polygon => polygon.getLinearRing(0)!.getCoordinates())
         ])
 
-        return new Feature({'name': 'FogOfWar', 'geometry': clipped})
-
+        return new Feature({ name: 'FogOfWar', geometry: clipped })
     }
 
     addGeoJsonLayer(data: object, artifactName: string): ExtendedVectorTileLayer {
@@ -443,16 +463,19 @@ export class MapService {
                 const tileCoord = JSON.parse(url)
                 const [x, y, zoom] = tileCoord
                 const data = tileIndex.getTile(x, y, zoom)
-                const geojson = JSON.stringify({
-                    type: 'FeatureCollection',
-                    features: data ? data.features : []
-                }, replacer)
+                const geojson = JSON.stringify(
+                    {
+                        type: 'FeatureCollection',
+                        features: data ? data.features : []
+                    },
+                    replacer
+                )
 
                 const tileFeatures = format.readFeatures(geojson, {
                     extent: vectorSource.getTileGrid()?.getTileCoordExtent(tileCoord),
                     featureProjection: 'EPSG:3857'
-                });
-                (tile as VectorTile).setFeatures(tileFeatures)
+                })
+                ;(tile as VectorTile).setFeatures(tileFeatures)
             }
         })
 
@@ -487,23 +510,29 @@ export class MapService {
             this.map?.addLayer(this.featureClickOverlay)
         }
 
-        this.map?.on('pointermove', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
-            if (!this.featureHoverOverlay) return
-            
-            const features = this.getFeaturesAtPixel(evt.pixel, originalGeojsonLayer)
-            this.handleFeaturesTooltip(features, this.featureHoverOverlay)
-        }.bind(this))
+        this.map?.on(
+            'pointermove',
+            function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
+                if (!this.featureHoverOverlay) return
 
-        this.map?.on('click', function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
-            const pixel = this.map?.getEventPixel(evt.originalEvent)
-            if (!pixel) return
+                const features = this.getFeaturesAtPixel(evt.pixel, originalGeojsonLayer)
+                this.handleFeaturesTooltip(features, this.featureHoverOverlay)
+            }.bind(this)
+        )
 
-            this.geojsonLayer?.getFeatures(pixel).then(features => {
-                if (this.featureClickOverlay) {
-                    this.handleFeaturesTooltip(features, this.featureClickOverlay, evt.coordinate, artifactName)
-                }
-            })
-        }.bind(this))
+        this.map?.on(
+            'click',
+            function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
+                const pixel = this.map?.getEventPixel(evt.originalEvent)
+                if (!pixel) return
+
+                this.geojsonLayer?.getFeatures(pixel).then(features => {
+                    if (this.featureClickOverlay) {
+                        this.handleFeaturesTooltip(features, this.featureClickOverlay, evt.coordinate, artifactName)
+                    }
+                })
+            }.bind(this)
+        )
 
         return this.geojsonLayer
     }
@@ -560,7 +589,7 @@ export class MapService {
             name: artifactName
         })
         geoTiffLayer.setOpacity(0.6)
-        
+
         this.map?.addLayer(geoTiffLayer)
         return geoTiffLayer
     }
@@ -602,12 +631,10 @@ export class MapService {
             const projection = this.map.getView().getProjection()
 
             if (resolution) {
-                const url = source.getFeatureInfoUrl(
-                    this.map.getCoordinateFromPixel(pixel),
-                    resolution,
-                    projection,
-                    {'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 10}
-                )
+                const url = source.getFeatureInfoUrl(this.map.getCoordinateFromPixel(pixel), resolution, projection, {
+                    INFO_FORMAT: 'application/json',
+                    FEATURE_COUNT: 10
+                })
 
                 if (url) {
                     this.http.get<GeoJSONFeatureCollection>(url).subscribe(response => {
@@ -673,15 +700,18 @@ export class MapService {
         coordinate?: Coordinate,
         artifactName?: string
     ) {
-
         const popupContent = document.getElementById('map-popup-content')!
         if (features.length > 0) {
             overlay.getSource()?.clear()
             overlay.getSource()?.addFeatures(features as Feature<Geometry>[])
 
             if (coordinate) {
-                popupContent.innerHTML = '<span><strong>' + artifactName + '</strong> : ' +
-                    features.map(feature => feature.get('label')) + '</span>'
+                popupContent.innerHTML =
+                    '<span><strong>' +
+                    artifactName +
+                    '</strong> : ' +
+                    features.map(feature => feature.get('label')) +
+                    '</span>'
                 this.mapPopUp?.setPosition(coordinate)
             }
         } else {
@@ -692,10 +722,13 @@ export class MapService {
         }
     }
 
-    getFeaturesAtPixel(pixel: number[], originalGeojsonLayer: ExtendedVectorLayer<Feature<Geometry>>): Array<Feature<Geometry>> {
+    getFeaturesAtPixel(
+        pixel: number[],
+        originalGeojsonLayer: ExtendedVectorLayer<Feature<Geometry>>
+    ): Array<Feature<Geometry>> {
         const features: Array<Feature<Geometry>> = []
-        
-        this.map?.forEachFeatureAtPixel(pixel, (feature) => {
+
+        this.map?.forEachFeatureAtPixel(pixel, feature => {
             if (feature.getId()) {
                 const originalFeature = originalGeojsonLayer.getSource()?.getFeatureById(feature.getId() as number)
                 if (originalFeature) {
@@ -703,7 +736,7 @@ export class MapService {
                 }
             }
         })
-        
+
         return features
     }
 }

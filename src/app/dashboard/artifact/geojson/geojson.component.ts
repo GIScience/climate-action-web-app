@@ -1,8 +1,8 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {HttpClient} from '@angular/common/http'
-import {Artifact} from '../artifact.interface'
-import {MapService} from '../../map/map.service'
+import { CommonModule } from '@angular/common'
+import { HttpClient } from '@angular/common/http'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { MapService } from '../../map/map.service'
+import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geojson',
@@ -12,19 +12,24 @@ import {MapService} from '../../map/map.service'
     styleUrls: ['./geojson.component.scss']
 })
 export class GeojsonComponent implements OnInit, OnDestroy {
+    @Input() inputData: { url: string; artifact: Artifact | null } | undefined
 
-    @Input() inputData: { url: string; artifact: Artifact | null; } | undefined
-
-    constructor(private http: HttpClient, private mapService: MapService) {
-    }
+    constructor(
+        private http: HttpClient,
+        private mapService: MapService
+    ) {}
 
     ngOnInit(): void {
-        if (!this.inputData || !this.inputData['artifact'] || !this.inputData.url ||
-            !this.inputData['artifact'].store_id.endsWith('.geojson'))
+        if (
+            !this.inputData ||
+            !this.inputData['artifact'] ||
+            !this.inputData.url ||
+            !this.inputData['artifact'].store_id.endsWith('.geojson')
+        )
             return
 
         const artifactName = this.inputData.artifact?.name
-        this.http.get<object>(this.inputData.url).subscribe((data) => {
+        this.http.get<object>(this.inputData.url).subscribe(data => {
             this.mapService.addGeoJsonLayer(data, artifactName)
         })
     }

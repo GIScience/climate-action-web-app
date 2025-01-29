@@ -1,25 +1,25 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {MapService} from '../../map/map.service'
-import {PluginParameterComponent} from './plugin-parameter.component'
-import {HttpClientModule} from '@angular/common/http'
-import {FormlyFieldConfig, FormlyModule} from '@ngx-formly/core'
-import {ReactiveFormsModule} from '@angular/forms'
-import {NullTypeComponent} from '../../../types/null/null.type'
-import {ArrayTypeComponent} from '../../../types/array/array.type'
-import {ObjectTypeComponent} from '../../../types/object/object.type'
-import {MultiSchemaTypeComponent} from '../../../types/multischema/multischema.type'
-import {FormlyMatDatepickerModule} from '@ngx-formly/material/datepicker'
-import {FormlyMaterialModule} from '@ngx-formly/material'
-import {MatDatepickerModule} from '@angular/material/datepicker'
-import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateModule} from '@angular/material-moment-adapter'
-import {MAT_DATE_FORMATS} from '@angular/material/core'
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import {JSONSchema7} from 'json-schema'
-import {dateTypeValidator, intTypeValidator, numericTypeValidator} from '../../../app.validators'
-import {FormlyFieldExpansionPanelComponent} from '../../../types/expansion-panel/formlyFieldExpansionPanel.type'
-import {MatExpansionModule} from '@angular/material/expansion'
-import {Feature} from 'ol'
-import {MultiPolygon} from 'ol/geom'
+import { HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ReactiveFormsModule } from '@angular/forms'
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateModule } from '@angular/material-moment-adapter'
+import { MAT_DATE_FORMATS } from '@angular/material/core'
+import { MatDatepickerModule } from '@angular/material/datepicker'
+import { MatExpansionModule } from '@angular/material/expansion'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core'
+import { FormlyMaterialModule } from '@ngx-formly/material'
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
+import { JSONSchema7 } from 'json-schema'
+import { Feature } from 'ol'
+import { MultiPolygon } from 'ol/geom'
+import { dateTypeValidator, intTypeValidator, numericTypeValidator } from '../../../app.validators'
+import { ArrayTypeComponent } from '../../../types/array/array.type'
+import { FormlyFieldExpansionPanelComponent } from '../../../types/expansion-panel/formlyFieldExpansionPanel.type'
+import { MultiSchemaTypeComponent } from '../../../types/multischema/multischema.type'
+import { NullTypeComponent } from '../../../types/null/null.type'
+import { ObjectTypeComponent } from '../../../types/object/object.type'
+import { MapService } from '../../map/map.service'
+import { PluginParameterComponent } from './plugin-parameter.component'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -32,19 +32,17 @@ describe('PluginParameterComponent', () => {
             imports: [
                 FormlyModule.forRoot({
                     validators: [
-                        {name: 'intType', validation: intTypeValidator},
-                        {name: 'numType', validation: numericTypeValidator},
-                        {name: 'dateType', validation: dateTypeValidator}
+                        { name: 'intType', validation: intTypeValidator },
+                        { name: 'numType', validation: numericTypeValidator },
+                        { name: 'dateType', validation: dateTypeValidator }
                     ],
-                    validationMessages: [
-                        {name: 'required', message: 'This field is required'}
-                    ],
+                    validationMessages: [{ name: 'required', message: 'This field is required' }],
                     types: [
-                        {name: 'null', component: NullTypeComponent, wrappers: ['form-field']},
-                        {name: 'array', component: ArrayTypeComponent},
-                        {name: 'object', component: ObjectTypeComponent},
-                        {name: 'multischema', component: MultiSchemaTypeComponent},
-                        {name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: []}
+                        { name: 'null', component: NullTypeComponent, wrappers: ['form-field'] },
+                        { name: 'array', component: ArrayTypeComponent },
+                        { name: 'object', component: ObjectTypeComponent },
+                        { name: 'multischema', component: MultiSchemaTypeComponent },
+                        { name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: [] }
                     ]
                 }),
                 BrowserAnimationsModule,
@@ -96,30 +94,48 @@ describe('PluginParameterComponent', () => {
 
     it('should return a GEOJSON feature object', () => {
         const inputFeature = new Feature({
-            geometry: new MultiPolygon(
-                [[[[0, 0], [111319.49079327357, 0], [111319.49079327357, 111325.1428663851], [0, 111325.1428663851], [0, 0]]]]
-            ),
+            geometry: new MultiPolygon([
+                [
+                    [
+                        [0, 0],
+                        [111319.49079327357, 0],
+                        [111319.49079327357, 111325.1428663851],
+                        [0, 111325.1428663851],
+                        [0, 0]
+                    ]
+                ]
+            ]),
             id: '1',
             osm_id: -285864,
             name: 'Heidelberg'
         })
 
         const expectedFeature = {
-            'type': 'Feature',
-            'geometry': { 
-                'type': 'MultiPolygon',
-                'coordinates': [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPolygon',
+                coordinates: [
+                    [
+                        [
+                            [0, 0],
+                            [1, 0],
+                            [1, 1],
+                            [0, 1],
+                            [0, 0]
+                        ]
+                    ]
+                ]
             },
-            'properties': {
-                'id': '1',
-                'osm_id': -285864,
-                'name': 'Heidelberg'
+            properties: {
+                id: '1',
+                osm_id: -285864,
+                name: 'Heidelberg'
             }
         }
 
         mapService.highlightedFeatures.clear()
         mapService.highlightedFeatures.push(inputFeature)
-    
+
         const aoi = mapService.getSelectedRegion()
 
         expect(aoi).toEqual(expectedFeature)
@@ -127,31 +143,27 @@ describe('PluginParameterComponent', () => {
 
     it('should interpret operator schema', () => {
         component.plugin = {
-            'name': 'testplugin',
-            'authors': [],
-            'version': '0.0.1',
-            'concerns': [],
-            'purpose': '',
-            'methodology': '',
-            'sources': [],
-            'assets': {
-                'icon': '...'
+            name: 'testplugin',
+            authors: [],
+            version: '0.0.1',
+            concerns: [],
+            purpose: '',
+            methodology: '',
+            sources: [],
+            assets: {
+                icon: '...'
             },
-            'plugin_id': 'testplugin',
+            plugin_id: 'testplugin',
             // @ts-ignore possible type mismatch
-            'operator_schema': test_schema,
-            'library_version': '2.6.2'
+            operator_schema: test_schema,
+            library_version: '2.6.2'
         }
 
         component.ngOnChanges()
         fixture.detectChanges()
 
         expect(mapService.highlightedFeatures.getLength()).toEqual(0)
-        expect(component.selectOptions['Option'].map((x) => x.label))
-            .toEqual([
-                'Option 1',
-                'Option 2'
-            ])
+        expect(component.selectOptions['Option'].map(x => x.label)).toEqual(['Option 1', 'Option 2'])
         const expectedSchema: FormlyFieldConfig[] = [
             {
                 key: 'blueprint_bool',
@@ -245,13 +257,15 @@ describe('PluginParameterComponent', () => {
                                     }
                                 },
                                 validators: {
-                                    validation: [{
-                                        name: 'dateType',
-                                        options: {
-                                            min: '1970-01-01',
-                                            max: new Date().toISOString().split('T')[0]
+                                    validation: [
+                                        {
+                                            name: 'dateType',
+                                            options: {
+                                                min: '1970-01-01',
+                                                max: new Date().toISOString().split('T')[0]
+                                            }
                                         }
-                                    }]
+                                    ]
                                 },
                                 parsers: [component.parseDate]
                             },
@@ -260,7 +274,8 @@ describe('PluginParameterComponent', () => {
                                 type: 'select',
                                 props: {
                                     label: 'Selection Input',
-                                    description: 'An optional selection parameter. The user can choose one of the available options.',
+                                    description:
+                                        'An optional selection parameter. The user can choose one of the available options.',
                                     placeholder: 'Choose',
                                     options: [
                                         {
@@ -283,7 +298,8 @@ describe('PluginParameterComponent', () => {
                                 type: 'select',
                                 props: {
                                     label: 'Multi-Selection Input',
-                                    description: 'An optional selection parameter. The user can choose multiple of the available options.',
+                                    description:
+                                        'An optional selection parameter. The user can choose multiple of the available options.',
                                     placeholder: 'Option 2',
                                     multiple: true,
                                     options: [
@@ -301,7 +317,8 @@ describe('PluginParameterComponent', () => {
                                     validation: []
                                 },
                                 parsers: []
-                            }]
+                            }
+                        ]
                     }
                 ]
             }
@@ -312,140 +329,117 @@ describe('PluginParameterComponent', () => {
     })
 
     const test_schema: JSONSchema7 = {
-        '$defs': {
-            'Feature_MultiPolygon_Union_Dict__NoneType__': {'description': 'This should be ignored at all levels'},
-            'MultiPolygon': {'description': 'This should be ignored at all levels'},
-            'Option': {
-                'enum': [
-                    'Option 1',
-                    'Option 2'
-                ],
-                'title': 'Option',
-                'type': 'string'
+        $defs: {
+            Feature_MultiPolygon_Union_Dict__NoneType__: { description: 'This should be ignored at all levels' },
+            MultiPolygon: { description: 'This should be ignored at all levels' },
+            Option: {
+                enum: ['Option 1', 'Option 2'],
+                title: 'Option',
+                type: 'string'
             }
         },
-        'properties': {
-            'blueprint_bool': {
-                'description': 'A required boolean parameter.',
-                'examples': [
-                    true
-                ],
-                'title': 'Boolean Input',
-                'type': 'boolean'
+        properties: {
+            blueprint_bool: {
+                description: 'A required boolean parameter.',
+                examples: [true],
+                title: 'Boolean Input',
+                type: 'boolean'
             },
-            'blueprint_int': {
-                'anyOf': [
+            blueprint_int: {
+                anyOf: [
                     {
-                        'maximum': 100,
-                        'minimum': 0,
-                        'type': 'integer'
+                        maximum: 100,
+                        minimum: 0,
+                        type: 'integer'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': 3,
-                'description': 'An optional integer parameter.',
-                'examples': [
-                    3
-                ],
-                'title': 'Integer Input'
+                default: 3,
+                description: 'An optional integer parameter.',
+                examples: [3],
+                title: 'Integer Input'
             },
-            'blueprint_float': {
-                'anyOf': [
+            blueprint_float: {
+                anyOf: [
                     {
-                        'exclusiveMaximum': 4,
-                        'exclusiveMinimum': 0.5,
-                        'type': 'number'
+                        exclusiveMaximum: 4,
+                        exclusiveMinimum: 0.5,
+                        type: 'number'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': 2.1,
-                'description': 'An optional floating point parameter.',
-                'examples': [
-                    2.1
-                ],
-                'title': 'Float Input'
+                default: 2.1,
+                description: 'An optional floating point parameter.',
+                examples: [2.1],
+                title: 'Float Input'
             },
-            'blueprint_string': {
-                'anyOf': [
+            blueprint_string: {
+                anyOf: [
                     {
-                        'type': 'string'
+                        type: 'string'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': 'John Doe',
-                'description': 'An optional string parameter.',
-                'examples': [
-                    'John Doe'
-                ],
-                'title': 'String Input'
+                default: 'John Doe',
+                description: 'An optional string parameter.',
+                examples: ['John Doe'],
+                title: 'String Input'
             },
-            'blueprint_date': {
-                'anyOf': [
+            blueprint_date: {
+                anyOf: [
                     {
-                        'format': 'date',
-                        'type': 'string'
+                        format: 'date',
+                        type: 'string'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': '2020-01-01',
-                'description': 'An optional date parameter.',
-                'examples': [
-                    '2020-01-01'
-                ],
-                'title': 'Date Input'
+                default: '2020-01-01',
+                description: 'An optional date parameter.',
+                examples: ['2020-01-01'],
+                title: 'Date Input'
             },
-            'blueprint_select': {
-                'anyOf': [
+            blueprint_select: {
+                anyOf: [
                     {
-                        '$ref': '#/$defs/Option'
+                        $ref: '#/$defs/Option'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': 'Option 2',
-                'description': 'An optional selection parameter. The user can choose one of the available options.',
-                'examples': [
-                    'Option 2'
-                ],
-                'title': 'Selection Input'
+                default: 'Option 2',
+                description: 'An optional selection parameter. The user can choose one of the available options.',
+                examples: ['Option 2'],
+                title: 'Selection Input'
             },
-            'blueprint_select_multi': {
-                'anyOf': [
+            blueprint_select_multi: {
+                anyOf: [
                     {
-                        'items': {
-                            '$ref': '#/$defs/Option'
+                        items: {
+                            $ref: '#/$defs/Option'
                         },
-                        'type': 'array'
+                        type: 'array'
                     },
                     {
-                        'type': 'null'
+                        type: 'null'
                     }
                 ],
-                'default': [
-                    'Option 2'
-                ],
-                'description': 'An optional selection parameter. The user can choose multiple of the available options.',
-                'examples': [
-                    [
-                        'Option 2'
-                    ]
-                ],
-                'title': 'Multi-Selection Input'
+                default: ['Option 2'],
+                description: 'An optional selection parameter. The user can choose multiple of the available options.',
+                examples: [['Option 2']],
+                title: 'Multi-Selection Input'
             }
         },
-        'required': [
-            'blueprint_bool'
-        ],
-        'title': 'BlueprintComputeInput',
-        'type': 'object'
+        required: ['blueprint_bool'],
+        title: 'BlueprintComputeInput',
+        type: 'object'
     }
 })

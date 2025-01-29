@@ -1,11 +1,10 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import {ImageComponent} from './image.component'
-import {HttpClientModule} from '@angular/common/http'
-import {By} from '@angular/platform-browser'
+import { HttpClientModule } from '@angular/common/http'
+import { By } from '@angular/platform-browser'
+import { ImageComponent } from './image.component'
 
 describe('ImageComponent', () => {
-
     let component: ImageComponent
     let fixture: ComponentFixture<ImageComponent>
 

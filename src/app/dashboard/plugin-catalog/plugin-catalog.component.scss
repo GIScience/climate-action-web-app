@@ -1,252 +1,256 @@
 .plugin-catalog {
-  background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
-  color: #fff;
-  z-index: 1;
-  position: relative;
-  backdrop-filter: blur(5px);
-  border-radius: 10px;
-  padding-top: 20px;
-  overflow: hidden;
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 10%);
-
-  input[type=checkbox] {
-    display: none;
-  }
-
-  &.is-loading {
-    background-image: linear-gradient(92deg, rgb(189 195 199 / 95%) 8%, rgba(231 231 231 / 5%) 18%, rgb(189 195 199 / 95%) 33%);
-    background-size: 200% 100%;
-    backdrop-filter: blur(5px);
-    animation: 1.5s shine linear infinite;
-  }
-
-  #catalog-toggle:checked {
- 
-    ~ .plugins-list {
-      width: 120px;
-    }
-    
-    ~ #catalog-header .plugin-title {
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    ~ #catalog-header label[for=catalog-toggle] {
-      left: 50%;
-      transform: translate(-50%);
-    }
-
-    ~ #catalog-header #catalog-toggle-burger {
-      background: #fff;
-
-      &:before,
-      &:after {
-        width: 14px;
-        background: #eee;
-        transform: translate(0, 0) rotate(0deg);
-      }
-
-    }
-    
-    &:hover ~ #catalog-header #catalog-toggle-burger {
-
-      &:before,
-      &:after {
-        width: 18px;
-      }
-    }
-    
-    ~ .plugins-list .plugin-card {
-      width: 100px;
-    }
-
-    ~ .plugins-list .plugin-card__text {
-      opacity: 0;
-      transition: none;
-    }
-  }
-
-  #catalog-header {
+    background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
+    color: #fff;
+    z-index: 1;
     position: relative;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    height: 50px;
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding-top: 20px;
+    overflow: hidden;
+    box-shadow: 2px 2px 4px rgb(0 0 0 / 10%);
 
-    h3.plugin-title {
-      margin: 10px 0;
-      transition: opacity 0.25s ease-in-out;
+    input[type='checkbox'] {
+        display: none;
     }
 
-    label[for=catalog-toggle] {
-      position: absolute;
-      right: 10px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      width: 40px;
+    &.is-loading {
+        background-image: linear-gradient(
+            92deg,
+            rgb(189 195 199 / 95%) 8%,
+            rgba(231 231 231 / 5%) 18%,
+            rgb(189 195 199 / 95%) 33%
+        );
+        background-size: 200% 100%;
+        backdrop-filter: blur(5px);
+        animation: 1.5s shine linear infinite;
     }
-    
-    #catalog-toggle-burger {
-      display: flex;
-      justify-content: center;
-      position: relative;
-      width: 18px;
-      height: 2px;
-      background-color: transparent;
-      border-radius: 99px;
-      transition: background-color .25s ease-in-out;
-    
-      &:before,
-      &:after {
-        content: '';
-        position: absolute;
-        top: -6px;
-        width: 10px;
-        height: 2px;
-        background: #eee;
-        border-radius: 99px;
-        transform: translate(2px, 9px) rotate(40deg);
-        transition: transform .25s ease-in-out, width .1s ease-in-out;
-      }
-      
-      &:after {
-        top: 6px;
-        transform: translate(2px, -9px) rotate(-40deg);
-      }
+
+    #catalog-toggle:checked {
+        ~ .plugins-list {
+            width: 120px;
+        }
+
+        ~ #catalog-header .plugin-title {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        ~ #catalog-header label[for='catalog-toggle'] {
+            left: 50%;
+            transform: translate(-50%);
+        }
+
+        ~ #catalog-header #catalog-toggle-burger {
+            background: #fff;
+
+            &:before,
+            &:after {
+                width: 14px;
+                background: #eee;
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        &:hover ~ #catalog-header #catalog-toggle-burger {
+            &:before,
+            &:after {
+                width: 18px;
+            }
+        }
+
+        ~ .plugins-list .plugin-card {
+            width: 100px;
+        }
+
+        ~ .plugins-list .plugin-card__text {
+            opacity: 0;
+            transition: none;
+        }
     }
-  }
 
-  ng-scrollbar {
-    max-height: calc(100vh - 145px - 1vw);
+    #catalog-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        height: 50px;
 
-    ::ng-deep {
+        h3.plugin-title {
+            margin: 10px 0;
+            transition: opacity 0.25s ease-in-out;
+        }
 
-      .ng-scroll-content {
-        padding-left: 5px;
-      }
+        label[for='catalog-toggle'] {
+            position: absolute;
+            right: 10px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 40px;
+        }
+
+        #catalog-toggle-burger {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            width: 18px;
+            height: 2px;
+            background-color: transparent;
+            border-radius: 99px;
+            transition: background-color 0.25s ease-in-out;
+
+            &:before,
+            &:after {
+                content: '';
+                position: absolute;
+                top: -6px;
+                width: 10px;
+                height: 2px;
+                background: #eee;
+                border-radius: 99px;
+                transform: translate(2px, 9px) rotate(40deg);
+                transition:
+                    transform 0.25s ease-in-out,
+                    width 0.1s ease-in-out;
+            }
+
+            &:after {
+                top: 6px;
+                transform: translate(2px, -9px) rotate(-40deg);
+            }
+        }
     }
-  }
+
+    ng-scrollbar {
+        max-height: calc(100vh - 145px - 1vw);
+
+        ::ng-deep {
+            .ng-scroll-content {
+                padding-left: 5px;
+            }
+        }
+    }
 }
 
 .plugins-list {
-  width: 240px;
-  padding-left: 10px;
-  transition: width 0.25s ease-in-out;
-
-  ul {
-    padding: 15px 0 0 5px;
-  }
-
-  .loading-state {
-    pointer-events: none;
+    width: 240px;
+    padding-left: 10px;
+    transition: width 0.25s ease-in-out;
 
     ul {
-      padding-left: 10px;
+        padding: 15px 0 0 5px;
+    }
 
-      li {
-        padding: 5px;
+    .loading-state {
+        pointer-events: none;
 
-        img {
-          opacity: 0.8;
+        ul {
+            padding-left: 10px;
+
+            li {
+                padding: 5px;
+
+                img {
+                    opacity: 0.8;
+                }
+
+                .plugin-card__text {
+                    h3 {
+                        color: transparent;
+                        background: rgba(255, 255, 255, 0.6);
+                        width: 150%;
+                        margin-bottom: 5px;
+                    }
+
+                    span {
+                        color: transparent;
+                        background: rgba(255, 255, 255, 0.6);
+                        width: 100%;
+                    }
+                }
+            }
         }
+    }
+
+    .plugin-card {
+        display: flex;
+        border-radius: 5px;
+        height: 75px;
+        margin-bottom: 10px;
+        padding: 5px;
+        width: 220px;
+        cursor: pointer;
+        position: relative;
+        transition: width 0.25s ease-in-out;
 
         .plugin-card__text {
-          
-          h3 {
-            color: transparent;
-            background: rgba(255, 255, 255, 0.6);
-            width: 150%;
-            margin-bottom: 5px;
-          }
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+            transition: opacity 0.3s ease-in-out 0.3s;
 
-          span {
-            color: transparent;
-            background: rgba(255, 255, 255, 0.6);
-            width: 100%;
-          }
+            h3 {
+                margin: 0;
+                font-size: small;
+            }
+
+            span {
+                font-size: smaller;
+            }
         }
-      }
+
+        img {
+            aspect-ratio: 1;
+            border-radius: 5px;
+            height: 100%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.85);
+        }
+
+        &.plugin-card-highlight,
+        &:hover {
+            background-color: #f2f2f2;
+            color: #111;
+
+            &:before,
+            &:after {
+                content: '';
+                position: absolute;
+                pointer-events: none;
+                right: 0;
+                bottom: 100%;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                box-shadow: 18px 18px #f2f2f2;
+            }
+
+            &:after {
+                top: 100%;
+                box-shadow: 18px -18px #f2f2f2;
+            }
+        }
+
+        &:not(.plugin-card-highlight):hover {
+            background-color: #cbcbcb;
+
+            &:before,
+            &:after {
+                box-shadow: 18px 18px #cbcbcb;
+            }
+
+            &:after {
+                box-shadow: 18px -18px #cbcbcb;
+            }
+        }
     }
-  }
-
-  .plugin-card {
-    display: flex;
-    border-radius: 5px;
-    height: 75px;
-    margin-bottom: 10px;
-    padding: 5px;
-    width: 220px;
-    cursor: pointer;
-    position: relative;
-    transition: width 0.25s ease-in-out;
-    
-    .plugin-card__text {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 10px;
-      transition: opacity 0.3s ease-in-out 0.3s;
-      
-      h3 {
-        margin: 0;
-        font-size: small;
-      }
-      
-      span {
-        font-size: smaller;
-      }
-    }
-    
-    img {
-      aspect-ratio: 1;
-      border-radius: 5px;
-      height: 100%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.85);
-    }
-
-    &.plugin-card-highlight,
-    &:hover {
-      background-color: #f2f2f2;
-      color: #111;
-
-      &:before, &:after {
-        content: '';
-        position: absolute;
-        pointer-events: none;
-        right: 0;
-        bottom: 100%;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        box-shadow: 18px 18px #f2f2f2;
-      }
-
-      &:after{
-        top: 100%;
-        box-shadow: 18px -18px #f2f2f2;
-      }
-    }
-
-    &:not(.plugin-card-highlight):hover {
-      background-color: #cbcbcb;
-
-      &:before, &:after {
-        box-shadow: 18px 18px #cbcbcb;
-      }
-
-      &:after{
-        box-shadow: 18px -18px #cbcbcb;
-      }
-    }
-  }
 }
 
 @keyframes shine {
-  to {
-    background-position-x: -200%;
-  }
+    to {
+        background-position-x: -200%;
+    }
 }

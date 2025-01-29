@@ -1,18 +1,16 @@
 // Unused for now, will restore once the websocket is re-enabled.
 
-import {Injectable} from '@angular/core'
-import {webSocket, WebSocketSubject} from 'rxjs/webSocket'
-import {environment} from '../../environments/environment'
-import {WSMessage} from './notification.interface'
-import {map, Observable} from 'rxjs'
+import { Injectable } from '@angular/core'
 import moment from 'moment/moment'
-
+import { map, Observable } from 'rxjs'
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
+import { environment } from '../../environments/environment'
+import { WSMessage } from './notification.interface'
 
 @Injectable({
     providedIn: 'root'
 })
 export class NotificationService {
-
     private wsUrl = environment.climateActionWSUrl
     private websocketSubject?: WebSocketSubject<string>
     private hearbeat?: number
@@ -22,7 +20,7 @@ export class NotificationService {
             this.websocketSubject = webSocket(`${this.wsUrl}/api/v1/gateway/computation/`)
             this.hearbeat = this.keepAlive()
         }
-        return this.websocketSubject.asObservable().pipe(map((x) => JSON.parse(x) as WSMessage))
+        return this.websocketSubject.asObservable().pipe(map(x => JSON.parse(x) as WSMessage))
     }
 
     public sendMessage(message: WSMessage): void {
@@ -43,10 +41,10 @@ export class NotificationService {
 
     private keepAlive(): number {
         return setInterval(() => {
-                this.sendMessage({
-                    'type': 'heartbeat',
-                    'timestamp': moment(new Date()).format()
-                })
+            this.sendMessage({
+                type: 'heartbeat',
+                timestamp: moment(new Date()).format()
+            })
         }, 5000)
     }
 }

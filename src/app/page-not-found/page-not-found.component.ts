@@ -1,15 +1,11 @@
-import {Component} from '@angular/core'
-import {NgOptimizedImage} from '@angular/common'
+import { NgOptimizedImage } from '@angular/common'
+import { Component } from '@angular/core'
 
 @Component({
     selector: 'app-page-not-found',
     templateUrl: './page-not-found.component.html',
     styleUrls: ['./page-not-found.component.scss'],
-    imports: [
-        NgOptimizedImage
-    ],
+    imports: [NgOptimizedImage],
     standalone: true
 })
-export class PageNotFoundComponent {
-
-}
+export class PageNotFoundComponent {}
