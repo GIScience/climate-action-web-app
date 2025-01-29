@@ -3,7 +3,7 @@ import {ComputationsIndexComponent} from '../computations-index/computations-ind
 import {ComputationComponent} from './computation.component'
 import {NoopAnimationsModule} from '@angular/platform-browser/animations'
 import {HttpClientModule} from '@angular/common/http'
-import {ActivatedRoute, convertToParamMap} from '@angular/router'
+import {ActivatedRoute} from '@angular/router'
 import {PluginService} from '../plugin/plugin.service'
 import {MapService} from '../map/map.service'
 import {ArtifactService} from '../artifact/artifact.service'
@@ -30,10 +30,10 @@ describe('ComputationComponent', () => {
             'updateRunStatus', 
             'getComputationMetadata', 
             'getPluginRuns', 
-            'setPluginState',
+            'setComputeState',
             'getComputationState',
             'collapsePluginCatalog', 
-            'setPluginState'
+            'setComputeState'
         ], {
             syncTasks$: new BehaviorSubject<void>(undefined)
         })
@@ -53,8 +53,11 @@ describe('ComputationComponent', () => {
                 {provide: MapService, useValue: mockMapService},
                 {provide: ActivatedRoute,
                     useValue: {
-                        paramMap: of(convertToParamMap({name: 'test_plugin'})),
-                        params: of({name: 'test_plugin'})
+                        snapshot: {
+                            params: {
+                                name: 'test_plugin'
+                            }
+                        }
                     }
                 },
                 provideTippyLoader(() => import('tippy.js')),

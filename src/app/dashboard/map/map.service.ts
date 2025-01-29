@@ -97,7 +97,7 @@ export class MapService {
         private pluginService: PluginService,
         private http: HttpClient
     ) {
-        this.pluginService.pluginState$.subscribe((value) => {
+        this.pluginService.computeState$.subscribe((value) => {
             if (value === 'compute-ready') {
                 this.enableComputeLayers()
             } else if (value === 'inactive') {

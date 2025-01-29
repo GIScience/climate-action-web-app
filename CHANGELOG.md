@@ -15,6 +15,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Refactored types and names of interfaces to match the backend
+- Allow accessing computations even if plugin is offline ([#167](https://gitlab.heigit.org/climate-action/web-app/-/issues/167))
 
 ### Added
 

@@ -118,8 +118,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 private snackBar: MatSnackBar,
                 private dialog: MatDialog) {
 
-        if (this.pluginService.pluginState$) {
-            this.pluginService.pluginState$.subscribe((value) => {
+        if (this.pluginService.computeState$) {
+            this.pluginService.computeState$.subscribe((value) => {
                 if (value === 'compute-ready') {
                     this.collapseComputation()
                 }
@@ -141,27 +141,25 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.route.params.subscribe(params => {
-            const pluginId = params['name']
-            this.pluginId = pluginId
+        const pluginId = this.route.snapshot.params['name']
+        this.pluginId = pluginId
 
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-            this.fetchArchivedComputations()
-            this.startPeriodicSync()
+        this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+        this.fetchArchivedComputations()
+        this.startPeriodicSync()
 
-            this.dataChange.subscribe(data => {
-                if (data.length > 0) {
-                    this.computations = data
-                    this.activateArtifact()
-                }
-            })
-
-            this.initializeSuccessfulRuns()
-
-            if (this.artifactService.closeArtifactEvent) {
-                this.artifactService.closeArtifactEvent.subscribe(() => this.closeArtifactEvent())
+        this.dataChange.subscribe(data => {
+            if (data.length > 0) {
+                this.computations = data
+                this.activateArtifact()
             }
         })
+
+        this.initializeSuccessfulRuns()
+
+        if (this.artifactService.closeArtifactEvent) {
+            this.artifactService.closeArtifactEvent.subscribe(() => this.closeArtifactEvent())
+        }
 
         this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
@@ -194,9 +192,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             })
 
         if (this.currentRuns.filter(run => run.pluginId === this.pluginId).length === 0) {
-            this.pluginService.setPluginState('compute-ready')
+            this.pluginService.setComputeState('compute-ready')
         } else {
-            this.pluginService.setPluginState('inactive')
+            this.pluginService.setComputeState('inactive')
         }
     }
 
@@ -312,8 +310,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     toggleComputation(computation: ComputationEntity) {
-        if (this.pluginService.pluginState$) {
-            this.pluginService.setPluginState('inactive')
+        if (this.pluginService.computeState$) {
+            this.pluginService.setComputeState('inactive')
         }
         this.pluginService.collapsePluginCatalog()
         const previousActiveComputation = this.activeComputation

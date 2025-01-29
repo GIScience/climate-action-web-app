@@ -133,7 +133,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     deactivateCompute(): void {
         this.form.reset()
-        this.pluginService.setPluginState('inactive')
+        this.pluginService.setComputeState('inactive')
     }
 
     toggleFormState(): void {
@@ -372,7 +372,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             next: (data) => {
                 this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, aoiName)
                 this.pluginService.triggerSyncTasks()
-                this.pluginService.setPluginState('inactive')
+                this.pluginService.setComputeState('inactive')
     
                 this.snackBar.open(
                     'Compute request sent, results will be displayed soon.', 
