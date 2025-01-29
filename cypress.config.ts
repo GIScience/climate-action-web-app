@@ -1,5 +1,5 @@
-import {defineConfig} from 'cypress'
-import {configureVisualRegression} from 'cypress-visual-regression'
+import { defineConfig } from 'cypress'
+import { configureVisualRegression } from 'cypress-visual-regression'
 
 export default defineConfig({
     viewportWidth: 1500,
@@ -14,7 +14,9 @@ export default defineConfig({
             configureVisualRegression(on)
             on('before:browser:launch', (browser, launchOptions) => {
                 if (browser.name === 'chrome' && browser.isHeadless) {
-                    launchOptions.args.push('--window-size=1500,850 --start-fullscreen --force-color-profile=srgb --font-render-hinting=none')
+                    launchOptions.args.push(
+                        '--window-size=1500,850 --start-fullscreen --force-color-profile=srgb --font-render-hinting=none'
+                    )
                 }
 
                 return launchOptions

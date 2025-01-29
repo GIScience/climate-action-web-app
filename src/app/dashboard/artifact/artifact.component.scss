@@ -1,111 +1,111 @@
 .artifact-container {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  position: absolute;
-  top: 5vw;
-  right: calc(50% - 17.5vw);
-  min-width: 35vw;
-  max-width: 35vw;
-  height: auto;
-  pointer-events: all;
-  overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    position: absolute;
+    top: 5vw;
+    right: calc(50% - 17.5vw);
+    min-width: 35vw;
+    max-width: 35vw;
+    height: auto;
+    pointer-events: all;
+    overflow: hidden;
 
-  &.minimised {
-    height: 47.5px;
-    margin-top: calc(98vh - 122.5px);
-    top: 0;
-    transform: none !important;
+    &.minimised {
+        height: 47.5px;
+        margin-top: calc(98vh - 122.5px);
+        top: 0;
+        transform: none !important;
 
-    & .artifact-header {
-      cursor: unset;
+        & .artifact-header {
+            cursor: unset;
 
-      .grip-icon {
-        display: none;
-      }
-    }
-  }
-
-  .artifact-header {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: aliceblue;
-    cursor: move;
-
-    .grip-icon {
-      color: #9c9c9c;
-    }
-    
-    .artifact-name {
-      margin: 0 7.5px;
-    }
-
-    .artifact-window-controls {
-      display: flex;
-      margin-left: auto;
-
-      .minimise-btn {
-        margin-right: 7.5px;
-        color: #666;
-        border-color: #666;
-
-        &:hover {
-          background-color: #e5e5e5;
+            .grip-icon {
+                display: none;
+            }
         }
-      }
+    }
 
-      .close-btn {
-        color: #666;
-        border-color: #666;
+    .artifact-header {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: aliceblue;
+        cursor: move;
 
-        &:hover {
-          background-color: #ffd8d8;
+        .grip-icon {
+            color: #9c9c9c;
         }
-      }
-    }
-  }
-  
-  .artifact {
-    line-height: 1.4;
-    transition: 0.3s ease;
-    position: relative;
-    height: 50vh;
-    padding: 10px;
-  }
 
-  .artifact-meta {
-    max-width: 50rem;
-    margin: 20px auto 0;
-    padding-bottom: 20px;
-  
-    p.artifact-summary,
-    p.table-summary {
-      margin-bottom: 0;
-      text-align: center;
-      
-      span {
-        display: inline-block;
-        text-align: left;
-      }
-    }
-        
-    p.artifact-summary {
-      padding: 0 1.25rem;
+        .artifact-name {
+            margin: 0 7.5px;
+        }
+
+        .artifact-window-controls {
+            display: flex;
+            margin-left: auto;
+
+            .minimise-btn {
+                margin-right: 7.5px;
+                color: #666;
+                border-color: #666;
+
+                &:hover {
+                    background-color: #e5e5e5;
+                }
+            }
+
+            .close-btn {
+                color: #666;
+                border-color: #666;
+
+                &:hover {
+                    background-color: #ffd8d8;
+                }
+            }
+        }
     }
 
-    .artifact-description,
-    .artifact-abstract {
-      display: block;
-      margin-top: 20px;
-      border-bottom: 1px solid #ccc;
-      border-top: 1px solid #ccc;
-      box-shadow: none;
-      border-radius: 0;
-  
-      .mat-expansion-panel-header {
-        font-size: 13px;
-      }
+    .artifact {
+        line-height: 1.4;
+        transition: 0.3s ease;
+        position: relative;
+        height: 50vh;
+        padding: 10px;
     }
-  }
+
+    .artifact-meta {
+        max-width: 50rem;
+        margin: 20px auto 0;
+        padding-bottom: 20px;
+
+        p.artifact-summary,
+        p.table-summary {
+            margin-bottom: 0;
+            text-align: center;
+
+            span {
+                display: inline-block;
+                text-align: left;
+            }
+        }
+
+        p.artifact-summary {
+            padding: 0 1.25rem;
+        }
+
+        .artifact-description,
+        .artifact-abstract {
+            display: block;
+            margin-top: 20px;
+            border-bottom: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            box-shadow: none;
+            border-radius: 0;
+
+            .mat-expansion-panel-header {
+                font-size: 13px;
+            }
+        }
+    }
 }

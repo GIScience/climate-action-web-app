@@ -1,26 +1,28 @@
-html, html a, body {
-  -webkit-font-smoothing: antialiased;
+html,
+html a,
+body {
+    -webkit-font-smoothing: antialiased;
 }
 
 a {
-  transition: all 0.3s ease-in-out;
-  text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 ::selection {
-  background: rgb(0 128 128 / 20%);
+    background: rgb(0 128 128 / 20%);
 }
 
 body {
-  font-family: $font-primary;
-  font-size: 14px;
-  color: #111;
-  line-height: 1.5;
-  overflow-x: hidden;
+    font-family: $font-primary;
+    font-size: 14px;
+    color: #111;
+    line-height: 1.5;
+    overflow-x: hidden;
 }
 
 h1,
@@ -29,77 +31,76 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: $font-primary;
-  font-variation-settings: 'wght' 600;
-
-  a {
     font-family: $font-primary;
-  }
+    font-variation-settings: 'wght' 600;
 
-  small {
-    font-weight: 300;
-    color: lighten($default-dark, 5%);
-  }
+    a {
+        font-family: $font-primary;
+    }
+
+    small {
+        font-weight: 300;
+        color: lighten($default-dark, 5%);
+    }
 }
 
 p {
-  font-family: $font-primary;
-  line-height: 1.9;
+    font-family: $font-primary;
+    line-height: 1.9;
 }
 
 .lead {
-  font-size: 18px;
+    font-size: 18px;
 }
 
 ul {
-  list-style: none;
-  padding: 0;
-  margin: 0
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 a {
-  color: $default-info;
+    color: $default-info;
 
-  &:hover,
-  &:focus {
-    text-decoration: none;
-    color: darken($default-info, 10%);
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &.text-gray {
     &:hover,
-    &:focus,
-    &.active {
-      color: $default-dark !important;
+    &:focus {
+        text-decoration: none;
+        color: darken($default-info, 10%);
     }
-  }
+
+    &:focus {
+        outline: none;
+    }
+
+    &.text-gray {
+        &:hover,
+        &:focus,
+        &.active {
+            color: $default-dark !important;
+        }
+    }
 }
 
 :focus {
-  outline: none;
+    outline: none;
 }
 
 hr {
-  border-top: 1px solid $border-color;
+    border-top: 1px solid $border-color;
 }
 
-
 a.btn {
-    color:#fff;
-  }
+    color: #fff;
+}
 
 a.btn:hover {
-  color:#fff;
+    color: #fff;
 }
 
 .btn-color {
-  color:#fff;
+    color: #fff;
 }
 
 .btn-color:hover {
-  color:#fff;
+    color: #fff;
 }

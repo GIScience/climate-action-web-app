@@ -7,4 +7,3 @@ export interface WSMessage {
     message?: string
     status?: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE'
 }
-

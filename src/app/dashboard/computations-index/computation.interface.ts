@@ -1,7 +1,7 @@
-import {Plugin,PluginBaseInfo} from '../plugin/plugin.interface'
-import {GeoJSONFeature} from 'ol/format/GeoJSON'
-import {Artifact, ArtifactEntity} from '../artifact/artifact.interface'
-import {RunStatus} from '../common/status.types'
+import { GeoJSONFeature } from 'ol/format/GeoJSON'
+import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
+import { RunStatus } from '../common/status.types'
+import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 
 export interface ComputationParameters {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +19,8 @@ export interface ComputationMetadata {
     message: string
 }
 
-export interface ComputationEntity extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status'> {
+export interface ComputationEntity
+    extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status'> {
     artifacts: ArtifactEntity[]
     aoiName?: ComputationMetadata['aoi']['properties']['name']
     geometry?: ComputationMetadata['aoi']['geometry']

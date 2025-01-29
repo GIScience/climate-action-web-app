@@ -1,44 +1,48 @@
 <div class="welcome-container">
-	<div class="welcome-content">
+    <div class="welcome-content">
+        <div *ngIf="currentRuns.length > 0" class="welcome-content__revisit">
+            <div class="plugin-bubbles-container">
+                <h2>You have run a total of {{ currentRuns.length }} computations so far.</h2>
 
-		<div *ngIf="currentRuns.length > 0" class="welcome-content__revisit">
-			<div class="plugin-bubbles-container">
-				<h2>You have run a total of {{ currentRuns.length }} computations so far.</h2>
+                <ul class="plugin-bubbles">
+                    <a
+                        *ngFor="let plugin of pluginCounts; let i = index"
+                        [routerLink]="'/dashboard/plugin/' + plugin.pluginId">
+                        <li
+                            class="bubble"
+                            [style.--bubble-size]="calculateBubbleSize(plugin.count) + 'px'"
+                            [style.--bubble-gradient]="getGradient(i)">
+                            <div class="bubble-content">
+                                <span class="count">{{ plugin.count }}</span>
+                                <span class="plugin-name">{{ plugin.pluginName }}</span>
+                            </div>
+                        </li>
+                    </a>
+                </ul>
+            </div>
+        </div>
 
-				<ul class="plugin-bubbles">
-					<a *ngFor="let plugin of pluginCounts; let i = index" [routerLink]="'/dashboard/plugin/' + plugin.pluginId">
-						<li class="bubble"
-							[style.--bubble-size]="calculateBubbleSize(plugin.count) + 'px'"
-							[style.--bubble-gradient]="getGradient(i)">
-							<div class="bubble-content">
-								<span class="count">{{plugin.count}}</span>
-								<span class="plugin-name">{{plugin.pluginName}}</span>
-							</div>
-						</li>
-					</a>
-				</ul>
-			</div>
-		</div>
+        <div *ngIf="currentRuns.length === 0" class="welcome-content__new">
+            <h1>Welcome to the HeiGIT <br />Climate Action Dashboard</h1>
 
-		<div *ngIf="currentRuns.length === 0" class="welcome-content__new">
-			<h1>Welcome to the HeiGIT <br />Climate Action Dashboard</h1>
+            <div class="image-slideshow">
+                <div class="image-slideshow__inner">
+                    <img
+                        src="assets/images/landing/amsterdam.jpg"
+                        alt="Amsterdam; Credit: https://unsplash.com/@jacegrandinetti" />
+                    <img src="assets/images/landing/kenya.jpg" alt="Kenya; Credit: https://unsplash.com/@davidclode" />
+                    <img
+                        src="assets/images/landing/vietnam.jpg"
+                        alt="Bali; Credit: https://unsplash.com/@nathan_cima" />
+                </div>
+            </div>
 
-			<div class="image-slideshow">
-				<div class="image-slideshow__inner">
-					<img src="assets/images/landing/amsterdam.jpg"
-						alt="Amsterdam; Credit: https://unsplash.com/@jacegrandinetti">
-					<img src="assets/images/landing/kenya.jpg" alt="Kenya; Credit: https://unsplash.com/@davidclode">
-					<img src="assets/images/landing/vietnam.jpg" alt="Bali; Credit: https://unsplash.com/@nathan_cima">
-				</div>
-			</div>
-
-			<p>Make informed decisions about climate action in your community. This app provides high-resolution data
-				and
-				analysis on key climate indicators, from energy sources to transportation options. Discover local
-				strengths,
-				identify areas for improvement, and explore tailored solutions for a more sustainable future.</p>
-			<p class="cta-explore">To start, select a plugin from the sidebar on the left.</p>
-		</div>
-
-	</div>
+            <p>
+                Make informed decisions about climate action in your community. This app provides high-resolution data
+                and analysis on key climate indicators, from energy sources to transportation options. Discover local
+                strengths, identify areas for improvement, and explore tailored solutions for a more sustainable future.
+            </p>
+            <p class="cta-explore">To start, select a plugin from the sidebar on the left.</p>
+        </div>
+    </div>
 </div>

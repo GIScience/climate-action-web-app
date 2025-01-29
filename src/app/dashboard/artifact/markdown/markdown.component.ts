@@ -1,8 +1,8 @@
-import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {HttpClient} from '@angular/common/http'
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser'
-import {Remarkable} from 'remarkable'
+import { CommonModule } from '@angular/common'
+import { HttpClient } from '@angular/common/http'
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import { Remarkable } from 'remarkable'
 
 @Component({
     selector: 'app-markdown',
@@ -19,7 +19,10 @@ export class MarkdownComponent implements OnInit {
 
     private mdParser: Remarkable
 
-    constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
+    constructor(
+        private http: HttpClient,
+        private sanitizer: DomSanitizer
+    ) {
         this.mdParser = new Remarkable('full', {
             html: false,
             breaks: false,
@@ -38,11 +41,11 @@ export class MarkdownComponent implements OnInit {
 
     private loadMarkdownFromUrl(): void {
         if (this.url) {
-            this.http.get(this.url, {responseType: 'text'}).subscribe({
-                next: (data) => {
+            this.http.get(this.url, { responseType: 'text' }).subscribe({
+                next: data => {
                     this.parseMarkdown(data)
                 },
-                error: (error) => console.error('Error fetching markdown content:', error)
+                error: error => console.error('Error fetching markdown content:', error)
             })
         } else {
             console.error('URL is undefined')
@@ -55,7 +58,7 @@ export class MarkdownComponent implements OnInit {
         this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html)
     }
 
-    private rewriteFootnoteLinks(html: string){
+    private rewriteFootnoteLinks(html: string) {
         const baseUrl = location.href.split('#')[0]
         const parser = new DOMParser()
         const doc = parser.parseFromString(html, 'text/html')
@@ -63,7 +66,7 @@ export class MarkdownComponent implements OnInit {
         const links = doc.querySelectorAll('a[href^="#fn"], a[href^="#fnref"]')
         links.forEach(link => {
             const originalHref = link.getAttribute('href')
-            if (originalHref){
+            if (originalHref) {
                 link.setAttribute('href', `${baseUrl}${originalHref}`)
             }
         })

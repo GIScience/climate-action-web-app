@@ -1,8 +1,8 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {GeojsonComponent} from './geojson.component'
-import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {of} from 'rxjs'
-import {MapService} from '../../map/map.service'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { of } from 'rxjs'
+import { MapService } from '../../map/map.service'
+import { GeojsonComponent } from './geojson.component'
 import SpyObj = jasmine.SpyObj
 
 describe('GeojsonComponent', () => {
@@ -59,39 +59,46 @@ describe('GeojsonComponent', () => {
 
     it('should pass geojson to map service', () => {
         const mockGeoJsonData = {
-            'type': 'FeatureCollection',
-            'features': [
+            type: 'FeatureCollection',
+            features: [
                 {
-                    'type': 'Feature',
-                    'geometry': {'type': 'Point', 'coordinates': [102.0, 0.5]},
-                    'properties': {'prop0': 'value0'}
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [102.0, 0.5] },
+                    properties: { prop0: 'value0' }
                 },
                 {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'LineString',
-                        'coordinates': [
-                            [102.0, 0.0], [103.0, 1.0], [104.0, 0.0], [105.0, 1.0]
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: [
+                            [102.0, 0.0],
+                            [103.0, 1.0],
+                            [104.0, 0.0],
+                            [105.0, 1.0]
                         ]
                     },
-                    'properties': {
-                        'prop0': 'value0',
-                        'prop1': 0.0
+                    properties: {
+                        prop0: 'value0',
+                        prop1: 0.0
                     }
                 },
                 {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Polygon',
-                        'coordinates': [
-                            [[100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
-                                [100.0, 1.0], [100.0, 0.0]]
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [
+                                [100.0, 0.0],
+                                [101.0, 0.0],
+                                [101.0, 1.0],
+                                [100.0, 1.0],
+                                [100.0, 0.0]
+                            ]
                         ]
-
                     },
-                    'properties': {
-                        'prop0': 'value0',
-                        'prop1': {'this': 'that'}
+                    properties: {
+                        prop0: 'value0',
+                        prop1: { this: 'that' }
                     }
                 }
             ]

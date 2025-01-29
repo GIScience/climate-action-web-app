@@ -1,45 +1,42 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core'
-import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations'
-import {ComputationEntity} from '../computations-index/computation.interface'
-import {ArtifactService} from '../artifact/artifact.service'
-import {PluginService} from '../plugin/plugin.service'
-import {MapService} from '../map/map.service'
-import {Artifact, ArtifactEntity} from '../artifact/artifact.interface'
-import {Observable, Subscription} from 'rxjs'
-import {CommonModule} from '@angular/common'
-import {MatIconModule} from '@angular/material/icon'
-import {TippyDirective} from '@ngneat/helipopper'
+import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
+import { CommonModule } from '@angular/common'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { MatIconModule } from '@angular/material/icon'
+import { TippyDirective } from '@ngneat/helipopper'
+import { Observable, Subscription } from 'rxjs'
+import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
+import { ArtifactService } from '../artifact/artifact.service'
+import { ComputationEntity } from '../computations-index/computation.interface'
+import { MapService } from '../map/map.service'
+import { PluginService } from '../plugin/plugin.service'
 
 @Component({
     selector: 'app-computation',
     standalone: true,
-    imports: [
-        CommonModule,
-        MatIconModule,
-        TippyDirective
-    ],
+    imports: [CommonModule, MatIconModule, TippyDirective],
     animations: [
         trigger('expandCollapse', [
-            state('collapsed', style({
-                height: '0',
-                padding: '0',
-                visibility: 'hidden'
-            })),
-            state('expanded', style({
-                height: '*',
-                padding: '*',
-                visibility: 'visible'
-            })),
-            transition('expanded <=> collapsed', [
-                animate('250ms ease-in-out')
-            ])
+            state(
+                'collapsed',
+                style({
+                    height: '0',
+                    padding: '0',
+                    visibility: 'hidden'
+                })
+            ),
+            state(
+                'expanded',
+                style({
+                    height: '*',
+                    padding: '*',
+                    visibility: 'visible'
+                })
+            ),
+            transition('expanded <=> collapsed', [animate('250ms ease-in-out')])
         ]),
         trigger('fadeIn', [
             state('in', style({ opacity: 1 })),
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('250ms ease-in')
-            ])
+            transition(':enter', [style({ opacity: 0 }), animate('250ms ease-in')])
         ])
     ],
     templateUrl: './computation.component.html',
@@ -82,7 +79,7 @@ export class ComputationComponent {
         this.artifactService.resetArtifacts()
 
         const waitForMapRender = (artifact: ArtifactEntity): Promise<void> => {
-            return new Promise<void>((resolve) => {
+            return new Promise<void>(resolve => {
                 this.mapService.map?.once('rendercomplete', () => {
                     this.artifactService.getLegend(artifact)
                     artifact.isLoading = false
@@ -95,7 +92,7 @@ export class ComputationComponent {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const waitForArtifactFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
             this.subscription = observable.subscribe({
-                next: (data) => {
+                next: data => {
                     if (dataCheck(data)) {
                         artifact.isLoading = false
                         if (this.subscription) {
@@ -103,7 +100,7 @@ export class ComputationComponent {
                         }
                     }
                 },
-                error: (err) => {
+                error: err => {
                     console.error('Error fetching artifact:', err)
                     artifact.isLoading = false
                     if (this.subscription) {
@@ -114,27 +111,27 @@ export class ComputationComponent {
         }
 
         const artifact_f = {
-            'IMAGE': (x: Artifact) => {
+            IMAGE: (x: Artifact) => {
                 this.artifactService.getImage(x)
                 waitForArtifactFetch(this.artifactService.image, data => !!data?.url)
             },
-            'MARKDOWN': (x: Artifact) => {
+            MARKDOWN: (x: Artifact) => {
                 this.artifactService.getMarkdown(x)
                 waitForArtifactFetch(this.artifactService.markdown, data => !!data?.url)
             },
-            'CHART': (x: Artifact) => {
+            CHART: (x: Artifact) => {
                 this.artifactService.getChart(x)
                 waitForArtifactFetch(this.artifactService.chart, data => !!data?.data)
             },
-            'TABLE': (x: Artifact) => {
+            TABLE: (x: Artifact) => {
                 this.artifactService.getTable(x)
                 waitForArtifactFetch(this.artifactService.table, data => !!data?.url)
             },
-            'MAP_LAYER_GEOJSON': (x: Artifact) => {
+            MAP_LAYER_GEOJSON: (x: Artifact) => {
                 this.artifactService.getGeoJson(x)
                 return waitForMapRender(x)
             },
-            'MAP_LAYER_GEOTIFF': (x: Artifact) => {
+            MAP_LAYER_GEOTIFF: (x: Artifact) => {
                 this.artifactService.getGeoTiff(x)
                 return waitForMapRender(x)
             }

@@ -3,11 +3,11 @@ export interface GeoJSONVTFeature {
     // Allow for 'any' since GeoJSONVTFeature's type defs clash with those of OL
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     geometry?: any
-    tags?: Record<string, unknown>,
+    tags?: Record<string, unknown>
     id?: string
 }
 
-export const replacer = function (key: string, value: GeoJSONVTFeature) {
+export const replacer = function (_key: string, value: GeoJSONVTFeature) {
     if (!value || !value.geometry) {
         return value
     }
@@ -23,7 +23,7 @@ export const replacer = function (key: string, value: GeoJSONVTFeature) {
                 geometry = geometry[0]
             }
             break
-            
+
         case 2:
             type = 'MultiLineString'
             if (geometry.length == 1) {
@@ -31,7 +31,7 @@ export const replacer = function (key: string, value: GeoJSONVTFeature) {
                 geometry = geometry[0]
             }
             break
-            
+
         case 3:
             type = 'Polygon'
             if (geometry.length > 1) {
@@ -39,7 +39,7 @@ export const replacer = function (key: string, value: GeoJSONVTFeature) {
                 geometry = [geometry]
             }
             break
-            
+
         default:
             console.error(`Unknown geometry type: ${rawType}`)
             type = 'None'
@@ -48,8 +48,8 @@ export const replacer = function (key: string, value: GeoJSONVTFeature) {
 
     return {
         type: 'Feature',
-        geometry: {type: type, coordinates: geometry},
+        geometry: { type: type, coordinates: geometry },
         properties: value.tags,
         id: value.id
     }
-} 
+}

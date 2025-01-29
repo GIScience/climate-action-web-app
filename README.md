@@ -4,7 +4,7 @@
 
 # Climate Action Frontend
 
-![Alt text](docs/screenshot.jpg?raw=true "Platform Screenshot")
+![Alt text](docs/screenshot.jpg?raw=true 'Platform Screenshot')
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -57,11 +57,11 @@ Make sure to start at least one plugin along with the API Gateway, for example `
 ## Build
 
 Run `npm run build:{build_target}` to build the project.
-Currently available `build_target`s are 
+Currently available `build_target`s are
 
- - dev
- - staging
- - prod
+- dev
+- staging
+- prod
 
 ## Docker
 

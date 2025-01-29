@@ -1,10 +1,10 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import {PluginComponent} from './plugin.component'
-import {HttpClientModule} from '@angular/common/http'
-import {RouterModule} from '@angular/router'
-import {PluginCatalogComponent} from '../plugin-catalog/plugin-catalog.component'
-import {Plugin} from './plugin.interface'
+import { HttpClientModule } from '@angular/common/http'
+import { RouterModule } from '@angular/router'
+import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
+import { PluginComponent } from './plugin.component'
+import { Plugin } from './plugin.interface'
 
 describe('PluginComponent', () => {
     let component: PluginComponent
@@ -29,7 +29,7 @@ describe('PluginComponent', () => {
                 author: 'Test 1',
                 year: '2023'
             },
-            {   
+            {
                 ENTRYTYPE: 'misc',
                 ID: '2',
                 title: 'Test 2',
@@ -57,12 +57,7 @@ describe('PluginComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientModule,
-                PluginComponent,
-                PluginCatalogComponent,
-                RouterModule.forRoot([])
-            ]
+            imports: [HttpClientModule, PluginComponent, PluginCatalogComponent, RouterModule.forRoot([])]
         })
         fixture = TestBed.createComponent(PluginComponent)
         component = fixture.componentInstance

@@ -15,9 +15,9 @@
 // any of the following premade media queries.
 
 @mixin mq($condition) {
-  @media #{$condition} {
-    @content;
-  }
+    @media #{$condition} {
+        @content;
+    }
 }
 
 // ---------------------------------------------------------
@@ -28,9 +28,9 @@
 // and all devices above it.
 
 @mixin from($breakpoint) {
-  @media screen and (min-width: $breakpoint){
-    @content;
-  }
+    @media screen and (min-width: $breakpoint) {
+        @content;
+    }
 }
 
 // ---------------------------------------------------------
@@ -40,9 +40,9 @@
 // Mixin used to match all devices under certain breakpoint.
 
 @mixin to($breakpoint) {
-  @media screen and (max-width: $breakpoint - 1px) {
-    @content;
-  }
+    @media screen and (max-width: $breakpoint - 1px) {
+        @content;
+    }
 }
 
 // ---------------------------------------------------------
@@ -51,8 +51,8 @@
 
 // Mixin used to match the devices between 2 breakpoints.
 
-@mixin between($start, $end){
-  @media screen and (min-width: $start) and (max-width: $end - 1px) {
-    @content;
-  }
+@mixin between($start, $end) {
+    @media screen and (min-width: $start) and (max-width: $end - 1px) {
+        @content;
+    }
 }

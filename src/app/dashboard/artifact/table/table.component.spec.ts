@@ -1,8 +1,8 @@
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing'
-import {TableComponent} from './table.component'
-import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {of} from 'rxjs'
-import {By} from '@angular/platform-browser'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { of } from 'rxjs'
+import { TableComponent } from './table.component'
 import SpyObj = jasmine.SpyObj
 
 describe('TableComponent', () => {
@@ -15,10 +15,7 @@ describe('TableComponent', () => {
         httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
 
         TestBed.configureTestingModule({
-            imports: [
-                TableComponent,
-                HttpClientModule
-            ],
+            imports: [TableComponent, HttpClientModule],
             providers: [
                 {
                     provide: HttpClient,
@@ -36,13 +33,16 @@ describe('TableComponent', () => {
     })
 
     it('should render table from csv', fakeAsync(() => {
-        httpClientSpy.get.and.returnValue(of(
-            'Username; Identifier;First name;Last name\n' +
-            'booker12;9012;Rachel;Booker\n' +
-            'grey07;2070;Laura;Grey\n' +
-            'johnson81;4081;Craig;Johnson\n' +
-            'jenkins46;9346;Mary;Jenkins\n' +
-            'smith79;5079;Jamie;Smith\n'))
+        httpClientSpy.get.and.returnValue(
+            of(
+                'Username; Identifier;First name;Last name\n' +
+                    'booker12;9012;Rachel;Booker\n' +
+                    'grey07;2070;Laura;Grey\n' +
+                    'johnson81;4081;Craig;Johnson\n' +
+                    'jenkins46;9346;Mary;Jenkins\n' +
+                    'smith79;5079;Jamie;Smith\n'
+            )
+        )
 
         component.url = 'http://localhost'
         component.ngOnInit()
@@ -51,8 +51,9 @@ describe('TableComponent', () => {
         tick(100)
 
         const expectedHeaders = ['Username', 'Identifier', 'First name', 'Last name']
-        const renderedHeaders = fixture.debugElement.queryAll(By.css('th'))
-        .map(headerElement => headerElement.nativeElement.textContent.trim())
+        const renderedHeaders = fixture.debugElement
+            .queryAll(By.css('th'))
+            .map(headerElement => headerElement.nativeElement.textContent.trim())
 
         expect(renderedHeaders).toEqual(expectedHeaders)
 

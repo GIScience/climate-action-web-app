@@ -1,12 +1,12 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {ArtifactComponent} from './artifact.component'
-import {ArtifactService} from './artifact.service'
-import {HttpClientModule} from '@angular/common/http'
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import {By} from '@angular/platform-browser'
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core'
-import {MarkdownComponent} from './markdown/markdown.component'
-import {provideTippyLoader, provideTippyConfig, tooltipVariation, popperVariation} from '@ngneat/helipopper/config'
+import { HttpClientModule } from '@angular/common/http'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { ArtifactComponent } from './artifact.component'
+import { ArtifactService } from './artifact.service'
+import { MarkdownComponent } from './markdown/markdown.component'
 
 describe('ArtifactComponent', () => {
     let component: ArtifactComponent
@@ -14,12 +14,7 @@ describe('ArtifactComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientModule,
-                ArtifactComponent,
-                BrowserAnimationsModule,
-                MarkdownComponent
-            ],
+            imports: [HttpClientModule, ArtifactComponent, BrowserAnimationsModule, MarkdownComponent],
             providers: [
                 ArtifactService,
                 provideTippyLoader(() => import('tippy.js')),
@@ -60,13 +55,12 @@ describe('ArtifactComponent', () => {
         expect(summaryElement.nativeElement.textContent).toContain(testSummary)
     })
 
-
     it('should display the description if present', async () => {
         const testDescription = 'Test Description'
         component.description = testDescription
         component.showAccordion = true
         fixture.detectChanges()
-        
+
         const accordionHeader = fixture.debugElement.query(By.css('.mat-expansion-panel-header'))
         accordionHeader.nativeElement.click()
         fixture.detectChanges()
@@ -81,8 +75,8 @@ describe('ArtifactComponent', () => {
         const fakeAnchor = document.createElement('a')
         spyOn(fakeAnchor, 'click')
         const createElementSpy = spyOn(document, 'createElement').and.returnValue(fakeAnchor)
-        const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake((computation) => computation)
-        const removeChildSpy = spyOn(document.body, 'removeChild').and.callFake((computation) => computation)
+        const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(computation => computation)
+        const removeChildSpy = spyOn(document.body, 'removeChild').and.callFake(computation => computation)
         component.currentUrl = 'http://localhost:4200/dashboard/sample-image.png'
         component.downloadContent()
 

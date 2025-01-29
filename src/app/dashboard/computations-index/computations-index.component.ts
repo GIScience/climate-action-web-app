@@ -1,39 +1,48 @@
-import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core'
-import {animate, state, style, transition, trigger} from '@angular/animations'
-import {PluginService} from '../plugin/plugin.service'
-import {ArtifactService} from '../artifact/artifact.service'
-import {ActiveArtifactRef, ArtifactEntity} from '../artifact/artifact.interface'
-import {ComputationEntity, ComputationMetadata, ComputationParameters} from './computation.interface'
-import {MapService} from '../map/map.service'
-import {MatIconModule} from '@angular/material/icon'
-import {BehaviorSubject, Subscription, timer} from 'rxjs'
-import {CommonModule, NgClass, NgIf} from '@angular/common'
-import {TippyDirective} from '@ngneat/helipopper'
-import {NgScrollbarModule} from 'ngx-scrollbar'
-import {ActivatedRoute} from '@angular/router'
-import {FilterByCriteriaPipe} from './computation-filters.pipe'
+import { animate, state, style, transition, trigger } from '@angular/animations'
+import { CommonModule, NgClass, NgIf } from '@angular/common'
+import { Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
+import { MatIconModule } from '@angular/material/icon'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { ActivatedRoute } from '@angular/router'
+import { TippyDirective } from '@ngneat/helipopper'
+import {
+    Archive,
+    ArchiveRestore,
+    CircleArrowLeft,
+    CircleX,
+    Clock,
+    Hash,
+    ListTodo,
+    LucideAngularModule
+} from 'lucide-angular'
 import moment from 'moment/moment'
-import {Archive, ArchiveRestore, CircleArrowLeft, CircleX, Clock, Hash, ListTodo, LucideAngularModule} from 'lucide-angular'
-import {MatSnackBar} from '@angular/material/snack-bar'
-import {MatDialog} from '@angular/material/dialog'
-import {ComputationComponent} from '../computation/computation.component'
+import { NgScrollbarModule } from 'ngx-scrollbar'
+import { BehaviorSubject, Subscription, timer } from 'rxjs'
+import { ActiveArtifactRef, ArtifactEntity } from '../artifact/artifact.interface'
+import { ArtifactService } from '../artifact/artifact.service'
+import { ComputationComponent } from '../computation/computation.component'
+import { MapService } from '../map/map.service'
+import { PluginService } from '../plugin/plugin.service'
+import { FilterByCriteriaPipe } from './computation-filters.pipe'
+import { ComputationEntity, ComputationMetadata, ComputationParameters } from './computation.interface'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
-    'IMAGE': 'image',
-    'MARKDOWN': 'description',
-    'CHART': 'bar_chart',
-    'TABLE': 'table_chart',
-    'MAP_LAYER_GEOJSON': 'layers',
-    'MAP_LAYER_GEOTIFF': 'map'
+    IMAGE: 'image',
+    MARKDOWN: 'description',
+    CHART: 'bar_chart',
+    TABLE: 'table_chart',
+    MAP_LAYER_GEOJSON: 'layers',
+    MAP_LAYER_GEOTIFF: 'map'
 }
 
 const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
-    'description': 1,
-    'image': 2,
-    'layers': 3,
-    'map': 4,
-    'bar_chart': 5,
-    'table_chart': 6
+    description: 1,
+    image: 2,
+    layers: 3,
+    map: 4,
+    bar_chart: 5,
+    table_chart: 6
 }
 
 @Component({
@@ -52,33 +61,33 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     ],
     animations: [
         trigger('expandCollapse', [
-            state('collapsed', style({
-                height: '0',
-                padding: '0',
-                visibility: 'hidden'
-            })),
-            state('expanded', style({
-                height: '*',
-                padding: '*',
-                visibility: 'visible'
-            })),
-            transition('expanded <=> collapsed', [
-                animate('250ms ease-in-out')
-            ])
+            state(
+                'collapsed',
+                style({
+                    height: '0',
+                    padding: '0',
+                    visibility: 'hidden'
+                })
+            ),
+            state(
+                'expanded',
+                style({
+                    height: '*',
+                    padding: '*',
+                    visibility: 'visible'
+                })
+            ),
+            transition('expanded <=> collapsed', [animate('250ms ease-in-out')])
         ]),
         trigger('fadeIn', [
             state('in', style({ opacity: 1 })),
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('250ms ease-in')
-            ])
+            transition(':enter', [style({ opacity: 0 }), animate('250ms ease-in')])
         ])
     ],
     templateUrl: './computations-index.component.html',
     styleUrl: './computations-index.component.scss'
 })
 export class ComputationsIndexComponent implements OnInit, OnDestroy {
-
     computations: ComputationEntity[] = []
     dataChange = new BehaviorSubject<ComputationEntity[]>([])
     currentRuns: ComputationEntity[] = []
@@ -111,15 +120,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private readonly INITIAL_INTERVAL = 2500
     private readonly MAX_INTERVAL = 1800000
 
-    constructor(private pluginService: PluginService,
-                public artifactService: ArtifactService,
-                private mapService: MapService,
-                private route: ActivatedRoute,
-                private snackBar: MatSnackBar,
-                private dialog: MatDialog) {
-
+    constructor(
+        private pluginService: PluginService,
+        public artifactService: ArtifactService,
+        private mapService: MapService,
+        private route: ActivatedRoute,
+        private snackBar: MatSnackBar,
+        private dialog: MatDialog
+    ) {
         if (this.pluginService.computeState$) {
-            this.pluginService.computeState$.subscribe((value) => {
+            this.pluginService.computeState$.subscribe(value => {
                 if (value === 'compute-ready') {
                     this.collapseComputation()
                 }
@@ -201,19 +211,22 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     fetchArchivedComputations() {
         const archivedItems = localStorage.getItem('archive_runs')
         if (archivedItems) {
-            this.archivedComputations = JSON.parse(archivedItems).filter((computation: ComputationEntity) =>
-                (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS')
+            this.archivedComputations = JSON.parse(archivedItems).filter(
+                (computation: ComputationEntity) =>
+                    computation.status === 'PENDING' ||
+                    computation.status === 'STARTED' ||
+                    computation.status === 'SUCCESS'
             )
         }
     }
 
     syncRuns() {
         this.currentRuns
-        .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
-        .forEach(run => {
-            this.pluginService.getComputationState(run.correlation_uuid).subscribe({
-                next: (status) => {
-                    if (status === 'SUCCESS') {
+            .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
+            .forEach(run => {
+                this.pluginService.getComputationState(run.correlation_uuid).subscribe({
+                    next: status => {
+                        if (status === 'SUCCESS') {
                             this.newRuns.push(run.correlation_uuid)
                             this.updateNewRunsStorage()
                             this.fetchAndProcessComputations(run)
@@ -222,18 +235,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                             }
                         } else if (status === 'FAILURE') {
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.snackBar.open(
-                                'Error while computing plugin, please try again.',
-                                'Close',
-                                {
-                                    verticalPosition: 'bottom',
-                                    horizontalPosition: 'center',
-                                    panelClass: ['error-snackbar']
-                                }
-                            )
+                            this.snackBar.open('Error while computing plugin, please try again.', 'Close', {
+                                verticalPosition: 'bottom',
+                                horizontalPosition: 'center',
+                                panelClass: ['error-snackbar']
+                            })
                         }
                     },
-                    error: (error) => {
+                    error: error => {
                         console.error('Error checking state for run:', run.correlation_uuid, error)
                     }
                 })
@@ -257,28 +266,34 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 }
 
                 if (Array.isArray(computations) && computations.length > 0) {
-
-                    computation.artifacts = computations.map<ArtifactEntity>((x) => {
-                        return {
-                            name: x.name,
-                            modality: x.modality,
-                            primary: x.primary,
-                            file_path: x.file_path,
-                            summary: x.summary,
-                            description: x.description,
-                            correlation_uuid: x.correlation_uuid,
-                            store_id: x.store_id,
-                            attachments: x.attachments,
-                            icon: ARTIFACT_ICON_MAP[x.modality]
-                        }
-                    }).sort((a, b) => {
-                        if (a.icon == b.icon) {
-                            return (a.name || '').localeCompare(b.name || '')
-                        } else if (a.icon && b.icon && a.icon in ARTIFACT_ORDER_MAP && b.icon in ARTIFACT_ORDER_MAP) {
-                            return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
-                        }
-                        return 0
-                    })
+                    computation.artifacts = computations
+                        .map<ArtifactEntity>(x => {
+                            return {
+                                name: x.name,
+                                modality: x.modality,
+                                primary: x.primary,
+                                file_path: x.file_path,
+                                summary: x.summary,
+                                description: x.description,
+                                correlation_uuid: x.correlation_uuid,
+                                store_id: x.store_id,
+                                attachments: x.attachments,
+                                icon: ARTIFACT_ICON_MAP[x.modality]
+                            }
+                        })
+                        .sort((a, b) => {
+                            if (a.icon == b.icon) {
+                                return (a.name || '').localeCompare(b.name || '')
+                            } else if (
+                                a.icon &&
+                                b.icon &&
+                                a.icon in ARTIFACT_ORDER_MAP &&
+                                b.icon in ARTIFACT_ORDER_MAP
+                            ) {
+                                return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
+                            }
+                            return 0
+                        })
                     this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
                 }
                 this.updateComputation(run.correlation_uuid, computation)
@@ -291,7 +306,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     updateComputation(correlation_uuid: string, computation: ComputationEntity) {
         if (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS') {
-            this.computations = this.computations.filter((x) => x.correlation_uuid != correlation_uuid)
+            this.computations = this.computations.filter(x => x.correlation_uuid != correlation_uuid)
             this.computations.push(computation)
             this.computations.sort((a, b) => {
                 return moment(a.timestamp?.valueOf()) < moment(b.timestamp?.valueOf()) ? 1 : -1
@@ -318,7 +333,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (previousActiveComputation) {
             previousActiveComputation.isExpanded = false
-            setTimeout(() => previousActiveComputation.keepInDOM = false, 300)
+            setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
             this.artifactService.closeArtifact()
             this.mapService.removeFocusedLayer()
         }
@@ -328,18 +343,20 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.activeArtifact = undefined
         } else {
             computation.keepInDOM = true
-            setTimeout(() => computation.isExpanded = true, 0)
+            setTimeout(() => (computation.isExpanded = true), 0)
             this.activeComputation = computation
 
             if (computation && computation.geometry) {
                 const geometry = computation.geometry
                 const geoJsonData = {
-                    'type': 'FeatureCollection',
-                    'features': [{
-                        'type': 'Feature',
-                        'geometry': geometry,
-                        'properties': {'name': 'AOI'}
-                    }]
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            geometry: geometry,
+                            properties: { name: 'AOI' }
+                        }
+                    ]
                 }
                 const extent = this.mapService.highlightAoI(geoJsonData)
 
@@ -361,7 +378,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (previousActiveComputation) {
             previousActiveComputation.isExpanded = false
-            setTimeout(() => previousActiveComputation.keepInDOM = false, 300)
+            setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
             this.artifactService.closeArtifact()
             this.mapService.removeFocusedLayer()
             this.activeComputation = undefined
@@ -379,10 +396,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (artifact) {
             this.activeArtifact = artifact
 
-            localStorage.setItem('active_artifact', JSON.stringify({
-                correlation_uuid: artifact.correlation_uuid,
-                store_id: artifact.store_id
-            } as ActiveArtifactRef))
+            localStorage.setItem(
+                'active_artifact',
+                JSON.stringify({
+                    correlation_uuid: artifact.correlation_uuid,
+                    store_id: artifact.store_id
+                } as ActiveArtifactRef)
+            )
         } else {
             console.error('Cannot persist active artifact: ', artifact)
         }
@@ -393,10 +413,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             const storedItem = localStorage.getItem('active_artifact')
             if (storedItem) {
                 const activeArtifactRef = JSON.parse(storedItem) as ActiveArtifactRef
-                const parentComputation = this.computations.find((x) => x.correlation_uuid === activeArtifactRef.correlation_uuid)
+                const parentComputation = this.computations.find(
+                    x => x.correlation_uuid === activeArtifactRef.correlation_uuid
+                )
                 if (parentComputation) {
                     this.toggleComputation(parentComputation)
-                    this.activeArtifact = parentComputation.artifacts.find((x) => x.store_id === activeArtifactRef.store_id)
+                    this.activeArtifact = parentComputation.artifacts.find(
+                        x => x.store_id === activeArtifactRef.store_id
+                    )
                     if (this.activeArtifact) {
                         this.computationComponent.renderArtifact(this.activeArtifact)
                     }
@@ -407,7 +431,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     viewParameters(computation: ComputationEntity) {
         this.dialog.open(this.parametersDialog, {
-            data: {parameters: JSON.stringify(computation.params)},
+            data: { parameters: JSON.stringify(computation.params) },
             autoFocus: false
         })
     }
@@ -417,11 +441,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     archiveComputation(correlation_uuid: string): void {
-        const computationToArchive = this.currentRuns.find((computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid)
-        const isCurrentComputation = this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
+        const computationToArchive = this.currentRuns.find(
+            (computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid
+        )
+        const isCurrentComputation =
+            this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
 
         if (computationToArchive) {
-            this.currentRuns = this.currentRuns.filter((run: ComputationEntity) => run.correlation_uuid !== correlation_uuid)
+            this.currentRuns = this.currentRuns.filter(
+                (run: ComputationEntity) => run.correlation_uuid !== correlation_uuid
+            )
             this.archivedComputations.push(computationToArchive)
             this.updateLocalStorage()
             this.refreshDataSource()
@@ -435,10 +464,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     unarchiveComputation(correlation_uuid: string): void {
-        const computationToUnarchive = this.archivedComputations.find((computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid)
+        const computationToUnarchive = this.archivedComputations.find(
+            (computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid
+        )
 
         if (computationToUnarchive) {
-            this.archivedComputations = this.archivedComputations.filter((a: ComputationEntity) => a.correlation_uuid !== correlation_uuid)
+            this.archivedComputations = this.archivedComputations.filter(
+                (a: ComputationEntity) => a.correlation_uuid !== correlation_uuid
+            )
             this.currentRuns.push(computationToUnarchive)
             this.updateLocalStorage()
 
@@ -462,21 +495,15 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     private startPeriodicSync() {
         let retryCount = 0
-        
+
         const checkAndScheduleNext = () => {
-            const hasPendingRuns = this.currentRuns.some(
-                run => run.status === 'PENDING' || run.status === 'STARTED'
-            )
-            const nextInterval = Math.min(
-                this.INITIAL_INTERVAL * Math.pow(2, retryCount),
-                this.MAX_INTERVAL
-            )
+            const hasPendingRuns = this.currentRuns.some(run => run.status === 'PENDING' || run.status === 'STARTED')
+            const nextInterval = Math.min(this.INITIAL_INTERVAL * Math.pow(2, retryCount), this.MAX_INTERVAL)
 
             if (hasPendingRuns) {
                 this.syncRuns()
                 retryCount++
-                this.syncSubscription = timer(nextInterval)
-                    .subscribe(() => checkAndScheduleNext())
+                this.syncSubscription = timer(nextInterval).subscribe(() => checkAndScheduleNext())
             }
         }
 

@@ -1,27 +1,22 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core'
-import {NavigationEnd, Router} from '@angular/router'
-import {PluginService} from '../plugin/plugin.service'
-import {ArtifactService} from '../artifact/artifact.service'
-import {CommonModule} from '@angular/common'
-import {MatIconModule} from '@angular/material/icon'
-import {PluginCard} from './plugin-catalog.interface'
-import {TippyDirective} from '@ngneat/helipopper'
-import {NgScrollbarModule} from 'ngx-scrollbar'
+import { CommonModule } from '@angular/common'
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { MatIconModule } from '@angular/material/icon'
+import { NavigationEnd, Router } from '@angular/router'
+import { TippyDirective } from '@ngneat/helipopper'
+import { NgScrollbarModule } from 'ngx-scrollbar'
+import { ArtifactService } from '../artifact/artifact.service'
+import { PluginService } from '../plugin/plugin.service'
+import { PluginCard } from './plugin-catalog.interface'
 
 @Component({
     selector: 'app-plugin-catalog',
     templateUrl: './plugin-catalog.component.html',
     styleUrls: ['./plugin-catalog.component.scss'],
-    imports: [
-        CommonModule,
-        MatIconModule,
-        TippyDirective,
-        NgScrollbarModule
-    ],
+    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule],
     standalone: true
 })
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
-    @ViewChild('catalogToggle', {static: true}) catalogToggle!: ElementRef<HTMLInputElement>
+    @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>
 
     cards: Array<PluginCard> = []
     activeCard?: PluginCard
@@ -30,8 +25,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     constructor(
         private router: Router,
         private pluginService: PluginService,
-        private artifactService: ArtifactService) {
-    }
+        private artifactService: ArtifactService
+    ) {}
 
     ngAfterViewInit(): void {
         if (this.catalogToggle) {
@@ -64,8 +59,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     loadPlugins() {
         this.loading = true
         this.pluginService.getPlugins().subscribe({
-            next: (data) => {
-                data.forEach((plugin) => {
+            next: data => {
+                data.forEach(plugin => {
                     const pluginCard = {
                         plugin_id: plugin.plugin_id,
                         name: plugin.name,
@@ -76,7 +71,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                         status: plugin.status || 'active'
                     } as PluginCard
 
-                    const existingCard = this.cards.find((x) => x.plugin_id === plugin.plugin_id)
+                    const existingCard = this.cards.find(x => x.plugin_id === plugin.plugin_id)
                     if (existingCard) {
                         Object.assign(existingCard, pluginCard)
                     } else {
@@ -85,8 +80,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                 })
 
                 const storedRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-                storedRuns.forEach((run) => {
-                    const existingCard = this.cards.find((x) => x.plugin_id === run.pluginId)
+                storedRuns.forEach(run => {
+                    const existingCard = this.cards.find(x => x.plugin_id === run.pluginId)
                     if (!existingCard) {
                         const offlineCard = {
                             plugin_id: run.pluginId,
@@ -114,7 +109,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     }
 
     onImageError(event: Event) {
-        (event.target as HTMLImageElement).src = 'assets/images/plugin-icons/fallback.jpg'
+        ;(event.target as HTMLImageElement).src = 'assets/images/plugin-icons/fallback.jpg'
     }
 
     activateCard(card: PluginCard) {

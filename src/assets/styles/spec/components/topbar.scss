@@ -1,149 +1,148 @@
 header {
-  background-color: $default-white;
-  width: 100vw;
-  z-index: 2;
+    background-color: $default-white;
+    width: 100vw;
+    z-index: 2;
 
-  .header-container {
-    height: $header-height;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-    .logo-wrapper,
-    .my-account {
-      flex-grow: 1;
-      flex-basis: 0;
-    }
+    .header-container {
+        height: $header-height;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-    .logo-wrapper {
-      padding: 0 25px;
-
-      img.logo {
-        height: 35px;
-      }
-    }
-
-    .nav-left,
-    .nav-right {
-      list-style: none;
-      margin-bottom: 0;
-      padding-left: 0;
-      position: relative;
-
-      > li {
-        float: left;
-
-        > button {
-          color: $default-text-color;
-          display: block;
-          line-height: $header-height;
-          min-height: $header-height;
-          margin: 0 15px;
-          padding: 0 10px;
-          transition: all 0.2s ease-in-out;
-
-          i {
-            font-size: 17px;
-          }
-
-          &:hover,
-          &:focus {
-            color: $default-dark;
-            text-decoration: none;
-          }
-
-          @include to($breakpoint-md) {
-            padding: 0 15px;
-          }
+        .logo-wrapper,
+        .my-account {
+            flex-grow: 1;
+            flex-basis: 0;
         }
-      }
-    }
 
-    .dropdown-menu {
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-      margin: 0;
-      transform-origin: top right;
-      transition: transform 0.15s ease-out;
+        .logo-wrapper {
+            padding: 0 25px;
 
-      .divider {
-        border-bottom: 1px solid $border-color;
-        height: 1px;
-        overflow: hidden;
-      }
-
-      > li {
-        > a {
-          transition: all 0.2s ease-out;
+            img.logo {
+                height: 35px;
+            }
         }
-      }
+
+        .nav-left,
+        .nav-right {
+            list-style: none;
+            margin-bottom: 0;
+            padding-left: 0;
+            position: relative;
+
+            > li {
+                float: left;
+
+                > button {
+                    color: $default-text-color;
+                    display: block;
+                    line-height: $header-height;
+                    min-height: $header-height;
+                    margin: 0 15px;
+                    padding: 0 10px;
+                    transition: all 0.2s ease-in-out;
+
+                    i {
+                        font-size: 17px;
+                    }
+
+                    &:hover,
+                    &:focus {
+                        color: $default-dark;
+                        text-decoration: none;
+                    }
+
+                    @include to($breakpoint-md) {
+                        padding: 0 15px;
+                    }
+                }
+            }
+        }
+
+        .dropdown-menu {
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            margin: 0;
+            transform-origin: top right;
+            transition: transform 0.15s ease-out;
+
+            .divider {
+                border-bottom: 1px solid $border-color;
+                height: 1px;
+                overflow: hidden;
+            }
+
+            > li {
+                > a {
+                    transition: all 0.2s ease-out;
+                }
+            }
+        }
+
+        .show {
+            .dropdown-menu {
+                transform: scale(1, 1);
+            }
+        }
+
+        h2 {
+            color: #008080;
+            line-height: 50px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .my-account {
+            i-lucide {
+                display: none;
+                float: right;
+                margin-right: 25px;
+            }
+        }
     }
 
-    .show {
-      .dropdown-menu {
-        transform: scale(1, 1);
-      }
+    .search-box {
+        .search-icon-close {
+            display: none;
+        }
+
+        &.active {
+            .search-icon {
+                display: none;
+            }
+
+            .search-icon-close {
+                display: inline-block;
+            }
+        }
     }
 
-    h2 {
-      color: #008080;
-      line-height: 50px;
-      margin: 0;
-      cursor: pointer;
-    }
-
-    .my-account {
-      
-      i-lucide {
+    .search-input {
         display: none;
-        float: right;
-        margin-right: 25px;
-      }
+
+        &.active {
+            display: inline-block;
+        }
+
+        input {
+            background-color: transparent;
+            border: 0;
+            box-shadow: none;
+            font-size: 18px;
+            height: 40px;
+            margin-top: 12px;
+            outline: none;
+            padding: 5px;
+
+            @include to($breakpoint-sm) {
+                width: 85px;
+            }
+
+            @include placeholder {
+                color: lighten($default-text-color, 20%);
+                font-style: italic;
+            }
+        }
     }
-  }
-
-  .search-box {
-    .search-icon-close {
-      display: none;
-    }
-
-    &.active {
-      .search-icon {
-        display: none;
-      }
-
-      .search-icon-close {
-        display: inline-block;
-      }
-    }
-  }
-
-  .search-input {
-    display: none;
-
-    &.active {
-      display: inline-block;
-    }
-
-    input {
-      background-color: transparent;
-      border: 0;
-      box-shadow: none;
-      font-size: 18px;
-      height: 40px;
-      margin-top: 12px;
-      outline: none;
-      padding: 5px;
-
-      @include to($breakpoint-sm) {
-        width: 85px;
-      }
-
-      @include placeholder {
-        color: lighten($default-text-color, 20%);
-        font-style: italic;
-      }
-    }
-  }
 }
 
 // ---------------------------------------------------------
@@ -151,16 +150,16 @@ header {
 // ---------------------------------------------------------
 
 .is-collapsed {
-  .header {
-    width: calc(100% - #{$collapsed-size});
+    .header {
+        width: calc(100% - #{$collapsed-size});
 
-    @include to($breakpoint-md) {
-      width: 100%;
-    }
+        @include to($breakpoint-md) {
+            width: 100%;
+        }
 
-    @include between($breakpoint-md, $breakpoint-xl) {
-      // width: calc(100% - #{$offscreen-size});
-      width: calc(100% - #{$collapsed-size});
+        @include between($breakpoint-md, $breakpoint-xl) {
+            // width: calc(100% - #{$offscreen-size});
+            width: calc(100% - #{$collapsed-size});
+        }
     }
-  }
 }

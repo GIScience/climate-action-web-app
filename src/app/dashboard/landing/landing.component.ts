@@ -1,9 +1,9 @@
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {RouterModule} from '@angular/router'
-import {PluginService} from '../plugin/plugin.service'
-import {ComputationEntity} from '../computations-index/computation.interface'
-import {pickRandomGradient} from '../../utils/style-utils'
+import { CommonModule } from '@angular/common'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { pickRandomGradient } from '../../utils/style-utils'
+import { ComputationEntity } from '../computations-index/computation.interface'
+import { PluginService } from '../plugin/plugin.service'
 
 @Component({
     selector: 'app-landing',
@@ -12,7 +12,6 @@ import {pickRandomGradient} from '../../utils/style-utils'
     templateUrl: './landing.component.html',
     styleUrl: './landing.component.scss'
 })
-
 export class LandingComponent implements OnInit {
     currentRuns: ComputationEntity[] = []
     pluginCounts: { pluginName: string; pluginId: string; count: number }[] = []
@@ -30,26 +29,29 @@ export class LandingComponent implements OnInit {
     ngOnInit() {
         this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         this.calculatePluginCounts()
-        
+
         this.pluginCounts.forEach((_, index) => {
             this.gradientCache[index] = pickRandomGradient(this.gradientCache)
         })
-        
+
         this.cdr.detectChanges()
         this.cdr.detach()
     }
 
     private calculatePluginCounts() {
-        const counts = this.currentRuns.reduce((acc, run) => {
-            if (run.pluginId) {
-                acc[run.pluginId] = {
-                    pluginName: run.pluginName || '',
-                    pluginId: run.pluginId,
-                    count: (acc[run.pluginId]?.count || 0) + 1
+        const counts = this.currentRuns.reduce(
+            (acc, run) => {
+                if (run.pluginId) {
+                    acc[run.pluginId] = {
+                        pluginName: run.pluginName || '',
+                        pluginId: run.pluginId,
+                        count: (acc[run.pluginId]?.count || 0) + 1
+                    }
                 }
-            }
-            return acc
-        }, {} as Record<string, { pluginName: string, pluginId: string, count: number }>)
+                return acc
+            },
+            {} as Record<string, { pluginName: string; pluginId: string; count: number }>
+        )
 
         this.pluginCounts = Object.values(counts).map(value => ({
             pluginName: value.pluginName,

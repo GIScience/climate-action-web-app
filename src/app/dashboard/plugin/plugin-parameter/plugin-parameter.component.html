@@ -1,27 +1,52 @@
 <div class="plugin-parameter-container">
-    <div class="area-selection-message" [ngClass]="{
-        'message--info': !areaSelected,
-        'message--blocked': areaSelected && selectedRegions.length > 1,
-        'message--warning': areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500
-    }" *ngIf="!areaSelected || (areaSelected && selectedRegions.length > 1) || (areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500)">
-        <i-lucide [img]="!areaSelected ? MapPinPlusInside : (selectedRegions.length > 1 ? TriangleAlert : CircleAlert)" size="20"></i-lucide>
+    <div
+        class="area-selection-message"
+        [ngClass]="{
+            'message--info': !areaSelected,
+            'message--blocked': areaSelected && selectedRegions.length > 1,
+            'message--warning': areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500
+        }"
+        *ngIf="
+            !areaSelected ||
+            (areaSelected && selectedRegions.length > 1) ||
+            (areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500)
+        ">
+        <i-lucide
+            [img]="!areaSelected ? MapPinPlusInside : selectedRegions.length > 1 ? TriangleAlert : CircleAlert"
+            size="20"></i-lucide>
         <span>
             <ng-container *ngIf="!areaSelected">Select an area on the map to continue.</ng-container>
-            <ng-container *ngIf="areaSelected && selectedRegions.length > 1">Multiple areas selected. Please select only one.</ng-container>
-            <ng-container *ngIf="areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500">The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container>
+            <ng-container *ngIf="areaSelected && selectedRegions.length > 1"
+                >Multiple areas selected. Please select only one.</ng-container
+            >
+            <ng-container *ngIf="areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500"
+                >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
+            >
         </span>
     </div>
     <div *ngIf="areaSelected" class="selected-regions">
         <div *ngFor="let region of selectedRegions" class="region-item">
-            <span class="region-name">{{ region.name }}</span> <span class="region-area">({{ region.area }} km<sup>2</sup>)</span>
+            <span class="region-name">{{ region.name }}</span>
+            <span class="region-area">({{ region.area }} km<sup>2</sup>)</span>
             <button class="deselect-region" (click)="deselectRegion(region)">×</button>
         </div>
     </div>
     <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
         <div>
-            <formly-form [model]="model" [fields]="fields" [options]="options" [form]="form" class="plugin-params-form"></formly-form>
+            <formly-form
+                [model]="model"
+                [fields]="fields"
+                [options]="options"
+                [form]="form"
+                class="plugin-params-form"></formly-form>
             <div class="btn-container">
-                <button type="submit" appearance="primary" class="btn-primary btn-withtext" [disabled]="!form.valid || selectedRegions.length !== 1"><i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute</button>
+                <button
+                    type="submit"
+                    appearance="primary"
+                    class="btn-primary btn-withtext"
+                    [disabled]="!form.valid || selectedRegions.length !== 1">
+                    <i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute
+                </button>
                 <button type="button" class="btn-light btn-withtext" (click)="deactivateCompute()">Cancel</button>
             </div>
         </div>

@@ -1,7 +1,7 @@
-import {JSONSchema7} from 'json-schema'
-import {Feature} from 'ol'
-import {MultiPolygon} from 'ol/geom'
-import {Source} from '../../types/sources/sources.type'
+import { JSONSchema7 } from 'json-schema'
+import { Feature } from 'ol'
+import { MultiPolygon } from 'ol/geom'
+import { Source } from '../../types/sources/sources.type'
 
 export interface PluginAuthor {
     name: string

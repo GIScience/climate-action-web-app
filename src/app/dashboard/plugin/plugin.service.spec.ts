@@ -1,10 +1,10 @@
-import {TestBed} from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 
-import {PluginService} from './plugin.service'
-import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {of} from 'rxjs'
-import {Plugin} from './plugin.interface'
-import {ComputationID, ComputationEntity} from '../computations-index/computation.interface'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { of } from 'rxjs'
+import { ComputationEntity, ComputationID } from '../computations-index/computation.interface'
+import { Plugin } from './plugin.interface'
+import { PluginService } from './plugin.service'
 import SpyObj = jasmine.SpyObj
 
 describe('PluginService', () => {
@@ -61,7 +61,7 @@ describe('PluginService', () => {
         plugin_id: 'blueprint_plugin',
         operator_schema: {},
         library_version: '2.6.4',
-        assets: {icon: '...'}
+        assets: { icon: '...' }
     } as Plugin
 
     const test_plugin_run = {
@@ -93,8 +93,7 @@ describe('PluginService', () => {
     })
 
     it('should get plugin list', () => {
-        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/').and
-            .returnValue(of<Plugin[]>([test_plugin, test_plugin]))
+        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/').and.returnValue(of<Plugin[]>([test_plugin, test_plugin]))
 
         service.getPlugins().subscribe(plugins => {
             expect(plugins).toHaveSize(2)
@@ -104,8 +103,7 @@ describe('PluginService', () => {
     })
 
     it('should get single plugin', () => {
-        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/test').and
-            .returnValue(of<Plugin>(test_plugin))
+        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/test').and.returnValue(of<Plugin>(test_plugin))
 
         service.getPluginDetails('test').subscribe(plugins => {
             expect(plugins).toBe(test_plugin)
@@ -132,8 +130,7 @@ describe('PluginService', () => {
             }
         }
 
-        httpClientSpy.post.withArgs('/api/v1/gateway/plugin/test', computeRequest).and
-            .returnValue(of(test_correlator))
+        httpClientSpy.post.withArgs('/api/v1/gateway/plugin/test', computeRequest).and.returnValue(of(test_correlator))
 
         service.computePlugin('test', computeRequest).subscribe(test_correlator => {
             expect(test_correlator).toEqual(test_correlator)
@@ -143,8 +140,9 @@ describe('PluginService', () => {
     })
 
     it('should get computations', () => {
-        httpClientSpy.get.withArgs('/api/v1/gateway/store/1fbeed00-e9b7-4f54-bae7-18f64bd33ea6/metadata/').and
-            .returnValue(of([test_correlator, test_computation]))
+        httpClientSpy.get
+            .withArgs('/api/v1/gateway/store/1fbeed00-e9b7-4f54-bae7-18f64bd33ea6/metadata/')
+            .and.returnValue(of([test_correlator, test_computation]))
 
         service.getComputationMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(computations => {
             expect(computations).toHaveSize(2)
@@ -220,4 +218,3 @@ describe('PluginService', () => {
         }
     })
 })
-

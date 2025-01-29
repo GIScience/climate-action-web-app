@@ -19,41 +19,69 @@ $responsive: true;
 // ---------------------------------------------------------
 
 @for $i from 0 through 4 {
-  .p-#{$i}  { padding: #{$i}px !important; }
-  .pT-#{$i} { padding-top: #{$i}px !important; }
-  .pR-#{$i} { padding-right: #{$i}px !important; }
-  .pB-#{$i} { padding-bottom: #{$i}px !important; }
-  .pL-#{$i} { padding-left: #{$i}px !important; }
+    .p-#{$i} {
+        padding: #{$i}px !important;
+    }
 
-  .pY-#{$i} {
-    padding-top: #{$i}px !important;
-    padding-bottom: #{$i}px !important;
-  }
+    .pT-#{$i} {
+        padding-top: #{$i}px !important;
+    }
 
-  .pX-#{$i} {
-    padding-left: #{$i}px !important;
-    padding-right: #{$i}px !important;
-  }
+    .pR-#{$i} {
+        padding-right: #{$i}px !important;
+    }
 
-  @if ($responsive == true) {
-    @include generateResponsive() {
-      .p-#{$i}\@#{$breakpointAlias}  { padding: #{$i}px !important; }
-      .pT-#{$i}\@#{$breakpointAlias} { padding-top: #{$i}px !important; }
-      .pR-#{$i}\@#{$breakpointAlias} { padding-right: #{$i}px !important; }
-      .pB-#{$i}\@#{$breakpointAlias} { padding-bottom: #{$i}px !important; }
-      .pL-#{$i}\@#{$breakpointAlias} { padding-left: #{$i}px !important; }
+    .pB-#{$i} {
+        padding-bottom: #{$i}px !important;
+    }
 
-      .pY-#{$i}\@#{$breakpointAlias} {
+    .pL-#{$i} {
+        padding-left: #{$i}px !important;
+    }
+
+    .pY-#{$i} {
         padding-top: #{$i}px !important;
         padding-bottom: #{$i}px !important;
-      }
+    }
 
-      .pX-#{$i}\@#{$breakpointAlias} {
+    .pX-#{$i} {
         padding-left: #{$i}px !important;
         padding-right: #{$i}px !important;
-      }
     }
-  }
+
+    @if ($responsive ==true) {
+        @include generateResponsive() {
+            .p-#{$i}\@#{$breakpointAlias} {
+                padding: #{$i}px !important;
+            }
+
+            .pT-#{$i}\@#{$breakpointAlias} {
+                padding-top: #{$i}px !important;
+            }
+
+            .pR-#{$i}\@#{$breakpointAlias} {
+                padding-right: #{$i}px !important;
+            }
+
+            .pB-#{$i}\@#{$breakpointAlias} {
+                padding-bottom: #{$i}px !important;
+            }
+
+            .pL-#{$i}\@#{$breakpointAlias} {
+                padding-left: #{$i}px !important;
+            }
+
+            .pY-#{$i}\@#{$breakpointAlias} {
+                padding-top: #{$i}px !important;
+                padding-bottom: #{$i}px !important;
+            }
+
+            .pX-#{$i}\@#{$breakpointAlias} {
+                padding-left: #{$i}px !important;
+                padding-right: #{$i}px !important;
+            }
+        }
+    }
 }
 
 // ---------------------------------------------------------
@@ -61,43 +89,71 @@ $responsive: true;
 // ---------------------------------------------------------
 
 @for $i from 5 through 35 {
-  @if $i % 5 == 0 {
-    .p-#{$i}  { padding: #{$i}px !important; }
-    .pT-#{$i} { padding-top: #{$i}px !important; }
-    .pR-#{$i} { padding-right: #{$i}px !important; }
-    .pB-#{$i} { padding-bottom: #{$i}px !important; }
-    .pL-#{$i} { padding-left: #{$i}px !important; }
-
-    .pY-#{$i} {
-      padding-top: #{$i}px !important;
-      padding-bottom: #{$i}px !important;
-    }
-
-    .pX-#{$i} {
-      padding-left: #{$i}px !important;
-      padding-right: #{$i}px !important;
-    }
-
-    @if ($responsive == true) {
-      @include generateResponsive() {
-        .p-#{$i}\@#{$breakpointAlias}  { padding: #{$i}px !important; }
-        .pT-#{$i}\@#{$breakpointAlias} { padding-top: #{$i}px !important; }
-        .pR-#{$i}\@#{$breakpointAlias} { padding-right: #{$i}px !important; }
-        .pB-#{$i}\@#{$breakpointAlias} { padding-bottom: #{$i}px !important; }
-        .pL-#{$i}\@#{$breakpointAlias} { padding-left: #{$i}px !important; }
-
-        .pY-#{$i}\@#{$breakpointAlias} {
-          padding-top: #{$i}px !important;
-          padding-bottom: #{$i}px !important;
+    @if $i % 5==0 {
+        .p-#{$i} {
+            padding: #{$i}px !important;
         }
 
-        .pX-#{$i}\@#{$breakpointAlias} {
-          padding-left: #{$i}px !important;
-          padding-right: #{$i}px !important;
+        .pT-#{$i} {
+            padding-top: #{$i}px !important;
         }
-      }
+
+        .pR-#{$i} {
+            padding-right: #{$i}px !important;
+        }
+
+        .pB-#{$i} {
+            padding-bottom: #{$i}px !important;
+        }
+
+        .pL-#{$i} {
+            padding-left: #{$i}px !important;
+        }
+
+        .pY-#{$i} {
+            padding-top: #{$i}px !important;
+            padding-bottom: #{$i}px !important;
+        }
+
+        .pX-#{$i} {
+            padding-left: #{$i}px !important;
+            padding-right: #{$i}px !important;
+        }
+
+        @if ($responsive ==true) {
+            @include generateResponsive() {
+                .p-#{$i}\@#{$breakpointAlias} {
+                    padding: #{$i}px !important;
+                }
+
+                .pT-#{$i}\@#{$breakpointAlias} {
+                    padding-top: #{$i}px !important;
+                }
+
+                .pR-#{$i}\@#{$breakpointAlias} {
+                    padding-right: #{$i}px !important;
+                }
+
+                .pB-#{$i}\@#{$breakpointAlias} {
+                    padding-bottom: #{$i}px !important;
+                }
+
+                .pL-#{$i}\@#{$breakpointAlias} {
+                    padding-left: #{$i}px !important;
+                }
+
+                .pY-#{$i}\@#{$breakpointAlias} {
+                    padding-top: #{$i}px !important;
+                    padding-bottom: #{$i}px !important;
+                }
+
+                .pX-#{$i}\@#{$breakpointAlias} {
+                    padding-left: #{$i}px !important;
+                    padding-right: #{$i}px !important;
+                }
+            }
+        }
     }
-  }
 }
 
 // ---------------------------------------------------------
@@ -105,41 +161,69 @@ $responsive: true;
 // ---------------------------------------------------------
 
 @for $i from 40 through 160 {
-  @if $i % 10 == 0 {
-    .p-#{$i}  { padding: #{$i}px !important; }
-    .pT-#{$i} { padding-top: #{$i}px !important; }
-    .pR-#{$i} { padding-right: #{$i}px !important; }
-    .pB-#{$i} { padding-bottom: #{$i}px !important; }
-    .pL-#{$i} { padding-left: #{$i}px !important; }
-
-    .pY-#{$i} {
-      padding-top: #{$i}px !important;
-      padding-bottom: #{$i}px !important;
-    }
-
-    .pX-#{$i} {
-      padding-left: #{$i}px !important;
-      padding-right: #{$i}px !important;
-    }
-
-    @if ($responsive == true) {
-      @include generateResponsive() {
-        .p-#{$i}\@#{$breakpointAlias}  { padding: #{$i}px !important; }
-        .pT-#{$i}\@#{$breakpointAlias} { padding-top: #{$i}px !important; }
-        .pR-#{$i}\@#{$breakpointAlias} { padding-right: #{$i}px !important; }
-        .pB-#{$i}\@#{$breakpointAlias} { padding-bottom: #{$i}px !important; }
-        .pL-#{$i}\@#{$breakpointAlias} { padding-left: #{$i}px !important; }
-
-        .pY-#{$i}\@#{$breakpointAlias} {
-          padding-top: #{$i}px !important;
-          padding-bottom: #{$i}px !important;
+    @if $i % 10==0 {
+        .p-#{$i} {
+            padding: #{$i}px !important;
         }
 
-        .pX-#{$i}\@#{$breakpointAlias} {
-          padding-left: #{$i}px !important;
-          padding-right: #{$i}px !important;
+        .pT-#{$i} {
+            padding-top: #{$i}px !important;
         }
-      }
+
+        .pR-#{$i} {
+            padding-right: #{$i}px !important;
+        }
+
+        .pB-#{$i} {
+            padding-bottom: #{$i}px !important;
+        }
+
+        .pL-#{$i} {
+            padding-left: #{$i}px !important;
+        }
+
+        .pY-#{$i} {
+            padding-top: #{$i}px !important;
+            padding-bottom: #{$i}px !important;
+        }
+
+        .pX-#{$i} {
+            padding-left: #{$i}px !important;
+            padding-right: #{$i}px !important;
+        }
+
+        @if ($responsive ==true) {
+            @include generateResponsive() {
+                .p-#{$i}\@#{$breakpointAlias} {
+                    padding: #{$i}px !important;
+                }
+
+                .pT-#{$i}\@#{$breakpointAlias} {
+                    padding-top: #{$i}px !important;
+                }
+
+                .pR-#{$i}\@#{$breakpointAlias} {
+                    padding-right: #{$i}px !important;
+                }
+
+                .pB-#{$i}\@#{$breakpointAlias} {
+                    padding-bottom: #{$i}px !important;
+                }
+
+                .pL-#{$i}\@#{$breakpointAlias} {
+                    padding-left: #{$i}px !important;
+                }
+
+                .pY-#{$i}\@#{$breakpointAlias} {
+                    padding-top: #{$i}px !important;
+                    padding-bottom: #{$i}px !important;
+                }
+
+                .pX-#{$i}\@#{$breakpointAlias} {
+                    padding-left: #{$i}px !important;
+                    padding-right: #{$i}px !important;
+                }
+            }
+        }
     }
-  }
 }

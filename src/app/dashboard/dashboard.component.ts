@@ -1,14 +1,14 @@
-import {Component, OnInit, ViewChild, ViewContainerRef} from '@angular/core'
-import {PluginCatalogComponent} from './plugin-catalog/plugin-catalog.component'
-import {ComputationsIndexComponent} from './computations-index/computations-index.component'
-import {SearchComponent} from './search/search.component'
-import {ArtifactComponent} from './artifact/artifact.component'
-import {MapComponent} from './map/map.component'
-import {RouterModule} from '@angular/router'
-import {LegendComponent} from './artifact/legend/legend.component'
-import {LegendObject} from './artifact/artifact.interface'
-import {ArtifactService} from './artifact/artifact.service'
-import {Subscription} from 'rxjs'
+import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { Subscription } from 'rxjs'
+import { ArtifactComponent } from './artifact/artifact.component'
+import { LegendObject } from './artifact/artifact.interface'
+import { ArtifactService } from './artifact/artifact.service'
+import { LegendComponent } from './artifact/legend/legend.component'
+import { ComputationsIndexComponent } from './computations-index/computations-index.component'
+import { MapComponent } from './map/map.component'
+import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
+import { SearchComponent } from './search/search.component'
 
 @Component({
     selector: 'app-dashboard',
@@ -27,10 +27,9 @@ import {Subscription} from 'rxjs'
 })
 export class DashboardComponent implements OnInit {
     @ViewChild(ComputationsIndexComponent) computationsIndexComponent?: ComputationsIndexComponent
-    @ViewChild('legendContainer', {read: ViewContainerRef, static: false})
-
+    @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
-    private legendSubscription!: Subscription
+    legendSubscription!: Subscription
 
     constructor(public artifactService: ArtifactService) {}
 

@@ -1,4 +1,9 @@
-import {mockPluginsList, mockPluginBlueprint, mockPluginBlueprintComputation, mockBlueprintTable} from '../support/interceptors'
+import {
+    mockBlueprintTable,
+    mockPluginBlueprint,
+    mockPluginBlueprintComputation,
+    mockPluginsList
+} from '../support/interceptors'
 
 describe('computations', () => {
     beforeEach(() => {
@@ -11,14 +16,19 @@ describe('computations', () => {
         mockPluginBlueprintComputation()
         mockBlueprintTable()
 
-        cy.window().then((win) => {
-            win.localStorage.setItem('plugin_runs', JSON.stringify([{
-                correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                pluginId: 'plugin_blueprint',
-                pluginName: 'Plugin Blueprint',
-                timestamp: '2024-12-17T08:55:23.807074Z',
-                status: 'SUCCESS'
-            }]))
+        cy.window().then(win => {
+            win.localStorage.setItem(
+                'plugin_runs',
+                JSON.stringify([
+                    {
+                        correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2024-12-17T08:55:23.807074Z',
+                        status: 'SUCCESS'
+                    }
+                ])
+            )
         })
 
         cy.reload(true)

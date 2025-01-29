@@ -1,17 +1,17 @@
-import {AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild} from '@angular/core'
-import {ActivatedRoute} from '@angular/router'
-import {Plugin, ComputeState} from './plugin.interface'
-import {Source} from '../../types/sources/sources.type'
-import {PluginService} from './plugin.service'
-import {map, Observable, switchMap, tap, catchError, of, throwError} from 'rxjs'
-import {TippyDirective} from '@ngneat/helipopper'
-import {ComputationsIndexComponent} from '../computations-index/computations-index.component'
-import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
-import {CommonModule} from '@angular/common'
-import {MarkdownModule} from 'ngx-markdown'
-import {NgScrollbarModule} from 'ngx-scrollbar'
-import {CircleX, CloudOff, LucideAngularModule, RedoDot} from 'lucide-angular'
-import {MatDialog} from '@angular/material/dialog'
+import { CommonModule } from '@angular/common'
+import { AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
+import { ActivatedRoute } from '@angular/router'
+import { TippyDirective } from '@ngneat/helipopper'
+import { CircleX, CloudOff, LucideAngularModule, RedoDot } from 'lucide-angular'
+import { MarkdownModule } from 'ngx-markdown'
+import { NgScrollbarModule } from 'ngx-scrollbar'
+import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
+import { Source } from '../../types/sources/sources.type'
+import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
+import { PluginParameterComponent } from './plugin-parameter/plugin-parameter.component'
+import { ComputeState, Plugin } from './plugin.interface'
+import { PluginService } from './plugin.service'
 
 @Component({
     selector: 'app-plugin',
@@ -23,7 +23,7 @@ import {MatDialog} from '@angular/material/dialog'
         ComputationsIndexComponent,
         PluginParameterComponent,
         TippyDirective,
-        NgScrollbarModule,  
+        NgScrollbarModule,
         LucideAngularModule
     ],
     standalone: true
@@ -39,14 +39,12 @@ export class PluginComponent implements AfterViewInit {
 
     @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<Plugin>
 
-
     constructor(
         private pluginService: PluginService,
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private cdr: ChangeDetectorRef
-    ) {
-    }
+    ) {}
 
     ngAfterViewInit(): void {
         this.loadPluginDetails()
@@ -59,21 +57,15 @@ export class PluginComponent implements AfterViewInit {
 
     processSourceText(source: Source) {
         const commonFields = [source.author, source.year]
-        
+
         switch (source.ENTRYTYPE) {
             case 'article':
-                return [...commonFields, source.journal, source.volume, source.pages]
-                    .filter(Boolean)
-                    .join(', ')
+                return [...commonFields, source.journal, source.volume, source.pages].filter(Boolean).join(', ')
             case 'inbook':
             case 'inproceedings':
-                return [...commonFields, source.pages]
-                    .filter(Boolean)
-                    .join(', ')
+                return [...commonFields, source.pages].filter(Boolean).join(', ')
             case 'misc':
-                return [...commonFields]
-                    .filter(Boolean)
-                    .join(', ')
+                return [...commonFields].filter(Boolean).join(', ')
             default:
                 return ''
         }
@@ -81,7 +73,7 @@ export class PluginComponent implements AfterViewInit {
 
     processSourceUrls(plugin: Plugin) {
         if (plugin.sources) {
-            plugin.sources = plugin.sources.map((y) => {
+            plugin.sources = plugin.sources.map(y => {
                 if (!y.url && y.note) {
                     const noteUrlMatch = y.note.match('\\url{(.*)}')
                     if (noteUrlMatch) {

@@ -1,4 +1,4 @@
-import {JSONSchema7Type} from 'json-schema'
+import { JSONSchema7Type } from 'json-schema'
 
 export interface FormlyModel {
     [key: string]: string
@@ -9,7 +9,7 @@ export interface SelectOptions {
 }
 
 export interface SelectOption {
-    label: string,
+    label: string
     value: JSONSchema7Type
 }
 
@@ -18,12 +18,11 @@ export interface ValidationProperty {
 }
 
 export interface ValidatorDescription {
-    name: string,
+    name: string
     options: ValidatorOptions
 }
 
 export interface ValidatorOptions {
-    min?: number | string,
+    min?: number | string
     max?: number | string
 }
-

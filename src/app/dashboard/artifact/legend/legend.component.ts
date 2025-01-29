@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {convertToTitleCase} from '../../../utils/artifact-utils'
-import {LegendObject} from '../artifact.interface'
-import {NgScrollbar} from 'ngx-scrollbar' 
+import { CommonModule } from '@angular/common'
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { NgScrollbar } from 'ngx-scrollbar'
+import { convertToTitleCase } from '../../../utils/artifact-utils'
+import { LegendObject } from '../artifact.interface'
 
 declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]
 
@@ -69,7 +69,7 @@ export class LegendComponent implements OnInit, AfterViewInit {
         }))
     }
 
-    trackByFn(index: number, item: LegendItem): string {
+    trackByFn(_index: number, item: LegendItem): string {
         return item.name
     }
 
@@ -88,7 +88,7 @@ export class LegendComponent implements OnInit, AfterViewInit {
                 for (let y = 0; y <= canvas.height; y++) {
                     const [r, g, b] = evaluate_cmap(y / canvas.height, name, reverse)
                     ctx.fillStyle = `rgb(${r},${g},${b})`
-                    ctx.fillRect(0, (canvas.height - y), canvas.width, 1)
+                    ctx.fillRect(0, canvas.height - y, canvas.width, 1)
                 }
             }
         }, 0)

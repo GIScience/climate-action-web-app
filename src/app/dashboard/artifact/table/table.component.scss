@@ -1,31 +1,29 @@
 .table-artifact-item {
-  max-width: 50rem;
-  margin: 0 auto;
+    max-width: 50rem;
+    margin: 0 auto;
 
-  table.artifact-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    width: 100%;
-  
-    & thead {
-  
-      & tr {
-        border-bottom: 2px solid #ddd;
-      }
+    table.artifact-table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+
+        & thead {
+            & tr {
+                border-bottom: 2px solid #ddd;
+            }
+        }
+
+        & tbody {
+            & tr {
+                border-bottom: 1px solid #ddd;
+            }
+        }
+
+        & th,
+        & td {
+            padding: 0.5rem 1rem;
+            text-align: left;
+            font-size: 12px;
+        }
     }
-
-    & tbody {
-
-      & tr {
-        border-bottom: 1px solid #ddd;
-      }
-    }
-
-    & th,
-    & td {
-      padding: .5rem 1rem;
-      text-align: left;
-      font-size: 12px;
-    }
-  }
 }

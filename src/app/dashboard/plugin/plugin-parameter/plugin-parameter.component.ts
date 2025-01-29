@@ -1,14 +1,18 @@
-import {Component, Input, OnChanges, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core'
-import {CommonModule} from '@angular/common'
-import {NgIf} from '@angular/common'
-import {Router} from '@angular/router'
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
-import {FormlyFieldConfig, FormlyFormOptions, FormlyModule} from '@ngx-formly/core'
-import {JSONSchema7, JSONSchema7Definition} from 'json-schema'
-import {PluginService} from '../plugin.service'
-import {MapService} from '../../map/map.service'
-import {MatSnackBar} from '@angular/material/snack-bar'
-import {ComputeRequest, Plugin} from '../plugin.interface'
+import { CommonModule, NgIf } from '@angular/common'
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
+import { FormlyFieldProps } from '@ngx-formly/core/lib/models/fieldconfig'
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
+import { CircleAlert, CirclePlay, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
+import moment from 'moment/moment'
+import Feature from 'ol/Feature'
+import { getArea } from 'ol/sphere'
+import { Subscription, fromEventPattern } from 'rxjs'
+import { MapService } from '../../map/map.service'
+import { ComputeRequest, Plugin } from '../plugin.interface'
+import { PluginService } from '../plugin.service'
 import {
     FormlyModel,
     SelectOption,
@@ -16,35 +20,21 @@ import {
     ValidationProperty,
     ValidatorOptions
 } from './plugin-parameter.interface'
-import {FormlyFieldProps} from '@ngx-formly/core/lib/models/fieldconfig'
-import {Subscription, fromEventPattern} from 'rxjs'
-import moment from 'moment/moment'
-import {LucideAngularModule, CirclePlay, MapPinPlusInside, TriangleAlert, CircleAlert} from 'lucide-angular'
-import {getArea} from 'ol/sphere'
-import Feature from 'ol/Feature'
 
 @Component({
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
     styleUrls: ['./plugin-parameter.component.scss'],
-    imports: [
-        FormlyModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgIf,
-        LucideAngularModule,
-        CommonModule
-    ],
+    imports: [FormlyModule, FormsModule, ReactiveFormsModule, NgIf, LucideAngularModule, CommonModule],
     standalone: true,
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
-
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
     aoiAttribute: string | undefined = undefined
-    selectedRegions: {name: string; area: number; feature: Feature}[] = []
+    selectedRegions: { name: string; area: number; feature: Feature }[] = []
     selectOptions: SelectOptions = {}
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
@@ -63,20 +53,20 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     areaSelected = false
     highlightedFeaturesSubscription: Subscription | undefined
 
-    constructor(private pluginService: PluginService,
-                private snackBar: MatSnackBar,
-                private router: Router,
-                private mapService: MapService,
-                private cdr: ChangeDetectorRef) {
+    constructor(
+        private pluginService: PluginService,
+        private snackBar: MatSnackBar,
+        private mapService: MapService,
+        private cdr: ChangeDetectorRef
+    ) {
+        const highlightedFeaturesObservable = fromEventPattern(handler =>
+            this.mapService.highlightedFeatures.on('change:length', handler)
+        )
 
-                    const highlightedFeaturesObservable = fromEventPattern(
-                        (handler) => this.mapService.highlightedFeatures.on('change:length', handler)
-                    )
-
-                    this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
-                        this.toggleFormState()
-                        this.showSelectedAreaInfo()
-                    })
+        this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
+            this.toggleFormState()
+            this.showSelectedAreaInfo()
+        })
     }
 
     ngOnInit(): void {
@@ -85,8 +75,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnChanges(): void {
         const schema = this.plugin.operator_schema
-        if (!schema)
-            return
+        if (!schema) return
 
         this.aoiAttribute = this.getAoiAttribute(schema)
         this.selectOptions = this.parseSelectOptions(schema.$defs)
@@ -113,7 +102,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         const selectedRegions = this.mapService.highlightedFeatures.getArray()
         this.selectedRegions = selectedRegions.map(feature => {
             const geometry = feature.getGeometry()
-            
+
             return {
                 name: feature.get('name') || 'Unnamed Region',
                 area: geometry ? Number((getArea(geometry) * PluginParameterComponent.sqmToSqkmFactor).toFixed(2)) : 0,
@@ -125,7 +114,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     deselectRegion(region: { name: string; area: number; feature: Feature }): void {
         this.mapService.highlightedFeatures.remove(region.feature)
         this.selectedRegions = this.selectedRegions.filter(r => r !== region)
-        
+
         if (this.selectedRegions.length === 0) {
             this.toggleFormState()
         }
@@ -148,8 +137,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     parseFields(schema: JSONSchema7): FormlyFieldConfig[] {
-        if (!schema.properties)
-            return []
+        if (!schema.properties) return []
 
         const fields: FormlyFieldConfig[] = []
         const optionalSubgroup: FormlyFieldConfig[] = []
@@ -157,7 +145,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         for (const [key, value] of Object.entries(schema.properties)) {
             if (typeof value != 'boolean') {
                 if (value.anyOf) {
-                    value.anyOf.forEach((nullable) => {
+                    value.anyOf.forEach(nullable => {
                         if (typeof nullable != 'boolean' && nullable.type != 'null') {
                             Object.assign(value, nullable)
                         }
@@ -270,15 +258,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private getValidators(property: JSONSchema7): ValidationProperty {
         switch (property.type) {
             case 'integer':
-                return {validation: [{name: 'intType', options: this.checkForMinAndMaxRange(property)}]}
+                return { validation: [{ name: 'intType', options: this.checkForMinAndMaxRange(property) }] }
             case 'number':
-                return {validation: [{name: 'numType', options: this.checkForMinAndMaxRange(property)}]}
+                return { validation: [{ name: 'numType', options: this.checkForMinAndMaxRange(property) }] }
             case 'string':
                 if (property['format'] === 'date') {
-                    return {validation: [{name: 'dateType', options: this.checkForMinAndMaxDateRange(property)}]}
+                    return { validation: [{ name: 'dateType', options: this.checkForMinAndMaxDateRange(property) }] }
                 }
         }
-        return {'validation': []}
+        return { validation: [] }
     }
 
     private getParsers(property: JSONSchema7) {
@@ -289,11 +277,17 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     getAoiAttribute(schema: JSONSchema7): string | undefined {
-        if (!schema.properties)
-            return
+        if (!schema.properties) return
 
         for (const [key, value] of Object.entries(schema.properties)) {
-            if (typeof value != 'boolean' && value && value.allOf && typeof value.allOf[0] != 'boolean' && value.allOf[0].$ref && value.allOf[0].$ref.includes(this.jsonSchema_polygon)) {
+            if (
+                typeof value != 'boolean' &&
+                value &&
+                value.allOf &&
+                typeof value.allOf[0] != 'boolean' &&
+                value.allOf[0].$ref &&
+                value.allOf[0].$ref.includes(this.jsonSchema_polygon)
+            ) {
                 delete schema.properties[key]
                 return key
             }
@@ -301,17 +295,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         return
     }
 
-
     parseSelectOptions($defs: { [p: string]: JSONSchema7Definition } | undefined): SelectOptions {
         const transformedDefs: SelectOptions = {}
-        if (!$defs)
-            return transformedDefs
+        if (!$defs) return transformedDefs
 
         for (const [key, value] of Object.entries($defs)) {
             if (typeof value != 'boolean' && value.enum && !key.includes(this.jsonSchema_polygon)) {
                 const option: SelectOption[] = []
                 value.enum.forEach(value => {
-                    option.push({label: String(value), value: value})
+                    option.push({ label: String(value), value: value })
                 })
                 transformedDefs[key] = option
             }
@@ -321,8 +313,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private getRefName($ref: string | undefined): string {
-        if (!$ref)
-            return ''
+        if (!$ref) return ''
         return $ref.replace('#/$defs/', '')
     }
 
@@ -343,17 +334,13 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
         const aoiName = aoi.properties?.name
-        
+
         if (!aoi) {
-            this.snackBar.open(
-                'Please select an area on the map first.', 
-                'Dismiss', 
-                {
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                }
-            )
+            this.snackBar.open('Please select an area on the map first.', 'Dismiss', {
+                verticalPosition: 'bottom',
+                horizontalPosition: 'center',
+                panelClass: ['error-snackbar']
+            })
             return
         }
 
@@ -369,32 +356,24 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         })
 
         this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
-            next: (data) => {
+            next: data => {
                 this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, aoiName)
                 this.pluginService.triggerSyncTasks()
                 this.pluginService.setComputeState('inactive')
-    
-                this.snackBar.open(
-                    'Compute request sent, results will be displayed soon.', 
-                    'Dismiss',
-                    {
-                        duration: 7000,
-                        verticalPosition: 'bottom',
-                        horizontalPosition: 'center',
-                        panelClass: ['success-snackbar']
-                    }
-                )
+
+                this.snackBar.open('Compute request sent, results will be displayed soon.', 'Dismiss', {
+                    duration: 7000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['success-snackbar']
+                })
             },
             error: () => {
-                this.snackBar.open(
-                    'Error while computing plugin. Please try again.', 
-                    'Dismiss', 
-                    {
-                        verticalPosition: 'bottom',
-                        horizontalPosition: 'center',
-                        panelClass: ['error-snackbar']
-                    }
-                )
+                this.snackBar.open('Error while computing plugin. Please try again.', 'Dismiss', {
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                })
             }
         })
     }

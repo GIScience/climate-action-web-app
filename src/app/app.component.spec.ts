@@ -1,8 +1,8 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing'
-import {RouterTestingModule} from '@angular/router/testing'
-import {AppComponent} from './app.component'
-import {HttpClientModule} from '@angular/common/http'
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core'
+import { HttpClientModule } from '@angular/common/http'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { RouterTestingModule } from '@angular/router/testing'
+import { AppComponent } from './app.component'
 
 describe('AppComponent', () => {
     let component: AppComponent
@@ -10,13 +10,8 @@ describe('AppComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [
-                HttpClientModule,
-                RouterTestingModule
-            ],
-            declarations: [
-                AppComponent
-            ],
+            imports: [HttpClientModule, RouterTestingModule],
+            declarations: [AppComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: []
         }).compileComponents()
@@ -33,5 +28,4 @@ describe('AppComponent', () => {
     it('should have as title "Dashboard - Climate Action"', () => {
         expect(component.title).toEqual('Climate Action Platform')
     })
-
 })

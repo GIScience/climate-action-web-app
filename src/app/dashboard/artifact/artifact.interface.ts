@@ -1,4 +1,4 @@
-import {HexColor} from '../../types/color/color.type'
+import { HexColor } from '../../types/color/color.type'
 
 export interface DiscreteLegendData {
     [key: string]: HexColor
