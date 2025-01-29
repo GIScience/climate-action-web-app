@@ -1,4 +1,4 @@
-<div class="plugin-catalog">
+<div class="plugin-catalog" [ngClass]="{'is-loading': loading}">
     <input id="catalog-toggle" type="checkbox" #catalogToggle checked="checked" />
     <div id="catalog-header">
         <h3 class="plugin-title">Plugins</h3>
@@ -7,27 +7,40 @@
         </label>
     </div>
     <div class="plugins-list">
-        <ng-scrollbar visibility="hover" orientation="vertical" position="invertY">
+        <div *ngIf="loading" class="loading-state">
             <ul>
-                <li *ngFor="let card of cards; let i = index;"
-                    class="plugin-card {{card.enabled ? 'enabled-card' : 'disabled-card'}}"
-                    (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
-                    [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="0" [tp]="tpl"
-                    tpPlacement="right">
-                    <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
+                <li class="plugin-card" *ngFor="let i of [1,2,3,4,5]">
+                    <img src="../../../assets/images/plugin-icons/loading.png" alt="Loading..." />
                     <div class="plugin-card__text">
-                        <h3>{{ card.name }}</h3>
-                        <span *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{
-                            card.library_version
-                            }}</span>
-                        <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
+                        <h3>Loading...</h3>
+                        <span>N/A</span>
                     </div>
-                    <ng-template #tpl>
-                        <strong>{{card.name}}</strong>
-                        <p *ngIf="card.purpose">{{card.purpose}}</p>
-                    </ng-template>
                 </li>
             </ul>
-        </ng-scrollbar>
+        </div>
+
+        <ng-container *ngIf="!loading">
+            <ng-scrollbar visibility="hover" orientation="vertical" position="invertY">
+                <ul>
+                    <li *ngFor="let card of cards; let i = index;" class="plugin-card"
+                        (click)="showPlugin(card); activateCard(card)" (keydown)="showPlugin(card); activateCard(card)"
+                        [ngClass]="{'plugin-card-highlight': activeCard === card}" tabindex="0" [tp]="tpl"
+                        tpPlacement="right">
+                        <img [src]="card.icon" alt="{{card.icon_credit}}" (error)="onImageError($event)">
+                        <div class="plugin-card__text">
+                            <h3>{{ card.name }}</h3>
+                            <span *ngIf="card.version && card.library_version">ver. {{ card.version }}/{{
+                                card.library_version
+                                }}</span>
+                            <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
+                        </div>
+                        <ng-template #tpl>
+                            <strong>{{card.name}}</strong>
+                            <p *ngIf="card.purpose">{{card.purpose}}</p>
+                        </ng-template>
+                    </li>
+                </ul>
+            </ng-scrollbar>
+        </ng-container>
     </div>
 </div>

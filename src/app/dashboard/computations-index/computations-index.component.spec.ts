@@ -29,10 +29,10 @@ describe('ComputationsIndexComponent', () => {
             'updateRunStatus',
             'getComputationMetadata',
             'getPluginRuns',
-            'setPluginState',
+            'setComputeState',
             'getComputationState',
             'collapsePluginCatalog',
-            'setPluginState'
+            'setComputeState'
         ], {
             syncTasks$: new BehaviorSubject<void>(undefined)
         })

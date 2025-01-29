@@ -25,6 +25,7 @@ export interface Plugin {
     plugin_id: string
     operator_schema: JSONSchema7
     library_version: string
+    status?: 'active' | 'unavailable' | 'releasing-soon'
 }
 
 export interface PluginBaseInfo {
@@ -41,4 +42,4 @@ export interface ComputeRequest {
     params: Record<string, unknown>
 }
 
-export type PluginState = 'inactive' | 'compute-ready'
+export type ComputeState = 'inactive' | 'compute-ready'

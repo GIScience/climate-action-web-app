@@ -1,16 +1,16 @@
 import {AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild} from '@angular/core'
 import {ActivatedRoute} from '@angular/router'
-import {Plugin, PluginState} from './plugin.interface'
+import {Plugin, ComputeState} from './plugin.interface'
 import {Source} from '../../types/sources/sources.type'
 import {PluginService} from './plugin.service'
-import {map, Observable, switchMap, tap} from 'rxjs'
+import {map, Observable, switchMap, tap, catchError, of, throwError} from 'rxjs'
 import {TippyDirective} from '@ngneat/helipopper'
 import {ComputationsIndexComponent} from '../computations-index/computations-index.component'
 import {PluginParameterComponent} from './plugin-parameter/plugin-parameter.component'
 import {CommonModule} from '@angular/common'
 import {MarkdownModule} from 'ngx-markdown'
 import {NgScrollbarModule} from 'ngx-scrollbar'
-import {CircleX, LucideAngularModule, RedoDot} from 'lucide-angular'
+import {CircleX, CloudOff, LucideAngularModule, RedoDot} from 'lucide-angular'
 import {MatDialog} from '@angular/material/dialog'
 
 @Component({
@@ -23,19 +23,22 @@ import {MatDialog} from '@angular/material/dialog'
         ComputationsIndexComponent,
         PluginParameterComponent,
         TippyDirective,
-        NgScrollbarModule,
+        NgScrollbarModule,  
         LucideAngularModule
     ],
     standalone: true
 })
 export class PluginComponent implements AfterViewInit {
     pluginObs$: Observable<Plugin> | undefined
-    pluginState: PluginState = 'inactive'
+    computeState: ComputeState = 'inactive'
+    loading = true
 
     readonly RedoDot = RedoDot
     readonly CircleX = CircleX
+    readonly CloudOff = CloudOff
 
     @ViewChild('pluginContentDialog') pluginContentDialog!: TemplateRef<Plugin>
+
 
     constructor(
         private pluginService: PluginService,
@@ -48,13 +51,13 @@ export class PluginComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.loadPluginDetails()
 
-        this.pluginService.getPluginState().subscribe(pluginState => {
-            this.pluginState = pluginState
+        this.pluginService.getComputeState().subscribe(computeState => {
+            this.computeState = computeState
             this.cdr.detectChanges()
         })
     }
 
-    computeSourceText(source: Source) {
+    processSourceText(source: Source) {
         const commonFields = [source.author, source.year]
         
         switch (source.ENTRYTYPE) {
@@ -99,19 +102,50 @@ export class PluginComponent implements AfterViewInit {
                     throw Error(`Plugin ${pluginName} does not exist`)
                 }
 
-                let pluginDetails = this.pluginService.getPluginDetails(pluginName)
-                pluginDetails = pluginDetails.pipe(tap(this.processSourceUrls))
-                pluginDetails = pluginDetails.pipe(tap(plugin => {
-                    plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id, plugin.version)
-                    return plugin
-                }))
-                return pluginDetails
+                this.loading = true
+
+                return this.pluginService.getPluginDetails(pluginName).pipe(
+                    tap(this.processSourceUrls),
+                    tap(plugin => {
+                        plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id, plugin.version)
+                        this.loading = false
+                        return plugin
+                    }),
+                    catchError(error => {
+                        this.loading = false
+                        if (error.status === 404) {
+                            // Create offline plugin name based on route, to be removed when API is updated
+                            const displayName = pluginName
+                                .split('_')
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                .join(' ')
+
+                            const plugin: Plugin = {
+                                name: displayName,
+                                plugin_id: pluginName,
+                                version: 'N/A',
+                                library_version: 'N/A',
+                                purpose: 'This plugin is currently offline. Previous computations are still available.',
+                                methodology: 'Plugin is offline',
+                                authors: [],
+                                concerns: [],
+                                assets: {
+                                    icon: this.pluginService.getIconUrl(pluginName || '', 'N/A')
+                                },
+                                operator_schema: {},
+                                status: 'unavailable'
+                            }
+                            return of(plugin)
+                        }
+                        return throwError(() => error)
+                    })
+                )
             })
         )
     }
 
     enableCompute() {
-        this.pluginService.setPluginState('compute-ready')
+        this.pluginService.setComputeState('compute-ready')
         this.pluginService.collapsePluginCatalog()
     }
 

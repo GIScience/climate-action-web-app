@@ -4,7 +4,7 @@ import {PluginService} from '../plugin/plugin.service'
 import {ArtifactService} from '../artifact/artifact.service'
 import {CommonModule} from '@angular/common'
 import {MatIconModule} from '@angular/material/icon'
-import {availableCards, PluginCard} from './plugin-catalog.interface'
+import {PluginCard} from './plugin-catalog.interface'
 import {TippyDirective} from '@ngneat/helipopper'
 import {NgScrollbarModule} from 'ngx-scrollbar'
 
@@ -23,8 +23,9 @@ import {NgScrollbarModule} from 'ngx-scrollbar'
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
     @ViewChild('catalogToggle', {static: true}) catalogToggle!: ElementRef<HTMLInputElement>
 
-    cards: Array<PluginCard> = availableCards
+    cards: Array<PluginCard> = []
     activeCard?: PluginCard
+    loading = true
 
     constructor(
         private router: Router,
@@ -56,29 +57,23 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     sortCards() {
         this.cards.sort((a, b) => {
-            if (a.enabled && !b.enabled) {
-                return -1
-            } else if (!a.enabled && b.enabled) {
-                return 1
-            } else {
-                return a.name.localeCompare(b.name)
-            }
+            return a.name.localeCompare(b.name)
         })
     }
 
     loadPlugins() {
+        this.loading = true
         this.pluginService.getPlugins().subscribe({
             next: (data) => {
                 data.forEach((plugin) => {
-
                     const pluginCard = {
-                        enabled: true,
                         plugin_id: plugin.plugin_id,
                         name: plugin.name,
                         icon: this.pluginService.getIconUrl(plugin.plugin_id, plugin.version),
                         library_version: plugin.library_version,
                         version: plugin.version,
-                        purpose: plugin.purpose
+                        purpose: plugin.purpose,
+                        status: plugin.status || 'active'
                     } as PluginCard
 
                     const existingCard = this.cards.find((x) => x.plugin_id === plugin.plugin_id)
@@ -88,11 +83,32 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                         this.cards.push(pluginCard)
                     }
                 })
+
+                const storedRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+                storedRuns.forEach((run) => {
+                    const existingCard = this.cards.find((x) => x.plugin_id === run.pluginId)
+                    if (!existingCard) {
+                        const offlineCard = {
+                            plugin_id: run.pluginId,
+                            name: run.pluginName,
+                            icon: this.pluginService.getIconUrl(run.pluginId || '', 'N/A'),
+                            library_version: 'N/A',
+                            version: 'N/A',
+                            purpose: 'This plugin is currently offline',
+                            status: 'unavailable'
+                        } as PluginCard
+
+                        this.cards.push(offlineCard)
+                    }
+                })
+
                 this.sortCards()
                 this.syncActiveCardWithRoute()
+                this.loading = false
             },
             error: error => {
                 console.error('Error fetching plugins:', error)
+                this.loading = false
             }
         })
     }
@@ -102,19 +118,15 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     }
 
     activateCard(card: PluginCard) {
-        if (card.enabled) {
-            this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
-                this.activeCard = card
-            })
-        }
+        this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
+            this.activeCard = card
+        })
     }
 
     showPlugin(card: PluginCard) {
-        if (card.enabled) {
-            this.artifactService.closeArtifact()
-            this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
-                this.activeCard = card
-            })
-        }
+        this.artifactService.closeArtifact()
+        this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
+            this.activeCard = card
+        })
     }
 }

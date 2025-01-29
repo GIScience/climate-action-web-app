@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {BehaviorSubject, Observable, of, Subject, throwError} from 'rxjs'
 import {catchError, concatMap, delay, retryWhen, timeout} from 'rxjs/operators'
-import {Plugin, PluginState} from './plugin.interface'
+import {Plugin, ComputeState} from './plugin.interface'
 import {RunStatus} from '../common/status.types'
 import {ComputationID, ComputationMetadata, ComputationEntity} from '../computations-index/computation.interface'
 import {environment} from '../../../environments/environment'
@@ -17,10 +17,10 @@ export class PluginService {
     private pluginRuns: ComputationEntity[] = []
     private pluginRunsSubject = new BehaviorSubject<ComputationEntity[]>(this.pluginRuns)
 
-    private pluginStateSubject = new BehaviorSubject<PluginState>('inactive')
+    private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
     private syncTasksSubject = new Subject<void>()
 
-    public pluginState$ = this.pluginStateSubject.asObservable()
+    public computeState$ = this.computeStateSubject.asObservable()
     public syncTasks$ = this.syncTasksSubject.asObservable()
 
     private catalogToggleInput!: HTMLInputElement
@@ -96,12 +96,12 @@ export class PluginService {
         return parsed_runs.filter(run => status.includes(run.status as RunStatus))
     }
 
-    setPluginState(pluginState: PluginState): void {
-        this.pluginStateSubject.next(pluginState)
+    setComputeState(computeState: ComputeState): void {
+        this.computeStateSubject.next(computeState)
     }
 
-    getPluginState(): Observable<PluginState> {
-        return this.pluginState$
+    getComputeState(): Observable<ComputeState> {
+        return this.computeState$
     }
 
     storeNewComputes(id: string, plugin: Plugin, aoiName?: string) {
