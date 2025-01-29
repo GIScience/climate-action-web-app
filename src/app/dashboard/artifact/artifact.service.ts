@@ -1,7 +1,7 @@
-import {Injectable, EventEmitter} from '@angular/core'
+import {EventEmitter, Injectable} from '@angular/core'
 import {BehaviorSubject} from 'rxjs'
 import {HttpClient} from '@angular/common/http'
-import {Artifact, ChartData, ArtifactData, LegendObject} from './artifact.interface'
+import {Artifact, ArtifactData, ChartData, LegendObject} from './artifact.interface'
 import {environment} from '../../../environments/environment'
 
 @Injectable({
@@ -95,7 +95,7 @@ export class ArtifactService {
         this.markdownSubject.next(null)
         this.imageSubject.next(null)
         this.tableSubject.next(null)
-        this.chartSubject.next({ data: null, artifact: null })
+        this.chartSubject.next({data: null, artifact: null})
         this.geojsonSubject.next(null)
         this.geotiffSubject.next(null)
         this.legendSubject.next(null)
@@ -106,14 +106,12 @@ export class ArtifactService {
     }
 
     getLegend(artifact: Artifact): void {
-        const url = `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}`
-        this.http.get<Artifact[]>(url).subscribe((response) => {
-            const mapLegend = response.find(item => item.store_id === artifact.store_id)?.attachments?.LEGEND
-            if (mapLegend) {
-              this.legendSubject.next(mapLegend)
-            } else {
-              this.legendSubject.next(null)
-            }
-        })
+        const mapLegend = artifact.attachments.LEGEND
+        if (mapLegend) {
+            mapLegend.title = mapLegend.title ? mapLegend.title : artifact.name
+            this.legendSubject.next(mapLegend)
+        } else {
+            this.legendSubject.next(null)
+        }
     }
 }

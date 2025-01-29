@@ -10,7 +10,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Removed backwards compatibility for AoI with the old backend
-- Change visual anchor for continuous legend ticks to triangle markers instead of hyphens ([#250](https://gitlab.heigit.org/climate-action/web-app/-/issues/250))
+- Change visual anchor for continuous legend ticks to triangle markers instead of
+  hyphens ([#250](https://gitlab.heigit.org/climate-action/web-app/-/issues/250))
 
 ### Fixed
 
@@ -19,10 +20,13 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
-- Landing page now displays a summary for revisiting users ([#182](https://gitlab.heigit.org/climate-action/web-app/-/issues/182))
+- Landing page now displays a summary for revisiting
+  users ([#182](https://gitlab.heigit.org/climate-action/web-app/-/issues/182))
 - Display computation parameters in a dialog ([#206](https://gitlab.heigit.org/climate-action/web-app/-/issues/206))
-- Default opacity of GeoJSON and GeoTIFF layers is now set to 0.6 (instead of 1.0) ([#253](https://gitlab.heigit.org/climate-action/web-app/-/issues/253))
+- Default opacity of GeoJSON and GeoTIFF layers is now set to 0.6 (instead of
+  1.0) ([#253](https://gitlab.heigit.org/climate-action/web-app/-/issues/253))
 - Greyscale basemap option ([#252](https://gitlab.heigit.org/climate-action/web-app/-/issues/252))
+- Change legend title to layer name ([#239](https://gitlab.heigit.org/climate-action/web-app/-/issues/239))
 
 ## [2.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.0.0) - 2024-12-17
 
@@ -30,10 +34,12 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Rename default soil consumption to land
   consumption ([#148](https://gitlab.heigit.org/climate-action/web-app/-/issues/148))
-- Always override the default icons in the plugin catalog ([#64](https://gitlab.heigit.org/climate-action/web-app/-/issues/64))
+- Always override the default icons in the plugin
+  catalog ([#64](https://gitlab.heigit.org/climate-action/web-app/-/issues/64))
 - Utilises new 'computation/state' endpoint to check computation state, to fix scheduled runs disappearing
   randomly ([#238](https://gitlab.heigit.org/climate-action/web-app/-/issues/238))
-- Fix multiple usability issues concerning starting a new computation ([#183](https://gitlab.heigit.org/climate-action/web-app/-/issues/183))
+- Fix multiple usability issues concerning starting a new
+  computation ([#183](https://gitlab.heigit.org/climate-action/web-app/-/issues/183))
 
 ### Added
 

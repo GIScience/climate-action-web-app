@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing'
 
 import {ArtifactService} from './artifact.service'
 import {HttpClient, HttpClientModule} from '@angular/common/http'
-import {Artifact, ChartData} from './artifact.interface'
+import {Artifact, ChartData, LegendObject} from './artifact.interface'
 import {of} from 'rxjs'
 import SpyObj = jasmine.SpyObj
 
@@ -21,6 +21,19 @@ describe('ArtifactService', () => {
         description: 'artifact description',
         correlation_uuid: correlation_uuid,
         store_id: store_uuid
+    } as Artifact
+
+    const test_legend = {legend_type: 'DISCRETE', legend_data: {a: '#ffffff'}} as LegendObject
+
+    const test_geojson = {
+        name: 'test_artifact',
+        modality: 'MAP_LAYER_GEOJSON',
+        file_path: './',
+        summary: 'artifact summary',
+        description: 'artifact description',
+        correlation_uuid: correlation_uuid,
+        store_id: store_uuid,
+        attachments: {LEGEND: test_legend}
     } as Artifact
 
     const test_chart = {
@@ -52,7 +65,7 @@ describe('ArtifactService', () => {
     it('should get markdown artifact item', done => {
         service.getMarkdown(test_artifact)
         service.markdown.subscribe((x) => {
-            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
+            expect(x).toEqual({url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact})
             done()
         })
     })
@@ -82,7 +95,7 @@ describe('ArtifactService', () => {
     it('should get table artifact item', done => {
         service.getTable(test_artifact)
         service.table.subscribe((x) => {
-            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
+            expect(x).toEqual({url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact})
             done()
         })
     })
@@ -97,6 +110,14 @@ describe('ArtifactService', () => {
                 data: test_chart,
                 artifact: test_artifact
             })
+            done()
+        })
+    })
+
+    it('should augment legend', done => {
+        service.getLegend(test_geojson)
+        service.legend.subscribe((x) => {
+            expect(x?.title).toEqual('test_artifact')
             done()
         })
     })
