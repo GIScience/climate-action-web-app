@@ -1,14 +1,16 @@
 @use 'globals';
 
 .plugin-name-wrapper {
-    background-color: rgb(231 231 231 / 85%);
-    position: relative;
-    border-radius: 15px 15px 0 0;
-    padding: 1rem 20px 1.5rem;
-    display: flex;
     align-items: center;
+    background-color: rgb(231 231 231 / 85%);
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    padding: 1rem 20px 1.5rem;
+    position: relative;
 
     &.is-loading {
+        animation: 1.5s shine linear infinite;
+        backdrop-filter: blur(5px);
         background: linear-gradient(
             110deg,
             rgba(236, 236, 236, 0.8) 8%,
@@ -16,12 +18,10 @@
             rgba(236, 236, 236, 0.8) 33%
         );
         background-size: 200% 100%;
-        backdrop-filter: blur(5px);
-        animation: 1.5s shine linear infinite;
 
         h1 {
-            color: transparent;
             background: rgba(255, 255, 255, 0.6);
+            color: transparent;
             width: 60%;
         }
     }
@@ -36,16 +36,18 @@
 }
 
 .current-plugin {
-    background-color: rgb(255 255 255 / 85%);
-    box-shadow: 0px -5px 7.5px -5px hsl(172deg 20.75% 51.51% / 75%);
     backdrop-filter: blur(5px);
+    background-color: rgb(255 255 255 / 85%);
     border-radius: 15px 15px 0 0;
+    box-shadow: 0px -5px 7.5px -5px hsl(172deg 20.75% 51.51% / 75%);
+    overflow: hidden;
     padding: 20px;
     position: relative;
-    overflow: hidden;
     top: -12.5px;
 
     &.is-loading {
+        animation: 1.5s shine linear infinite;
+        backdrop-filter: blur(5px);
         background: linear-gradient(
             110deg,
             rgba(236, 236, 236, 0.8) 8%,
@@ -53,14 +55,12 @@
             rgba(236, 236, 236, 0.8) 33%
         );
         background-size: 200% 100%;
-        backdrop-filter: blur(5px);
-        animation: 1.5s shine linear infinite;
         border-radius: 15px;
         padding-bottom: 10vh;
 
         h2 {
-            color: transparent;
             background: rgba(255, 255, 255, 0.6);
+            color: transparent;
             width: 30%;
         }
     }
@@ -69,16 +69,16 @@
         max-height: 20vh;
 
         .new-compute-container {
+            align-items: center;
             background: linear-gradient(0deg, #fff 0%, rgba(255, 255, 255, 0.8) 85%, rgba(255, 255, 255, 0) 100%);
-            position: absolute;
             bottom: 0;
-            left: 0;
-            height: 70%;
-            width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            height: 70%;
             justify-content: center;
+            left: 0;
+            position: absolute;
+            width: 100%;
 
             button.new-compute {
                 margin-bottom: 25px;
@@ -121,9 +121,9 @@
         li {
             background-color: #eee;
             border-radius: 5px;
-            padding: 0 5px;
-            margin-right: 5px;
             margin-bottom: 5px;
+            margin-right: 5px;
+            padding: 0 5px;
 
             &:last-of-type {
                 margin-right: 0;
@@ -142,15 +142,15 @@
 
                 ::ng-deep {
                     p {
-                        margin: 5px 0;
                         display: inline;
+                        margin: 5px 0;
                     }
                 }
             }
 
             a {
-                display: inline;
                 cursor: pointer;
+                display: inline;
                 margin-left: 2.5px;
             }
         }
@@ -158,19 +158,19 @@
 }
 
 .computations-list {
-    background-color: rgb(255 255 255 / 85%);
     backdrop-filter: blur(5px);
+    background-color: rgb(255 255 255 / 85%);
     border-radius: 15px;
-    padding: 0 20px;
-    margin-top: -12.5px;
     box-shadow:
         0px -5px 7.5px -5px hsl(172deg 20.75% 51.51% / 75%),
         2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: -12.5px;
+    padding: 0 20px;
 }
 
 .plugin-content-dialog {
-    position: relative;
     padding: 20px;
+    position: relative;
 
     h3 {
         margin-top: 0;
@@ -183,14 +183,14 @@
     }
 
     button.close-dialog {
-        color: #666;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 0;
         background: #fff;
         border: none;
         border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        top: 10px;
     }
 
     ul.plugin-sources {

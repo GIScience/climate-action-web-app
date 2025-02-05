@@ -1,19 +1,21 @@
 .plugin-catalog {
-    background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
-    color: #fff;
-    z-index: 1;
-    position: relative;
     backdrop-filter: blur(5px);
+    background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
     border-radius: 10px;
-    padding-top: 20px;
-    overflow: hidden;
     box-shadow: 2px 2px 4px rgb(0 0 0 / 10%);
+    color: #fff;
+    overflow: hidden;
+    padding-top: 20px;
+    position: relative;
+    z-index: 1;
 
     input[type='checkbox'] {
         display: none;
     }
 
     &.is-loading {
+        animation: 1.5s shine linear infinite;
+        backdrop-filter: blur(5px);
         background-image: linear-gradient(
             92deg,
             rgb(189 195 199 / 95%) 8%,
@@ -21,8 +23,6 @@
             rgb(189 195 199 / 95%) 33%
         );
         background-size: 200% 100%;
-        backdrop-filter: blur(5px);
-        animation: 1.5s shine linear infinite;
     }
 
     #catalog-toggle:checked {
@@ -45,9 +45,9 @@
 
             &:before,
             &:after {
-                width: 14px;
                 background: #eee;
                 transform: translate(0, 0) rotate(0deg);
+                width: 14px;
             }
         }
 
@@ -69,11 +69,11 @@
     }
 
     #catalog-header {
-        position: relative;
-        display: flex;
         align-items: center;
-        padding: 0 20px;
+        display: flex;
         height: 50px;
+        padding: 0 20px;
+        position: relative;
 
         h3.plugin-title {
             margin: 10px 0;
@@ -81,39 +81,39 @@
         }
 
         label[for='catalog-toggle'] {
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+            height: 100%;
+            justify-content: center;
             position: absolute;
             right: 10px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
             width: 40px;
         }
 
         #catalog-toggle-burger {
-            display: flex;
-            justify-content: center;
-            position: relative;
-            width: 18px;
-            height: 2px;
             background-color: transparent;
             border-radius: 99px;
+            display: flex;
+            height: 2px;
+            justify-content: center;
+            position: relative;
             transition: background-color 0.25s ease-in-out;
+            width: 18px;
 
             &:before,
             &:after {
-                content: '';
-                position: absolute;
-                top: -6px;
-                width: 10px;
-                height: 2px;
                 background: #eee;
                 border-radius: 99px;
+                content: '';
+                height: 2px;
+                position: absolute;
+                top: -6px;
                 transform: translate(2px, 9px) rotate(40deg);
                 transition:
                     transform 0.25s ease-in-out,
                     width 0.1s ease-in-out;
+                width: 10px;
             }
 
             &:after {
@@ -135,9 +135,9 @@
 }
 
 .plugins-list {
-    width: 240px;
     padding-left: 10px;
     transition: width 0.25s ease-in-out;
+    width: 240px;
 
     ul {
         padding: 15px 0 0 5px;
@@ -158,15 +158,15 @@
 
                 .plugin-card__text {
                     h3 {
-                        color: transparent;
                         background: rgba(255, 255, 255, 0.6);
-                        width: 150%;
+                        color: transparent;
                         margin-bottom: 5px;
+                        width: 150%;
                     }
 
                     span {
-                        color: transparent;
                         background: rgba(255, 255, 255, 0.6);
+                        color: transparent;
                         width: 100%;
                     }
                 }
@@ -175,15 +175,15 @@
     }
 
     .plugin-card {
-        display: flex;
         border-radius: 5px;
+        cursor: pointer;
+        display: flex;
         height: 75px;
         margin-bottom: 10px;
         padding: 5px;
-        width: 220px;
-        cursor: pointer;
         position: relative;
         transition: width 0.25s ease-in-out;
+        width: 220px;
 
         .plugin-card__text {
             display: flex;
@@ -193,8 +193,8 @@
             transition: opacity 0.3s ease-in-out 0.3s;
 
             h3 {
-                margin: 0;
                 font-size: small;
+                margin: 0;
             }
 
             span {
@@ -204,10 +204,10 @@
 
         img {
             aspect-ratio: 1;
+            border: 2px solid rgba(255, 255, 255, 0.85);
             border-radius: 5px;
             height: 100%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.85);
         }
 
         &.plugin-card-highlight,
@@ -217,20 +217,20 @@
 
             &:before,
             &:after {
-                content: '';
-                position: absolute;
-                pointer-events: none;
-                right: 0;
-                bottom: 100%;
-                width: 32px;
-                height: 32px;
                 border-radius: 50%;
+                bottom: 100%;
                 box-shadow: 18px 18px #f2f2f2;
+                content: '';
+                height: 32px;
+                pointer-events: none;
+                position: absolute;
+                right: 0;
+                width: 32px;
             }
 
             &:after {
-                top: 100%;
                 box-shadow: 18px -18px #f2f2f2;
+                top: 100%;
             }
         }
 

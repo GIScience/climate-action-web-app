@@ -148,13 +148,13 @@ $responsive: true;
 // ---------------------------------------------------------
 
 .tl-50p {
-    top: 50%;
     left: 50%;
+    top: 50%;
 }
 
 .tr-50p {
-    top: 50%;
     right: 50%;
+    top: 50%;
 }
 
 .t-50p {
@@ -176,13 +176,13 @@ $responsive: true;
 @if ($responsive ==true) {
     @include generateResponsive() {
         .tl-50p\@#{$breakpointAlias} {
-            top: 50%;
             left: 50%;
+            top: 50%;
         }
 
         .tr-50p\@#{$breakpointAlias} {
-            top: 50%;
             right: 50%;
+            top: 50%;
         }
 
         .t-50p\@#{$breakpointAlias} {

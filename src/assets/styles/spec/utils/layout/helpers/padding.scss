@@ -40,8 +40,8 @@ $responsive: true;
     }
 
     .pY-#{$i} {
-        padding-top: #{$i}px !important;
         padding-bottom: #{$i}px !important;
+        padding-top: #{$i}px !important;
     }
 
     .pX-#{$i} {
@@ -72,8 +72,8 @@ $responsive: true;
             }
 
             .pY-#{$i}\@#{$breakpointAlias} {
-                padding-top: #{$i}px !important;
                 padding-bottom: #{$i}px !important;
+                padding-top: #{$i}px !important;
             }
 
             .pX-#{$i}\@#{$breakpointAlias} {
@@ -111,8 +111,8 @@ $responsive: true;
         }
 
         .pY-#{$i} {
-            padding-top: #{$i}px !important;
             padding-bottom: #{$i}px !important;
+            padding-top: #{$i}px !important;
         }
 
         .pX-#{$i} {
@@ -143,8 +143,8 @@ $responsive: true;
                 }
 
                 .pY-#{$i}\@#{$breakpointAlias} {
-                    padding-top: #{$i}px !important;
                     padding-bottom: #{$i}px !important;
+                    padding-top: #{$i}px !important;
                 }
 
                 .pX-#{$i}\@#{$breakpointAlias} {
@@ -183,8 +183,8 @@ $responsive: true;
         }
 
         .pY-#{$i} {
-            padding-top: #{$i}px !important;
             padding-bottom: #{$i}px !important;
+            padding-top: #{$i}px !important;
         }
 
         .pX-#{$i} {
@@ -215,8 +215,8 @@ $responsive: true;
                 }
 
                 .pY-#{$i}\@#{$breakpointAlias} {
-                    padding-top: #{$i}px !important;
                     padding-bottom: #{$i}px !important;
+                    padding-top: #{$i}px !important;
                 }
 
                 .pX-#{$i}\@#{$breakpointAlias} {

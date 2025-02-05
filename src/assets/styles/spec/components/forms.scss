@@ -1,24 +1,23 @@
 .checkbox label {
     display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    padding-left: 17px;
     margin-bottom: 0;
+    padding-left: 17px;
+    position: relative;
+    vertical-align: middle;
 }
 
 .checkbox label::before {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    width: 17px;
-    height: 17px;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: -12px;
+    background-color: $md-white;
     border: 1px solid $grey-300;
     border-radius: 3px;
-    background-color: $md-white;
+    content: '';
+    display: inline-block;
+    height: 17px;
+    left: 0;
+    margin-left: -12px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     -webkit-transition:
         border 0.15s ease-in-out,
         color 0.15s ease-in-out;
@@ -28,21 +27,22 @@
     transition:
         border 0.15s ease-in-out,
         color 0.15s ease-in-out;
+    width: 17px;
 }
 
 .checkbox label::after {
+    color: $grey-500;
     display: inline-block;
-    position: absolute;
-    width: 17px;
-    height: 17px;
-    text-align: center;
     font-size: 10px !important;
-    line-height: 17px;
+    height: 17px;
     left: 0;
+    line-height: 17px;
+    margin-left: -12px;
+    position: absolute;
+    text-align: center;
     top: 50%;
     transform: translateY(-50%);
-    margin-left: -12px;
-    color: $grey-500;
+    width: 17px;
 }
 
 .checkbox input[type='checkbox'] {
@@ -57,8 +57,8 @@
 }
 
 .checkbox input[type='checkbox']:checked + label::after {
-    font-family: 'FontAwesome';
     content: '\f00c';
+    font-family: 'FontAwesome';
     font-size: 13px;
 }
 
@@ -130,38 +130,37 @@
 
 .radio label {
     display: inline-block;
-    vertical-align: middle;
-    position: relative;
     padding-left: 5px;
+    position: relative;
+    vertical-align: middle;
 }
 
 .radio label::before {
+    background-color: #fff;
+    border: 1px solid #cccccc;
+    border-radius: 50%;
     content: '';
     display: inline-block;
-    position: absolute;
-    width: 17px;
     height: 17px;
     left: 0;
     margin-left: -20px;
-    border: 1px solid #cccccc;
-    border-radius: 50%;
-    background-color: #fff;
+    position: absolute;
     -webkit-transition: border 0.15s ease-in-out;
     -o-transition: border 0.15s ease-in-out;
     transition: border 0.15s ease-in-out;
+    width: 17px;
 }
 
 .radio label::after {
-    display: inline-block;
-    position: absolute;
+    background-color: #555555;
+    border-radius: 50%;
     content: ' ';
-    width: 11px;
+    display: inline-block;
     height: 11px;
     left: 3px;
-    top: 3px;
     margin-left: -20px;
-    border-radius: 50%;
-    background-color: #555555;
+    position: absolute;
+    top: 3px;
     -webkit-transform: scale(0, 0);
     -ms-transform: scale(0, 0);
     -o-transform: scale(0, 0);
@@ -170,6 +169,7 @@
     -moz-transition: -moz-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
     -o-transition: -o-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
     transition: transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
+    width: 11px;
 }
 
 .radio input[type='radio'] {

@@ -72,8 +72,8 @@
     }
 
     .bdrsR-#{$i} {
-        border-top-right-radius: #{$i}px !important;
         border-bottom-right-radius: #{$i}px !important;
+        border-top-right-radius: #{$i}px !important;
     }
 
     .bdrsB-#{$i} {
@@ -82,8 +82,8 @@
     }
 
     .bdrsL-#{$i} {
-        border-top-left-radius: #{$i}px !important;
         border-bottom-left-radius: #{$i}px !important;
+        border-top-left-radius: #{$i}px !important;
     }
 }
 

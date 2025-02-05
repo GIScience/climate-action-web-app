@@ -2,14 +2,14 @@
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 10px;
-    position: absolute;
-    top: 5vw;
-    right: calc(50% - 17.5vw);
-    min-width: 35vw;
-    max-width: 35vw;
     height: auto;
-    pointer-events: all;
+    max-width: 35vw;
+    min-width: 35vw;
     overflow: hidden;
+    pointer-events: all;
+    position: absolute;
+    right: calc(50% - 17.5vw);
+    top: 5vw;
 
     &.minimised {
         height: 47.5px;
@@ -27,11 +27,11 @@
     }
 
     .artifact-header {
-        display: flex;
         align-items: center;
-        padding: 10px;
         background-color: aliceblue;
         cursor: move;
+        display: flex;
+        padding: 10px;
 
         .grip-icon {
             color: #9c9c9c;
@@ -46,9 +46,9 @@
             margin-left: auto;
 
             .minimise-btn {
-                margin-right: 7.5px;
-                color: #666;
                 border-color: #666;
+                color: #666;
+                margin-right: 7.5px;
 
                 &:hover {
                     background-color: #e5e5e5;
@@ -56,8 +56,8 @@
             }
 
             .close-btn {
-                color: #666;
                 border-color: #666;
+                color: #666;
 
                 &:hover {
                     background-color: #ffd8d8;
@@ -67,16 +67,16 @@
     }
 
     .artifact {
-        line-height: 1.4;
-        transition: 0.3s ease;
-        position: relative;
         height: 50vh;
+        line-height: 1.4;
         padding: 10px;
+        position: relative;
+        transition: 0.3s ease;
     }
 
     .artifact-meta {
-        max-width: 50rem;
         margin: 20px auto 0;
+        max-width: 50rem;
         padding-bottom: 20px;
 
         p.artifact-summary,
@@ -96,12 +96,12 @@
 
         .artifact-description,
         .artifact-abstract {
-            display: block;
-            margin-top: 20px;
             border-bottom: 1px solid #ccc;
+            border-radius: 0;
             border-top: 1px solid #ccc;
             box-shadow: none;
-            border-radius: 0;
+            display: block;
+            margin-top: 20px;
 
             .mat-expansion-panel-header {
                 font-size: 13px;

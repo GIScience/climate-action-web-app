@@ -36,8 +36,8 @@
 // ---------------------------------------------------------
 
 .sidebar-inner {
-    position: relative;
     height: 100%;
+    position: relative;
 }
 
 // ---------------------------------------------------------
@@ -185,8 +185,8 @@
             ul {
                 &.dropdown-menu {
                     background-color: transparent;
-                    border-radius: 0;
                     border: 0;
+                    border-radius: 0;
                     box-shadow: none;
                     float: none;
                     padding-left: 50px;
@@ -252,10 +252,10 @@
             width: $collapsed-size;
 
             &:not(:hover) .sidebar-logo .logo img {
-                width: 32px;
+                content: url('/favicon.ico');
                 height: 32px;
                 margin: 0 20px;
-                content: url('/favicon.ico');
+                width: 32px;
             }
 
             .sidebar-inner {

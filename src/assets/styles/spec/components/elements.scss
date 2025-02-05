@@ -1,6 +1,6 @@
 button {
-    display: flex;
     cursor: pointer;
+    display: flex;
     font-family: Manrope;
 
     &.btn-primary {
@@ -9,9 +9,9 @@ button {
         border-radius: 25px;
         color: #fff;
         font-size: 15px;
+        font-weight: 500;
         padding: 10px 20px;
         transition: background-color 0.15s ease-in-out;
-        font-weight: 500;
 
         &:hover {
             background-color: rgb(0 128 128 / 75%);
@@ -24,9 +24,9 @@ button {
         border-radius: 25px;
         color: #008080;
         font-size: 15px;
+        font-weight: 500;
         padding: 10px 20px;
         transition: background-color 0.15s ease-in-out;
-        font-weight: 500;
 
         &:hover {
             background-color: rgb(0 128 128 / 15%);
@@ -39,9 +39,9 @@ button {
         border-radius: 25px;
         color: #808080;
         font-size: 15px;
+        font-weight: 500;
         padding: 10px 20px;
         transition: background-color 0.15s ease-in-out;
-        font-weight: 500;
 
         &:hover {
             background-color: rgb(128 128 128 / 20%);
@@ -58,16 +58,16 @@ button {
     }
 
     &.btn-onlyicon {
+        align-items: center;
         background-color: rgb(255 255 255 / 75%);
         border: 1.5px solid #008080;
         border-radius: 50%;
-        width: 27.5px;
-        height: 27.5px;
+        color: #008080;
         display: flex;
-        align-items: center;
+        height: 27.5px;
         justify-content: center;
         transition: background-color 0.15s ease-in-out;
-        color: #008080;
+        width: 27.5px;
 
         &:hover {
             background-color: #cddddc;
@@ -75,9 +75,9 @@ button {
     }
 
     &[disabled] {
+        filter: grayscale(0.75);
         opacity: 0.5;
         pointer-events: none;
-        filter: grayscale(0.75);
     }
 }
 
