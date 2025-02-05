@@ -1,6 +1,6 @@
 .search-locations__wrapper {
-    width: 250px;
     text-align: right;
+    width: 250px;
 
     ng-scrollbar {
         max-height: 500px;
@@ -11,18 +11,18 @@
 
         input.search-locations {
             background-image: url('../../../assets/images/search.svg');
+            background-position: 7.5px center;
             background-repeat: no-repeat;
             background-size: 17.5px;
-            background-position: 7.5px center;
-            width: 75%;
-            padding: 7.5px 30px;
-            border-radius: 5px;
             border: 1px solid #ddd;
-            transition: width 0.25s ease;
+            border-radius: 5px;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             font-size: 16px;
-            z-index: 2;
+            padding: 7.5px 30px;
             position: relative;
+            transition: width 0.25s ease;
+            width: 75%;
+            z-index: 2;
 
             &:focus,
             &:not(:placeholder-shown) {
@@ -39,37 +39,37 @@
         }
 
         button.clear-search {
-            border: none;
             background-color: transparent;
+            border: none;
             position: absolute;
-            z-index: 2;
-            top: 6.5px;
             right: 0;
+            top: 6.5px;
+            z-index: 2;
         }
     }
 
     .location-suggestions {
-        text-align: left;
-        border: 1px solid #ddd;
-        background-color: rgb(255 255 255 / 85%);
-        width: 100%;
-        overflow-y: auto;
-        border-radius: 5px;
         backdrop-filter: blur(5px);
+        background-color: rgb(255 255 255 / 85%);
+        border: 1px solid #ddd;
+        border-radius: 5px;
         margin-top: -10px;
+        overflow-y: auto;
         padding-top: 10px;
+        text-align: left;
+        width: 100%;
 
         &.location-suggestions--empty {
-            text-align: center;
             color: #666;
+            text-align: center;
         }
     }
 
     .location-suggestion__item {
-        padding: 10px;
-        cursor: pointer;
         border-bottom: 1px solid #ddd;
+        cursor: pointer;
         line-height: 18px;
+        padding: 10px;
 
         &:last-of-type {
             border-bottom: none;

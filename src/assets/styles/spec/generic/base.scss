@@ -5,8 +5,8 @@ body {
 }
 
 a {
-    transition: all 0.3s ease-in-out;
     text-decoration: none;
+    transition: all 0.3s ease-in-out;
 }
 
 * {
@@ -18,9 +18,9 @@ a {
 }
 
 body {
+    color: #111;
     font-family: $font-primary;
     font-size: 14px;
-    color: #111;
     line-height: 1.5;
     overflow-x: hidden;
 }
@@ -39,8 +39,8 @@ h6 {
     }
 
     small {
-        font-weight: 300;
         color: lighten($default-dark, 5%);
+        font-weight: 300;
     }
 }
 
@@ -55,8 +55,8 @@ p {
 
 ul {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 a {
@@ -64,8 +64,8 @@ a {
 
     &:hover,
     &:focus {
-        text-decoration: none;
         color: darken($default-info, 10%);
+        text-decoration: none;
     }
 
     &:focus {

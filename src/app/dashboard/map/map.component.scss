@@ -5,15 +5,15 @@
         .ol-control {
             button {
                 border: 1px solid #e1eae8;
-                transition: background-color 0.25s ease;
-                width: 27.5px;
-                height: 27.5px;
                 border-radius: 2.5px;
                 cursor: pointer;
+                height: 27.5px;
+                transition: background-color 0.25s ease;
+                width: 27.5px;
 
                 &:hover {
-                    outline: none;
                     background-color: #e1eae8;
+                    outline: none;
                 }
 
                 &:focus {
@@ -23,38 +23,38 @@
         }
 
         .ol-zoom {
-            top: calc(0.5vw + 40px);
+            display: flex;
             left: auto;
             right: calc(0.5vw + 30px);
-            display: flex;
+            top: calc(0.5vw + 40px);
         }
 
         .ol-attribution {
+            border-radius: 5px;
             bottom: 0.5em;
             right: 0.5vw;
-            border-radius: 5px;
         }
 
         .ol-zoom-extent {
-            top: calc(0.5vw + 40px);
-            right: 0.5vw;
             left: auto;
+            right: 0.5vw;
+            top: calc(0.5vw + 40px);
 
             button {
-                display: flex;
                 align-items: flex-end;
+                display: flex;
                 justify-content: center;
             }
         }
 
         .ol-scale-line {
             border: 1.5px solid rgb(128 128 128 / 50%);
-            top: calc(0.5vw + 40px);
-            right: calc(0.5vw + 95px);
-            left: auto;
             bottom: auto;
-            height: 30px;
             display: flex;
+            height: 30px;
+            left: auto;
+            right: calc(0.5vw + 95px);
+            top: calc(0.5vw + 40px);
 
             .ol-scale-line-inner {
                 font-size: 12px;
@@ -62,37 +62,37 @@
         }
 
         .ol-layerswitcher {
-            right: 0.5vw;
-            bottom: 2.5em;
             background-color: transparent;
+            bottom: 2.5em;
+            right: 0.5vw;
 
             .panel-container {
-                display: none;
-                background-color: rgb(255 255 255 / 85%);
                 backdrop-filter: blur(5px);
-                padding: 10px;
+                background-color: rgb(255 255 255 / 85%);
                 border-radius: 5px;
+                display: none;
+                padding: 10px;
             }
 
             & > button {
+                border-radius: 5px;
+                box-sizing: content-box;
+                height: 27.5px;
                 margin: 0;
                 position: relative;
                 width: 27.5px;
-                height: 27.5px;
                 z-index: 2;
-                border-radius: 5px;
-                box-sizing: content-box;
             }
 
             & > button:after {
-                content: '';
                 background: url('../../../assets/images/layers.svg') no-repeat center/contain;
+                content: '';
+                height: 17.5px;
+                left: 0;
+                margin: 5px;
                 position: absolute;
                 top: 0;
-                left: 0;
                 width: 17.5px;
-                height: 17.5px;
-                margin: 5px;
             }
 
             &.ol-forceopen {
@@ -110,8 +110,8 @@
             }
 
             h3 {
-                margin-top: 0;
                 margin-bottom: 10px;
+                margin-top: 0;
             }
 
             input[type='radio'],
@@ -126,17 +126,17 @@
 
             li:not(.baselayer):not(.ol-header) {
                 background-color: rgb(204 204 204 / 50%);
+                border-radius: 5px;
                 margin-bottom: 15px;
                 padding: 10px;
-                border-radius: 5px;
                 text-align: center;
             }
 
             .panel li label {
                 align-items: center;
-                justify-items: center;
                 cursor: pointer;
                 display: inline-grid;
+                justify-items: center;
                 grid-gap: 7.5px;
                 grid-auto-flow: column;
 
@@ -147,13 +147,13 @@
 
             [type='radio'] + label:before,
             [type='radio']:checked + label:after {
-                content: '';
-                width: 1.25em;
-                height: 1.25em;
-                border: 2px solid #008080;
                 background-color: #fff;
+                border: 2px solid #008080;
+                content: '';
                 grid-column: 1;
                 grid-row: 1;
+                height: 1.25em;
+                width: 1.25em;
             }
 
             [type='radio'] + label:before,
@@ -163,8 +163,8 @@
 
             [type='radio']:checked + label:after {
                 background-color: #008080;
-                width: 0.65em;
                 height: 0.65em;
+                width: 0.65em;
             }
 
             [type='checkbox'] + label:before,
@@ -173,33 +173,33 @@
             }
 
             .layerswitcher-opacity {
-                position: relative;
+                background: linear-gradient(to right, rgba(0, 128, 128, 0), rgba(0, 128, 128, 0.6));
                 border: 1px solid #008080;
+                border-radius: 3px;
+                box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+                cursor: pointer;
                 height: 4px;
                 margin: 0.75em 0.25em;
-                border-radius: 3px;
-                background: linear-gradient(to right, rgba(0, 128, 128, 0), rgba(0, 128, 128, 0.6));
-                cursor: pointer;
-                box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+                position: relative;
 
                 .layerswitcher-opacity-cursor,
                 .layerswitcher-opacity-cursor:before {
-                    position: absolute;
-                    width: 18px;
-                    height: 18px;
-                    top: 50%;
-                    left: 50%;
                     background: rgba(0, 128, 128, 0.75);
                     border-radius: 50%;
+                    height: 18px;
+                    left: 50%;
+                    position: absolute;
+                    top: 50%;
                     transform: translate(-50%, -50%);
+                    width: 18px;
                     z-index: 1;
                 }
 
                 .layerswitcher-opacity-cursor:before {
                     content: '';
+                    height: 60%;
                     position: absolute;
                     width: 60%;
-                    height: 60%;
                 }
             }
 
@@ -213,24 +213,24 @@
 }
 
 .ol-popup {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(5px);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.85);
     border: 1px solid #ccc;
+    border-radius: 10px;
     bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     left: -50px;
+    padding: 10px;
+    position: absolute;
 
     &:before {
-        top: 100%;
         border: solid transparent;
         content: ' ';
         height: 0;
-        width: 0;
-        position: absolute;
         pointer-events: none;
+        position: absolute;
+        top: 100%;
+        width: 0;
     }
 
     &:before {

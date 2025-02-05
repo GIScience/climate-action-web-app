@@ -1,18 +1,18 @@
 .legend-container {
-    background-color: rgb(255 255 255 / 85%);
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    border-radius: 5px;
     backdrop-filter: blur(5px);
+    background-color: rgb(255 255 255 / 85%);
+    border-radius: 5px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     min-width: 100px;
+    padding: 10px;
 
     ng-scrollbar {
         max-height: 35vh;
     }
 
     h3 {
-        margin-top: 0;
         margin-bottom: 10px;
+        margin-top: 0;
     }
 
     & ul {
@@ -21,10 +21,10 @@
 
     .legend-color-box {
         display: inline-block;
-        width: 20px;
         height: 20px;
         margin-right: 8px;
         vertical-align: middle;
+        width: 20px;
     }
 
     .discrete-legend {
@@ -36,11 +36,11 @@
 
             li {
                 align-items: center;
-                display: grid;
                 column-gap: 7.5px;
-                margin-bottom: 7.5px;
+                display: grid;
                 grid-template-columns: 20px 1fr;
                 line-height: 1.25rem;
+                margin-bottom: 7.5px;
             }
         }
     }
@@ -49,34 +49,34 @@
         position: relative;
 
         .vertical-legend-wrapper {
-            position: relative;
             line-height: 0;
-            margin-top: 15px;
             margin-bottom: 10px;
+            margin-top: 15px;
+            position: relative;
         }
 
         .ticks {
-            position: absolute;
-            left: 30px;
-            top: 5px;
             bottom: 0;
             height: 100%;
+            left: 30px;
+            position: absolute;
+            top: 5px;
 
             span {
                 position: absolute;
                 white-space: nowrap;
 
                 &:before {
-                    content: '';
-                    display: inline-block;
-                    width: 0;
-                    height: 0;
+                    border-bottom: 10px solid #111111;
                     border-left: 5px solid transparent;
                     border-right: 5px solid transparent;
-                    border-bottom: 10px solid #111111;
-                    margin-top: 5px;
+                    content: '';
+                    display: inline-block;
+                    height: 0;
                     margin-right: 2px;
+                    margin-top: 5px;
                     transform: rotate(-90deg);
+                    width: 0;
                 }
             }
         }

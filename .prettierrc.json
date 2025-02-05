@@ -8,5 +8,7 @@
     "trailingComma": "none",
     "bracketSameLine": true,
     "printWidth": 120,
-    "endOfLine": "auto"
+    "endOfLine": "auto",
+    "plugins": ["prettier-plugin-css-order"],
+    "cssDeclarationSorterOrder": "alphabetical"
 }

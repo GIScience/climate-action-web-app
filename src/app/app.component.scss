@@ -8,23 +8,23 @@
 }
 
 app-dashboard {
-    width: 100%;
-    position: relative;
     overflow: hidden;
+    position: relative;
+    width: 100%;
 }
 
 footer {
     align-items: center;
-    display: flex;
-    white-space: pre-line;
-    justify-content: space-between;
-    width: 100vw;
     background: white;
+    display: flex;
+    justify-content: space-between;
+    white-space: pre-line;
+    width: 100vw;
 
     .demo-info {
+        color: #d60039;
         float: right;
         margin: 0 20px;
-        color: #d60039;
     }
 
     .about-info {

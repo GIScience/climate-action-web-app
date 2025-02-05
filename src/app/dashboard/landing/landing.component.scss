@@ -12,21 +12,21 @@
 }
 
 .welcome-container {
-    position: absolute;
-    display: flex;
     align-items: center;
-    justify-content: center;
-    width: calc(100% - calc(120px + 1.5vw));
+    display: flex;
     height: calc(100% - 1vw);
+    justify-content: center;
+    position: absolute;
+    width: calc(100% - calc(120px + 1.5vw));
 
     .welcome-content {
-        width: 600px;
-        height: auto;
-        background-color: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.85);
         border-radius: 15px;
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        height: auto;
         overflow: hidden;
+        width: 600px;
     }
 
     .welcome-content__revisit {
@@ -34,17 +34,17 @@
         flex-direction: column;
 
         .plugin-bubbles-container {
-            padding: 2em;
             border-radius: 15px;
             box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.25);
+            padding: 2em;
             z-index: 1;
         }
 
         h2 {
+            font-variation-settings: 'wght' 600;
             margin-top: 5px;
             padding: 0 20px;
             text-align: center;
-            font-variation-settings: 'wght' 600;
         }
 
         .plugin-bubbles {
@@ -52,12 +52,12 @@
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
-            padding: 20px;
             min-height: 200px;
+            padding: 20px;
 
             a {
-                display: flex;
                 border-radius: 50%;
+                display: flex;
                 height: fit-content;
                 transition: box-shadow 0.25s ease-out;
 
@@ -86,23 +86,23 @@
 
         .bubble {
             --bubble-size: 100px;
-            width: var(--bubble-size);
-            height: var(--bubble-size);
-            border-radius: 50%;
-            display: flex;
             align-items: center;
-            justify-content: center;
             background: var(--bubble-gradient);
+            border-radius: 50%;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            display: flex;
+            height: var(--bubble-size);
+            justify-content: center;
+            width: var(--bubble-size);
 
             .bubble-content {
-                z-index: 2;
-                text-align: center;
                 color: #fff;
                 display: flex;
                 flex-direction: column;
                 max-width: 80%;
+                text-align: center;
                 word-break: break-word;
+                z-index: 2;
 
                 .count {
                     display: block;
@@ -231,21 +231,21 @@
 
     .welcome-content__new {
         h1 {
+            font-variation-settings: 'wght' 800;
             margin-top: 20px;
             padding: 0 20px;
             text-align: center;
-            font-variation-settings: 'wght' 800;
         }
 
         p {
             padding: 0.5em 2em;
 
             &.cta-explore {
-                text-align: center;
                 font-size: 16px;
                 font-weight: bold;
                 margin: 0 0 1.25em;
                 padding: 0;
+                text-align: center;
             }
         }
 
@@ -255,18 +255,18 @@
             max-width: 600px;
 
             .image-slideshow__inner {
-                position: relative;
                 height: 200px;
                 overflow: hidden;
+                position: relative;
 
                 img {
                     animation: imageAnimation 18s linear infinite 0s;
                     backface-visibility: hidden;
-                    background-size: cover;
                     background-position: center center;
+                    background-size: cover;
                     left: 0px;
-                    position: absolute;
                     opacity: 0;
+                    position: absolute;
                     top: 0px;
                     width: 100%;
 

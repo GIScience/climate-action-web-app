@@ -1,15 +1,15 @@
 .plugin-parameter-container {
+    border-top: 1px solid #ccc;
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 1px solid #ccc;
 
     .area-selection-message {
+        align-items: center;
         border-radius: 5px;
         display: flex;
-        align-items: center;
         justify-content: center;
-        padding: 7.5px 10px;
         margin-bottom: 15px;
+        padding: 7.5px 10px;
 
         i-lucide {
             margin-right: 10px;
@@ -34,27 +34,27 @@
         margin-bottom: 15px;
 
         .region-item {
-            display: flex;
             align-items: flex-end;
-            justify-content: space-between;
-            padding: 2.5px 10px 5px;
-            margin: 5px;
             border: 2px solid #008080;
             border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            margin: 5px;
+            padding: 2.5px 10px 5px;
 
             .region-name {
                 display: inline-block;
                 font-weight: 600;
                 max-width: 265px;
-                text-overflow: ellipsis;
                 overflow: hidden;
+                text-overflow: ellipsis;
                 white-space: nowrap;
             }
 
             .region-area {
                 display: inline-block;
-                white-space: nowrap;
                 margin-left: 5px;
+                white-space: nowrap;
             }
 
             .deselect-region {
@@ -62,8 +62,8 @@
                 border: none;
                 color: #666;
                 cursor: pointer;
-                padding: 0 5px;
                 font-size: 16px;
+                padding: 0 5px;
 
                 &:hover {
                     color: #ff4444;
@@ -74,10 +74,10 @@
 
     formly-form {
         .mat-expansion-panel {
-            border-radius: 0;
             background-color: transparent;
-            border-top: 1px solid #ccc;
             border-bottom: 1px solid #ccc;
+            border-radius: 0;
+            border-top: 1px solid #ccc;
             box-shadow: none !important;
         }
     }
@@ -92,14 +92,14 @@
 
     .mat-mdc-form-field-hint-wrapper,
     .mat-mdc-form-field-error-wrapper {
-        position: relative !important;
         margin-top: -20px;
+        position: relative !important;
     }
 
     .btn-container {
         display: flex;
-        margin: 15px auto;
         justify-content: center;
+        margin: 15px auto;
 
         button {
             margin: 0 5px;

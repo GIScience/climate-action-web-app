@@ -4,15 +4,15 @@ header {
     z-index: 2;
 
     .header-container {
-        height: $header-height;
-        display: flex;
-        justify-content: space-between;
         align-items: center;
+        display: flex;
+        height: $header-height;
+        justify-content: space-between;
 
         .logo-wrapper,
         .my-account {
-            flex-grow: 1;
             flex-basis: 0;
+            flex-grow: 1;
         }
 
         .logo-wrapper {
@@ -37,8 +37,8 @@ header {
                     color: $default-text-color;
                     display: block;
                     line-height: $header-height;
-                    min-height: $header-height;
                     margin: 0 15px;
+                    min-height: $header-height;
                     padding: 0 10px;
                     transition: all 0.2s ease-in-out;
 
@@ -86,9 +86,9 @@ header {
 
         h2 {
             color: #008080;
+            cursor: pointer;
             line-height: 50px;
             margin: 0;
-            cursor: pointer;
         }
 
         .my-account {

@@ -19,8 +19,8 @@ $responsive: true;
 // ---------------------------------------------------------
 
 [class*='gap'] {
-    width: auto !important;
     overflow: hidden !important;
+    width: auto !important;
 }
 
 // ---------------------------------------------------------
@@ -39,12 +39,12 @@ $responsive: true;
     }
 
     .gapY-#{$i} {
-        margin-top: #{($i / -2)}px !important;
         margin-bottom: #{($i / -2)}px !important;
+        margin-top: #{($i / -2)}px !important;
 
         & > * {
-            padding-top: #{($i / 2)}px !important;
             padding-bottom: #{($i / 2)}px !important;
+            padding-top: #{($i / 2)}px !important;
         }
     }
 
@@ -69,12 +69,12 @@ $responsive: true;
             }
 
             .gapY-#{$i}\@#{$breakpointAlias} {
-                margin-top: #{($i / -2)}px !important;
                 margin-bottom: #{($i / -2)}px !important;
+                margin-top: #{($i / -2)}px !important;
 
                 & > * {
-                    padding-top: #{($i / 2)}px !important;
                     padding-bottom: #{($i / 2)}px !important;
+                    padding-top: #{($i / 2)}px !important;
                 }
             }
 
@@ -106,12 +106,12 @@ $responsive: true;
         }
 
         .gapY-#{$i} {
-            margin-top: #{($i / -2)}px !important;
             margin-bottom: #{($i / -2)}px !important;
+            margin-top: #{($i / -2)}px !important;
 
             & > * {
-                padding-top: #{($i / 2)}px !important;
                 padding-bottom: #{($i / 2)}px !important;
+                padding-top: #{($i / 2)}px !important;
             }
         }
 
@@ -136,12 +136,12 @@ $responsive: true;
                 }
 
                 .gapY-#{$i}\@#{$breakpointAlias} {
-                    margin-top: #{($i / -2)}px !important;
                     margin-bottom: #{($i / -2)}px !important;
+                    margin-top: #{($i / -2)}px !important;
 
                     & > * {
-                        padding-top: #{($i / 2)}px !important;
                         padding-bottom: #{($i / 2)}px !important;
+                        padding-top: #{($i / 2)}px !important;
                     }
                 }
 
@@ -174,12 +174,12 @@ $responsive: true;
         }
 
         .gapY-#{$i} {
-            margin-top: #{($i / -2)}px !important;
             margin-bottom: #{($i / -2)}px !important;
+            margin-top: #{($i / -2)}px !important;
 
             & > * {
-                padding-top: #{($i / 2)}px !important;
                 padding-bottom: #{($i / 2)}px !important;
+                padding-top: #{($i / 2)}px !important;
             }
         }
 
@@ -204,12 +204,12 @@ $responsive: true;
                 }
 
                 .gapY-#{$i}\@#{$breakpointAlias} {
-                    margin-top: #{($i / -2)}px !important;
                     margin-bottom: #{($i / -2)}px !important;
+                    margin-top: #{($i / -2)}px !important;
 
                     & > * {
-                        padding-top: #{($i / 2)}px !important;
                         padding-bottom: #{($i / 2)}px !important;
+                        padding-top: #{($i / 2)}px !important;
                     }
                 }
 

@@ -1,26 +1,26 @@
 .computations-index {
     .computations-index__header {
-        display: flex;
         align-items: center;
+        display: flex;
 
         button {
-            margin-left: auto;
             background: none;
             border: none;
             cursor: pointer;
             font-size: 20px;
+            margin-left: auto;
         }
     }
 
     .computations-index-content {
         display: flex;
-        min-height: 20vh;
         max-height: 52.5vh;
+        min-height: 20vh;
         transition: max-height 0.25s ease-in-out;
 
         .empty-computations {
-            display: flex;
             align-items: center;
+            display: flex;
             justify-content: center;
             width: 100%;
         }
@@ -32,18 +32,18 @@
 
     .scheduled-computation {
         &:after {
+            border-bottom: 1px solid #ccc;
             content: '';
             display: block;
             margin: 0 auto;
             width: 85%;
-            border-bottom: 1px solid #ccc;
         }
 
         .scheduled-parent-computation {
+            align-items: center;
             display: grid;
             grid-template-columns: 1fr 40px;
             padding: 10px 5px;
-            align-items: center;
         }
 
         .card-header {
@@ -55,21 +55,21 @@
             }
 
             .card-subtitle {
-                font-size: small;
                 color: gray;
+                font-size: small;
             }
         }
 
         .scheduled-run-dot {
-            width: 25px;
-            margin: 7.5px;
+            animation: rotate 1s infinite linear;
             aspect-ratio: 1;
-            border-radius: 50%;
             background:
                 radial-gradient(farthest-side, #ffa516 94%, #0000) top/4px 4px no-repeat,
                 conic-gradient(#0000 30%, #ffa516);
+            border-radius: 50%;
+            margin: 7.5px;
             -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
-            animation: rotate 1s infinite linear;
+            width: 25px;
         }
 
         @keyframes rotate {
@@ -81,22 +81,22 @@
 
     .computation {
         &:after {
+            border-bottom: 1px solid #ccc;
             content: '';
             display: block;
             margin: 0 auto;
             width: 80%;
-            border-bottom: 1px solid #ccc;
         }
 
         .parent-computation {
-            display: grid;
-            grid-template-columns: 40px 1fr 65px;
             align-items: center;
             border-radius: 10px;
-            padding: 10px 5px;
-            width: 100%;
             cursor: pointer;
+            display: grid;
+            grid-template-columns: 40px 1fr 65px;
+            padding: 10px 5px;
             transition: background-color 0.15s ease-in-out;
+            width: 100%;
 
             &.is-new {
                 .computation-actions {
@@ -104,16 +104,16 @@
                 }
 
                 .new-run-dot {
-                    display: block;
-                    width: 15px;
-                    height: 15px;
-                    border-radius: 100%;
+                    animation: pulse 1s alternate infinite;
                     background: rgba(255, 255, 255, 0.7);
+                    border-radius: 100%;
                     box-shadow:
                         inset 0px 0px 10px 2px rgba(0, 255, 140, 0.75),
                         0px 0px 10px 2px rgba(0, 255, 135, 0.3);
-                    animation: pulse 1s alternate infinite;
+                    display: block;
+                    height: 15px;
                     justify-self: center;
+                    width: 15px;
                 }
 
                 @keyframes pulse {
@@ -161,10 +161,10 @@
                 display: flex;
 
                 mat-icon {
-                    transition: transform 0.3s ease-in-out;
+                    color: #666;
                     font-size: 30px;
                     height: 30px;
-                    color: #666;
+                    transition: transform 0.3s ease-in-out;
                     width: 30px;
                 }
             }
@@ -182,16 +182,16 @@
                 }
 
                 .card-subtitle {
-                    font-size: small;
                     color: gray;
+                    font-size: small;
                 }
             }
 
             .computation-actions {
-                visibility: hidden;
-                margin-left: auto;
                 display: flex;
                 gap: 2.5px;
+                margin-left: auto;
+                visibility: hidden;
             }
         }
     }
@@ -200,10 +200,10 @@
         width: 100%;
 
         .empty-archive {
-            display: flex;
             align-items: center;
-            justify-content: center;
+            display: flex;
             height: 100%;
+            justify-content: center;
             width: 100%;
         }
 
@@ -218,13 +218,13 @@
                 justify-content: space-between;
 
                 h4 {
-                    margin-top: 0;
                     margin-bottom: 5px;
+                    margin-top: 0;
                 }
 
                 .card-subtitle {
-                    font-size: small;
                     color: gray;
+                    font-size: small;
                 }
 
                 button {
@@ -237,8 +237,8 @@
 }
 
 .parameters-dialog {
-    position: relative;
     padding: 20px;
+    position: relative;
 
     h3 {
         margin-top: 0;
@@ -246,22 +246,22 @@
 
     .parameters-dialog__content {
         max-height: 50vh !important;
-        min-width: 500px;
         max-width: 650px !important;
+        min-width: 500px;
         position: relative;
 
         .parameters-table {
-            width: 100%;
             border-collapse: collapse;
+            width: 100%;
 
             td {
-                padding: 8px 12px;
                 border-bottom: 1px solid #ccc;
+                padding: 8px 12px;
 
                 &.parameter-name {
                     border-right: 1px solid #ccc;
-                    font-variation-settings: 'wght' 500;
                     color: #666;
+                    font-variation-settings: 'wght' 500;
                     width: 40%;
                 }
             }
@@ -272,19 +272,19 @@
         }
 
         .no-params-message {
-            text-align: center;
             padding: 20px;
+            text-align: center;
         }
     }
 
     button.close-dialog {
-        color: #666;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 0;
         background: #fff;
         border: none;
         border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        top: 10px;
     }
 }

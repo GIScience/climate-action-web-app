@@ -1,19 +1,19 @@
 .peers {
+    align-items: flex-start;
     box-sizing: border-box;
     display: flex !important;
-    align-items: flex-start;
-    justify-content: flex-start;
     flex-flow: row wrap;
     height: auto;
-    max-width: 100%;
+    justify-content: flex-start;
     margin: 0;
+    max-width: 100%;
     padding: 0;
 }
 
 .peer {
     display: block;
-    height: auto;
     flex: 0 0 auto;
+    height: auto;
 }
 
 .peer-greed {
