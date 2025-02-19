@@ -1,25 +1,19 @@
 import { CommonModule, NgIf } from '@angular/common'
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { MapService } from '@app/dashboard/map/map.service'
+import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
+import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
-import { FormlyFieldProps } from '@ngx-formly/core/lib/models/fieldconfig'
-import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
+import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
+import { JSONSchema7 } from 'json-schema'
 import { CircleAlert, CirclePlay, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
-import moment from 'moment/moment'
 import Feature from 'ol/Feature'
 import { getArea } from 'ol/sphere'
-import { Subscription, fromEventPattern } from 'rxjs'
-import { MapService } from '../../map/map.service'
-import { ComputeRequest, Plugin } from '../plugin.interface'
-import { PluginService } from '../plugin.service'
-import {
-    FormlyModel,
-    SelectOption,
-    SelectOptions,
-    ValidationProperty,
-    ValidatorOptions
-} from './plugin-parameter.interface'
+import { fromEventPattern, Subscription } from 'rxjs'
+import { FormlyModel } from './plugin-parameter.interface'
+import moment from 'moment/moment'
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -33,9 +27,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
-    aoiAttribute: string | undefined = undefined
     selectedRegions: { name: string; area: number; feature: Feature }[] = []
-    selectOptions: SelectOptions = {}
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
     model: FormlyModel = {}
@@ -48,8 +40,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     readonly TriangleAlert = TriangleAlert
     readonly CircleAlert = CircleAlert
 
-    jsonSchema_polygon = 'MultiPolygon'
-
     areaSelected = false
     highlightedFeaturesSubscription: Subscription | undefined
 
@@ -57,7 +47,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         private pluginService: PluginService,
         private snackBar: MatSnackBar,
         private mapService: MapService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private formlyJsonschema: FormlyJsonschema
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.highlightedFeatures.on('change:length', handler)
@@ -74,13 +65,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     ngOnChanges(): void {
-        const schema = this.plugin.operator_schema
-        if (!schema) return
-
-        this.aoiAttribute = this.getAoiAttribute(schema)
-        this.selectOptions = this.parseSelectOptions(schema.$defs)
-
-        this.fields = this.parseFields(schema)
+        this.fields = this.parseFieldsFromSchema(this.plugin.operator_schema)
         Promise.resolve().then(() => {
             this.toggleFormState()
         })
@@ -136,199 +121,59 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         this.cdr.detectChanges()
     }
 
-    parseFields(schema: JSONSchema7): FormlyFieldConfig[] {
-        if (!schema.properties) return []
+    parseFieldsFromSchema(schema: JSONSchema7): FormlyFieldConfig[] {
+        const options = { map: this.custom_field_transformer }
+        return [this.formlyJsonschema.toFieldConfig(schema, options)]
+    }
 
-        const fields: FormlyFieldConfig[] = []
-        const optionalSubgroup: FormlyFieldConfig[] = []
+    private custom_field_transformer(field: FormlyFieldConfig, schema: JSONSchema7): FormlyFieldConfig {
+        function separateOptionalParameters(field: FormlyFieldConfig, schema: JSONSchema7): FormlyFieldConfig {
+            if (!field.fieldGroup) return field
 
-        for (const [key, value] of Object.entries(schema.properties)) {
-            if (typeof value != 'boolean') {
-                if (value.anyOf) {
-                    value.anyOf.forEach(nullable => {
-                        if (typeof nullable != 'boolean' && nullable.type != 'null') {
-                            Object.assign(value, nullable)
-                        }
-                    })
-                }
-                const field: FormlyFieldConfig = {}
-                field.key = key
-                field.type = this.parseType(value)
-                field.props = this.parseProps(value)
-                field.validators = this.getValidators(value)
-                field.parsers = this.getParsers(value)
+            const splittedFieldGroup: FormlyFieldConfig[] = []
+            const optionalSubgroup: FormlyFieldConfig[] = []
 
-                if (schema.required && schema.required.includes(key)) {
-                    field.props.required = true
-                    fields.push(field)
+            field.fieldGroup.forEach((parsedField: FormlyFieldConfig) => {
+                if (schema.required?.includes(String(parsedField.key))) {
+                    splittedFieldGroup.push(parsedField)
                 } else {
-                    optionalSubgroup.push(field)
+                    optionalSubgroup.push(parsedField)
                 }
-            }
-        }
-
-        if (optionalSubgroup.length > 0) {
-            fields.push({
-                type: 'expander',
-                fieldGroup: [
-                    {
-                        props: {
-                            label: 'Optional Attributes',
-                            description: 'Click here to access more configurations.'
-                        },
-                        fieldGroup: optionalSubgroup
-                    }
-                ]
             })
-        }
 
-        return fields
-    }
-
-    private parseType(property: JSONSchema7): string {
-        switch (property.type) {
-            case 'boolean':
-                return 'checkbox'
-            case 'integer':
-            case 'number':
-                return 'input'
-            case 'string':
-                if (property['format'] === 'date') {
-                    return 'datepicker'
-                } else {
-                    return 'input'
-                }
-            case 'array':
-                if (property.items) {
-                    return 'select'
-                }
-                console.error('Wrong format in multi-select schema, "items" missing.')
-                return 'textarea'
-            case undefined:
-                if (property.$ref) {
-                    return 'select'
-                }
-                console.error('Wrong format in select schema, "$ref" missing.')
-                return 'textarea'
-            default:
-                console.error(`Unexpected plugin parameter type: ${property.type} in ${property.title}`)
-                return 'textarea'
-        }
-    }
-
-    private parseProps(property: JSONSchema7): FormlyFieldProps {
-        const props: FormlyFieldProps = {}
-
-        props.label = property.title
-        props.description = property.description
-
-        if (property.examples && Array.isArray(property.examples) && property.examples.length > 0) {
-            props.placeholder = String(property.examples[0])
-        }
-
-        switch (property.type) {
-            case 'string':
-                if (property['format'] === 'date') {
-                    const minMax = this.checkForMinAndMaxDateRange(property)
-                    Object.assign(props, {
-                        datepickerOptions: {
-                            startAt: props.placeholder,
-                            min: minMax.min,
-                            max: minMax.max
+            if (optionalSubgroup.length > 0) {
+                splittedFieldGroup.push({
+                    type: 'expander',
+                    fieldGroup: [
+                        {
+                            props: {
+                                label: 'Optional Attributes',
+                                description: 'Click here to access more configurations.'
+                            },
+                            fieldGroup: optionalSubgroup
                         }
-                    })
-                }
-                break
-            case 'array':
-                // @ts-ignore typing definition incomplete
-                props.multiple = true
-                if (property.items && typeof property.items != 'boolean' && !Array.isArray(property.items)) {
-                    props.options = this.selectOptions[this.getRefName(property.items.$ref)]
-                }
-                break
-            case undefined:
-                if (property.$ref) {
-                    props.placeholder = 'Choose' //select placeholder is effectively default
-                    props.options = this.selectOptions[this.getRefName(property.$ref)]
-                }
-        }
-        return props
-    }
-
-    private getValidators(property: JSONSchema7): ValidationProperty {
-        switch (property.type) {
-            case 'integer':
-                return { validation: [{ name: 'intType', options: this.checkForMinAndMaxRange(property) }] }
-            case 'number':
-                return { validation: [{ name: 'numType', options: this.checkForMinAndMaxRange(property) }] }
-            case 'string':
-                if (property['format'] === 'date') {
-                    return { validation: [{ name: 'dateType', options: this.checkForMinAndMaxDateRange(property) }] }
-                }
-        }
-        return { validation: [] }
-    }
-
-    private getParsers(property: JSONSchema7) {
-        if (property.type === 'string' && property['format'] === 'date') {
-            return [this.parseDate]
-        }
-        return []
-    }
-
-    getAoiAttribute(schema: JSONSchema7): string | undefined {
-        if (!schema.properties) return
-
-        for (const [key, value] of Object.entries(schema.properties)) {
-            if (
-                typeof value != 'boolean' &&
-                value &&
-                value.allOf &&
-                typeof value.allOf[0] != 'boolean' &&
-                value.allOf[0].$ref &&
-                value.allOf[0].$ref.includes(this.jsonSchema_polygon)
-            ) {
-                delete schema.properties[key]
-                return key
-            }
-        }
-        return
-    }
-
-    parseSelectOptions($defs: { [p: string]: JSONSchema7Definition } | undefined): SelectOptions {
-        const transformedDefs: SelectOptions = {}
-        if (!$defs) return transformedDefs
-
-        for (const [key, value] of Object.entries($defs)) {
-            if (typeof value != 'boolean' && value.enum && !key.includes(this.jsonSchema_polygon)) {
-                const option: SelectOption[] = []
-                value.enum.forEach(value => {
-                    option.push({ label: String(value), value: value })
+                    ]
                 })
-                transformedDefs[key] = option
             }
+            field.fieldGroup = splittedFieldGroup
+
+            return field
         }
 
-        return transformedDefs
-    }
-
-    private getRefName($ref: string | undefined): string {
-        if (!$ref) return ''
-        return $ref.replace('#/$defs/', '')
-    }
-
-    private checkForMinAndMaxRange(value: JSONSchema7): ValidatorOptions {
-        return {
-            min: value.minimum ?? value.exclusiveMinimum ?? Number.NEGATIVE_INFINITY,
-            max: value.maximum ?? value.exclusiveMaximum ?? Number.POSITIVE_INFINITY
+        if (schema.examples && Array.isArray(schema.examples)) {
+            field.props = field.props || {}
+            field.props.placeholder = String(schema.examples[0])
         }
-    }
 
-    private checkForMinAndMaxDateRange(value: JSONSchema7): ValidatorOptions {
-        return {
-            min: String(value.minimum ?? value.exclusiveMinimum ?? '1970-01-01'),
-            max: String(value.maximum ?? value.exclusiveMaximum ?? new Date().toISOString().split('T')[0])
+        if (schema.format == 'date') {
+            field.type = 'datepicker'
+            field.parsers = [v => (moment.isMoment(v) ? v.format('YYYY-MM-DD') : v)]
+            field.validators = { date: (control: AbstractControl) => moment(control.value, true).isValid() }
         }
+
+        field = separateOptionalParameters(field, schema)
+
+        return field
     }
 
     private requestCompute(model: FormlyModel) {
@@ -376,15 +221,5 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 })
             }
         })
-    }
-
-    parseDate(value: moment.Moment): string {
-        if (moment.isMoment(value)) {
-            return value.format('YYYY-MM-DD')
-        } else if (moment(value, 'YYYY-MM-DD', true).isValid()) {
-            return value
-        } else {
-            return value
-        }
     }
 }

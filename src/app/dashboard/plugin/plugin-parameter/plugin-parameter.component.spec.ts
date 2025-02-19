@@ -1,25 +1,15 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
-import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateModule } from '@angular/material-moment-adapter'
-import { MAT_DATE_FORMATS } from '@angular/material/core'
-import { MatDatepickerModule } from '@angular/material/datepicker'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
-import { JSONSchema7 } from 'json-schema'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
-import { dateTypeValidator, intTypeValidator, numericTypeValidator } from '../../../app.validators'
-import { ArrayTypeComponent } from '../../../types/array/array.type'
-import { FormlyFieldExpansionPanelComponent } from '../../../types/expansion-panel/formlyFieldExpansionPanel.type'
-import { MultiSchemaTypeComponent } from '../../../types/multischema/multischema.type'
-import { NullTypeComponent } from '../../../types/null/null.type'
-import { ObjectTypeComponent } from '../../../types/object/object.type'
-import { MapService } from '../../map/map.service'
+import { MapService } from '@app/dashboard/map/map.service'
 import { PluginParameterComponent } from './plugin-parameter.component'
+import { JSONSchema7 } from 'json-schema'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -28,58 +18,14 @@ describe('PluginParameterComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [FormlyFieldExpansionPanelComponent],
             imports: [
-                FormlyModule.forRoot({
-                    validators: [
-                        { name: 'intType', validation: intTypeValidator },
-                        { name: 'numType', validation: numericTypeValidator },
-                        { name: 'dateType', validation: dateTypeValidator }
-                    ],
-                    validationMessages: [{ name: 'required', message: 'This field is required' }],
-                    types: [
-                        { name: 'null', component: NullTypeComponent, wrappers: ['form-field'] },
-                        { name: 'array', component: ArrayTypeComponent },
-                        { name: 'object', component: ObjectTypeComponent },
-                        { name: 'multischema', component: MultiSchemaTypeComponent },
-                        { name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: [] }
-                    ]
-                }),
                 BrowserAnimationsModule,
                 FormlyMatDatepickerModule,
                 FormlyMaterialModule,
-                MomentDateModule,
-                MatDatepickerModule,
                 MatExpansionModule,
                 PluginParameterComponent,
                 ReactiveFormsModule,
                 HttpClientModule
-            ],
-            providers: [
-                {
-                    provide: MapService
-                },
-                {
-                    provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-                    useValue: {
-                        useUtc: true,
-                        strict: true
-                    }
-                },
-                {
-                    provide: MAT_DATE_FORMATS,
-                    useValue: {
-                        parse: {
-                            dateInput: 'YYYY-MM-DD'
-                        },
-                        display: {
-                            dateInput: 'YYYY-MM-DD',
-                            monthYearLabel: 'MMM YYYY',
-                            dateA11yLabel: 'LL',
-                            monthYearA11yLabel: 'LL'
-                        }
-                    }
-                }
             ]
         })
         fixture = TestBed.createComponent(PluginParameterComponent)
@@ -141,305 +87,717 @@ describe('PluginParameterComponent', () => {
         expect(aoi).toEqual(expectedFeature)
     })
 
-    it('should interpret operator schema', () => {
-        component.plugin = {
-            name: 'testplugin',
-            authors: [],
-            version: '0.0.1',
-            concerns: [],
-            purpose: '',
-            methodology: '',
-            sources: [],
-            assets: {
-                icon: '...'
+    it('should correctly parse required boolean field', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                bool_showcase: {
+                    description: 'A required boolean parameter.',
+                    examples: [true],
+                    title: 'Boolean Input',
+                    type: 'boolean'
+                }
             },
-            plugin_id: 'testplugin',
-            // @ts-ignore possible type mismatch
-            operator_schema: test_schema,
-            library_version: '2.6.2'
+            required: ['bool_showcase'],
+            title: 'ComputeInput',
+            type: 'object'
         }
 
-        component.ngOnChanges()
-        fixture.detectChanges()
-
-        expect(mapService.highlightedFeatures.getLength()).toEqual(0)
-        expect(component.selectOptions['Option'].map(x => x.label)).toEqual(['Option 1', 'Option 2'])
-        const expectedSchema: FormlyFieldConfig[] = [
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
             {
-                key: 'blueprint_bool',
-                type: 'checkbox',
+                type: 'object',
                 props: {
-                    label: 'Boolean Input',
-                    description: 'A required boolean parameter.',
-                    placeholder: 'true',
-                    required: true
+                    label: 'ComputeInput'
                 },
                 validators: {
-                    validation: []
+                    type: {
+                        schemaType: ['object']
+                    }
                 },
-                parsers: []
-            },
-            {
-                type: 'expander',
                 fieldGroup: [
                     {
+                        type: 'boolean',
                         props: {
-                            label: 'Optional Attributes',
-                            description: 'Click here to access more configurations.'
+                            label: 'Boolean Input',
+                            description: 'A required boolean parameter.',
+                            placeholder: 'true'
                         },
+                        key: 'bool_showcase',
+                        validators: {
+                            type: {
+                                schemaType: ['boolean']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Boolean Input',
+                            description: 'A required boolean parameter.',
+                            placeholder: 'true'
+                        },
+                        expressions: {}
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
+    it('should correctly parse optional boolean field', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                bool_showcase: {
+                    default: true,
+                    description: 'A required boolean parameter.',
+                    examples: [true],
+                    title: 'Boolean Input',
+                    type: 'boolean'
+                }
+            },
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'expander',
                         fieldGroup: [
                             {
-                                key: 'blueprint_int',
-                                type: 'input',
                                 props: {
-                                    label: 'Integer Input',
-                                    description: 'An optional integer parameter.',
-                                    placeholder: '3'
+                                    label: 'Optional Attributes',
+                                    description: 'Click here to access more configurations.'
                                 },
-                                validators: {
-                                    validation: [
-                                        {
-                                            name: 'intType',
-                                            options: {
-                                                min: 0,
-                                                max: 100
+                                fieldGroup: [
+                                    {
+                                        type: 'boolean',
+                                        props: {
+                                            label: 'Boolean Input',
+                                            description: 'A required boolean parameter.',
+                                            placeholder: 'true'
+                                        },
+                                        key: 'bool_showcase',
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
                                             }
-                                        }
-                                    ]
-                                },
-                                parsers: []
-                            },
-                            {
-                                key: 'blueprint_float',
-                                type: 'input',
-                                props: {
-                                    label: 'Float Input',
-                                    description: 'An optional floating point parameter.',
-                                    placeholder: '2.1'
-                                },
-                                validators: {
-                                    validation: [
-                                        {
-                                            name: 'numType',
-                                            options: {
-                                                min: 0.5,
-                                                max: 4
-                                            }
-                                        }
-                                    ]
-                                },
-                                parsers: []
-                            },
-                            {
-                                key: 'blueprint_string',
-                                type: 'input',
-                                props: {
-                                    label: 'String Input',
-                                    description: 'An optional string parameter.',
-                                    placeholder: 'John Doe'
-                                },
-                                validators: {
-                                    validation: []
-                                },
-                                parsers: []
-                            },
-                            {
-                                key: 'blueprint_date',
-                                type: 'datepicker',
-                                props: {
-                                    label: 'Date Input',
-                                    description: 'An optional date parameter.',
-                                    placeholder: '2020-01-01',
-                                    datepickerOptions: {
-                                        startAt: '2020-01-01',
-                                        min: '1970-01-01',
-                                        max: new Date().toISOString().split('T')[0]
+                                        },
+                                        templateOptions: {
+                                            label: 'Boolean Input',
+                                            description: 'A required boolean parameter.',
+                                            placeholder: 'true'
+                                        },
+                                        defaultValue: true
                                     }
-                                },
-                                validators: {
-                                    validation: [
-                                        {
-                                            name: 'dateType',
-                                            options: {
-                                                min: '1970-01-01',
-                                                max: new Date().toISOString().split('T')[0]
-                                            }
-                                        }
-                                    ]
-                                },
-                                parsers: [component.parseDate]
-                            },
-                            {
-                                key: 'blueprint_select',
-                                type: 'select',
-                                props: {
-                                    label: 'Selection Input',
-                                    description:
-                                        'An optional selection parameter. The user can choose one of the available options.',
-                                    placeholder: 'Choose',
-                                    options: [
-                                        {
-                                            label: 'Option 1',
-                                            value: 'Option 1'
-                                        },
-                                        {
-                                            label: 'Option 2',
-                                            value: 'Option 2'
-                                        }
-                                    ]
-                                },
-                                validators: {
-                                    validation: []
-                                },
-                                parsers: []
-                            },
-                            {
-                                key: 'blueprint_select_multi',
-                                type: 'select',
-                                props: {
-                                    label: 'Multi-Selection Input',
-                                    description:
-                                        'An optional selection parameter. The user can choose multiple of the available options.',
-                                    placeholder: 'Option 2',
-                                    multiple: true,
-                                    options: [
-                                        {
-                                            label: 'Option 1',
-                                            value: 'Option 1'
-                                        },
-                                        {
-                                            label: 'Option 2',
-                                            value: 'Option 2'
-                                        }
-                                    ]
-                                },
-                                validators: {
-                                    validation: []
-                                },
-                                parsers: []
+                                ]
                             }
                         ]
                     }
-                ]
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
             }
-        ]
-
-        component.fields = component.parseFields(test_schema)
-        expect(component.fields).toEqual(expectedSchema)
+        ])
     })
 
-    const test_schema: JSONSchema7 = {
-        $defs: {
-            Feature_MultiPolygon_Union_Dict__NoneType__: { description: 'This should be ignored at all levels' },
-            MultiPolygon: { description: 'This should be ignored at all levels' },
-            Option: {
-                enum: ['Option 1', 'Option 2'],
-                title: 'Option',
-                type: 'string'
+    it('should correctly parse integer fields', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                showcase: {
+                    description: 'Test description.',
+                    examples: [3],
+                    exclusiveMaximum: 100,
+                    exclusiveMinimum: 0,
+                    title: 'Test Title',
+                    type: 'integer'
+                }
+            },
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'integer',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            exclusiveMinimum: 0,
+                            exclusiveMaximum: 100,
+                            placeholder: '3'
+                        },
+                        key: 'showcase',
+                        validators: {
+                            type: {
+                                schemaType: ['integer']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            exclusiveMinimum: 0,
+                            exclusiveMaximum: 100,
+                            placeholder: '3'
+                        },
+                        expressions: {},
+                        parsers: [null]
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
             }
-        },
-        properties: {
-            blueprint_bool: {
-                description: 'A required boolean parameter.',
-                examples: [true],
-                title: 'Boolean Input',
-                type: 'boolean'
+        ])
+    })
+
+    it('should correctly parse float fields', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                showcase: {
+                    description: 'Test description.',
+                    examples: [2.1],
+                    maximum: 4.0,
+                    minimum: 0.5,
+                    title: 'Test Title',
+                    type: 'number'
+                }
             },
-            blueprint_int: {
-                anyOf: [
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
                     {
-                        maximum: 100,
-                        minimum: 0,
-                        type: 'integer'
-                    },
-                    {
-                        type: 'null'
+                        type: 'number',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            min: 0.5,
+                            max: 4.0,
+                            placeholder: '2.1'
+                        },
+                        key: 'showcase',
+                        validators: {
+                            type: {
+                                schemaType: ['number']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            min: 0.5,
+                            max: 4.0,
+                            placeholder: '2.1'
+                        },
+                        expressions: {},
+                        parsers: [null]
                     }
                 ],
-                default: 3,
-                description: 'An optional integer parameter.',
-                examples: [3],
-                title: 'Integer Input'
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
+    it('should correctly parse string fields', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                showcase: {
+                    description: 'Test description.',
+                    examples: ['John Doe'],
+                    title: 'Test Title',
+                    type: 'string'
+                }
             },
-            blueprint_float: {
-                anyOf: [
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
                     {
-                        exclusiveMaximum: 4,
-                        exclusiveMinimum: 0.5,
-                        type: 'number'
-                    },
-                    {
-                        type: 'null'
+                        type: 'string',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            placeholder: 'John Doe'
+                        },
+                        key: 'showcase',
+                        defaultValue: '',
+                        validators: {
+                            type: {
+                                schemaType: ['string']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            placeholder: 'John Doe'
+                        },
+                        expressions: {},
+                        parsers: [null]
                     }
                 ],
-                default: 2.1,
-                description: 'An optional floating point parameter.',
-                examples: [2.1],
-                title: 'Float Input'
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
+    it('should correctly parse date fields', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                showcase: {
+                    description: 'Test description.',
+                    examples: ['2020-01-01'],
+                    format: 'date',
+                    title: 'Test Title',
+                    type: 'string'
+                }
             },
-            blueprint_string: {
-                anyOf: [
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
                     {
-                        type: 'string'
-                    },
-                    {
-                        type: 'null'
+                        type: 'datepicker',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            placeholder: '2020-01-01'
+                        },
+                        key: 'showcase',
+                        validators: {},
+                        defaultValue: '',
+                        expressions: {},
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            placeholder: '2020-01-01'
+                        },
+                        parsers: [null]
                     }
                 ],
-                default: 'John Doe',
-                description: 'An optional string parameter.',
-                examples: ['John Doe'],
-                title: 'String Input'
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
+    it('should correctly parse select fields', () => {
+        const schema: JSONSchema7 = {
+            $defs: {
+                Option: {
+                    enum: ['Option 1', 'Option 2'],
+                    title: 'Option',
+                    type: 'string'
+                }
             },
-            blueprint_date: {
-                anyOf: [
+            properties: {
+                showcase: {
+                    $ref: '#/$defs/Option',
+                    description: 'Test description.',
+                    examples: ['Option 2'],
+                    title: 'Test Title'
+                }
+            },
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
                     {
-                        format: 'date',
-                        type: 'string'
-                    },
-                    {
-                        type: 'null'
+                        type: 'enum',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            multiple: false,
+                            options: [
+                                { value: 'Option 1', label: 'Option 1' },
+                                { value: 'Option 2', label: 'Option 2' }
+                            ]
+                        },
+                        key: 'showcase',
+                        defaultValue: '',
+                        validators: {
+                            type: {
+                                schemaType: ['string']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            multiple: false,
+                            options: [
+                                { value: 'Option 1', label: 'Option 1' },
+                                { value: 'Option 2', label: 'Option 2' }
+                            ]
+                        },
+                        parsers: [null],
+                        expressions: {}
                     }
                 ],
-                default: '2020-01-01',
-                description: 'An optional date parameter.',
-                examples: ['2020-01-01'],
-                title: 'Date Input'
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
+    it('should correctly parse multi-select fields', () => {
+        const schema: JSONSchema7 = {
+            $defs: {
+                Option: {
+                    enum: ['Option 1', 'Option 2'],
+                    title: 'Option',
+                    type: 'string'
+                }
             },
-            blueprint_select: {
-                anyOf: [
-                    {
+            properties: {
+                showcase: {
+                    description: 'Test description.',
+                    examples: [['Option 2']],
+                    items: {
                         $ref: '#/$defs/Option'
                     },
-                    {
-                        type: 'null'
-                    }
-                ],
-                default: 'Option 2',
-                description: 'An optional selection parameter. The user can choose one of the available options.',
-                examples: ['Option 2'],
-                title: 'Selection Input'
+                    title: 'Test Title',
+                    type: 'array',
+                    uniqueItems: true
+                }
             },
-            blueprint_select_multi: {
-                anyOf: [
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
                     {
-                        items: {
-                            $ref: '#/$defs/Option'
+                        type: 'enum',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            multiple: true,
+                            uniqueItems: true,
+                            options: [
+                                { value: 'Option 1', label: 'Option 1' },
+                                { value: 'Option 2', label: 'Option 2' }
+                            ],
+                            placeholder: 'Option 2'
                         },
-                        type: 'array'
-                    },
-                    {
-                        type: 'null'
+                        key: 'showcase',
+                        defaultValue: [],
+                        validators: {
+                            type: {
+                                schemaType: ['array']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.',
+                            multiple: true,
+                            options: [
+                                { value: 'Option 1', label: 'Option 1' },
+                                { value: 'Option 2', label: 'Option 2' }
+                            ],
+                            placeholder: 'Option 2',
+                            uniqueItems: true
+                        },
+                        expressions: {}
                     }
                 ],
-                default: ['Option 2'],
-                description: 'An optional selection parameter. The user can choose multiple of the available options.',
-                examples: [['Option 2']],
-                title: 'Multi-Selection Input'
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
             }
-        },
-        required: ['blueprint_bool'],
-        title: 'BlueprintComputeInput',
-        type: 'object'
-    }
+        ])
+    })
+
+    it('should correctly parse mapping fields', () => {
+        const schema: JSONSchema7 = {
+            $defs: {
+                Mapping: {
+                    properties: {
+                        good: {
+                            description: 'A good string.',
+                            examples: ['John Doe'],
+                            title: 'String for Good',
+                            type: 'string'
+                        },
+                        mediocre: {
+                            default: 2.1,
+                            description: 'A mediocre float.',
+                            examples: [2.1],
+                            maximum: 4.0,
+                            minimum: 0.5,
+                            title: 'Mediocre Float',
+                            type: 'number'
+                        },
+                        bad: {
+                            $ref: '#/$defs/Option',
+                            default: 'Option 2',
+                            description: 'A bad selection.',
+                            examples: ['Option 2'],
+                            title: 'Bad Selection'
+                        }
+                    },
+                    required: ['good'],
+                    title: 'Mapping',
+                    type: 'object'
+                },
+                Option: {
+                    enum: ['Option 1', 'Option 2'],
+                    title: 'Option',
+                    type: 'string'
+                }
+            },
+            properties: {
+                showcase: {
+                    $ref: '#/$defs/Mapping',
+                    description: 'Test description.',
+                    examples: [
+                        {
+                            bad: 'Option 2',
+                            good: 'John Doe',
+                            mediocre: 2.1
+                        }
+                    ],
+                    title: 'Test Title'
+                }
+            },
+            required: ['showcase'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'object',
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.'
+                        },
+                        fieldGroup: [
+                            {
+                                type: 'string',
+                                props: {
+                                    label: 'String for Good',
+                                    description: 'A good string.',
+                                    placeholder: 'John Doe'
+                                },
+                                key: 'good',
+                                defaultValue: '',
+                                validators: {
+                                    type: {
+                                        schemaType: ['string']
+                                    }
+                                },
+                                templateOptions: {
+                                    label: 'String for Good',
+                                    description: 'A good string.',
+                                    placeholder: 'John Doe'
+                                },
+                                parsers: [null],
+                                expressions: {}
+                            },
+                            {
+                                type: 'expander',
+                                fieldGroup: [
+                                    {
+                                        props: {
+                                            label: 'Optional Attributes',
+                                            description: 'Click here to access more configurations.'
+                                        },
+                                        fieldGroup: [
+                                            {
+                                                type: 'number',
+                                                props: {
+                                                    label: 'Mediocre Float',
+                                                    description: 'A mediocre float.',
+                                                    min: 0.5,
+                                                    max: 4.0,
+                                                    placeholder: '2.1'
+                                                },
+                                                key: 'mediocre',
+                                                defaultValue: 2.1,
+                                                validators: {
+                                                    type: {
+                                                        schemaType: ['number']
+                                                    }
+                                                },
+                                                templateOptions: {
+                                                    label: 'Mediocre Float',
+                                                    description: 'A mediocre float.',
+                                                    min: 0.5,
+                                                    max: 4.0,
+                                                    placeholder: '2.1'
+                                                },
+                                                parsers: [null]
+                                            },
+                                            {
+                                                type: 'enum',
+                                                props: {
+                                                    label: 'Bad Selection',
+                                                    description: 'A bad selection.',
+                                                    multiple: false,
+                                                    options: [
+                                                        { value: 'Option 1', label: 'Option 1' },
+                                                        { value: 'Option 2', label: 'Option 2' }
+                                                    ]
+                                                },
+                                                key: 'bad',
+                                                defaultValue: 'Option 2',
+                                                validators: {
+                                                    type: {
+                                                        schemaType: ['string']
+                                                    }
+                                                },
+                                                templateOptions: {
+                                                    label: 'Bad Selection',
+                                                    description: 'A bad selection.',
+                                                    multiple: false,
+                                                    options: [
+                                                        { value: 'Option 1', label: 'Option 1' },
+                                                        { value: 'Option 2', label: 'Option 2' }
+                                                    ]
+                                                },
+                                                parsers: [null]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        key: 'showcase',
+                        defaultValue: {},
+                        validators: {
+                            type: {
+                                schemaType: ['object']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Test Title',
+                            description: 'Test description.'
+                        },
+                        expressions: {}
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
 })
