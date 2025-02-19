@@ -7,6 +7,15 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.1.0...main)
 
+### Changed
+
+- The custom JSONSchema parser was replaced with a slight adaption of the Formly-provided parser
+- Date input is now shown in a more human friendly manner
+
+### Fixed
+
+- Now supporting mapping/grouping input fields ([#145](https://gitlab.heigit.org/climate-action/web-app/-/issues/145))
+
 ## [2.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.1.0) - 2025-01-29
 
 ### Changed
