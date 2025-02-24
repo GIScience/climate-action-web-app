@@ -79,8 +79,8 @@ describe('PluginParameterComponent', () => {
             }
         }
 
-        mapService.highlightedFeatures.clear()
-        mapService.highlightedFeatures.push(inputFeature)
+        mapService.selectedFeatures.clear()
+        mapService.selectedFeatures.push(inputFeature)
 
         const aoi = mapService.getSelectedRegion()
 

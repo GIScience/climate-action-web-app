@@ -3,31 +3,31 @@
         class="area-selection-message"
         [ngClass]="{
             'message--info': !areaSelected,
-            'message--blocked': areaSelected && selectedRegions.length > 1,
-            'message--warning': areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500
+            'message--blocked': areaSelected && this.mapService.selectedFeatures.getLength() > 1,
+            'message--warning': areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500
         }"
         *ngIf="
             !areaSelected ||
-            (areaSelected && selectedRegions.length > 1) ||
-            (areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500)
+            (areaSelected && this.mapService.selectedFeatures.getLength() > 1) ||
+            (areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500)
         ">
         <i-lucide
-            [img]="!areaSelected ? MapPinPlusInside : selectedRegions.length > 1 ? TriangleAlert : CircleAlert"
+            [img]="!areaSelected ? MapPinPlusInside : this.mapService.selectedFeatures.getLength() > 1 ? TriangleAlert : CircleAlert"
             size="20"></i-lucide>
         <span>
             <ng-container *ngIf="!areaSelected">Select an area on the map to continue.</ng-container>
-            <ng-container *ngIf="areaSelected && selectedRegions.length > 1"
+            <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
                 >Multiple areas selected. Please select only one.</ng-container
             >
-            <ng-container *ngIf="areaSelected && selectedRegions.length === 1 && selectedRegions[0].area > 500"
+            <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500"
                 >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
             >
         </span>
     </div>
     <div *ngIf="areaSelected" class="selected-regions">
-        <div *ngFor="let region of selectedRegions" class="region-item">
-            <span class="region-name">{{ region.name }}</span>
-            <span class="region-area">({{ region.area }} km<sup>2</sup>)</span>
+        <div *ngFor="let region of this.mapService.selectedFeatures.getArray()" class="region-item">
+            <span class="region-name">{{ region.get('name') }}</span>
+            <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
             <button class="deselect-region" (click)="deselectRegion(region)">×</button>
         </div>
     </div>
@@ -44,7 +44,7 @@
                     type="submit"
                     appearance="primary"
                     class="btn-primary btn-withtext"
-                    [disabled]="!form.valid || selectedRegions.length !== 1">
+                    [disabled]="!form.valid || this.mapService.selectedFeatures.getLength() !== 1">
                     <i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute
                 </button>
                 <button type="button" class="btn-light btn-withtext" (click)="deactivateCompute()">Cancel</button>

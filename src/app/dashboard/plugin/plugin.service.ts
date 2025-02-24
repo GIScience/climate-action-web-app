@@ -1,11 +1,14 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { BehaviorSubject, Observable, of, Subject, throwError } from 'rxjs'
+import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
 import { environment } from '../../../environments/environment'
 import { RunStatus } from '../common/status.types'
 import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
+import GeoJSON from 'ol/format/GeoJSON'
+import { MultiPolygon } from 'ol/geom'
+import { Feature } from 'ol'
 
 @Injectable({
     providedIn: 'root'
@@ -47,6 +50,7 @@ export class PluginService {
     }
 
     getComputationMetadata(id: string): Observable<ComputationMetadata> {
+        const gj = new GeoJSON()
         const requestTimeout = 5000
         const maxRetries = 3
         return this.http.get<ComputationMetadata>(`${this.apiUrl}/api/v1/gateway/store/${id}/metadata/`).pipe(
@@ -67,6 +71,12 @@ export class PluginService {
             catchError(error => {
                 console.error(`Error fetching computation ${id}:`, error)
                 return throwError(() => error)
+            }),
+            map((metadata: ComputationMetadata) => {
+                const feat = gj.readFeature(metadata.aoi, { featureProjection: 'EPSG:3857' }) as Feature<MultiPolygon>
+                feat.set('renderStyle', 'AOI')
+                metadata.aoi = feat
+                return metadata
             })
         )
     }

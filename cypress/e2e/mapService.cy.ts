@@ -296,8 +296,8 @@ describe('mapService', () => {
         mockPluginsList()
         mockPluginBlueprint()
 
-        let currentHighlightedFeaturesCount = 0
-        let newHighlightedFeaturesCount = 0
+        let currentSelectedFeaturesCount = 0
+        let newSelectedFeaturesCount = 0
 
         cy.reload(true)
 
@@ -317,9 +317,9 @@ describe('mapService', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            currentHighlightedFeaturesCount = mapService.highlightedFeatures.getLength()
+            currentSelectedFeaturesCount = mapService.selectedFeatures.getLength()
 
-            expect(currentHighlightedFeaturesCount).to.be.greaterThan(0)
+            expect(currentSelectedFeaturesCount).to.be.greaterThan(0)
         })
 
         cy.get('.selected-regions .deselect-region').first().click()
@@ -328,9 +328,9 @@ describe('mapService', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            newHighlightedFeaturesCount = mapService.highlightedFeatures.getLength()
+            newSelectedFeaturesCount = mapService.selectedFeatures.getLength()
 
-            expect(newHighlightedFeaturesCount).to.not.equal(currentHighlightedFeaturesCount)
+            expect(newSelectedFeaturesCount).to.not.equal(currentSelectedFeaturesCount)
         })
     })
 

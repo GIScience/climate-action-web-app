@@ -10,7 +10,6 @@ import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { JSONSchema7 } from 'json-schema'
 import { CircleAlert, CirclePlay, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
 import Feature from 'ol/Feature'
-import { getArea } from 'ol/sphere'
 import { fromEventPattern, Subscription } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
 import moment from 'moment/moment'
@@ -27,13 +26,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
-    selectedRegions: { name: string; area: number; feature: Feature }[] = []
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
     model: FormlyModel = {}
     options: FormlyFormOptions = {}
-
-    static readonly sqmToSqkmFactor = 1 / 1000000
 
     readonly CirclePlay = CirclePlay
     readonly MapPinPlusInside = MapPinPlusInside
@@ -46,17 +42,16 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     constructor(
         private pluginService: PluginService,
         private snackBar: MatSnackBar,
-        private mapService: MapService,
+        public mapService: MapService,
         private cdr: ChangeDetectorRef,
         private formlyJsonschema: FormlyJsonschema
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
-            this.mapService.highlightedFeatures.on('change:length', handler)
+            this.mapService.selectedFeatures.on('change:length', handler)
         )
 
         this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
             this.toggleFormState()
-            this.showSelectedAreaInfo()
         })
     }
 
@@ -83,24 +78,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    showSelectedAreaInfo(): void {
-        const selectedRegions = this.mapService.highlightedFeatures.getArray()
-        this.selectedRegions = selectedRegions.map(feature => {
-            const geometry = feature.getGeometry()
+    deselectRegion(region: Feature): void {
+        this.mapService.selectedFeatures.remove(region)
 
-            return {
-                name: feature.get('name') || 'Unnamed Region',
-                area: geometry ? Number((getArea(geometry) * PluginParameterComponent.sqmToSqkmFactor).toFixed(2)) : 0,
-                feature: feature
-            }
-        })
-    }
-
-    deselectRegion(region: { name: string; area: number; feature: Feature }): void {
-        this.mapService.highlightedFeatures.remove(region.feature)
-        this.selectedRegions = this.selectedRegions.filter(r => r !== region)
-
-        if (this.selectedRegions.length === 0) {
+        if (this.mapService.selectedFeatures.getLength() === 0) {
             this.toggleFormState()
         }
     }
@@ -111,7 +92,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     toggleFormState(): void {
-        if (this.mapService.highlightedFeatures.getLength() > 0) {
+        if (this.mapService.selectedFeatures.getLength() > 0) {
             this.form.enable()
             this.areaSelected = true
         } else {

@@ -5,6 +5,8 @@ import { of } from 'rxjs'
 import { ComputationEntity, ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
 import { PluginService } from './plugin.service'
+import { Feature } from 'ol'
+import { MultiPolygon } from 'ol/geom'
 import SpyObj = jasmine.SpyObj
 
 describe('PluginService', () => {
@@ -12,14 +14,48 @@ describe('PluginService', () => {
     let httpClientSpy: SpyObj<HttpClient>
 
     const test_computation = {
-        name: 'test_computation',
-        modality: 'IMAGE',
-        file_path: './',
-        summary: 'computation summary',
-        description: 'computation description',
         correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
+        timestamp: new Date('2023-09-27T16:42:52+01:00'),
         params: {},
-        store_id: '2fbeed00-e9b7-4f54-bae7-18f64bd33ea6'
+        aoi: {
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPolygon',
+                coordinates: [
+                    [
+                        [
+                            [0, 0],
+                            [1, 0],
+                            [1, 1],
+                            [0, 1],
+                            [0, 0]
+                        ]
+                    ]
+                ]
+            },
+            properties: {
+                name: 'Test AOI'
+            }
+        },
+        artifacts: [
+            {
+                name: 'Image',
+                modality: 'IMAGE',
+                primary: true,
+                file_path: 'test_image.png',
+                summary: 'An image.',
+                description: 'The image is under CC0 license.',
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                attachments: {}
+            }
+        ],
+        plugin_info: {
+            plugin_id: 'test_plugin',
+            plugin_version: '1.0.0'
+        },
+        status: 'SUCCESS',
+        message: ''
     }
 
     const test_correlator = {
@@ -142,10 +178,10 @@ describe('PluginService', () => {
     it('should get computations', () => {
         httpClientSpy.get
             .withArgs('/api/v1/gateway/store/1fbeed00-e9b7-4f54-bae7-18f64bd33ea6/metadata/')
-            .and.returnValue(of([test_correlator, test_computation]))
+            .and.returnValue(of(test_computation))
 
         service.getComputationMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(computations => {
-            expect(computations).toHaveSize(2)
+            expect(computations.aoi).toBeInstanceOf(Feature<MultiPolygon>)
         })
 
         expect(httpClientSpy.get.calls.count()).toBe(1)

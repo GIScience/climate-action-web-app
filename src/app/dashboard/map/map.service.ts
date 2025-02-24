@@ -6,9 +6,9 @@ import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
 import FeatureLike from 'ol/Feature'
 import VectorTile from 'ol/VectorTile'
 import { ScaleLine } from 'ol/control'
-import { ZoomToExtent, defaults as defaultControls } from 'ol/control.js'
+import { defaults as defaultControls, ZoomToExtent } from 'ol/control.js'
 import { Coordinate } from 'ol/coordinate'
-import { Extent, createEmpty, extend } from 'ol/extent'
+import { Extent } from 'ol/extent'
 import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
 import GeoJSON, { GeoJSONFeature } from 'ol/format/GeoJSON.js'
 import { MultiPolygon } from 'ol/geom'
@@ -17,7 +17,7 @@ import Point from 'ol/geom/Point'
 import VectorLayer, { Options as VectorLayerOptions } from 'ol/layer/Vector'
 import VectorTileLayer, { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'
 import TileLayer, { Options as TileLayerOptions } from 'ol/layer/WebGLTile.js'
-import { fromLonLat } from 'ol/proj'
+import { fromLonLat, transformExtent } from 'ol/proj'
 import Projection from 'ol/proj/Projection'
 import RenderFeature from 'ol/render/Feature'
 import GeoTIFF from 'ol/source/GeoTIFF'
@@ -34,6 +34,7 @@ import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
 import { replacer } from './utils/geojson-vt.utils'
+import { getArea } from 'ol/sphere'
 
 class ExtendedTileLayer extends TileLayer {
     name?: string
@@ -76,7 +77,7 @@ class ExtendedVectorLayer<T extends Feature<Geometry | Point>> extends VectorLay
 export class MapService {
     map: Map | undefined
     mapPopUp: Overlay | undefined
-    focusedLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
+    focusedLayer: ExtendedVectorLayer<Feature<MultiPolygon> | Feature<Polygon>> | undefined
     regionLayer: ExtendedTileLayer | undefined
     selectedRegionLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerLayer: ExtendedVectorLayer<Feature<Point>> | undefined
@@ -84,13 +85,13 @@ export class MapService {
     featureHoverOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     featureClickOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerFeatures: Collection<Feature<Point>> = new Collection([])
-    highlightedFeatures: Collection<FeatureLike> = new Collection([])
+    selectedFeatures: Collection<FeatureLike> = new Collection([])
     layerSwitcherCollapsed: boolean = false
     windowWidth?: number
     windowResolution?: number
-    mapPadding?: number[]
 
     private orsAPIKey = environment.orsAPIKey
+    static readonly sqmToSqkmFactor = 1 / 1000000
 
     constructor(
         private pluginService: PluginService,
@@ -105,56 +106,44 @@ export class MapService {
         })
     }
 
-    goToLocation(suggestion: GeoJSONFeature) {
+    goToLocation(suggestion: Feature<Point>) {
         if (suggestion) {
-            const lon = suggestion.geometry.coordinates[0]
-            const lat = suggestion.geometry.coordinates[1]
-            const coord = fromLonLat([lon, lat]) as [number, number]
-            this.addMarker(coord)
-            this.fitMapViewToSearchResult(suggestion, coord)
+            this.addMarker(suggestion)
+            this.fitMapViewToSearchResult(suggestion)
         }
     }
 
-    getAutoCompleteSuggestions(query: string): Observable<GeoJSONFeatureCollection[]> {
+    getAutoCompleteSuggestions(query: string): Observable<Feature<Point>[]> {
         const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
-        return this.http.get<GeoJSONFeatureCollection>(orsUrl).pipe(map(results => results.features))
+        const gj = new GeoJSON()
+
+        function transformer(coll: GeoJSONFeatureCollection): Feature<Point>[] {
+            const feats = coll.features.map((feature: GeoJSONFeature) => {
+                const feat = gj.readFeature(feature, { featureProjection: 'EPSG:3857' })
+                feat.set('extent', feature.bbox ? transformExtent(feature.bbox, 'EPSG:4326', 'EPSG:3857') : undefined)
+                return feat
+            })
+            return feats.filter(
+                (feature: Feature<Geometry>) => feature.getGeometry()?.getType() == 'Point'
+            ) as Feature<Point>[]
+        }
+
+        const observable: Observable<GeoJSONFeatureCollection> = this.http.get<GeoJSONFeatureCollection>(orsUrl)
+        return observable.pipe(map(transformer))
     }
 
-    highlightLocationOnMap(coordinates: Coordinate) {
-        const coord = fromLonLat(coordinates) as [number, number]
-        this.addMarker(coord)
-    }
-
-    addMarker(coord: Coordinate) {
+    addMarker(feature: Feature<Point>) {
         this.markerFeatures.clear()
-
-        const markerFeature = new Feature({
-            geometry: new Point(coord)
-        })
-
-        this.markerFeatures.push(markerFeature)
+        this.markerFeatures.push(feature)
     }
 
-    fitMapViewToSearchResult(result: GeoJSONFeature, coord: [number, number]) {
-        if (result.bbox) {
-            const extent = [
-                ...fromLonLat([result.bbox[0], result.bbox[1]]),
-                ...fromLonLat([result.bbox[2], result.bbox[3]])
-            ]
-            if (this.map) {
-                this.map.getView().fit(extent, {
-                    padding: this.calculateMapPadding()
-                })
-            }
-        } else {
-            if (this.map) {
-                const extent = createEmpty()
-                extend(extent, [coord[0], coord[1], coord[0], coord[1]])
-                this.map.getView().fit(extent, {
-                    padding: this.calculateMapPadding(),
-                    maxZoom: 15
-                })
-            }
+    fitMapViewToSearchResult(result: Feature<Point>) {
+        const extent = result.get('extent') || result.getGeometry()?.getExtent()
+        if (this.map && extent) {
+            this.map.getView().fit(extent, {
+                padding: this.calculateMapPadding(),
+                maxZoom: 15
+            })
         }
     }
 
@@ -189,7 +178,7 @@ export class MapService {
 
         this.selectedRegionLayer = new ExtendedVectorLayer({
             source: new VectorSource({
-                features: this.highlightedFeatures
+                features: this.selectedFeatures
             }),
             map: this.map,
             style: {
@@ -383,22 +372,16 @@ export class MapService {
         }
     }
 
-    highlightAoI(data: object): Extent {
+    highlightAoI(feature: Feature<MultiPolygon>): Extent {
         this.removeComputeLayers()
 
-        const features = new GeoJSON().readFeatures(data, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
-        })
+        const extent = feature.getGeometry()!.getExtent()
 
-        const extent = features[0].getGeometry()!.getExtent()
-
-        const scissor = features[0].getGeometry()! as MultiPolygon
+        const scissor = feature.getGeometry()!
         const fogOfWar = this.cutFromGlobalPolygon(scissor)
-        features.push(fogOfWar)
 
-        const geojsonLayerSource = new VectorSource({
-            features: features
+        const vectorSource = new VectorSource({
+            features: [feature, fogOfWar]
         })
 
         const aoiStyle = new Style({
@@ -411,9 +394,9 @@ export class MapService {
         const fowStyle = new Style({ fill: new Fill({ color: '#80808050' }) })
 
         this.focusedLayer = new ExtendedVectorLayer({
-            source: geojsonLayerSource,
+            source: vectorSource,
             style: function (feature) {
-                return feature.get('name') == 'AOI' ? aoiStyle : fowStyle
+                return feature.get('renderStyle') == 'AOI' ? aoiStyle : fowStyle
             },
             displayInLayerSwitcher: false
         })
@@ -601,8 +584,8 @@ export class MapService {
         if (this.selectedRegionLayer) {
             this.selectedRegionLayer.setVisible(false)
         }
-        if (this.highlightedFeatures.getLength() > 0) {
-            this.highlightedFeatures.clear()
+        if (this.selectedFeatures.getLength() > 0) {
+            this.selectedFeatures.clear()
         }
     }
 
@@ -639,10 +622,20 @@ export class MapService {
                 if (url) {
                     this.http.get<GeoJSONFeatureCollection>(url).subscribe(response => {
                         if (response.features && response.features.length > 0) {
-                            this.highlightedFeatures.clear()
+                            this.selectedFeatures.clear()
                             response.features.forEach((geoJsonFeature: GeoJSONFeature) => {
                                 const feature = new GeoJSON().readFeature(geoJsonFeature)
-                                this.highlightedFeatures.push(feature)
+                                feature.set('name', feature.get('name') || 'Unnamed Region')
+                                feature.set(
+                                    'id',
+                                    (feature.get('id') || Math.random().toString(36).substring(2, 9)).toString()
+                                )
+                                const geometry = feature.getGeometry()
+                                feature.set(
+                                    'area',
+                                    geometry ? Number((getArea(geometry) * MapService.sqmToSqkmFactor).toFixed(2)) : 0
+                                )
+                                this.selectedFeatures.push(feature)
                             })
                         }
                     })
@@ -652,10 +645,8 @@ export class MapService {
     }
 
     getSelectedRegion(): GeoJSONFeatureCollection {
-        const feature = this.highlightedFeatures.getLength() > 0 ? this.highlightedFeatures.item(0) : undefined
+        const feature = this.selectedFeatures.getLength() > 0 ? this.selectedFeatures.item(0) : undefined
         if (feature) {
-            feature.set('id', (feature.get('id') || Math.random().toString(36).substring(2, 9)).toString())
-            feature.set('name', feature.get('name') || 'Unnamed Region')
             return new GeoJSON().writeFeatureObject(feature, {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857',
@@ -666,11 +657,11 @@ export class MapService {
     }
 
     getSelectedRegions(): Feature[] {
-        return this.highlightedFeatures.getArray()
+        return this.selectedFeatures.getArray()
     }
 
     removeSelectedRegion(feature: Feature): void {
-        this.highlightedFeatures.remove(feature)
+        this.selectedFeatures.remove(feature)
     }
 
     createFeatureOverlay(opacity: number): ExtendedVectorLayer<Feature<Geometry>> {
