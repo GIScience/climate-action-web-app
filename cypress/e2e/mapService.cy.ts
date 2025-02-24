@@ -258,7 +258,11 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.get('.ol-zoom-in').click().click().click().click().click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
 
         cy.waitForRenderComplete()
 
@@ -307,7 +311,11 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.get('.ol-zoom-in').click().click().click().click().click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
 
         cy.waitForRenderComplete()
 
@@ -346,7 +354,11 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.get('.ol-zoom-in').click().click().click().click().click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
 
         cy.waitForRenderComplete()
 

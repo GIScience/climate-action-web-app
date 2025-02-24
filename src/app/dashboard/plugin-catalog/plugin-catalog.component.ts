@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common'
+import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
@@ -12,7 +12,7 @@ import { PluginCard } from './plugin-catalog.interface'
     selector: 'app-plugin-catalog',
     templateUrl: './plugin-catalog.component.html',
     styleUrls: ['./plugin-catalog.component.scss'],
-    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule],
+    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule, NgOptimizedImage],
     standalone: true
 })
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
@@ -46,8 +46,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     syncActiveCardWithRoute(): void {
         const currentUrl = this.router.url
-        const matchingCard = this.cards.find(card => currentUrl.includes(`plugin/${card.plugin_id}`))
-        this.activeCard = matchingCard
+        this.activeCard = this.cards.find(card => currentUrl.includes(`plugin/${card.plugin_id}`))
     }
 
     sortCards() {

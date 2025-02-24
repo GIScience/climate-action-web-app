@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { EventEmitter, Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
-import { environment } from '../../../environments/environment'
+import { environment } from '@environments/environment'
 import { Artifact, ArtifactData, ChartData, LegendObject } from './artifact.interface'
 
 @Injectable({

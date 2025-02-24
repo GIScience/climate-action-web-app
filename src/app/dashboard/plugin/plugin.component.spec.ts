@@ -22,7 +22,7 @@ describe('PluginComponent', () => {
         methodology: 'This Plugin uses no methodology because it does nothing.',
         sources: [
             {
-                url: 'http://some.url.com',
+                url: 'https://some.url.com',
                 ENTRYTYPE: 'misc',
                 ID: '1',
                 title: 'Test 1',
@@ -35,16 +35,16 @@ describe('PluginComponent', () => {
                 title: 'Test 2',
                 author: 'Test 2',
                 year: '2024',
-                note: '\\url{http://another.url.com}'
+                note: '\\url{https://another.url.com}'
             },
             {
-                url: 'http://some.url.com',
+                url: 'https://some.url.com',
                 ENTRYTYPE: 'misc',
                 ID: '3',
                 title: 'Test 3',
                 author: 'Test 3',
                 year: '2025',
-                note: '\\url{http://another.url.com}'
+                note: '\\url{https://another.url.com}'
             }
         ],
         assets: {
@@ -71,7 +71,7 @@ describe('PluginComponent', () => {
     it('should update url when present in notes', () => {
         expect(component.processSourceUrls(test_plugin).sources).toEqual([
             {
-                url: 'http://some.url.com',
+                url: 'https://some.url.com',
                 ENTRYTYPE: 'misc',
                 ID: '1',
                 title: 'Test 1',
@@ -79,22 +79,22 @@ describe('PluginComponent', () => {
                 year: '2023'
             },
             {
-                url: 'http://another.url.com',
+                url: 'https://another.url.com',
                 ENTRYTYPE: 'misc',
                 ID: '2',
                 title: 'Test 2',
                 author: 'Test 2',
                 year: '2024',
-                note: '\\url{http://another.url.com}'
+                note: '\\url{https://another.url.com}'
             },
             {
-                url: 'http://some.url.com',
+                url: 'https://some.url.com',
                 ENTRYTYPE: 'misc',
                 ID: '3',
                 title: 'Test 3',
                 author: 'Test 3',
                 year: '2025',
-                note: '\\url{http://another.url.com}'
+                note: '\\url{https://another.url.com}'
             }
         ])
     })

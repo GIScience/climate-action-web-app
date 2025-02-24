@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { NgScrollbar } from 'ngx-scrollbar'
-import { convertToTitleCase } from '../../../utils/artifact-utils'
+import { convertToTitleCase } from '@app/utils/artifact-utils'
 import { LegendObject } from '../artifact.interface'
 
 declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]

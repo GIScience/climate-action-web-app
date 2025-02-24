@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
-import { environment } from '../../../environments/environment'
+import { environment } from '@environments/environment'
 import { RunStatus } from '../common/status.types'
 import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
@@ -83,12 +83,6 @@ export class PluginService {
 
     setCatalogToggleInput(input: HTMLInputElement) {
         this.catalogToggleInput = input
-    }
-
-    openPluginCatalog() {
-        if (this.catalogToggleInput && this.catalogToggleInput.checked) {
-            this.catalogToggleInput.checked = false
-        }
     }
 
     collapsePluginCatalog() {
