@@ -20,14 +20,14 @@
                 (click)="selectSuggestion(suggestion)"
                 (keyup.enter)="selectSuggestion(suggestion)"
                 (keydown)="onSuggestionKeydown($event)"
-                (mouseover)="highlightSuggestion(suggestion)"
-                (focus)="highlightSuggestion(suggestion)"
+                (mouseover)="this.mapService.addMarker(suggestion)"
+                (focus)="this.mapService.addMarker(suggestion)"
                 tabindex="0">
                 <span
-                    [innerHTML]="suggestion.properties.name | highlight: searchControl.value"
+                    [innerHTML]="suggestion.get('name') | highlight: searchControl.value"
                     class="suggestion__title"></span
                 ><br />
-                <span class="suggestion__subtitle">{{ formatLocation(suggestion.properties) }}</span>
+                <span class="suggestion__subtitle">{{ formatLocation(suggestion.getProperties()) }}</span>
             </div>
         </ng-scrollbar>
     </div>

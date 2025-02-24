@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, flush, tick } from '@angular/core/testing'
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
@@ -10,6 +10,9 @@ import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ComputationEntity } from './computation.interface'
 import { ComputationsIndexComponent } from './computations-index.component'
+import { Feature } from 'ol'
+import { MultiPolygon } from 'ol/geom'
+import GeoJSON from 'ol/format/GeoJSON'
 
 describe('ComputationsIndexComponent', () => {
     let component: ComputationsIndexComponent
@@ -120,24 +123,26 @@ describe('ComputationsIndexComponent', () => {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 timestamp: new Date('2023-09-27T16:42:52+01:00'),
                 params: {},
-                aoi: {
+                aoi: new GeoJSON().readFeature({
                     type: 'Feature',
                     geometry: {
-                        type: 'Polygon',
+                        type: 'MultiPolygon',
                         coordinates: [
                             [
-                                [0, 0],
-                                [1, 0],
-                                [1, 1],
-                                [0, 1],
-                                [0, 0]
+                                [
+                                    [0, 0],
+                                    [1, 0],
+                                    [1, 1],
+                                    [0, 1],
+                                    [0, 0]
+                                ]
                             ]
                         ]
                     },
                     properties: {
                         name: 'Test AOI'
                     }
-                },
+                }) as Feature<MultiPolygon>,
                 artifacts: [
                     {
                         name: 'Image',

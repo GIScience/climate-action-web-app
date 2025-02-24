@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
 import { NgScrollbar } from 'ngx-scrollbar'
-import { Coordinate } from 'ol/coordinate'
-import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { MapService } from '../map/map.service'
 import { SearchTermHighlightPipe } from './search-highlight.pipe'
+import { AutocompleteProperties } from '@app/dashboard/search/search.interface'
+import { Feature } from 'ol'
+import Point from 'ol/geom/Point'
 
 @Component({
     selector: 'app-search',
@@ -25,7 +26,7 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
 })
 export class SearchComponent implements OnInit {
     searchControl = new FormControl()
-    suggestions: GeoJSONFeatureCollection[] = []
+    suggestions: Feature<Point>[] = []
     firstSuggestionItem: HTMLElement | null = null
     searchInput: HTMLInputElement | null = null
     isFetchingSuggestions = false
@@ -33,7 +34,7 @@ export class SearchComponent implements OnInit {
 
     readonly CircleX = CircleX
 
-    constructor(private mapService: MapService) {}
+    constructor(public mapService: MapService) {}
 
     ngOnInit(): void {
         setTimeout(() => {
@@ -57,7 +58,7 @@ export class SearchComponent implements OnInit {
                 })
             )
             .subscribe({
-                next: (results: GeoJSONFeatureCollection[]) => {
+                next: (results: Feature<Point>[]) => {
                     this.suggestions = results
                     this.isFetchingSuggestions = false
                     if (results.length > 0) {
@@ -73,7 +74,7 @@ export class SearchComponent implements OnInit {
             })
     }
 
-    formatLocation(properties: GeoJSONFeatureCollection): string {
+    formatLocation(properties: AutocompleteProperties): string {
         const { layer, locality, county, region, country } = properties
 
         const parts = [
@@ -88,13 +89,8 @@ export class SearchComponent implements OnInit {
         return parts.join(', ')
     }
 
-    highlightSuggestion(suggestion: GeoJSONFeatureCollection) {
-        const coordinates = suggestion.geometry.coordinates as Coordinate
-        this.mapService.highlightLocationOnMap(coordinates)
-    }
-
-    selectSuggestion(suggestion: GeoJSONFeatureCollection) {
-        this.searchControl.setValue(suggestion.properties.label, { emitEvent: false })
+    selectSuggestion(suggestion: Feature<Point>) {
+        this.searchControl.setValue(suggestion.get('label'), { emitEvent: false })
         this.suggestions = []
         this.isSearchActive = false
         this.mapService.goToLocation(suggestion)

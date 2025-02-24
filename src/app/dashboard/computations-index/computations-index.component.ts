@@ -259,8 +259,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     artifacts: [],
                     status: run.status || 'PENDING',
                     timestamp: run.timestamp,
-                    aoiName: response.aoi?.properties.name,
-                    geometry: response.aoi?.geometry,
+                    aoiName: response.aoi?.get('name'),
+                    geometry: response.aoi,
                     pluginId: response.plugin_info?.plugin_id,
                     params: response.params
                 }
@@ -347,18 +347,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.activeComputation = computation
 
             if (computation && computation.geometry) {
-                const geometry = computation.geometry
-                const geoJsonData = {
-                    type: 'FeatureCollection',
-                    features: [
-                        {
-                            type: 'Feature',
-                            geometry: geometry,
-                            properties: { name: 'AOI' }
-                        }
-                    ]
-                }
-                const extent = this.mapService.highlightAoI(geoJsonData)
+                const extent = this.mapService.highlightAoI(computation.geometry)
 
                 if (extent && this.mapService.map) {
                     this.mapService.map.getView().fit(extent, {
