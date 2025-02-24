@@ -63,7 +63,7 @@
             <ng-template #pluginContentDialog let-data>
                 <div class="plugin-content-dialog">
                     <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-                        <div mat-dialog-content class="plugin__full-content" scrollViewport>
+                        <div class="plugin__full-content" scrollViewport>
                             <h3>Purpose</h3>
                             <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
                             <h3>Methodology</h3>
@@ -86,7 +86,7 @@
                             </div>
                         </div>
                     </ng-scrollbar>
-                    <button mat-button (click)="closeDialog()" class="close-dialog">
+                    <button (click)="closeDialog()" class="close-dialog">
                         <i-lucide [img]="CircleX" size="30"></i-lucide>
                     </button>
                 </div>

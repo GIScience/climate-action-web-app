@@ -37,7 +37,6 @@
         "@ngneat/helipopper": "^10.2.0-alpha.0",
         "@ngx-formly/core": "^6.3.12",
         "@ngx-formly/material": "^6.3.12",
-        "@types/ol": "^7.0.0",
         "brand-colors": "^2.1.1",
         "chart.js": "^4.4.3",
         "cypress-visual-regression": "^5.2.2",

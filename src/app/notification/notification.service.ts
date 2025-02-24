@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
 import moment from 'moment/moment'
 import { map, Observable } from 'rxjs'
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
-import { environment } from '../../environments/environment'
+import { environment } from '@environments/environment'
 import { WSMessage } from './notification.interface'
 
 @Injectable({

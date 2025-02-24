@@ -19426,7 +19426,7 @@ function evaluate_cmap(x, name, reverse) {
      * Evaluate colormap `name` at some value `x`.
      * @param {number} x - The value (between 0 and 1) at which to evaluate the colormap.
      * @param {string} name - The name of the colormap (see matplotlib documentation).
-     * @reverse {boolean} reverse - Whether or not to reverse the colormap.
+     * @reverse {boolean} reverse - Whether to reverse the colormap.
      * @return {list} - A 3-tuple (R, G, B) containing the color assigned to `x`.
      */
 
@@ -19445,7 +19445,7 @@ function evaluate_cmap(x, name, reverse) {
         x = 1 - x
     }
 
-    // Get the colors and whether or not we need to interpolate
+    // Get the colors and whether we need to interpolate
     let colors = data[name]['colors']
     let interpolate = data[name]['interpolate']
 

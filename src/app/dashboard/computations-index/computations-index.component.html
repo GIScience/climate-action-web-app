@@ -138,7 +138,7 @@
 <ng-template #parametersDialog let-data>
     <div class="parameters-dialog">
         <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-            <div mat-dialog-content class="parameters-dialog__content" scrollViewport>
+            <div class="parameters-dialog__content" scrollViewport>
                 <h3>Computation Parameters</h3>
                 <ng-container *ngIf="getParameterEntries(data.parameters).length > 0; else noParams">
                     <table class="parameters-table">
@@ -155,7 +155,7 @@
                 </ng-template>
             </div>
         </ng-scrollbar>
-        <button mat-button (click)="closeDialog()" class="close-dialog">
+        <button (click)="closeDialog()" class="close-dialog">
             <i-lucide [img]="CircleX" size="30"></i-lucide>
         </button>
     </div>

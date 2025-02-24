@@ -1,5 +1,5 @@
 ### Wish Description
-<!---Please add a clear and concise description of what your feature should accomplish Ex. I'm missing a function that will [...]" or "I'm always frustrated that I cannot [...]-->
+<!---Please add a clear and concise description of what your feature should accomplish Ex. I'm missing a function that will [...] or I'm always frustrated that I cannot [...]-->
 
 ### Expected Solution
 <!---Describe the solution you'd like-->

@@ -151,8 +151,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        const pluginId = this.route.snapshot.params['name']
-        this.pluginId = pluginId
+        this.pluginId = this.route.snapshot.params['name']
 
         this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         this.fetchArchivedComputations()

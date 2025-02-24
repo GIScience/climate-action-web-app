@@ -14,15 +14,7 @@ import { SearchComponent } from './search/search.component'
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    imports: [
-        PluginCatalogComponent,
-        ComputationsIndexComponent,
-        ArtifactComponent,
-        SearchComponent,
-        MapComponent,
-        RouterModule,
-        LegendComponent
-    ],
+    imports: [PluginCatalogComponent, ArtifactComponent, SearchComponent, MapComponent, RouterModule],
     standalone: true
 })
 export class DashboardComponent implements OnInit {

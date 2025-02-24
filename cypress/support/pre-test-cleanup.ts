@@ -3,7 +3,7 @@ export function beforeCompareSnapshots(ignoredElementsQuerySelector: string, app
         return cy
             .get(appContentQuerySelector)
             .then($app => {
-                return new Cypress.Promise((resolve, reject) => {
+                return new Cypress.Promise((resolve, _) => {
                     setTimeout(() => {
                         $app.find(ignoredElementsQuerySelector).css('visibility', 'hidden')
                         resolve()

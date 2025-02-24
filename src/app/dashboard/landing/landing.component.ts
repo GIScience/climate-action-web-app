@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common'
+import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
-import { pickRandomGradient } from '../../utils/style-utils'
+import { pickRandomGradient } from '@app/utils/style-utils'
 import { ComputationEntity } from '../computations-index/computation.interface'
 import { PluginService } from '../plugin/plugin.service'
 
 @Component({
     selector: 'app-landing',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, NgOptimizedImage],
     templateUrl: './landing.component.html',
     styleUrl: './landing.component.scss'
 })

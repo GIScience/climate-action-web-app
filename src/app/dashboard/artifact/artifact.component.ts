@@ -90,11 +90,7 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         }
         this.refreshAccordion()
 
-        if (this.modality === 'MAP_LAYER_GEOJSON' || this.modality === 'MAP_LAYER_GEOTIFF') {
-            this.minimised = true
-        } else {
-            this.minimised = false
-        }
+        this.minimised = this.modality === 'MAP_LAYER_GEOJSON' || this.modality === 'MAP_LAYER_GEOTIFF'
     }
 
     generateDownloadJsonUri(jsonData: object) {

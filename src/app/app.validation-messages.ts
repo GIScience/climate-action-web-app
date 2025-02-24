@@ -1,6 +1,5 @@
 import { FormlyFieldConfig } from '@ngx-formly/core'
 import { ValidationErrors } from '@angular/forms'
-import { ValidatorOptions } from '@app/dashboard/plugin/plugin-parameter/plugin-parameter.interface'
 
 export function minItemsValidationMessage(_: ValidationErrors, field: FormlyFieldConfig) {
     return `should NOT have fewer than ${field?.props?.['minItems']} items`
@@ -22,7 +21,7 @@ export function minValidationMessage(_: ValidationErrors, field: FormlyFieldConf
     return `should be >= ${field?.props?.['min']}`
 }
 
-export function maxValidationMessage(_: ValidatorOptions, field: FormlyFieldConfig) {
+export function maxValidationMessage(_: ValidationErrors, field: FormlyFieldConfig) {
     return `should be <= ${field?.props?.['max']}`
 }
 

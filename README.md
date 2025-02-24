@@ -72,7 +72,7 @@ docker build --build-arg BUILD_TARGET={build_target} . --tag repo.heigit.org/cli
 docker run --publish 8080:80 repo.heigit.org/climate-action/web-app:{build_target}
 ```
 
-Then head to [localhost:8080](localhost:8080).
+Then head to [localhost:8080](http://localhost:8080).
 
 To push a new version to [Docker Hub](https://repo.heigit.org/climate-action) run
 
