@@ -42,7 +42,7 @@ describe('ComputationComponent', () => {
             }
         )
 
-        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage', 'closeArtifact'])
+        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage'])
         mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
 
         await TestBed.configureTestingModule({

@@ -39,6 +39,7 @@
         "@ngx-formly/material": "^6.3.12",
         "brand-colors": "^2.1.1",
         "chart.js": "^4.4.3",
+        "cypress-real-events": "^1.14.0",
         "cypress-visual-regression": "^5.2.2",
         "dayjs": "^1.11.9",
         "geojson-vt": "^4.0.2",

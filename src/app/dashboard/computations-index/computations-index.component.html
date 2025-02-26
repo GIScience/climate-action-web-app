@@ -72,14 +72,14 @@
                                 (click)="viewParameters(computation)"
                                 aria-label="View Parameters"
                                 tp="View Parameters"
-                                class="btn-onlyicon">
+                                class="btn-onlyicon btn-onlyicon--cta">
                                 <i-lucide [img]="ListTodo" size="15"></i-lucide>
                             </button>
                             <button
                                 (click)="archiveComputation(computation.correlation_uuid)"
                                 aria-label="Archive Computation"
                                 tp="Archive Computation"
-                                class="archive-computation btn-onlyicon">
+                                class="archive-computation btn-onlyicon btn-onlyicon--cta">
                                 <i-lucide [img]="Archive" size="15"></i-lucide>
                             </button>
                         </div>
@@ -123,7 +123,7 @@
                                     (click)="unarchiveComputation(archivedComputation.correlation_uuid)"
                                     aria-label="Un-archive Computation"
                                     tp="Un-archive Computation"
-                                    class="pX-5 pY-3 btn-onlyicon">
+                                    class="pX-5 pY-3 btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="ArchiveRestore" size="15"></i-lucide>
                                 </button>
                             </div>

@@ -1,20 +1,34 @@
+import { CommonModule } from '@angular/common'
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { Subscription } from 'rxjs'
-import { ArtifactComponent } from './artifact/artifact.component'
+import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
+import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
 import { LegendObject } from './artifact/artifact.interface'
 import { ArtifactService } from './artifact/artifact.service'
 import { LegendComponent } from './artifact/legend/legend.component'
 import { ComputationsIndexComponent } from './computations-index/computations-index.component'
 import { MapComponent } from './map/map.component'
 import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
+import { ReportComponent } from './report/report.component'
+import { ReportService } from './report/report.service'
 import { SearchComponent } from './search/search.component'
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    imports: [PluginCatalogComponent, ArtifactComponent, SearchComponent, MapComponent, RouterModule],
+    imports: [
+        CommonModule,
+        PluginCatalogComponent,
+        ArtifactViewerComponent,
+        SearchComponent,
+        MapComponent,
+        RouterModule,
+        ReportComponent,
+        LucideAngularModule
+    ],
     standalone: true
 })
 export class DashboardComponent implements OnInit {
@@ -23,7 +37,15 @@ export class DashboardComponent implements OnInit {
     legendContainer!: ViewContainerRef
     legendSubscription!: Subscription
 
-    constructor(public artifactService: ArtifactService) {}
+    leftColumnCollapsed = false
+
+    readonly PanelLeftClose = PanelLeftClose
+    readonly PanelLeftOpen = PanelLeftOpen
+    constructor(
+        public artifactService: ArtifactService,
+        public artifactViewerService: ArtifactViewerService,
+        public reportService: ReportService
+    ) {}
 
     ngOnInit(): void {
         this.legendSubscription = this.artifactService.legend.subscribe(legend => {
@@ -32,6 +54,10 @@ export class DashboardComponent implements OnInit {
             } else {
                 this.removeLegendContainer()
             }
+        })
+
+        this.reportService.collapseLeftColumn$.subscribe(collapse => {
+            this.leftColumnCollapsed = collapse
         })
     }
 
@@ -46,5 +72,10 @@ export class DashboardComponent implements OnInit {
         if (this.legendContainer) {
             this.legendContainer.clear()
         }
+    }
+
+    collapseLeftColumn(): void {
+        this.leftColumnCollapsed = !this.leftColumnCollapsed
+        this.reportService.collapseLeftColumn(this.leftColumnCollapsed)
     }
 }

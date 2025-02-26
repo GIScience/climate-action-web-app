@@ -1,6 +1,6 @@
 main.dashboard {
     display: grid;
-    grid-template-columns: auto 425px 1fr 15%;
+    grid-template-columns: auto 1fr 15%;
     height: 100%;
     position: relative;
     grid-gap: 0.5vw;
@@ -8,7 +8,7 @@ main.dashboard {
     width: 100vw;
 
     @media (max-width: 1600px) {
-        grid-template-columns: auto 400px 1fr 12.5%;
+        grid-template-columns: auto 1fr 12.5%;
     }
 
     app-map {
@@ -17,6 +17,35 @@ main.dashboard {
         position: absolute;
         top: 0;
         width: 100%;
+    }
+
+    .dashboard__left-column {
+        display: flex;
+        position: relative;
+        transition: transform 0.2s ease-in-out;
+        z-index: 5;
+
+        ::ng-deep {
+            app-landing {
+                align-items: center;
+                display: flex;
+                height: calc(100% - 1vw);
+                justify-content: center;
+                width: calc(100vw - (120px + 1.5vw));
+            }
+        }
+
+        .left-column-collapser {
+            background-color: #fff;
+            cursor: pointer;
+            position: absolute;
+            right: -15px;
+            top: 17.5px;
+        }
+
+        &.collapsed {
+            transform: translateX(-500px);
+        }
     }
 
     .dashboard__middle-column {

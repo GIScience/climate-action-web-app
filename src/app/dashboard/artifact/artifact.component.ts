@@ -1,9 +1,9 @@
-import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
 import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
+    Input,
     OnInit,
     Type,
     ViewChild,
@@ -11,10 +11,7 @@ import {
     ViewEncapsulation
 } from '@angular/core'
 import { MatExpansionModule } from '@angular/material/expansion'
-import { MatGridListModule } from '@angular/material/grid-list'
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import { TippyDirective } from '@ngneat/helipopper'
-import { Download, GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
+import { DomSanitizer } from '@angular/platform-browser'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { Artifact } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
@@ -29,17 +26,7 @@ import { TableComponent } from './table/table.component'
     selector: 'app-artifact',
     templateUrl: './artifact.component.html',
     styleUrls: ['./artifact.component.scss'],
-    imports: [
-        MatGridListModule,
-        CommonModule,
-        MatExpansionModule,
-        TippyDirective,
-        NgScrollbarModule,
-        MarkdownComponent,
-        CdkDrag,
-        CdkDragHandle,
-        LucideAngularModule
-    ],
+    imports: [CommonModule, MatExpansionModule, NgScrollbarModule, MarkdownComponent],
     standalone: true,
     encapsulation: ViewEncapsulation.None
 })
@@ -49,84 +36,49 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
     @ViewChild('descriptionContainer', { read: ViewContainerRef })
     descriptionContainer!: ViewContainerRef
 
-    currentUrl: string | null = null
-    downloadJsonHref: SafeUrl | null = null
-    name: string | null = null
+    @Input() artifact?: Artifact
+    @Input() artifactService?: ArtifactService
+
     summary: string | null = null
     description: string | null = null
     showAccordion = false
-    minimised = false
     modality: string | null = null
 
-    readonly GripHorizontal = GripHorizontal
-    readonly Download = Download
-    readonly Maximize2 = Maximize2
-    readonly Minimize2 = Minimize2
-    readonly X = X
-
     constructor(
-        public artifactService: ArtifactService,
+        private defaultArtifactService: ArtifactService,
         private sanitizer: DomSanitizer,
         private changeDetector: ChangeDetectorRef
     ) {}
 
+    private getService(): ArtifactService {
+        return this.artifactService || this.defaultArtifactService
+    }
+
     display<C>(componentType: Type<C>, name: string, value: unknown, artifact: Artifact | null) {
-        if (this.container) this.container.clear()
+        this.container.clear()
 
         const ref = this.container.createComponent(componentType)
         ref.setInput(name, value)
 
-        this.displayName(artifact?.name || null)
         this.displaySummary(artifact?.summary || null)
         this.displayDescription(artifact?.description || null)
-        this.modality = artifact?.modality || null
 
+        const service = this.getService()
         if (typeof value === 'object' && value && !(value as { url?: string }).url) {
             this.generateDownloadJsonUri(value)
-            this.currentUrl = null
+            service.currentUrl = null
         } else {
-            this.currentUrl = typeof value === 'string' ? value : (value as { url?: string })?.url || null
-            this.downloadJsonHref = null
+            service.currentUrl = typeof value === 'string' ? value : (value as { url?: string })?.url || null
+            service.downloadJsonHref = null
         }
         this.refreshAccordion()
-
-        this.minimised = this.modality === 'MAP_LAYER_GEOJSON' || this.modality === 'MAP_LAYER_GEOTIFF'
     }
 
     generateDownloadJsonUri(jsonData: object) {
         const theJSON = JSON.stringify(jsonData)
-        this.downloadJsonHref = this.sanitizer.bypassSecurityTrustUrl(
+        this.getService().downloadJsonHref = this.sanitizer.bypassSecurityTrustUrl(
             'data:application/json;charset=UTF-8,' + encodeURIComponent(theJSON)
         )
-    }
-
-    downloadContent(): void {
-        if (this.downloadJsonHref) {
-            const a = document.createElement('a')
-            document.body.appendChild(a)
-            a.style.display = 'none'
-            a.href = (
-                this.downloadJsonHref as { changingThisBreaksApplicationSecurity: string }
-            ).changingThisBreaksApplicationSecurity
-            a.download = 'data.json'
-            a.click()
-            document.body.removeChild(a)
-        } else if (this.currentUrl) {
-            const a = document.createElement('a')
-            a.href = this.currentUrl
-            a.download = this.getFileName(this.currentUrl)
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-        }
-    }
-
-    getFileName(url: string): string {
-        return url.split('/').pop() || 'download'
-    }
-
-    private displayName(name: string | null) {
-        this.name = name
     }
 
     private displaySummary(summary: string | null) {
@@ -146,32 +98,33 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         this.showAccordion = true
     }
 
-    toggleMinimise(): void {
-        this.minimised = !this.minimised
-    }
-
     ngOnInit(): void {
-        this.artifactService.markdown.subscribe(v => {
+        if (this.artifact) {
+            this.getService().fetchArtifact(this.artifact)
+        }
+
+        const service = this.getService()
+        service.markdown.subscribe(v => {
             if (!v) this.clearContainer()
             else this.display(MarkdownComponent, 'url', v.url, v)
         })
-        this.artifactService.image.subscribe(v => {
+        service.image.subscribe(v => {
             if (!v) this.clearContainer()
             else this.display(ImageComponent, 'url', v.url, v)
         })
-        this.artifactService.table.subscribe(v => {
+        service.table.subscribe(v => {
             if (!v) this.clearContainer()
             else this.display(TableComponent, 'url', v.url, v)
         })
-        this.artifactService.geojson.subscribe(v => {
+        service.geojson.subscribe(v => {
             if (!v) this.clearContainer()
             else this.display(GeojsonComponent, 'inputData', { url: v.url, artifact: v }, v)
         })
-        this.artifactService.geotiff.subscribe(v => {
+        service.geotiff.subscribe(v => {
             if (!v) this.clearContainer()
             else this.display(GeoTiffComponent, 'inputData', { url: v.url, artifact: v }, v)
         })
-        this.artifactService.chart.subscribe(v => {
+        service.chart.subscribe(v => {
             if (!v.data) this.clearContainer()
             else this.display(ChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
         })

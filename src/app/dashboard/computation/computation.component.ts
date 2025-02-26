@@ -2,18 +2,22 @@ import { AnimationEvent, animate, state, style, transition, trigger } from '@ang
 import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { TippyDirective } from '@ngneat/helipopper'
-import { Observable, Subscription } from 'rxjs'
-import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
+import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
+import { Observable, Subscription, take } from 'rxjs'
+import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
+import { ArtifactData, ArtifactEntity, ChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { ComputationEntity } from '../computations-index/computation.interface'
+import { ComputationBasicInfo, ComputationEntity } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { ReportService } from '../report/report.service'
 
 @Component({
     selector: 'app-computation',
     standalone: true,
-    imports: [CommonModule, MatIconModule, TippyDirective],
+    imports: [CommonModule, LucideAngularModule, MatIconModule, TippyDirective],
     animations: [
         trigger('expandCollapse', [
             state(
@@ -49,10 +53,15 @@ export class ComputationComponent {
 
     private subscription: Subscription | undefined
 
+    readonly ClipboardPlus = ClipboardPlus
+
     constructor(
         private artifactService: ArtifactService,
         private pluginService: PluginService,
-        private mapService: MapService
+        private mapService: MapService,
+        private reportService: ReportService,
+        private artifactViewerService: ArtifactViewerService,
+        private snackBar: MatSnackBar
     ) {}
 
     onAnimationEvent(event: AnimationEvent, computation: ComputationEntity) {
@@ -74,9 +83,30 @@ export class ComputationComponent {
     }
 
     renderArtifact(artifact: ArtifactEntity) {
+        let isReportVisible = false
+
+        this.reportService.isVisible$.pipe(take(1)).subscribe(isVisible => {
+            isReportVisible = isVisible
+            if (isVisible) {
+                this.snackBar.open(
+                    'Please exit the Report Builder first, or add this artifact to the report.',
+                    'Close',
+                    {
+                        duration: 4000,
+                        verticalPosition: 'bottom',
+                        horizontalPosition: 'center',
+                        panelClass: ['snackbar']
+                    }
+                )
+            }
+        })
+
+        if (isReportVisible) {
+            return
+        }
+
         this.pluginService.collapsePluginCatalog()
-        artifact.isLoading = true
-        this.artifactService.resetArtifacts()
+        this.artifactViewerService.isViewerVisible = true
 
         const waitForMapRender = (artifact: ArtifactEntity): Promise<void> => {
             return new Promise<void>(resolve => {
@@ -110,41 +140,44 @@ export class ComputationComponent {
             })
         }
 
-        const artifact_f = {
-            IMAGE: (x: Artifact) => {
-                this.artifactService.getImage(x)
-                waitForArtifactFetch(this.artifactService.image, data => !!data?.url)
-            },
-            MARKDOWN: (x: Artifact) => {
-                this.artifactService.getMarkdown(x)
-                waitForArtifactFetch(this.artifactService.markdown, data => !!data?.url)
-            },
-            CHART: (x: Artifact) => {
-                this.artifactService.getChart(x)
-                waitForArtifactFetch(this.artifactService.chart, data => !!data?.data)
-            },
-            TABLE: (x: Artifact) => {
-                this.artifactService.getTable(x)
-                waitForArtifactFetch(this.artifactService.table, data => !!data?.url)
-            },
-            MAP_LAYER_GEOJSON: (x: Artifact) => {
-                this.artifactService.getGeoJson(x)
-                return waitForMapRender(x)
-            },
-            MAP_LAYER_GEOTIFF: (x: Artifact) => {
-                this.artifactService.getGeoTiff(x)
-                return waitForMapRender(x)
-            }
+        const artifactTypeMap = {
+            IMAGE: { observable: this.artifactService.image, check: (data: ArtifactData | null) => !!data?.url },
+            MARKDOWN: { observable: this.artifactService.markdown, check: (data: ArtifactData | null) => !!data?.url },
+            TABLE: { observable: this.artifactService.table, check: (data: ArtifactData | null) => !!data?.url },
+            CHART: { observable: this.artifactService.chart, check: (data: ChartData | null) => !!data }
         }
 
-        this.artifactService.clearLegend()
-        if (artifact) {
-            this.artifactService.isArtifactVisible = true
-            artifact_f[artifact.modality](artifact)
+        if (artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF') {
+            waitForMapRender(artifact)
+            this.artifactViewerService.minimised = true
+        } else if (
+            artifact.modality === 'CHART' ||
+            artifact.modality === 'TABLE' ||
+            artifact.modality === 'IMAGE' ||
+            artifact.modality === 'MARKDOWN'
+        ) {
+            this.artifactViewerService.minimised = false
+            const { observable, check } = artifactTypeMap[artifact.modality]
+            waitForArtifactFetch(observable, check)
         }
+
+        this.artifactViewerService.setName(artifact.name)
+
+        this.artifactService.fetchArtifact(artifact, { setLoading: true })
+        this.artifactService.clearLegend()
+        this.artifactActivated.emit(artifact)
     }
 
-    storeActiveArtifact(artifact: ArtifactEntity) {
-        this.artifactActivated.emit(artifact)
+    addToReport(artifact: ArtifactEntity) {
+        event?.stopPropagation()
+
+        const computationBasicInfo: ComputationBasicInfo = {
+            correlation_uuid: this.computation.correlation_uuid,
+            aoiName: this.computation.aoiName,
+            geometry: this.computation.geometry,
+            timestamp: this.computation.timestamp
+        }
+
+        this.reportService.addArtifact(artifact, computationBasicInfo)
     }
 }

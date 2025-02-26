@@ -14,7 +14,7 @@
         </div>
         <div *ngIf="legendData.legend_type === 'CONTINUOUS'" class="continuous-legend">
             <div #legendWrapper class="vertical-legend-wrapper">
-                <canvas id="canvas_{{ legendData.legend_data.cmap_name }}" width="25" height="200"></canvas>
+                <canvas [id]="getCanvasId(legendData.legend_data.cmap_name)" width="25" height="200"></canvas>
                 <div #ticksContainer class="ticks">
                     <span
                         *ngFor="let item of continuousItems(); trackBy: trackByFn"

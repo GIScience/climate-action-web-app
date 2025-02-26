@@ -19,8 +19,8 @@ import {
 import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { BehaviorSubject, Subscription, timer } from 'rxjs'
+import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ActiveArtifactRef, ArtifactEntity } from '../artifact/artifact.interface'
-import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
@@ -122,7 +122,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     constructor(
         private pluginService: PluginService,
-        public artifactService: ArtifactService,
+        public artifactViewerService: ArtifactViewerService,
         private mapService: MapService,
         private route: ActivatedRoute,
         private snackBar: MatSnackBar,
@@ -165,10 +165,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
 
         this.initializeSuccessfulRuns()
-
-        if (this.artifactService.closeArtifactEvent) {
-            this.artifactService.closeArtifactEvent.subscribe(() => this.closeArtifactEvent())
-        }
 
         this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
@@ -333,7 +329,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (previousActiveComputation) {
             previousActiveComputation.isExpanded = false
             setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
-            this.artifactService.closeArtifact()
+            this.artifactViewerService.closeArtifactViewer()
             this.mapService.removeFocusedLayer()
         }
 
@@ -367,16 +363,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (previousActiveComputation) {
             previousActiveComputation.isExpanded = false
             setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
-            this.artifactService.closeArtifact()
+            this.artifactViewerService.closeArtifactViewer()
             this.mapService.removeFocusedLayer()
             this.activeComputation = undefined
-        }
-    }
-
-    closeArtifactEvent(): void {
-        this.artifactService.isArtifactVisible = false
-        if (this.activeArtifact) {
-            this.activeArtifact = undefined
         }
     }
 
@@ -447,7 +436,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
 
         if (isCurrentComputation) {
-            this.artifactService.resetArtifacts()
+            this.artifactViewerService.closeArtifactViewer()
         }
     }
 

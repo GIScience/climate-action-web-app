@@ -60,9 +60,9 @@ button {
     &.btn-onlyicon {
         align-items: center;
         background-color: rgb(255 255 255 / 75%);
-        border: 1.5px solid #008080;
+        border: 1.5px solid #555;
         border-radius: 50%;
-        color: #008080;
+        color: #555;
         display: flex;
         height: 27.5px;
         justify-content: center;
@@ -71,6 +71,16 @@ button {
 
         &:hover {
             background-color: #cddddc;
+        }
+
+        &.btn-onlyicon--cta {
+            border: 1.5px solid #008080;
+            color: #008080;
+        }
+
+        &.btn-onlyicon--large {
+            height: 35px;
+            width: 35px;
         }
     }
 

@@ -29,11 +29,12 @@ export interface Artifact {
     modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
     primary: boolean
     file_path: string
-    summary: string
-    description: string
+    summary?: string
+    description?: string
     correlation_uuid: string
     store_id: string
     attachments: AttachmentsObject
+    isLoading?: boolean
 }
 
 export interface ArtifactEntity extends Artifact {

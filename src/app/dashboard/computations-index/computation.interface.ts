@@ -32,4 +32,7 @@ export interface ComputationEntity
     keepInDOM?: boolean
 }
 
+export interface ComputationBasicInfo
+    extends Pick<ComputationEntity, 'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'> {}
+
 export type ComputationID = Pick<ComputationMetadata, 'correlation_uuid'>
