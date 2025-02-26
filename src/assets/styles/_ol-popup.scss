@@ -1,0 +1,33 @@
+.ol-popup {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    left: -50px;
+    padding: 10px;
+    position: absolute;
+
+    &:before {
+        border: solid transparent;
+        content: ' ';
+        height: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 100%;
+        width: 0;
+    }
+
+    &:before {
+        border-top-color: rgba(255, 255, 255, 0.85);
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+    }
+
+    .ol-popup-content {
+        display: inline-block;
+        white-space: nowrap;
+    }
+}

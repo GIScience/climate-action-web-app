@@ -8,8 +8,6 @@
                 *ngIf="artifact.primary || computation.showSecondaryArtifacts"
                 [@fadeIn]="computation.showSecondaryArtifacts || artifact.primary ? 'in' : null"
                 class="child-computation"
-                (click)="renderArtifact(artifact); storeActiveArtifact(artifact)"
-                (keyup.enter)="renderArtifact(artifact); storeActiveArtifact(artifact)"
                 [ngClass]="{
                     'child-computation-highlight': activeArtifact === artifact,
                     'primary-child': artifact.primary,
@@ -19,8 +17,21 @@
                 tp="{{ artifact.summary }}"
                 tpPlacement="right"
                 tabindex="0">
-                <mat-icon aria-hidden="false" aria-label="Computation" fontIcon="{{ artifact.icon }}"></mat-icon>
-                <div>{{ artifact.name }}</div>
+                <div
+                    class="computation-content"
+                    (click)="renderArtifact(artifact)"
+                    (keyup.enter)="renderArtifact(artifact)"
+                    tabindex="0">
+                    <mat-icon aria-hidden="false" aria-label="Computation" fontIcon="{{ artifact.icon }}"></mat-icon>
+                    <div>{{ artifact.name }}</div>
+                </div>
+                <button
+                    class="add-to-report-btn btn-onlyicon btn-onlyicon--cta"
+                    (click)="addToReport(artifact)"
+                    tp="Add to Report"
+                    tpPlacement="left">
+                    <i-lucide [img]="ClipboardPlus" size="15"></i-lucide>
+                </button>
                 <div *ngIf="artifact.isLoading" class="loading-circle"></div>
             </li>
         </ng-container>

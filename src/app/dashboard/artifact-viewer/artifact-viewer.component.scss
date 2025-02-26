@@ -1,0 +1,68 @@
+.artifact-container {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    height: auto;
+    max-width: 35vw;
+    min-width: 35vw;
+    overflow: hidden;
+    pointer-events: all;
+    position: absolute;
+    right: calc(50% - 17.5vw);
+    top: 5vw;
+
+    &.minimised {
+        height: 47.5px;
+        margin-top: calc(98vh - 122.5px);
+        top: 0;
+        transform: none !important;
+
+        & .artifact-header {
+            cursor: unset;
+
+            .grip-icon {
+                display: none;
+            }
+        }
+    }
+
+    .artifact-header {
+        align-items: center;
+        background-color: aliceblue;
+        cursor: move;
+        display: flex;
+        padding: 10px;
+
+        .grip-icon {
+            color: #9c9c9c;
+        }
+
+        .artifact-name {
+            margin: 0 7.5px;
+        }
+
+        .artifact-window-controls {
+            display: flex;
+            margin-left: auto;
+
+            .minimise-btn {
+                border-color: #666;
+                color: #666;
+                margin-right: 7.5px;
+
+                &:hover {
+                    background-color: #e5e5e5;
+                }
+            }
+
+            .close-btn {
+                border-color: #666;
+                color: #666;
+
+                &:hover {
+                    background-color: #ffd8d8;
+                }
+            }
+        }
+    }
+}

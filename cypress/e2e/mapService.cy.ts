@@ -240,7 +240,7 @@ describe('mapService', () => {
             mapService.map.dispatchEvent(event)
         })
 
-        cy.get('#map-popup-content span').should('contain.text', 'Connectivity : 0.0167')
+        cy.get('#map-popup-content-main-map span').should('contain.text', 'Connectivity : 0.0167')
     })
 
     it('should read the boundaries from the ohsome api and display them on the map', () => {

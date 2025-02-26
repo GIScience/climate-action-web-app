@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http'
-import { EventEmitter, Injectable } from '@angular/core'
-import { BehaviorSubject } from 'rxjs'
+import { Injectable } from '@angular/core'
+import { SafeUrl } from '@angular/platform-browser'
 import { environment } from '@environments/environment'
+import { BehaviorSubject } from 'rxjs'
 import { Artifact, ArtifactData, ChartData, LegendObject } from './artifact.interface'
 
 @Injectable({
     providedIn: 'root'
 })
 export class ArtifactService {
-    isArtifactVisible = false
-    closeArtifactEvent = new EventEmitter<void>()
+    currentUrl: string | null = null
+    downloadJsonHref: SafeUrl | null = null
 
     private apiUrl = environment.climateActionApiUrl
 
@@ -85,20 +86,38 @@ export class ArtifactService {
         })
     }
 
-    closeArtifact(): void {
-        this.resetArtifacts()
-        localStorage.setItem('active_artifact', '[]')
-        this.closeArtifactEvent.emit()
-    }
+    fetchArtifact(artifact: Artifact, options: { setLoading?: boolean } = {}): void {
+        if (!artifact) return
 
-    resetArtifacts(): void {
-        this.markdownSubject.next(null)
-        this.imageSubject.next(null)
-        this.tableSubject.next(null)
-        this.chartSubject.next({ data: null, artifact: null })
-        this.geojsonSubject.next(null)
-        this.geotiffSubject.next(null)
-        this.legendSubject.next(null)
+        if (options.setLoading) {
+            artifact.isLoading = true
+        }
+
+        setTimeout(() => {
+            this.currentUrl = null
+            this.downloadJsonHref = null
+
+            switch (artifact.modality) {
+                case 'MARKDOWN':
+                    this.getMarkdown(artifact)
+                    break
+                case 'IMAGE':
+                    this.getImage(artifact)
+                    break
+                case 'TABLE':
+                    this.getTable(artifact)
+                    break
+                case 'MAP_LAYER_GEOJSON':
+                    this.getGeoJson(artifact)
+                    break
+                case 'MAP_LAYER_GEOTIFF':
+                    this.getGeoTiff(artifact)
+                    break
+                case 'CHART':
+                    this.getChart(artifact)
+                    break
+            }
+        })
     }
 
     clearLegend(): void {
@@ -113,5 +132,15 @@ export class ArtifactService {
         } else {
             this.legendSubject.next(null)
         }
+    }
+
+    resetAllSubjects(): void {
+        this.markdownSubject.next(null)
+        this.imageSubject.next(null)
+        this.tableSubject.next(null)
+        this.chartSubject.next({ data: null, artifact: null })
+        this.geojsonSubject.next(null)
+        this.geotiffSubject.next(null)
+        this.legendSubject.next(null)
     }
 }

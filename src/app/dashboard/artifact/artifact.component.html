@@ -1,62 +1,30 @@
-<div
-    cdkDrag
-    [cdkDragDisabled]="minimised"
-    cdkDragBoundary=".dashboard__middle-column"
-    [class.minimised]="minimised"
-    class="artifact-container">
-    <div cdkDragHandle class="artifact-header">
-        <i-lucide [img]="GripHorizontal" size="15" class="grip-icon"></i-lucide>
-        <h3 class="artifact-name">{{ name }}</h3>
-        <button
-            *ngIf="currentUrl || downloadJsonHref"
-            (click)="downloadContent()"
-            class="download-btn btn-onlyicon"
-            tp="Download Artifact">
-            <i-lucide [img]="Download" size="15"></i-lucide>
-        </button>
-        <div class="artifact-window-controls">
-            <button
-                (click)="toggleMinimise()"
-                class="minimise-btn btn-onlyicon"
-                [tp]="minimised ? 'Maximise Artifact' : 'Minimise Artifact'">
-                <i-lucide *ngIf="minimised; else minimizeIcon" [img]="Maximize2" size="15"></i-lucide>
-                <ng-template #minimizeIcon>
-                    <i-lucide [img]="Minimize2" size="15"></i-lucide>
-                </ng-template>
-            </button>
-            <button (click)="artifactService.closeArtifact()" class="close-btn btn-onlyicon" tp="Close Artifact">
-                <i-lucide [img]="X" size="15"></i-lucide>
-            </button>
+<div class="artifact" id="artifact-page">
+    <ng-scrollbar>
+        <div *ngIf="showAccordion && modality === 'MARKDOWN'" class="artifact-meta">
+            <mat-expansion-panel *ngIf="summary" class="artifact-abstract">
+                <mat-expansion-panel-header> Abstract </mat-expansion-panel-header>
+                {{ summary }}
+            </mat-expansion-panel>
         </div>
-    </div>
-    <div class="artifact" id="artifact-page">
-        <ng-scrollbar>
-            <div *ngIf="showAccordion && modality === 'MARKDOWN'" class="artifact-meta">
-                <mat-expansion-panel *ngIf="summary" class="artifact-abstract">
-                    <mat-expansion-panel-header> Abstract </mat-expansion-panel-header>
-                    {{ summary }}
+
+        <div *ngIf="modality === 'TABLE'" class="artifact-meta">
+            <p class="table-summary">
+                <span>{{ summary }}</span>
+            </p>
+        </div>
+
+        <ng-container #container></ng-container>
+
+        <div *ngIf="modality !== 'MARKDOWN'" class="artifact-meta">
+            <p *ngIf="modality !== 'TABLE'" class="artifact-summary">
+                <span>{{ summary }}</span>
+            </p>
+            <div *ngIf="showAccordion">
+                <mat-expansion-panel *ngIf="description" class="artifact-description">
+                    <mat-expansion-panel-header> Detailed Description </mat-expansion-panel-header>
+                    <app-markdown [rawMarkdown]="description"></app-markdown>
                 </mat-expansion-panel>
             </div>
-
-            <div *ngIf="modality === 'TABLE'" class="artifact-meta">
-                <p class="table-summary">
-                    <span>{{ summary }}</span>
-                </p>
-            </div>
-
-            <ng-container #container></ng-container>
-
-            <div *ngIf="modality !== 'MARKDOWN'" class="artifact-meta">
-                <p *ngIf="modality !== 'TABLE'" class="artifact-summary">
-                    <span>{{ summary }}</span>
-                </p>
-                <div *ngIf="showAccordion">
-                    <mat-expansion-panel *ngIf="description" class="artifact-description">
-                        <mat-expansion-panel-header> Detailed Description </mat-expansion-panel-header>
-                        <app-markdown [rawMarkdown]="description"></app-markdown>
-                    </mat-expansion-panel>
-                </div>
-            </div>
-        </ng-scrollbar>
-    </div>
+        </div>
+    </ng-scrollbar>
 </div>

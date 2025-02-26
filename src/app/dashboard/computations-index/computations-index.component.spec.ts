@@ -4,15 +4,15 @@ import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { Feature } from 'ol'
+import GeoJSON from 'ol/format/GeoJSON'
+import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, of } from 'rxjs'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ComputationEntity } from './computation.interface'
 import { ComputationsIndexComponent } from './computations-index.component'
-import { Feature } from 'ol'
-import { MultiPolygon } from 'ol/geom'
-import GeoJSON from 'ol/format/GeoJSON'
 
 describe('ComputationsIndexComponent', () => {
     let component: ComputationsIndexComponent
@@ -44,7 +44,7 @@ describe('ComputationsIndexComponent', () => {
             }
         )
 
-        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage', 'closeArtifact'])
+        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage'])
         mockMapService = jasmine.createSpyObj<MapService>('MapService', [
             'initMap',
             'highlightAoI',

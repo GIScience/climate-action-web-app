@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
 import { default as packageInfo } from '../../package.json'
-import { ArtifactService } from './dashboard/artifact/artifact.service'
+import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
 import { MapService } from './dashboard/map/map.service'
+import { ReportService } from './dashboard/report/report.service'
 
 @Component({
     selector: 'app-root',
@@ -18,13 +19,16 @@ export class AppComponent {
     }
 
     constructor(
-        public artifactService: ArtifactService,
-        public mapService: MapService
+        public artifactViewerService: ArtifactViewerService,
+        public mapService: MapService,
+        public reportService: ReportService
     ) {}
 
-    resetMapState() {
-        this.artifactService.closeArtifact()
+    clearDashboardState() {
+        this.artifactViewerService.closeArtifactViewer()
         this.mapService.removeFocusedLayer()
         this.mapService.removeComputeLayers()
+        this.reportService.closeReport()
+        this.reportService.collapseLeftColumn(false)
     }
 }

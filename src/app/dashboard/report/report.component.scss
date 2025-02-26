@@ -1,0 +1,304 @@
+.report-window {
+    background: linear-gradient(40deg, #fdfdfd9e 0%, #00000057 100%), url('../../../assets/images/dot-grid.png');
+    background-blend-mode: difference;
+    box-shadow: inset 0px 0px 100px 0px rgb(0 0 0 / 15%);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px - 1vw);
+    left: 0;
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    z-index: 3;
+
+    .circles-background {
+        bottom: 0;
+        height: 75%;
+        left: 0;
+        overflow: hidden;
+        position: absolute;
+        width: 100%;
+        z-index: 0;
+    }
+
+    .circles {
+        height: 100%;
+        left: 0;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+
+    .circles li {
+        animation: floatup 25s linear infinite;
+        background: rgba(255, 255, 255, 0.2);
+        bottom: -150px;
+        display: block;
+        list-style: none;
+        position: absolute;
+
+        &:nth-child(1) {
+            animation-delay: 0s;
+            height: 80px;
+            left: 25%;
+            width: 80px;
+        }
+
+        &:nth-child(2) {
+            animation-delay: 2s;
+            animation-duration: 12s;
+            height: 20px;
+            left: 10%;
+            width: 20px;
+        }
+
+        &:nth-child(3) {
+            animation-delay: 4s;
+            height: 20px;
+            left: 70%;
+            width: 20px;
+        }
+
+        &:nth-child(4) {
+            animation-delay: 0s;
+            animation-duration: 18s;
+            height: 60px;
+            left: 40%;
+            width: 60px;
+        }
+
+        &:nth-child(5) {
+            animation-delay: 0s;
+            height: 20px;
+            left: 65%;
+            width: 20px;
+        }
+
+        &:nth-child(6) {
+            animation-delay: 3s;
+            height: 110px;
+            left: 75%;
+            width: 110px;
+        }
+
+        &:nth-child(7) {
+            animation-delay: 7s;
+            height: 150px;
+            left: 35%;
+            width: 150px;
+        }
+
+        &:nth-child(8) {
+            animation-delay: 15s;
+            animation-duration: 45s;
+            height: 25px;
+            left: 50%;
+            width: 25px;
+        }
+
+        &:nth-child(9) {
+            animation-delay: 2s;
+            animation-duration: 35s;
+            height: 15px;
+            left: 20%;
+            width: 15px;
+        }
+
+        &:nth-child(10) {
+            animation-delay: 0s;
+            animation-duration: 11s;
+            height: 150px;
+            left: 85%;
+            width: 150px;
+        }
+    }
+
+    @keyframes floatup {
+        0% {
+            border-radius: 0;
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+        }
+        100% {
+            border-radius: 50%;
+            opacity: 0;
+            transform: translateY(-1000px) rotate(720deg);
+        }
+    }
+
+    .report-header {
+        align-items: center;
+        border-bottom: 1px solid #aaa;
+        display: flex;
+        margin: 0 auto;
+        padding: 1rem 0;
+        width: 25vw;
+
+        .grip-icon {
+            margin-right: 1rem;
+            opacity: 0.5;
+        }
+
+        h2 {
+            margin: 0 0.5rem 0 0;
+        }
+    }
+
+    .artifact-counter {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 10px;
+        padding: 3px 8px;
+    }
+
+    .report-controls {
+        align-items: center;
+        display: flex;
+        margin-left: auto;
+        margin-right: 0.5rem;
+
+        & > button {
+            border: 1px solid #aaa;
+            border-radius: 0;
+            padding: 0.25rem 0.5rem;
+
+            &:first-of-type {
+                border-radius: 4px 0 0 4px;
+            }
+
+            &:last-of-type {
+                border-radius: 0 4px 4px 0;
+            }
+        }
+    }
+
+    .report-body {
+        margin: 1rem auto;
+        overflow: auto;
+        width: 90%;
+
+        .empty-report-message {
+            align-items: center;
+            color: var(--text-muted);
+            display: flex;
+            height: 100%;
+            justify-content: center;
+
+            p {
+                font-size: 16px;
+                font-variation-settings: 'wght' 500;
+                max-width: 25vw;
+                text-align: center;
+
+                span {
+                    align-items: center;
+                    color: #005858;
+                    display: inline-flex;
+                }
+            }
+        }
+
+        .report-contents {
+            display: grid;
+            grid-gap: 1vw;
+
+            &.rows {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            &.grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .report-item {
+                backdrop-filter: blur(5px);
+                background-color: rgb(255 255 255 / 85%);
+                border-radius: 15px;
+                padding: 1rem;
+                position: relative;
+
+                .report-item-header {
+                    align-items: center;
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 1rem;
+
+                    h3 {
+                        margin: 0;
+                    }
+                }
+
+                ::ng-deep {
+                    .artifact-description {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.report-map-container {
+    height: 75vh;
+    margin: 10px 0;
+    position: relative;
+    width: 100%;
+
+    .report-map {
+        height: 100%;
+        width: 100%;
+    }
+
+    .map-zoom-note {
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 4px;
+        color: white;
+        font-size: 14px;
+        font-variation-settings: 'wght' 500;
+        opacity: 0;
+        padding: 5px 8px;
+        position: absolute;
+        right: calc(50% - 125px);
+        text-align: center;
+        top: 50%;
+        transition: opacity 0.3s ease;
+        width: 275px;
+        z-index: 10;
+
+        &.visible {
+            opacity: 1;
+        }
+    }
+
+    ::ng-deep {
+        @import 'ol';
+        @import 'ol-popup';
+
+        .ol-zoom {
+            right: 0.5vw;
+            top: 0.5em;
+        }
+
+        .ol-scale-line {
+            right: calc(0.5vw + 65px);
+            top: 0.5em;
+        }
+
+        .ol-zoom-extent {
+            display: none;
+        }
+
+        app-legend {
+            max-width: 250px;
+            position: absolute;
+            right: 0.5vw;
+            top: 45px;
+        }
+    }
+}

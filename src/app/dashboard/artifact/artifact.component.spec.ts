@@ -35,16 +35,6 @@ describe('ArtifactComponent', () => {
         fixture.detectChanges()
     })
 
-    it('should display the name if present', () => {
-        const testName = 'Test Name'
-        component.name = testName
-        fixture.detectChanges()
-
-        const nameElement = fixture.debugElement.query(By.css('.artifact-name'))
-        expect(nameElement).toBeTruthy()
-        expect(nameElement.nativeElement.textContent).toContain(testName)
-    })
-
     it('should display the summary if present', () => {
         const testSummary = 'Test Summary'
         component.summary = testSummary
@@ -69,23 +59,5 @@ describe('ArtifactComponent', () => {
         const markdownContent = fixture.debugElement.query(By.css('.markdown-artifact-item'))
         expect(markdownContent).toBeTruthy()
         expect(markdownContent.nativeElement.textContent).toContain(testDescription)
-    })
-
-    it('should create a link and trigger a download when downloadContent is called', () => {
-        const fakeAnchor = document.createElement('a')
-        spyOn(fakeAnchor, 'click')
-        const createElementSpy = spyOn(document, 'createElement').and.returnValue(fakeAnchor)
-        const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(computation => computation)
-        const removeChildSpy = spyOn(document.body, 'removeChild').and.callFake(computation => computation)
-        component.currentUrl = 'http://localhost:4200/dashboard/sample-image.png'
-        component.downloadContent()
-
-        expect(createElementSpy).toHaveBeenCalled()
-        expect(createElementSpy).toHaveBeenCalledWith('a')
-        expect(fakeAnchor.href).toBe('http://localhost:4200/dashboard/sample-image.png')
-        expect(fakeAnchor.download).toBeTruthy()
-        expect(fakeAnchor.click).toHaveBeenCalled()
-        expect(appendChildSpy).toHaveBeenCalled()
-        expect(removeChildSpy).toHaveBeenCalled()
     })
 })

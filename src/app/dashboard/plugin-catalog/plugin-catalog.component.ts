@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { ArtifactService } from '../artifact/artifact.service'
+import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { PluginService } from '../plugin/plugin.service'
 import { PluginCard } from './plugin-catalog.interface'
 
@@ -25,7 +25,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     constructor(
         private router: Router,
         private pluginService: PluginService,
-        private artifactService: ArtifactService
+        private artifactViewerService: ArtifactViewerService
     ) {}
 
     ngAfterViewInit(): void {
@@ -111,14 +111,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         ;(event.target as HTMLImageElement).src = 'assets/images/plugin-icons/fallback.jpg'
     }
 
-    activateCard(card: PluginCard) {
-        this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
-            this.activeCard = card
-        })
-    }
-
     showPlugin(card: PluginCard) {
-        this.artifactService.closeArtifact()
+        this.artifactViewerService.closeArtifactViewer()
         this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
             this.activeCard = card
         })

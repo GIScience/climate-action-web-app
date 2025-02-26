@@ -1,5 +1,21 @@
 @use 'globals';
 
+.current-plugin-container {
+    position: relative;
+    transition: transform 0.2s ease-in-out;
+    width: 400px;
+
+    &::after {
+        background-color: red;
+        content: '';
+        display: none;
+        height: 10%;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+}
+
 .plugin-name-wrapper {
     align-items: center;
     background-color: rgb(231 231 231 / 85%);

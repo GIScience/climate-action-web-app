@@ -1,3 +1,4 @@
+import 'cypress-real-events'
 import { addCompareSnapshotCommand } from 'cypress-visual-regression/dist/command'
 
 addCompareSnapshotCommand()

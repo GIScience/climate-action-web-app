@@ -1,17 +1,20 @@
 <main class="dashboard">
     <app-map></app-map>
-    <app-plugin-catalog></app-plugin-catalog>
 
-    <div class="dashboard__left-column">
-        <div class="current-plugin-container">
-            <router-outlet></router-outlet>
-        </div>
+    <div class="dashboard__left-column" [ngClass]="{ collapsed: leftColumnCollapsed }">
+        <app-plugin-catalog></app-plugin-catalog>
+        <router-outlet></router-outlet>
+        <button class="left-column-collapser btn-onlyicon btn-onlyicon--large" (click)="collapseLeftColumn()">
+            <i-lucide [img]="leftColumnCollapsed ? PanelLeftOpen : PanelLeftClose" size="22.5"></i-lucide>
+        </button>
     </div>
     <div class="dashboard__middle-column">
-        <app-artifact [hidden]="!artifactService.isArtifactVisible"></app-artifact>
+        <app-artifact-viewer [hidden]="!artifactViewerService.isViewerVisible"></app-artifact-viewer>
     </div>
     <div class="dashboard__right-column">
         <app-search></app-search>
         <div #legendContainer></div>
     </div>
 </main>
+
+<app-report></app-report>

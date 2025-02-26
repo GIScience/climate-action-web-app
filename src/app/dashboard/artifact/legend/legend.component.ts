@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
-import { NgScrollbar } from 'ngx-scrollbar'
 import { convertToTitleCase } from '@app/utils/artifact-utils'
+import { NgScrollbar } from 'ngx-scrollbar'
 import { LegendObject } from '../artifact.interface'
 
 declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]
@@ -19,6 +19,7 @@ interface LegendItem {
 })
 export class LegendComponent implements OnInit, AfterViewInit {
     @Input() legendData!: LegendObject
+    @Input() artifactId?: string
     @ViewChild('ticksContainer') ticksContainer!: ElementRef
     @ViewChild('legendWrapper') legendWrapper!: ElementRef
 
@@ -73,8 +74,12 @@ export class LegendComponent implements OnInit, AfterViewInit {
         return item.name
     }
 
+    getCanvasId(name: string): string {
+        return this.artifactId ? `canvas_${name}_${this.artifactId}` : `canvas_${name}`
+    }
+
     plotColormap(name: string): void {
-        const canvasId = `canvas_${name}`
+        const canvasId = this.getCanvasId(name)
         const reverse = name.endsWith('_r')
 
         if (reverse) {

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Inject, Injectable, InjectionToken, Optional } from '@angular/core'
 import geojsonvt from 'geojson-vt'
 import { Collection, Feature, Map, MapBrowserEvent, Overlay, View } from 'ol'
 import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
 import FeatureLike from 'ol/Feature'
 import VectorTile from 'ol/VectorTile'
 import { ScaleLine } from 'ol/control'
-import { defaults as defaultControls, ZoomToExtent } from 'ol/control.js'
+import { ZoomToExtent, defaults as defaultControls } from 'ol/control.js'
 import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
 import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
@@ -14,6 +14,7 @@ import GeoJSON, { GeoJSONFeature } from 'ol/format/GeoJSON.js'
 import { MultiPolygon } from 'ol/geom'
 import { Geometry, Polygon } from 'ol/geom.js'
 import Point from 'ol/geom/Point'
+import { defaults as defaultInteractions } from 'ol/interaction.js'
 import VectorLayer, { Options as VectorLayerOptions } from 'ol/layer/Vector'
 import VectorTileLayer, { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'
 import TileLayer, { Options as TileLayerOptions } from 'ol/layer/WebGLTile.js'
@@ -26,6 +27,7 @@ import TileWMS from 'ol/source/TileWMS'
 import VectorSource from 'ol/source/Vector'
 import VectorTileSource from 'ol/source/VectorTile'
 import XYZ from 'ol/source/XYZ'
+import { getArea } from 'ol/sphere'
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style } from 'ol/style'
 import { StyleFunction } from 'ol/style/Style'
 import TileGrid from 'ol/tilegrid/TileGrid'
@@ -34,7 +36,8 @@ import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
 import { replacer } from './utils/geojson-vt.utils'
-import { getArea } from 'ol/sphere'
+
+export const MAP_ID = new InjectionToken<string>('MAP_ID')
 
 class ExtendedTileLayer extends TileLayer {
     name?: string
@@ -89,14 +92,19 @@ export class MapService {
     layerSwitcherCollapsed: boolean = false
     windowWidth?: number
     windowResolution?: number
+    mapId: string = 'main-map'
 
     private orsAPIKey = environment.orsAPIKey
     static readonly sqmToSqkmFactor = 1 / 1000000
 
     constructor(
         private pluginService: PluginService,
-        private http: HttpClient
+        private http: HttpClient,
+        @Optional() @Inject(MAP_ID) mapId?: string
     ) {
+        if (mapId) {
+            this.mapId = mapId
+        }
         this.pluginService.computeState$.subscribe(value => {
             if (value === 'compute-ready') {
                 this.enableComputeLayers()
@@ -207,8 +215,22 @@ export class MapService {
         return this.selectedRegionLayer
     }
 
-    initMap() {
+    initMap(targetId: string, isReportMap: boolean = false) {
+        this.mapId = targetId
+
         const selectedRegionLayer: ExtendedVectorLayer<FeatureLike> = this.initLayers()
+
+        const popupElement = this.createPopupElements()
+
+        this.mapPopUp = new Overlay({
+            element: popupElement!,
+            autoPan: {
+                animation: {
+                    duration: 250
+                }
+            }
+        })
+
         const localStorageSelectedMapLayerKey = 'selected_map_layer'
         const localStorageLayerSwitcherStateKey = 'layer_switcher_collapsed'
         const osmCartoLayerName = 'OSM Carto'
@@ -273,15 +295,6 @@ export class MapService {
             })
         })
 
-        this.mapPopUp = new Overlay({
-            element: document.getElementById('map-popup')!,
-            autoPan: {
-                animation: {
-                    duration: 250
-                }
-            }
-        })
-
         const heidelbergCoords = [8.6759928, 49.4187355]
         const initialView = new View({
             center: fromLonLat(heidelbergCoords),
@@ -292,11 +305,16 @@ export class MapService {
         const customZoomOutLabel = document.createElement('span')
         customZoomOutLabel.innerHTML = '<img src="assets/images/globe.svg" style="width: 16px; height: 16px;">'
 
+        const interactions = defaultInteractions({
+            mouseWheelZoom: !isReportMap
+        })
+
         this.map = new Map({
             layers: [greyscaleBase, aerialImagery, heigitCarto, osmCarto],
-            target: 'map',
+            target: targetId,
             view: initialView,
             overlays: [this.mapPopUp],
+            interactions: interactions,
             controls: defaultControls().extend([
                 new ScaleLine(),
                 new ZoomToExtent({
@@ -306,6 +324,29 @@ export class MapService {
                 })
             ])
         })
+
+        if (isReportMap) {
+            const mapElement = this.map.getTargetElement()
+            const noteId = `map-zoom-note-${targetId.replace('report-map-', '')}`
+            const noteElement = document.getElementById(noteId)
+
+            if (mapElement && noteElement) {
+                let hideTimeout: number | null = null
+
+                mapElement.addEventListener('wheel', () => {
+                    noteElement.classList.add('visible')
+
+                    if (hideTimeout) {
+                        window.clearTimeout(hideTimeout)
+                    }
+
+                    hideTimeout = window.setTimeout(() => {
+                        noteElement.classList.remove('visible')
+                        hideTimeout = null
+                    }, 3000)
+                })
+            }
+        }
 
         const selectedMapLayer = localStorage.getItem(localStorageSelectedMapLayerKey) || osmCartoLayerName
         this.map.getLayers().forEach(layer => {
@@ -664,6 +705,24 @@ export class MapService {
         this.selectedFeatures.remove(feature)
     }
 
+    private createPopupElements() {
+        const mapContainer = document.getElementById(this.mapId)
+        if (!mapContainer) return
+
+        const popupElement = document.createElement('div')
+        popupElement.id = `map-popup-${this.mapId}`
+        popupElement.className = 'ol-popup'
+
+        const popupContent = document.createElement('div')
+        popupContent.id = `map-popup-content-${this.mapId}`
+        popupContent.className = 'ol-popup-content'
+
+        popupElement.appendChild(popupContent)
+        mapContainer.appendChild(popupElement)
+
+        return popupElement
+    }
+
     createFeatureOverlay(opacity: number): ExtendedVectorLayer<Feature<Geometry>> {
         const highlightStrokeWidth = 15
         return new ExtendedVectorLayer({
@@ -691,7 +750,7 @@ export class MapService {
         coordinate?: Coordinate,
         artifactName?: string
     ) {
-        const popupContent = document.getElementById('map-popup-content')!
+        const popupContent = document.getElementById(`map-popup-content-${this.mapId}`)!
         if (features.length > 0) {
             overlay.getSource()?.clear()
             overlay.getSource()?.addFeatures(features as Feature<Geometry>[])
