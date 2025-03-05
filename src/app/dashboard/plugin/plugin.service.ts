@@ -45,6 +45,10 @@ export class PluginService {
         return this.http.post<ComputationID>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
     }
 
+    computeDemo(pluginId: string): Observable<ComputationID> {
+        return this.http.get<ComputationID>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}/demo`)
+    }
+
     getComputationState(id: string): Observable<RunStatus> {
         return this.http.get<RunStatus>(`${this.apiUrl}/api/v1/gateway/computation/${id}/state`)
     }

@@ -17,10 +17,11 @@
         <span>
             <ng-container *ngIf="!areaSelected">Select an area on the map to continue.</ng-container>
             <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
-                >Multiple areas selected. Please select only one.</ng-container
+            >Multiple areas selected. Please select only one.</ng-container
             >
-            <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500"
-                >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
+            <ng-container
+                *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500"
+            >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
             >
         </span>
     </div>
@@ -45,8 +46,20 @@
                     appearance="primary"
                     class="btn-primary btn-withtext"
                     [disabled]="!form.valid || this.mapService.selectedFeatures.getLength() !== 1">
-                    <i-lucide [img]="CirclePlay" size="20"></i-lucide> Compute
+                    <i-lucide [img]="CirclePlay" size="20"></i-lucide>
+                    Compute
                 </button>
+                <div matTooltip="This plugin does not provide a demo."
+                     [matTooltipDisabled]="this.plugin.demo_config!==null">
+                    <button
+                        type="button"
+                        appearance="primary"
+                        class="btn-primary btn-withtext" (click)="runDemo()"
+                        [disabled]="!this.plugin.demo_config">
+                        <i-lucide [img]="Eye" size="20"></i-lucide>
+                        Demo
+                    </button>
+                </div>
                 <button type="button" class="btn-light btn-withtext" (click)="deactivateCompute()">Cancel</button>
             </div>
         </div>

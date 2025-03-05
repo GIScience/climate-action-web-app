@@ -8,17 +8,18 @@ import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { JSONSchema7 } from 'json-schema'
-import { CircleAlert, CirclePlay, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
+import { CircleAlert, CirclePlay, Eye, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
 import Feature from 'ol/Feature'
 import { fromEventPattern, Subscription } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
 import moment from 'moment/moment'
+import { MatTooltip } from '@angular/material/tooltip'
 
 @Component({
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
     styleUrls: ['./plugin-parameter.component.scss'],
-    imports: [FormlyModule, FormsModule, ReactiveFormsModule, NgIf, LucideAngularModule, CommonModule],
+    imports: [FormlyModule, FormsModule, ReactiveFormsModule, NgIf, LucideAngularModule, CommonModule, MatTooltip],
     standalone: true,
     encapsulation: ViewEncapsulation.None
 })
@@ -32,6 +33,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     options: FormlyFormOptions = {}
 
     readonly CirclePlay = CirclePlay
+    readonly Eye = Eye
     readonly MapPinPlusInside = MapPinPlusInside
     readonly TriangleAlert = TriangleAlert
     readonly CircleAlert = CircleAlert
@@ -196,6 +198,30 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             },
             error: () => {
                 this.snackBar.open('Error while computing plugin. Please try again.', 'Dismiss', {
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                })
+            }
+        })
+    }
+
+    runDemo() {
+        this.pluginService.computeDemo(this.plugin.plugin_id).subscribe({
+            next: data => {
+                this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, 'Demo')
+                this.pluginService.triggerSyncTasks()
+                this.pluginService.setComputeState('inactive')
+
+                this.snackBar.open('Demo request sent, results will be displayed soon.', 'Dismiss', {
+                    duration: 7000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['success-snackbar']
+                })
+            },
+            error: () => {
+                this.snackBar.open('Error while computing demo. Please try again.', 'Dismiss', {
                     verticalPosition: 'bottom',
                     horizontalPosition: 'center',
                     panelClass: ['error-snackbar']

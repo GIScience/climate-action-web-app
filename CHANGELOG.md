@@ -19,6 +19,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Added a report builder to the dashboard to view multiple artifacts at once ([#210](https://gitlab.heigit.org/climate-action/web-app/-/issues/210))
+- Users can now request a demo computation, if the plugin provides that functionality
 
 ## [2.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.1.0) - 2025-01-29
 
