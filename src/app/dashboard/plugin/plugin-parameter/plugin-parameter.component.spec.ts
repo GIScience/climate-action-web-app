@@ -10,11 +10,13 @@ import { MultiPolygon } from 'ol/geom'
 import { MapService } from '@app/dashboard/map/map.service'
 import { PluginParameterComponent } from './plugin-parameter.component'
 import { JSONSchema7 } from 'json-schema'
+import { Plugin } from '@app/dashboard/plugin/plugin.interface'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
     let fixture: ComponentFixture<PluginParameterComponent>
     let mapService: MapService
+    const test_plugin = { demo_config: { aoi: {}, params: {} } } as Plugin
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -30,6 +32,7 @@ describe('PluginParameterComponent', () => {
         })
         fixture = TestBed.createComponent(PluginParameterComponent)
         component = fixture.componentInstance
+        component.plugin = test_plugin
         mapService = TestBed.inject(MapService)
         fixture.detectChanges()
     })

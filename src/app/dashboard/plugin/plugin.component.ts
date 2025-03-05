@@ -7,7 +7,7 @@ import { TippyDirective } from '@ngneat/helipopper'
 import { CircleX, CloudOff, LucideAngularModule, RedoDot } from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
+import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { PluginParameterComponent } from './plugin-parameter/plugin-parameter.component'
 import { ComputeState, Plugin } from './plugin.interface'
@@ -106,7 +106,7 @@ export class PluginComponent implements AfterViewInit {
                     catchError(error => {
                         this.loading = false
                         if (error.status === 404) {
-                            // Create offline plugin name based on route, to be removed when API is updated
+                            //TODO: Create offline plugin name based on route, to be removed when API is updated
                             const displayName = pluginName
                                 .split('_')
                                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -121,6 +121,8 @@ export class PluginComponent implements AfterViewInit {
                                 methodology: 'Plugin is offline',
                                 authors: [],
                                 concerns: [],
+                                demo_config: null,
+                                sources: null,
                                 assets: {
                                     icon: this.pluginService.getIconUrl(pluginName || '', 'N/A')
                                 },

@@ -20,7 +20,8 @@ export interface Plugin {
     concerns: Array<Concern>
     purpose: string
     methodology: string
-    sources?: Array<Source>
+    sources: Array<Source> | null
+    demo_config: DemoConfig | null
     assets: PluginAssets
     plugin_id: string
     operator_schema: JSONSchema7
@@ -39,6 +40,11 @@ export interface Concern {
 
 export interface ComputeRequest {
     aoi: Feature<MultiPolygon>
+    params: Record<string, unknown>
+}
+
+export interface DemoConfig {
+    aoi: MultiPolygon
     params: Record<string, unknown>
 }
 
