@@ -82,7 +82,7 @@ docker image push repo.heigit.org/climate-action/web-app:{build_target}
 
 ## Tests
 
-Run `npm run test:all` to execute the unit & integration tests on [Jasmine](https://jasmine.github.io/) via [Karma](https://karma-runner.github.io) and E2E tests on [Cypress](https://www.cypress.io/).
+Run `npm run test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
 
 ## References
 

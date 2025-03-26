@@ -12,6 +12,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - The custom JSONSchema parser was replaced with a slight adaption of the Formly-provided parser
 - Date input is now shown in a more human friendly manner
 
+- Moved the Unit Testing Framework from Karma to Jest ([#303](https://gitlab.heigit.org/climate-action/web-app/-/issues/303))
+
 ### Fixed
 
 - Now supporting mapping/grouping input fields ([#145](https://gitlab.heigit.org/climate-action/web-app/-/issues/145))

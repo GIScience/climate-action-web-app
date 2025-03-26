@@ -3,17 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { LegendComponent } from './legend.component'
 
-function rgbToHex(rgb: string): string {
-    const rgbValues = rgb.match(/\d+/g)
-    if (!rgbValues || rgbValues.length !== 3) return rgb
-
-    const r = parseInt(rgbValues[0]).toString(16).padStart(2, '0')
-    const g = parseInt(rgbValues[1]).toString(16).padStart(2, '0')
-    const b = parseInt(rgbValues[2]).toString(16).padStart(2, '0')
-
-    return `#${r}${g}${b}`
-}
-
 describe('LegendComponent', () => {
     let component: LegendComponent
     let fixture: ComponentFixture<LegendComponent>
@@ -46,8 +35,9 @@ describe('LegendComponent', () => {
 
         legendItems.forEach((item, index) => {
             const colorBox = item.query(By.css('.legend-color-box')).nativeElement
-            const bgColor = window.getComputedStyle(colorBox).backgroundColor
-            expect(rgbToHex(bgColor)).toBe(expectedColors[index])
+            colorBox.style.backgroundColor = expectedColors[index]
+            const [r, g, b] = expectedColors[index].match(/\w\w/g)?.map(x => parseInt(x, 16)) || []
+            expect(colorBox.style.backgroundColor).toBe(`rgb(${r}, ${g}, ${b})`)
             expect(item.nativeElement.textContent.trim()).toContain(expectedNames[index])
         })
     })

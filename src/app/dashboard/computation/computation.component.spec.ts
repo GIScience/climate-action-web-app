@@ -16,34 +16,32 @@ describe('ComputationComponent', () => {
     let component: ComputationsIndexComponent
     let fixture: ComponentFixture<ComputationsIndexComponent>
 
-    let mockPluginService: jasmine.SpyObj<PluginService>
-    let mockArtifactService: jasmine.SpyObj<ArtifactService>
-    let mockMapService: jasmine.SpyObj<MapService>
+    let mockPluginService: Partial<PluginService>
+    let mockArtifactService: Partial<ArtifactService>
+    let mockMapService: Partial<MapService>
 
     let pluginRuns$: BehaviorSubject<ComputationEntity[]>
 
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<ComputationEntity[]>([])
 
-        mockPluginService = jasmine.createSpyObj<PluginService>(
-            'PluginService',
-            [
-                'getComputesFromLS',
-                'updateRunStatus',
-                'getComputationMetadata',
-                'getPluginRuns',
-                'setComputeState',
-                'getComputationState',
-                'collapsePluginCatalog',
-                'setComputeState'
-            ],
-            {
-                syncTasks$: new BehaviorSubject<void>(undefined)
-            }
-        )
+        mockPluginService = {
+            getComputesFromLS: jest.fn(),
+            updateRunStatus: jest.fn(),
+            getComputationMetadata: jest.fn(),
+            getPluginRuns: jest.fn(),
+            setComputeState: jest.fn(),
+            getComputationState: jest.fn(),
+            collapsePluginCatalog: jest.fn(),
+            syncTasks$: new BehaviorSubject<void>(undefined)
+        }
 
-        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage'])
-        mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
+        mockArtifactService = {
+            getImage: jest.fn()
+        }
+        mockMapService = {
+            initMap: jest.fn()
+        }
 
         await TestBed.configureTestingModule({
             imports: [ComputationComponent, NoopAnimationsModule, HttpClientModule],
@@ -72,14 +70,16 @@ describe('ComputationComponent', () => {
             ]
         }).compileComponents()
 
-        mockPluginService.getPluginRuns.and.returnValue(pluginRuns$.asObservable())
+        mockPluginService.getPluginRuns = jest.fn().mockReturnValue(pluginRuns$.asObservable())
     })
 
     beforeEach(fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([])
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([])
 
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
+
+        component.formatTimestamp = jest.fn().mockReturnValue('Jan 1, 2023 12:00 PM')
 
         fixture.detectChanges()
         tick()
@@ -94,7 +94,7 @@ describe('ComputationComponent', () => {
     }))
 
     it('should render content for non-expandable computations correctly', fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([
             {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 pluginId: 'test_plugin',
@@ -104,7 +104,12 @@ describe('ComputationComponent', () => {
             }
         ] as ComputationEntity[])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(of())
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of()
+            }
+            return of()
+        })
 
         component.ngOnInit()
         fixture.detectChanges()
@@ -118,7 +123,7 @@ describe('ComputationComponent', () => {
     }))
 
     it('should display only primary children initially', fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([
             {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 pluginId: 'test_plugin',
@@ -128,37 +133,40 @@ describe('ComputationComponent', () => {
             }
         ] as ComputationEntity[])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(
-            of({
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
-                params: {},
-                plugin_info: {
-                    plugin_id: 'test_plugin',
-                    plugin_version: '1.0.0'
-                },
-                artifacts: [
-                    {
-                        name: 'Image 1',
-                        modality: 'IMAGE',
-                        file_path: 'test_image1.png',
-                        summary: 'An image 1.',
-                        description: 'The image 1 is under CC0 license.',
-                        store_id: 'image1',
-                        primary: true
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of({
+                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    params: {},
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
                     },
-                    {
-                        name: 'Image 2',
-                        modality: 'IMAGE',
-                        file_path: 'test_image2.png',
-                        summary: 'An image 2.',
-                        description: 'The image 2 is under CC0 license.',
-                        store_id: 'image2',
-                        primary: false
-                    }
-                ]
-            } as ComputationMetadata)
-        )
+                    artifacts: [
+                        {
+                            name: 'Image 1',
+                            modality: 'IMAGE',
+                            file_path: 'test_image1.png',
+                            summary: 'An image 1.',
+                            description: 'The image 1 is under CC0 license.',
+                            store_id: 'image1',
+                            primary: true
+                        },
+                        {
+                            name: 'Image 2',
+                            modality: 'IMAGE',
+                            file_path: 'test_image2.png',
+                            summary: 'An image 2.',
+                            description: 'The image 2 is under CC0 license.',
+                            store_id: 'image2',
+                            primary: false
+                        }
+                    ]
+                } as ComputationMetadata)
+            }
+            return of()
+        })
 
         component.ngOnInit()
         fixture.detectChanges()
@@ -178,7 +186,7 @@ describe('ComputationComponent', () => {
     }))
 
     it('should display non-primary children when Show More is clicked', fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([
             {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 pluginId: 'test_plugin',
@@ -188,37 +196,40 @@ describe('ComputationComponent', () => {
             }
         ] as ComputationEntity[])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(
-            of({
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
-                params: {},
-                plugin_info: {
-                    plugin_id: 'test_plugin',
-                    plugin_version: '1.0.0'
-                },
-                artifacts: [
-                    {
-                        name: 'Image 1',
-                        modality: 'IMAGE',
-                        file_path: 'test_image1.png',
-                        summary: 'An image 1.',
-                        description: 'The image 1 is under CC0 license.',
-                        store_id: 'image1',
-                        primary: true
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of({
+                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    params: {},
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
                     },
-                    {
-                        name: 'Image 2',
-                        modality: 'IMAGE',
-                        file_path: 'test_image2.png',
-                        summary: 'An image 2.',
-                        description: 'The image 2 is under CC0 license.',
-                        store_id: 'image2',
-                        primary: false
-                    }
-                ]
-            } as ComputationMetadata)
-        )
+                    artifacts: [
+                        {
+                            name: 'Image 1',
+                            modality: 'IMAGE',
+                            file_path: 'test_image1.png',
+                            summary: 'An image 1.',
+                            description: 'The image 1 is under CC0 license.',
+                            store_id: 'image1',
+                            primary: true
+                        },
+                        {
+                            name: 'Image 2',
+                            modality: 'IMAGE',
+                            file_path: 'test_image2.png',
+                            summary: 'An image 2.',
+                            description: 'The image 2 is under CC0 license.',
+                            store_id: 'image2',
+                            primary: false
+                        }
+                    ]
+                } as ComputationMetadata)
+            }
+            return of()
+        })
 
         component.ngOnInit()
         fixture.detectChanges()
@@ -246,7 +257,7 @@ describe('ComputationComponent', () => {
     }))
 
     it('should hide non-primary children when Show Less is clicked', fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([
             {
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                 pluginId: 'test_plugin',
@@ -256,37 +267,40 @@ describe('ComputationComponent', () => {
             }
         ] as ComputationEntity[])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(
-            of({
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
-                params: {},
-                plugin_info: {
-                    plugin_id: 'test_plugin',
-                    plugin_version: '1.0.0'
-                },
-                artifacts: [
-                    {
-                        name: 'Image 1',
-                        modality: 'IMAGE',
-                        file_path: 'test_image1.png',
-                        summary: 'An image 1.',
-                        description: 'The image 1 is under CC0 license.',
-                        store_id: 'image1',
-                        primary: true
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of({
+                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    params: {},
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
                     },
-                    {
-                        name: 'Image 2',
-                        modality: 'IMAGE',
-                        file_path: 'test_image2.png',
-                        summary: 'An image 2.',
-                        description: 'The image 2 is under CC0 license.',
-                        store_id: 'image2',
-                        primary: false
-                    }
-                ]
-            } as ComputationMetadata)
-        )
+                    artifacts: [
+                        {
+                            name: 'Image 1',
+                            modality: 'IMAGE',
+                            file_path: 'test_image1.png',
+                            summary: 'An image 1.',
+                            description: 'The image 1 is under CC0 license.',
+                            store_id: 'image1',
+                            primary: true
+                        },
+                        {
+                            name: 'Image 2',
+                            modality: 'IMAGE',
+                            file_path: 'test_image2.png',
+                            summary: 'An image 2.',
+                            description: 'The image 2 is under CC0 license.',
+                            store_id: 'image2',
+                            primary: false
+                        }
+                    ]
+                } as ComputationMetadata)
+            }
+            return of()
+        })
 
         component.ngOnInit()
         fixture.detectChanges()

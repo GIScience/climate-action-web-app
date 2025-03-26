@@ -42,10 +42,10 @@ describe('ArtifactViewerComponent', () => {
 
     it('should create a link and trigger a download when downloadContent is called', () => {
         const fakeAnchor = document.createElement('a')
-        spyOn(fakeAnchor, 'click')
-        const createElementSpy = spyOn(document, 'createElement').and.returnValue(fakeAnchor)
-        const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(computation => computation)
-        const removeChildSpy = spyOn(document.body, 'removeChild').and.callFake(computation => computation)
+        jest.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
+        const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(fakeAnchor)
+        const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
+        const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
         component.artifactService.currentUrl = 'http://localhost:4200/dashboard/sample-image.png'
         component.downloadContent()
 

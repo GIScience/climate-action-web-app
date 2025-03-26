@@ -7,7 +7,7 @@ cache:
     paths:
         - node_modules
 
-test_jasmine_and_lint:
+test_jest_and_lint:
     stage: test
     rules:
         - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -31,7 +31,7 @@ test_cypress:
         - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     variables:
         NODE_ENV: 'test'
-    needs: ['test_jasmine_and_lint']
+    needs: ['test_jest_and_lint']
     image:
         name: cypress/included:cypress-13.11.0-node-20.14.0-chrome-125.0.6422.141-1-ff-126.0.1-edge-125.0.2535.85-1
         entrypoint: ['']
