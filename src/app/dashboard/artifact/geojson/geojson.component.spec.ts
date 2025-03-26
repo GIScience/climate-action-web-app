@@ -1,19 +1,25 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
 import { of } from 'rxjs'
 import { MapService } from '../../map/map.service'
 import { GeojsonComponent } from './geojson.component'
-import SpyObj = jasmine.SpyObj
 
 describe('GeojsonComponent', () => {
     let component: GeojsonComponent
     let fixture: ComponentFixture<GeojsonComponent>
-    let httpClientSpy: SpyObj<HttpClient>
-    let mapServiceSpy: SpyObj<MapService>
+    let httpClientSpy: jest.Mocked<HttpClient>
+    let mapServiceSpy: jest.Mocked<MapService>
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
-        mapServiceSpy = jasmine.createSpyObj<MapService>('MapService', ['addGeoJsonLayer'])
+        httpClientSpy = {
+            post: jest.fn(),
+            get: jest.fn()
+        } as unknown as jest.Mocked<HttpClient>
+
+        mapServiceSpy = {
+            addGeoJsonLayer: jest.fn()
+        } as unknown as jest.Mocked<MapService>
 
         TestBed.configureTestingModule({
             imports: [GeojsonComponent, HttpClientModule],
@@ -104,7 +110,7 @@ describe('GeojsonComponent', () => {
             ]
         }
 
-        httpClientSpy.get.and.returnValue(of(mockGeoJsonData))
+        httpClientSpy.get.mockReturnValue(of(mockGeoJsonData))
 
         component.inputData = {
             url: 'http://test_url',

@@ -1,18 +1,20 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
 import TileLayer from 'ol/layer/WebGLTile.js'
 import { XYZ } from 'ol/source'
 import { MapService } from '../../map/map.service'
 import { GeoTiffComponent } from './geotiff.component'
-import SpyObj = jasmine.SpyObj
 
 describe('GeoTiffComponent', () => {
     let component: GeoTiffComponent
     let fixture: ComponentFixture<GeoTiffComponent>
-    let mapServiceSpy: SpyObj<MapService>
+    let mapServiceSpy: jest.Mocked<MapService>
 
     beforeEach(async () => {
-        mapServiceSpy = jasmine.createSpyObj<MapService>('MapService', ['addGeoTiffLayer'])
+        mapServiceSpy = {
+            addGeoTiffLayer: jest.fn()
+        } as unknown as jest.Mocked<MapService>
 
         await TestBed.configureTestingModule({
             imports: [GeoTiffComponent, HttpClientModule],
@@ -39,7 +41,7 @@ describe('GeoTiffComponent', () => {
         const mockSource: XYZ = new XYZ()
         const mockLayer = new TileLayer({ source: mockSource })
 
-        mapServiceSpy.addGeoTiffLayer.and.returnValue(Promise.resolve(mockLayer))
+        mapServiceSpy.addGeoTiffLayer.mockResolvedValue(mockLayer)
 
         component.inputData = {
             url: mockUrl,
@@ -60,9 +62,7 @@ describe('GeoTiffComponent', () => {
         await fixture.whenStable()
         await new Promise(resolve => setTimeout(resolve, 0))
 
-        const addGeoTiffLayerCalls = mapServiceSpy.addGeoTiffLayer.calls.all()
-
-        expect(addGeoTiffLayerCalls.length).toBeGreaterThan(0)
+        expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledTimes(1)
         expect(mapServiceSpy.addGeoTiffLayer).toHaveBeenCalledWith(mockUrl, 'geotiff')
     })
 })

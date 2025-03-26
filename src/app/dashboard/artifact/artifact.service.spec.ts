@@ -1,13 +1,16 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
 import { of } from 'rxjs'
 import { Artifact, ChartData, LegendObject } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
-import SpyObj = jasmine.SpyObj
 
 describe('ArtifactService', () => {
     let service: ArtifactService
-    let httpClientSpy: SpyObj<HttpClient>
+    let httpClientSpy: {
+        post: jest.Mock
+        get: jest.Mock
+    }
 
     const correlation_uuid = 'd9660bee-85ca-40c1-80b8-b51c5fd0cd9f'
     const store_uuid = '063c0ef6-5955-4b10-84c2-45e7b4cccf05'
@@ -43,7 +46,10 @@ describe('ArtifactService', () => {
     } as ChartData
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
+        httpClientSpy = {
+            post: jest.fn().mockImplementation(() => of({})),
+            get: jest.fn().mockImplementation(() => of({}))
+        }
 
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
@@ -100,9 +106,7 @@ describe('ArtifactService', () => {
     })
 
     it('should get chart artifact item', done => {
-        httpClientSpy.get
-            .withArgs(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
-            .and.returnValue(of(test_chart))
+        httpClientSpy.get.mockReturnValue(of(test_chart))
 
         service.getChart(test_artifact)
         service.chart.subscribe(x => {
@@ -110,6 +114,7 @@ describe('ArtifactService', () => {
                 data: test_chart,
                 artifact: test_artifact
             })
+            expect(httpClientSpy.get).toHaveBeenCalledWith(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
             done()
         })
     })

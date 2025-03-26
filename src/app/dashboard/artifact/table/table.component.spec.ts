@@ -1,18 +1,20 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
+import { jest } from '@jest/globals'
 import { of } from 'rxjs'
 import { TableComponent } from './table.component'
-import SpyObj = jasmine.SpyObj
 
 describe('TableComponent', () => {
     let component: TableComponent
     let fixture: ComponentFixture<TableComponent>
-
-    let httpClientSpy: SpyObj<HttpClient>
+    let httpClientSpy: jest.Mocked<HttpClient>
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
+        httpClientSpy = {
+            post: jest.fn(),
+            get: jest.fn()
+        } as unknown as jest.Mocked<HttpClient>
 
         TestBed.configureTestingModule({
             imports: [TableComponent, HttpClientModule],
@@ -33,7 +35,7 @@ describe('TableComponent', () => {
     })
 
     it('should render table from csv', fakeAsync(() => {
-        httpClientSpy.get.and.returnValue(
+        httpClientSpy.get.mockReturnValue(
             of(
                 'Username; Identifier;First name;Last name\n' +
                     'booker12;9012;Rachel;Booker\n' +
@@ -58,9 +60,9 @@ describe('TableComponent', () => {
         expect(renderedHeaders).toEqual(expectedHeaders)
 
         const ths = fixture.debugElement.queryAll(By.css('th'))
-        expect(ths).toHaveSize(1 * 4)
+        expect(ths).toHaveLength(1 * 4)
 
         const trs = fixture.debugElement.queryAll(By.css('td'))
-        expect(trs).toHaveSize(5 * 4)
+        expect(trs).toHaveLength(5 * 4)
     }))
 })

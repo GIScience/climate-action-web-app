@@ -1,14 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
 import { MapComponent } from './map.component'
 import { MapService } from './map.service'
 
 describe('MapComponent', () => {
     let component: MapComponent
     let fixture: ComponentFixture<MapComponent>
-    let mockMapService: jasmine.SpyObj<MapService>
+    let mockMapService: jest.Mocked<MapService>
 
     beforeEach(async () => {
-        mockMapService = jasmine.createSpyObj<MapService>('MapService', ['initMap'])
+        mockMapService = {
+            initMap: jest.fn()
+        } as unknown as jest.Mocked<MapService>
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],

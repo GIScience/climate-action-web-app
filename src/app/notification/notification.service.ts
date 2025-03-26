@@ -1,10 +1,10 @@
 // Unused for now, will restore once the websocket is re-enabled.
 
 import { Injectable } from '@angular/core'
+import { environment } from '@environments/environment'
 import moment from 'moment/moment'
 import { map, Observable } from 'rxjs'
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
-import { environment } from '@environments/environment'
 import { WSMessage } from './notification.interface'
 
 @Injectable({
@@ -13,7 +13,7 @@ import { WSMessage } from './notification.interface'
 export class NotificationService {
     private wsUrl = environment.climateActionWSUrl
     private websocketSubject?: WebSocketSubject<string>
-    private hearbeat?: number
+    private hearbeat?: NodeJS.Timeout
 
     startWebSocket(): Observable<WSMessage> {
         if (!this.websocketSubject) {
@@ -39,7 +39,7 @@ export class NotificationService {
         }
     }
 
-    private keepAlive(): number {
+    private keepAlive(): NodeJS.Timeout {
         return setInterval(() => {
             this.sendMessage({
                 type: 'heartbeat',

@@ -3,6 +3,46 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { AppComponent } from './app.component'
+import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
+import { MapService } from './dashboard/map/map.service'
+import { ReportService } from './dashboard/report/report.service'
+
+jest.mock(
+    'src/environments/environment',
+    () => ({
+        environment: {
+            production: false,
+            climateActionApiUrl: 'http://mock-api-url',
+            climateActionWSUrl: 'ws://mock-ws-url',
+            orsAPIKey: 'mock-ors-api-key'
+        }
+    }),
+    { virtual: true }
+)
+
+jest.mock(
+    '../../package.json',
+    () => ({
+        default: {
+            version: '2.1.0'
+        }
+    }),
+    { virtual: true }
+)
+
+const mockArtifactViewerService = {
+    closeArtifactViewer: jest.fn()
+}
+
+const mockMapService = {
+    removeFocusedLayer: jest.fn(),
+    removeComputeLayers: jest.fn()
+}
+
+const mockReportService = {
+    closeReport: jest.fn(),
+    collapseLeftColumn: jest.fn()
+}
 
 describe('AppComponent', () => {
     let component: AppComponent
@@ -13,11 +53,18 @@ describe('AppComponent', () => {
             imports: [HttpClientModule, RouterTestingModule],
             declarations: [AppComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
-            providers: []
+            providers: [
+                { provide: ArtifactViewerService, useValue: mockArtifactViewerService },
+                { provide: MapService, useValue: mockMapService },
+                { provide: ReportService, useValue: mockReportService }
+            ]
         }).compileComponents()
 
         fixture = TestBed.createComponent(AppComponent)
         component = fixture.componentInstance
+
+        component.currentYear = jest.fn().mockReturnValue(2023)
+
         fixture.detectChanges()
     })
 

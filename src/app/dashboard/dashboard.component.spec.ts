@@ -5,13 +5,21 @@ import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariati
 import { ArtifactComponent } from './artifact/artifact.component'
 import { ComputationComponent } from './computation/computation.component'
 import { DashboardComponent } from './dashboard.component'
+import { MapService } from './map/map.service'
 import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
 
 describe('DashboardComponent', () => {
     let component: DashboardComponent
     let fixture: ComponentFixture<DashboardComponent>
+    let mockMapService: Partial<MapService>
 
     beforeEach(() => {
+        mockMapService = {
+            initMap: jest.fn(),
+            highlightAoI: jest.fn(),
+            removeFocusedLayer: jest.fn()
+        }
+
         TestBed.configureTestingModule({
             imports: [
                 ComputationComponent,
@@ -22,6 +30,7 @@ describe('DashboardComponent', () => {
                 RouterModule.forRoot([])
             ],
             providers: [
+                { provide: MapService, useValue: mockMapService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',

@@ -18,40 +18,36 @@ describe('ComputationsIndexComponent', () => {
     let component: ComputationsIndexComponent
     let fixture: ComponentFixture<ComputationsIndexComponent>
 
-    let mockPluginService: jasmine.SpyObj<PluginService>
-    let mockArtifactService: jasmine.SpyObj<ArtifactService>
-    let mockMapService: jasmine.SpyObj<MapService>
+    let mockPluginService: Partial<PluginService>
+    let mockArtifactService: Partial<ArtifactService>
+    let mockMapService: Partial<MapService>
 
     let pluginRuns$: BehaviorSubject<ComputationEntity[]>
 
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<ComputationEntity[]>([])
 
-        mockPluginService = jasmine.createSpyObj<PluginService>(
-            'PluginService',
-            [
-                'getComputesFromLS',
-                'updateRunStatus',
-                'getComputationMetadata',
-                'getPluginRuns',
-                'setComputeState',
-                'getComputationState',
-                'collapsePluginCatalog',
-                'setComputeState'
-            ],
-            {
-                syncTasks$: new BehaviorSubject<void>(undefined)
-            }
-        )
+        mockPluginService = {
+            getComputesFromLS: jest.fn(),
+            updateRunStatus: jest.fn(),
+            getComputationMetadata: jest.fn(),
+            getPluginRuns: jest.fn(),
+            setComputeState: jest.fn(),
+            getComputationState: jest.fn(),
+            collapsePluginCatalog: jest.fn(),
+            syncTasks$: new BehaviorSubject<void>(undefined)
+        }
 
-        mockArtifactService = jasmine.createSpyObj<ArtifactService>('ArtifactService', ['getImage'])
-        mockMapService = jasmine.createSpyObj<MapService>('MapService', [
-            'initMap',
-            'highlightAoI',
-            'removeFocusedLayer'
-        ])
+        mockArtifactService = {
+            getImage: jest.fn()
+        }
+        mockMapService = {
+            initMap: jest.fn(),
+            highlightAoI: jest.fn(),
+            removeFocusedLayer: jest.fn()
+        }
 
-        mockMapService.highlightAoI.and.returnValue([0, 0, 1, 1])
+        mockMapService.highlightAoI = jest.fn().mockReturnValue([0, 0, 1, 1])
 
         await TestBed.configureTestingModule({
             imports: [
@@ -75,14 +71,16 @@ describe('ComputationsIndexComponent', () => {
             ]
         }).compileComponents()
 
-        mockPluginService.getPluginRuns.and.returnValue(pluginRuns$.asObservable())
+        mockPluginService.getPluginRuns = jest.fn().mockReturnValue(pluginRuns$.asObservable())
     })
 
     beforeEach(fakeAsync(() => {
-        mockPluginService.getComputesFromLS.and.returnValue([])
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([])
 
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
+
+        component.formatTimestamp = jest.fn().mockReturnValue('Jan 1, 2023 12:00 PM')
 
         fixture.detectChanges()
         tick()
@@ -116,54 +114,57 @@ describe('ComputationsIndexComponent', () => {
             timestamp: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationEntity
 
-        mockPluginService.getComputesFromLS.and.returnValue([testRun])
+        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([testRun])
 
-        mockPluginService.getComputationMetadata.withArgs('8a897536-c4b4-4e5a-9d70-50430183ac66').and.returnValue(
-            of({
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
-                params: {},
-                aoi: new GeoJSON().readFeature({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'MultiPolygon',
-                        coordinates: [
-                            [
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of({
+                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    params: {},
+                    aoi: new GeoJSON().readFeature({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'MultiPolygon',
+                            coordinates: [
                                 [
-                                    [0, 0],
-                                    [1, 0],
-                                    [1, 1],
-                                    [0, 1],
-                                    [0, 0]
+                                    [
+                                        [0, 0],
+                                        [1, 0],
+                                        [1, 1],
+                                        [0, 1],
+                                        [0, 0]
+                                    ]
                                 ]
                             ]
-                        ]
+                        },
+                        properties: {
+                            name: 'Test AOI'
+                        }
+                    }) as Feature<MultiPolygon>,
+                    artifacts: [
+                        {
+                            name: 'Image',
+                            modality: 'IMAGE',
+                            primary: true,
+                            file_path: 'test_image.png',
+                            summary: 'An image.',
+                            description: 'The image is under CC0 license.',
+                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                            store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                            attachments: {}
+                        }
+                    ],
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
                     },
-                    properties: {
-                        name: 'Test AOI'
-                    }
-                }) as Feature<MultiPolygon>,
-                artifacts: [
-                    {
-                        name: 'Image',
-                        modality: 'IMAGE',
-                        primary: true,
-                        file_path: 'test_image.png',
-                        summary: 'An image.',
-                        description: 'The image is under CC0 license.',
-                        correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                        store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
-                        attachments: {}
-                    }
-                ],
-                plugin_info: {
-                    plugin_id: 'test_plugin',
-                    plugin_version: '1.0.0'
-                },
-                status: 'SUCCESS',
-                message: ''
-            })
-        )
+                    status: 'SUCCESS',
+                    message: ''
+                })
+            }
+            return of()
+        })
 
         component.ngOnInit()
         fixture.detectChanges()
@@ -227,7 +228,7 @@ describe('ComputationsIndexComponent', () => {
         localStorage.setItem('plugin_runs', JSON.stringify([]))
         localStorage.setItem('archive_runs', JSON.stringify([archivedRun]))
 
-        mockPluginService.getComputationMetadata.and.returnValue(of())
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of())
         component.unarchiveComputation(archivedRun.correlation_uuid)
 
         const archivedItems = JSON.parse(localStorage.getItem('archive_runs') || '[]')

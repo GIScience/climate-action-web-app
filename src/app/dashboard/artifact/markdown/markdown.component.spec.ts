@@ -1,17 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
 import { HttpClient } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
 import { of } from 'rxjs'
 import { MarkdownComponent } from './markdown.component'
-import SpyObj = jasmine.SpyObj
 
 describe('MarkdownComponent', () => {
     let component: MarkdownComponent
     let fixture: ComponentFixture<MarkdownComponent>
-    let httpClientSpy: SpyObj<HttpClient>
+    let httpClientSpy: jest.Mocked<HttpClient>
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
+        httpClientSpy = {
+            post: jest.fn(),
+            get: jest.fn()
+        } as unknown as jest.Mocked<HttpClient>
 
         TestBed.configureTestingModule({
             imports: [MarkdownComponent],
@@ -40,7 +42,7 @@ describe('MarkdownComponent', () => {
             testBaseUrl +
             '#fnref1" class="footnote-backref">↩</a></p>\n</li>\n</ol>\n</section>'
 
-        httpClientSpy.get.and.returnValue(of(markdown))
+        httpClientSpy.get.mockReturnValue(of(markdown))
 
         component.url = 'http://localhost/test.md'
         component.ngOnInit()

@@ -1,17 +1,19 @@
-import { TestBed } from '@angular/core/testing'
-
 import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { TestBed } from '@angular/core/testing'
+import { jest } from '@jest/globals'
+import { Feature } from 'ol'
+import { MultiPolygon } from 'ol/geom'
 import { of } from 'rxjs'
 import { ComputationEntity, ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
 import { PluginService } from './plugin.service'
-import { Feature } from 'ol'
-import { MultiPolygon } from 'ol/geom'
-import SpyObj = jasmine.SpyObj
 
 describe('PluginService', () => {
     let service: PluginService
-    let httpClientSpy: SpyObj<HttpClient>
+    let httpClientSpy: {
+        post: jest.Mock
+        get: jest.Mock
+    }
 
     const test_computation = {
         correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
@@ -109,7 +111,10 @@ describe('PluginService', () => {
     }
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj<HttpClient>('HttpClient', ['post', 'get'])
+        httpClientSpy = {
+            post: jest.fn().mockImplementation(() => of({})),
+            get: jest.fn().mockImplementation(() => of({}))
+        }
 
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
@@ -129,23 +134,23 @@ describe('PluginService', () => {
     })
 
     it('should get plugin list', () => {
-        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/').and.returnValue(of<Plugin[]>([test_plugin, test_plugin]))
+        httpClientSpy.get.mockReturnValue(of<Plugin[]>([test_plugin, test_plugin]))
 
         service.getPlugins().subscribe(plugins => {
-            expect(plugins).toHaveSize(2)
+            expect(plugins).toHaveLength(2)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1)
+        expect(httpClientSpy.get).toHaveBeenCalledTimes(1)
     })
 
     it('should get single plugin', () => {
-        httpClientSpy.get.withArgs('/api/v1/gateway/plugin/test').and.returnValue(of<Plugin>(test_plugin))
+        httpClientSpy.get.mockReturnValue(of<Plugin>(test_plugin))
 
         service.getPluginDetails('test').subscribe(plugins => {
             expect(plugins).toBe(test_plugin)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1)
+        expect(httpClientSpy.get).toHaveBeenCalledTimes(1)
     })
 
     it('should invoke plugin computation', () => {
@@ -166,31 +171,29 @@ describe('PluginService', () => {
             }
         }
 
-        httpClientSpy.post.withArgs('/api/v1/gateway/plugin/test', computeRequest).and.returnValue(of(test_correlator))
+        httpClientSpy.post.mockReturnValue(of(test_correlator))
 
         service.computePlugin('test', computeRequest).subscribe(test_correlator => {
             expect(test_correlator).toEqual(test_correlator)
         })
 
-        expect(httpClientSpy.post.calls.count()).toBe(1)
+        expect(httpClientSpy.post).toHaveBeenCalledTimes(1)
     })
 
     it('should get computations', () => {
-        httpClientSpy.get
-            .withArgs('/api/v1/gateway/store/1fbeed00-e9b7-4f54-bae7-18f64bd33ea6/metadata/')
-            .and.returnValue(of(test_computation))
+        httpClientSpy.get.mockReturnValue(of(test_computation))
 
         service.getComputationMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(computations => {
             expect(computations.aoi).toBeInstanceOf(Feature<MultiPolygon>)
         })
 
-        expect(httpClientSpy.get.calls.count()).toBe(1)
+        expect(httpClientSpy.get).toHaveBeenCalledTimes(1)
     })
 
     it('should get computes', () => {
         expect(localStorage.getItem('plugin_runs')).toBe(null)
         localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run, test_plugin_run]))
-        expect(service.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])).toHaveSize(2)
+        expect(service.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])).toHaveLength(2)
     })
 
     it('should store computes', () => {
@@ -198,7 +201,7 @@ describe('PluginService', () => {
         service.storeNewComputes('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', test_plugin)
         const item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)).toHaveSize(1)
+            expect(JSON.parse(item)).toHaveLength(1)
         } else {
             fail()
         }
@@ -210,7 +213,7 @@ describe('PluginService', () => {
 
         const item = localStorage.getItem('plugin_runs')
         if (item) {
-            expect(JSON.parse(item)).toHaveSize(1)
+            expect(JSON.parse(item)).toHaveLength(1)
         } else {
             fail()
         }
