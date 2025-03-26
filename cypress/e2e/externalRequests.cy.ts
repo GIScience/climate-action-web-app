@@ -4,7 +4,8 @@ describe('External Requests', () => {
         'https://tile.openstreetmap.org',
         'https://api.openrouteservice.org',
         'https://maps.heigit.org',
-        'https://a.basemaps.cartocdn.com'
+        'https://a.basemaps.cartocdn.com',
+        'https://server.arcgisonline.com'
     ]
 
     const cypressInternalPatterns = [
