@@ -264,22 +264,15 @@ export class MapService {
         })
 
         const aerialImagery = new ExtendedTileLayer({
-            name: 'Bing Aerial Imagery',
+            name: 'ESRI World Imagery',
             baseLayer: true,
             visible: false,
             source: new XYZ({
-                tileGrid: new TileGrid({
-                    extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
-                    resolutions: [
-                        78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128,
-                        2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525,
-                        76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516,
-                        2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974
-                    ]
-                }),
-                url: 'https://maps.heigit.org/sketch-map-tool/tms/1.0.0/world_imagery/webmercator/{z}/{x}/{-y}.png',
-                attributions: 'Satellite layer powered by ESRI, Source: Geobasis-DE / LVermGeoRP, Maxar, Microsoft.',
-                attributionsCollapsible: false
+                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                attributions:
+                    'Powered by <a href="https://www.esri.com/" target="_blank">ESRI</a> | Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+                attributionsCollapsible: false,
+                maxZoom: 19
             })
         })
 
