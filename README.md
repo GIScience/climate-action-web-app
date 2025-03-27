@@ -2,9 +2,9 @@
 [![Latest Release](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/badges/release.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/releases)
 [![coverage report](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/badges/main/coverage.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/commits/main)
 
-# Climate Action Frontend
+# Climate Action Navigator
 
-![Alt text](docs/screenshot.jpg?raw=true 'Platform Screenshot')
+![Alt text](docs/screenshot.jpg?raw=true 'Dashboard Screenshot')
 
 <!-- TABLE OF CONTENTS -->
 <details>

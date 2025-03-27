@@ -72,7 +72,7 @@ describe('AppComponent', () => {
         expect(component).toBeTruthy()
     })
 
-    it('should have as title "Dashboard - Climate Action"', () => {
-        expect(component.title).toEqual('Climate Action Platform')
+    it('should have as title "Climate Action Navigator"', () => {
+        expect(component.title).toEqual('Climate Action Navigator')
     })
 })

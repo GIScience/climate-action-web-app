@@ -12,7 +12,11 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - The custom JSONSchema parser was replaced with a slight adaption of the Formly-provided parser
 - Date input is now shown in a more human friendly manner
 
-- Moved the Unit Testing Framework from Karma to Jest ([#303](https://gitlab.heigit.org/climate-action/web-app/-/issues/303))
+- Moved the Unit Testing Framework from Karma to
+  Jest ([#303](https://gitlab.heigit.org/climate-action/web-app/-/issues/303))
+
+- It was decided to call the website `Climate Action Navigator` hence all occurrences were
+  renamed ([#251](https://gitlab.heigit.org/climate-action/web-app/-/issues/251))
 
 ### Fixed
 
@@ -20,7 +24,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
-- Added a report builder to the dashboard to view multiple artifacts at once ([#210](https://gitlab.heigit.org/climate-action/web-app/-/issues/210))
+- Added a report builder to the dashboard to view multiple artifacts at
+  once ([#210](https://gitlab.heigit.org/climate-action/web-app/-/issues/210))
 - Users can now request a demo computation, if the plugin provides that functionality
 
 ## [2.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.1.0) - 2025-01-29
@@ -34,7 +39,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Refactored types and names of interfaces to match the backend
-- Allow accessing computations even if plugin is offline ([#167](https://gitlab.heigit.org/climate-action/web-app/-/issues/167))
+- Allow accessing computations even if plugin is
+  offline ([#167](https://gitlab.heigit.org/climate-action/web-app/-/issues/167))
 
 ### Added
 
