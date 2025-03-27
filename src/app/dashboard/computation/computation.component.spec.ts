@@ -56,7 +56,8 @@ describe('ComputationComponent', () => {
                             params: {
                                 name: 'test_plugin'
                             }
-                        }
+                        },
+                        queryParams: of({})
                     }
                 },
                 provideTippyLoader(() => import('tippy.js')),
@@ -87,10 +88,12 @@ describe('ComputationComponent', () => {
     }))
 
     afterEach(fakeAsync(() => {
-        expect(fixture.debugElement.queryAll(By.css('.computations-index-content')).length).toBe(1)
-        tick()
-        discardPeriodicTasks()
-        flush()
+        if (fixture) {
+            expect(fixture.debugElement.queryAll(By.css('.computations-index-content')).length).toBe(1)
+            tick()
+            discardPeriodicTasks()
+            flush()
+        }
     }))
 
     it('should render content for non-expandable computations correctly', fakeAsync(() => {

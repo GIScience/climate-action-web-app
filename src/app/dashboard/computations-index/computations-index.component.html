@@ -69,6 +69,13 @@
                         </div>
                         <div class="computation-actions">
                             <button
+                                (click)="shareComputation(computation.correlation_uuid, $event)"
+                                aria-label="Share Computation"
+                                tp="Share Computation"
+                                class="btn-onlyicon btn-onlyicon--cta">
+                                <i-lucide [img]="Share2" size="15"></i-lucide>
+                            </button>
+                            <button
                                 (click)="viewParameters(computation)"
                                 aria-label="View Parameters"
                                 tp="View Parameters"
