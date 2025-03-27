@@ -10,7 +10,7 @@ describe('computations', () => {
         cy.visit('/')
     })
 
-    it('should display the selected artifact even after a reload', () => {
+    const setupTest = () => {
         mockPluginsList()
         mockPluginBlueprint()
         mockPluginBlueprintComputation()
@@ -42,6 +42,10 @@ describe('computations', () => {
         cy.wait('@getPluginBlueprintComputation')
 
         cy.get('.computations-index-content').should('exist')
+    }
+
+    it('should display the selected artifact even after a reload', () => {
+        setupTest()
 
         cy.get('.parent-computation').eq(0).click()
         cy.get('.child-computation').eq(1).click()
@@ -49,7 +53,40 @@ describe('computations', () => {
         cy.wait('@getBlueprintTable')
 
         cy.reload(true)
-
         cy.get('.table-artifact-item').should('exist')
+    })
+
+    it('should generate a share link', () => {
+        setupTest()
+
+        cy.get('.parent-computation').eq(0).realHover()
+        cy.get('.parent-computation .computation-actions').find('button').first().click()
+
+        // check content in clipboard
+        cy.window().then(win => {
+            win.navigator.clipboard.readText().then(text => {
+                expect(text).to.eq(
+                    'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
+                )
+            })
+        })
+    })
+
+    it('should import a computation when visiting the share link', () => {
+        setupTest()
+
+        cy.window().then(win => {
+            win.localStorage.clear()
+        })
+
+        cy.reload(true)
+
+        cy.get('.parent-computation').should('not.exist')
+
+        cy.visit(
+            'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
+        )
+
+        cy.get('.parent-computation').should('exist').should('have.length', 1)
     })
 })

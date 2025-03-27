@@ -14,7 +14,8 @@ import {
     Clock,
     Hash,
     ListTodo,
-    LucideAngularModule
+    LucideAngularModule,
+    Share2
 } from 'lucide-angular'
 import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
@@ -24,6 +25,7 @@ import { ActiveArtifactRef, ArtifactEntity } from '../artifact/artifact.interfac
 import { ComputationComponent } from '../computation/computation.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import { ComputationEntity, ComputationMetadata, ComputationParameters } from './computation.interface'
 
@@ -106,6 +108,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Clock = Clock
     readonly Hash = Hash
     readonly ListTodo = ListTodo
+    readonly Share2 = Share2
 
     @Input() pluginId: string = ''
 
@@ -125,6 +128,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         public artifactViewerService: ArtifactViewerService,
         private mapService: MapService,
         private route: ActivatedRoute,
+        private shareService: ShareService,
         private snackBar: MatSnackBar,
         private dialog: MatDialog
     ) {
@@ -156,6 +160,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         this.fetchArchivedComputations()
         this.startPeriodicSync()
+
+        this.shareService.onComputationToImport().subscribe(computationId => {
+            if (computationId) {
+                this.importComputation(computationId)
+            }
+        })
 
         this.dataChange.subscribe(data => {
             if (data.length > 0) {
@@ -369,6 +379,20 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
+    shareComputation(correlation_uuid: string, event: Event) {
+        event.stopPropagation()
+
+        const shareLink = this.shareService.getShareUrl(correlation_uuid)
+
+        navigator.clipboard.writeText(shareLink)
+        this.snackBar.open('Computation link copied to clipboard', 'Close', {
+            duration: 4000,
+            verticalPosition: 'bottom',
+            horizontalPosition: 'center',
+            panelClass: ['success-snackbar']
+        })
+    }
+
     storeActiveArtifact(artifact: ArtifactEntity) {
         if (artifact) {
             this.activeArtifact = artifact
@@ -497,5 +521,55 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .split('_')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ')
+    }
+
+    importComputation(correlationUuid: string): void {
+        if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
+            this.snackBar.open(
+                'Computation ID #' + this.formatUUID(correlationUuid) + ' has already been imported',
+                'Close',
+                {
+                    duration: 4000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                }
+            )
+            return
+        }
+
+        this.pluginService.getComputationMetadata(correlationUuid).subscribe({
+            next: (response: ComputationMetadata) => {
+                const computation: ComputationEntity = {
+                    correlation_uuid: correlationUuid,
+                    pluginId: response.plugin_info?.plugin_id,
+                    pluginName: response.plugin_info?.plugin_id,
+                    timestamp: response.timestamp,
+                    status: 'SUCCESS',
+                    aoiName: response.aoi?.get('name'),
+                    artifacts: [],
+                    params: response.params
+                }
+
+                this.currentRuns.push(computation)
+                this.pluginService.refreshComputesInLS(this.currentRuns)
+                this.fetchAndProcessComputations(computation)
+                this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', 'Close', {
+                    duration: 4000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['success-snackbar']
+                })
+            },
+            error: error => {
+                console.error('Error importing computation:', error)
+                this.snackBar.open('Error importing computation', 'Close', {
+                    duration: 4000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                })
+            }
+        })
     }
 }
