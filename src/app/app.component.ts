@@ -10,7 +10,7 @@ import { ReportService } from './dashboard/report/report.service'
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    title = 'Climate Action Platform'
+    title = 'Climate Action Navigator'
     name = 'HeiGIT'
     version: string = packageInfo.version
 
