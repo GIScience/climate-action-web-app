@@ -31,8 +31,9 @@ export class ShareService {
     }
 
     getShareUrl(computationId: string): string {
-        const currentUrl = window.location.origin + this.router.url.split('?')[0]
-        return `${currentUrl}?share-id=${computationId}`
+        const currentPath = window.location.pathname.split('?')[0]
+        const baseUrl = window.location.origin
+        return `${baseUrl}${currentPath}?share-id=${computationId}`
     }
 
     onComputationToImport() {
