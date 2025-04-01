@@ -1,1 +1,6 @@
-export type RunStatus = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE'
+export type ComputationState = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | 'REVOKED'
+
+export type ComputationStateInfo = {
+    state: ComputationState
+    message: string
+}
