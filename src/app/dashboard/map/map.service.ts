@@ -30,7 +30,6 @@ import XYZ from 'ol/source/XYZ'
 import { getArea } from 'ol/sphere'
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style } from 'ol/style'
 import { StyleFunction } from 'ol/style/Style'
-import TileGrid from 'ol/tilegrid/TileGrid'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
@@ -242,27 +241,6 @@ export class MapService {
             visible: true
         })
 
-        const heigitCarto = new ExtendedTileLayer({
-            name: 'HeiGIT Carto',
-            baseLayer: true,
-            visible: false,
-            source: new XYZ({
-                tileGrid: new TileGrid({
-                    extent: [-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244],
-                    resolutions: [
-                        78271.51696402048, 39135.75848201024, 19567.87924100512, 9783.93962050256, 4891.96981025128,
-                        2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705, 152.8740565703525,
-                        76.43702828517625, 38.21851414258813, 19.109257071294063, 9.554628535647032, 4.777314267823516,
-                        2.388657133911758, 1.194328566955879, 0.5971642834779395, 0.29858214173896974
-                    ]
-                }),
-                url: 'https://maps.heigit.org/osm-wms/tms/1.0.0/osm_auto:all/webmercator/{z}/{x}/{-y}.png',
-                attributions:
-                    'Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Service © <a href="https://heigit.org" target="_blank">HeiGIT</a> @ <a href="https://www.uni-heidelberg.de/" target="_blank">Heidelberg University</a>.',
-                attributionsCollapsible: false
-            })
-        })
-
         const aerialImagery = new ExtendedTileLayer({
             name: 'ESRI World Imagery',
             baseLayer: true,
@@ -303,7 +281,7 @@ export class MapService {
         })
 
         this.map = new Map({
-            layers: [greyscaleBase, aerialImagery, heigitCarto, osmCarto],
+            layers: [greyscaleBase, aerialImagery, osmCarto],
             target: targetId,
             view: initialView,
             overlays: [this.mapPopUp],

@@ -18,10 +18,10 @@ describe('mapService', () => {
     it('display the layerswitcher', () => {
         cy.get('.ol-layerswitcher').should('exist')
 
-        const expectedTexts = ['OSM Carto', 'ESRI World Imagery', 'HeiGIT Carto', 'Carto Positron']
+        const expectedTexts = ['OSM Carto', 'ESRI World Imagery', 'Carto Positron']
 
         cy.get('.ol-layerswitcher li.baselayer label span')
-            .should('have.length', 4)
+            .should('have.length', 3)
             .each(item => {
                 cy.wrap(item)
                     .invoke('text')
