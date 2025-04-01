@@ -761,13 +761,13 @@ export const mockPluginBlueprint404 = () => {
 }
 
 export const mockPluginBluePrintIcon = () => {
-    cy.intercept('/api/v1/gateway/store/plugin_blueprint/icon?plugin_version=0.0.1', {
+    cy.intercept('/api/v1/gateway/store/plugin_blueprint/icon', {
         fixture: 'plugin_bp_icon.jpeg'
     }).as('getPluginBlueprintIcon')
 }
 
 export const mockPluginWalkabilitytIcon = () => {
-    cy.intercept('/api/v1/gateway/store/walkability/icon?plugin_version=1.0.0', {
+    cy.intercept('/api/v1/gateway/store/walkability/icon', {
         fixture: 'plugin_walkability_icon.jpeg'
     }).as('getPluginWalkabiityIcon')
 }

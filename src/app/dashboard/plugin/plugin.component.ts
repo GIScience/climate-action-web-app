@@ -99,7 +99,7 @@ export class PluginComponent implements AfterViewInit {
                 return this.pluginService.getPluginDetails(pluginName).pipe(
                     tap(this.processSourceUrls),
                     tap(plugin => {
-                        plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id, plugin.version)
+                        plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id)
                         this.loading = false
                         return plugin
                     }),
@@ -124,7 +124,7 @@ export class PluginComponent implements AfterViewInit {
                                 demo_config: null,
                                 sources: null,
                                 assets: {
-                                    icon: this.pluginService.getIconUrl(pluginName || '', 'N/A')
+                                    icon: this.pluginService.getIconUrl(pluginName || '')
                                 },
                                 operator_schema: {},
                                 status: 'unavailable'
