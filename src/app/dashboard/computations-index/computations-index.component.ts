@@ -230,17 +230,17 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
             .forEach(run => {
                 this.pluginService.getComputationState(run.correlation_uuid).subscribe({
-                    next: status => {
-                        if (status === 'SUCCESS') {
+                    next: stateInfo => {
+                        if (stateInfo.state === 'SUCCESS') {
                             this.newRuns.push(run.correlation_uuid)
                             this.updateNewRunsStorage()
                             this.fetchAndProcessComputations(run)
                             if (this.syncSubscription) {
                                 this.syncSubscription.unsubscribe()
                             }
-                        } else if (status === 'FAILURE') {
+                        } else if (stateInfo.state === 'FAILURE') {
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.snackBar.open('Error while computing plugin, please try again.', 'Close', {
+                            this.snackBar.open(`Error while computing plugin: ${stateInfo.message}.`, 'Close', {
                                 verticalPosition: 'bottom',
                                 horizontalPosition: 'center',
                                 panelClass: ['error-snackbar']

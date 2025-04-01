@@ -1,5 +1,5 @@
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
-import { RunStatus } from '../common/status.types'
+import { ComputationState } from '../common/status.types'
 import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
@@ -16,7 +16,7 @@ export interface ComputationMetadata {
     aoi: Feature<MultiPolygon>
     artifacts: Artifact[]
     plugin_info: PluginBaseInfo
-    status: RunStatus
+    status: ComputationState
     message: string
 }
 

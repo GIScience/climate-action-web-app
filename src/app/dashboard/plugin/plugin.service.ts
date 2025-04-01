@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
 import { environment } from '@environments/environment'
-import { RunStatus } from '../common/status.types'
+import { ComputationState, ComputationStateInfo } from '../common/status.types'
 import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
 import GeoJSON from 'ol/format/GeoJSON'
@@ -49,8 +49,8 @@ export class PluginService {
         return this.http.get<ComputationID>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}/demo`)
     }
 
-    getComputationState(id: string): Observable<RunStatus> {
-        return this.http.get<RunStatus>(`${this.apiUrl}/api/v1/gateway/computation/${id}/state`)
+    getComputationState(id: string): Observable<ComputationStateInfo> {
+        return this.http.get<ComputationStateInfo>(`${this.apiUrl}/api/v1/gateway/computation/${id}/state`)
     }
 
     getComputationMetadata(id: string): Observable<ComputationMetadata> {
@@ -95,12 +95,12 @@ export class PluginService {
         }
     }
 
-    getComputesFromLS(status: RunStatus[]): ComputationEntity[] {
+    getComputesFromLS(status: ComputationState[]): ComputationEntity[] {
         const plugin_runs: string | null = localStorage.getItem('plugin_runs')
         if (!plugin_runs) return []
 
         const parsed_runs: ComputationEntity[] = JSON.parse(plugin_runs)
-        return parsed_runs.filter(run => status.includes(run.status as RunStatus))
+        return parsed_runs.filter(run => status.includes(run.status as ComputationState))
     }
 
     setComputeState(computeState: ComputeState): void {
@@ -118,7 +118,7 @@ export class PluginService {
             pluginId: plugin.plugin_id,
             pluginName: plugin.name,
             timestamp: new Date(),
-            status: 'PENDING' as RunStatus,
+            status: 'PENDING' as ComputationState,
             aoiName: aoiName
         }
         runs.push(currentRunInfo as ComputationEntity)
@@ -135,7 +135,7 @@ export class PluginService {
         return this.pluginRunsSubject.asObservable()
     }
 
-    updateRunStatus(correlationId: string, newStatus: RunStatus) {
+    updateRunStatus(correlationId: string, newStatus: ComputationState) {
         const runs = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
         const index = runs.findIndex(run => run.correlation_uuid === correlationId)
 
