@@ -63,7 +63,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                     const pluginCard = {
                         plugin_id: plugin.plugin_id,
                         name: plugin.name,
-                        icon: this.pluginService.getIconUrl(plugin.plugin_id, plugin.version),
+                        icon: this.pluginService.getIconUrl(plugin.plugin_id),
                         library_version: plugin.library_version,
                         version: plugin.version,
                         purpose: plugin.purpose,
@@ -85,7 +85,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                         const offlineCard = {
                             plugin_id: run.pluginId,
                             name: run.pluginName,
-                            icon: this.pluginService.getIconUrl(run.pluginId || '', 'N/A'),
+                            icon: this.pluginService.getIconUrl(run.pluginId || ''),
                             library_version: 'N/A',
                             version: 'N/A',
                             purpose: 'This plugin is currently offline',

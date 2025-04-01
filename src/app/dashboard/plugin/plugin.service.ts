@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { environment } from '@environments/environment'
+import { Feature } from 'ol'
+import GeoJSON from 'ol/format/GeoJSON'
+import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
-import { environment } from '@environments/environment'
 import { ComputationState, ComputationStateInfo } from '../common/status.types'
 import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
-import GeoJSON from 'ol/format/GeoJSON'
-import { MultiPolygon } from 'ol/geom'
-import { Feature } from 'ol'
 
 @Injectable({
     providedIn: 'root'
@@ -29,8 +29,8 @@ export class PluginService {
 
     constructor(private http: HttpClient) {}
 
-    getIconUrl(pluginId: string, pluginVersion: string): string {
-        return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon?plugin_version=${pluginVersion}`
+    getIconUrl(pluginId: string) {
+        return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon`
     }
 
     getPlugins(): Observable<Plugin[]> {
