@@ -1,6 +1,6 @@
-[![pipeline status](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/badges/main/pipeline.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/commits/main)
-[![Latest Release](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/badges/release.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/releases)
-[![coverage report](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/badges/main/coverage.svg)](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/web-app/-/commits/main)
+[![pipeline status](https://gitlab.heigit.org/climate-action/web-app/badges/main/pipeline.svg)](https://gitlab.heigit.org/climate-action/web-app/-/commits/main)
+[![Latest Release](https://gitlab.heigit.org/climate-action/web-app/-/badges/release.svg)](https://gitlab.heigit.org/climate-action/web-app/-/releases)
+[![coverage report](https://gitlab.heigit.org/climate-action/web-app/badges/main/coverage.svg)](https://gitlab.heigit.org/climate-action/web-app/-/commits/main)
 
 # Climate Action Navigator
 
@@ -50,7 +50,7 @@ For the Search function to work, you'll need to acquire an API key from our sear
 
 ### Backend Server
 
-To see more than the raw website and access the plugins, you will need to set up a local dev environment of the [Climate Action Infrastructure](https://gitlab.gistools.geog.uni-heidelberg.de/climate-action/infrastructure).
+To see more than the raw website and access the plugins, you will need to set up a local dev environment of the [Climate Action Infrastructure](https://gitlab.heigit.org/climate-action/infrastructure).
 
 Make sure to start at least one plugin along with the API Gateway, for example `docker compose up -d ca-plugin-blueprint ca-api-gateway`
 
