@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
+import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import {
     Archive,
@@ -525,35 +526,29 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     importComputation(correlationUuid: string): void {
         if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
-            this.snackBar.open(
-                'Computation ID #' + this.formatUUID(correlationUuid) + ' has already been imported',
-                'Close',
-                {
-                    duration: 4000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                }
-            )
+            this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' is already present', 'Close', {
+                duration: 4000,
+                verticalPosition: 'bottom',
+                horizontalPosition: 'center',
+                panelClass: ['error-snackbar']
+            })
             return
         }
 
         this.pluginService.getComputationMetadata(correlationUuid).subscribe({
             next: (response: ComputationMetadata) => {
-                const computation: ComputationEntity = {
+                const computation = {
                     correlation_uuid: correlationUuid,
                     pluginId: response.plugin_info?.plugin_id,
-                    pluginName: response.plugin_info?.plugin_id,
+                    pluginName: derivePluginNameFromId(response.plugin_info.plugin_id),
                     timestamp: response.timestamp,
                     status: 'SUCCESS',
-                    aoiName: response.aoi?.get('name'),
-                    artifacts: [],
-                    params: response.params
+                    aoiName: response.aoi?.get('name')
                 }
 
-                this.currentRuns.push(computation)
+                this.currentRuns.push(computation as ComputationEntity)
                 this.pluginService.refreshComputesInLS(this.currentRuns)
-                this.fetchAndProcessComputations(computation)
+                this.fetchAndProcessComputations(computation as ComputationEntity)
                 this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', 'Close', {
                     duration: 4000,
                     verticalPosition: 'bottom',

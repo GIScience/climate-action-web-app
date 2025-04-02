@@ -3,11 +3,12 @@ import { AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild } f
 import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute } from '@angular/router'
 import { Source } from '@app/types/sources/sources.type'
+import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { CircleX, CloudOff, LucideAngularModule, RedoDot } from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs'
+import { Observable, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { PluginParameterComponent } from './plugin-parameter/plugin-parameter.component'
 import { ComputeState, Plugin } from './plugin.interface'
@@ -89,14 +90,14 @@ export class PluginComponent implements AfterViewInit {
     private loadPluginDetails() {
         this.pluginObs$ = this.route.paramMap.pipe(
             map(params => params.get('name')),
-            switchMap(pluginName => {
-                if (!pluginName || pluginName == '') {
-                    throw Error(`Plugin ${pluginName} does not exist`)
+            switchMap(pluginId => {
+                if (!pluginId || pluginId == '') {
+                    throw Error(`Plugin ${pluginId} does not exist`)
                 }
 
                 this.loading = true
 
-                return this.pluginService.getPluginDetails(pluginName).pipe(
+                return this.pluginService.getPluginDetails(pluginId).pipe(
                     tap(this.processSourceUrls),
                     tap(plugin => {
                         plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id)
@@ -106,15 +107,11 @@ export class PluginComponent implements AfterViewInit {
                     catchError(error => {
                         this.loading = false
                         if (error.status === 404) {
-                            //TODO: Create offline plugin name based on route, to be removed when API is updated
-                            const displayName = pluginName
-                                .split('_')
-                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                .join(' ')
+                            const displayName = derivePluginNameFromId(pluginId)
 
                             const plugin: Plugin = {
                                 name: displayName,
-                                plugin_id: pluginName,
+                                plugin_id: pluginId,
                                 version: 'N/A',
                                 library_version: 'N/A',
                                 purpose: 'This plugin is currently offline. Previous computations are still available.',
@@ -124,7 +121,7 @@ export class PluginComponent implements AfterViewInit {
                                 demo_config: null,
                                 sources: null,
                                 assets: {
-                                    icon: this.pluginService.getIconUrl(pluginName || '')
+                                    icon: this.pluginService.getIconUrl(pluginId || '')
                                 },
                                 operator_schema: {},
                                 status: 'unavailable'
