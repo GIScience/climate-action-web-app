@@ -1,4 +1,5 @@
 import { HexColor } from '@app/types/color/color.type'
+import type { Data, Layout } from 'plotly.js-cartesian-dist'
 
 export interface DiscreteLegendData {
     [key: string]: HexColor
@@ -26,7 +27,7 @@ export interface AttachmentsObject {
 
 export interface Artifact {
     name: string
-    modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
+    modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'CHART_PLOTLY' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
     primary: boolean
     file_path: string
     summary?: string
@@ -47,6 +48,11 @@ export interface ChartData {
     color: HexColor | HexColor[]
     x: string[] | number[]
     y: number[]
+}
+
+export interface PlotlyChartData {
+    data: Data[]
+    layout: Partial<Layout>
 }
 
 export type ActiveArtifactRef = Pick<Artifact, 'correlation_uuid' | 'store_id'>

@@ -3,8 +3,7 @@ import { Injectable } from '@angular/core'
 import { SafeUrl } from '@angular/platform-browser'
 import { environment } from '@environments/environment'
 import { BehaviorSubject } from 'rxjs'
-import { Artifact, ArtifactData, ChartData, LegendObject } from './artifact.interface'
-
+import { Artifact, ArtifactData, ChartData, LegendObject, PlotlyChartData } from './artifact.interface'
 @Injectable({
     providedIn: 'root'
 })
@@ -38,6 +37,12 @@ export class ArtifactService {
     })
     chart = this.chartSubject.asObservable()
 
+    private plotlyChartSubject = new BehaviorSubject<{ data: PlotlyChartData | null; artifact: Artifact | null }>({
+        data: null,
+        artifact: null
+    })
+    plotlyChart = this.plotlyChartSubject.asObservable()
+
     constructor(private http: HttpClient) {}
 
     getMarkdown(artifact: Artifact): void {
@@ -66,6 +71,19 @@ export class ArtifactService {
             .get<ChartData>(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
             .subscribe(data => {
                 this.chartSubject.next({
+                    data: data,
+                    artifact: artifact
+                })
+            })
+    }
+
+    getPlotlyChart(artifact: Artifact): void {
+        this.http
+            .get<PlotlyChartData>(
+                `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`
+            )
+            .subscribe(data => {
+                this.plotlyChartSubject.next({
                     data: data,
                     artifact: artifact
                 })
@@ -116,6 +134,9 @@ export class ArtifactService {
                 case 'CHART':
                     this.getChart(artifact)
                     break
+                case 'CHART_PLOTLY':
+                    this.getPlotlyChart(artifact)
+                    break
             }
         })
     }
@@ -139,6 +160,7 @@ export class ArtifactService {
         this.imageSubject.next(null)
         this.tableSubject.next(null)
         this.chartSubject.next({ data: null, artifact: null })
+        this.plotlyChartSubject.next({ data: null, artifact: null })
         this.geojsonSubject.next(null)
         this.geotiffSubject.next(null)
         this.legendSubject.next(null)

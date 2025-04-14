@@ -40,7 +40,8 @@
                             "papaparse/papaparse.min.js",
                             "rbush",
                             "earcut",
-                            "moment"
+                            "moment",
+                            "plotly.js-cartesian-dist"
                         ]
                     },
                     "configurations": {

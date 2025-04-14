@@ -33,7 +33,8 @@ import { ComputationEntity, ComputationMetadata, ComputationParameters } from '.
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
     IMAGE: 'image',
     MARKDOWN: 'description',
-    CHART: 'bar_chart',
+    CHART: 'data_usage',
+    CHART_PLOTLY: 'bar_chart',
     TABLE: 'table_chart',
     MAP_LAYER_GEOJSON: 'layers',
     MAP_LAYER_GEOTIFF: 'map'
@@ -44,8 +45,9 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     image: 2,
     layers: 3,
     map: 4,
-    bar_chart: 5,
-    table_chart: 6
+    data_usage: 5,
+    bar_chart: 6,
+    table_chart: 7
 }
 
 @Component({

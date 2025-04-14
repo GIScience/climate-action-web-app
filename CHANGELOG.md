@@ -11,12 +11,12 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - The custom JSONSchema parser was replaced with a slight adaption of the Formly-provided parser
 - Date input is now shown in a more human friendly manner
+- It was decided to call the website `Climate Action Navigator` hence all occurrences were
+  renamed ([#251](https://gitlab.heigit.org/climate-action/web-app/-/issues/251))
 
 - Moved the Unit Testing Framework from Karma to
   Jest ([#303](https://gitlab.heigit.org/climate-action/web-app/-/issues/303))
-
-- It was decided to call the website `Climate Action Navigator` hence all occurrences were
-  renamed ([#251](https://gitlab.heigit.org/climate-action/web-app/-/issues/251))
+- A new charting library (Plotly) is implemented to handle updated charts from the backend ([#287](https://gitlab.heigit.org/climate-action/web-app/-/issues/287))
 
 ### Fixed
 

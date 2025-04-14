@@ -7,7 +7,7 @@ import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
 import { Observable, Subscription, take } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
-import { ArtifactData, ArtifactEntity, ChartData } from '../artifact/artifact.interface'
+import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo, ComputationEntity } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
@@ -144,7 +144,11 @@ export class ComputationComponent {
             IMAGE: { observable: this.artifactService.image, check: (data: ArtifactData | null) => !!data?.url },
             MARKDOWN: { observable: this.artifactService.markdown, check: (data: ArtifactData | null) => !!data?.url },
             TABLE: { observable: this.artifactService.table, check: (data: ArtifactData | null) => !!data?.url },
-            CHART: { observable: this.artifactService.chart, check: (data: ChartData | null) => !!data }
+            CHART: { observable: this.artifactService.chart, check: (data: ChartData | null) => !!data },
+            CHART_PLOTLY: {
+                observable: this.artifactService.plotlyChart,
+                check: (data: PlotlyChartData | null) => !!data
+            }
         }
 
         if (artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF') {
@@ -152,6 +156,7 @@ export class ComputationComponent {
             this.artifactViewerService.minimised = true
         } else if (
             artifact.modality === 'CHART' ||
+            artifact.modality === 'CHART_PLOTLY' ||
             artifact.modality === 'TABLE' ||
             artifact.modality === 'IMAGE' ||
             artifact.modality === 'MARKDOWN'

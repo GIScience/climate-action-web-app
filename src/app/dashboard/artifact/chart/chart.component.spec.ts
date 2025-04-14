@@ -24,7 +24,7 @@ jest.mock('chart.js', () => {
     }
 })
 
-describe('BarChartComponent', () => {
+describe('ChartComponent', () => {
     let component: ChartComponent
     let fixture: ComponentFixture<ChartComponent>
 
