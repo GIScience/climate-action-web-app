@@ -241,11 +241,15 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                             }
                         } else if (stateInfo.state === 'FAILURE') {
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.snackBar.open(`Error while computing plugin: ${stateInfo.message}.`, 'Close', {
-                                verticalPosition: 'bottom',
-                                horizontalPosition: 'center',
-                                panelClass: ['error-snackbar']
-                            })
+                            this.snackBar.open(
+                                `Error while computing plugin${stateInfo.message ? ': ' + stateInfo.message : ''}.`,
+                                'Close',
+                                {
+                                    verticalPosition: 'bottom',
+                                    horizontalPosition: 'center',
+                                    panelClass: ['error-snackbar']
+                                }
+                            )
                         }
                     },
                     error: error => {
