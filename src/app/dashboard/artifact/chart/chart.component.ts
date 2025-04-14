@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
-import { ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem } from 'chart.js'
 import { convertToTitleCase } from '@app/utils/artifact-utils'
+import { ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem } from 'chart.js'
 
 import { Artifact, ChartData } from '../artifact.interface'
 

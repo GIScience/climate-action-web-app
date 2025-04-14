@@ -20,6 +20,7 @@ import { GeojsonComponent } from './geojson/geojson.component'
 import { GeoTiffComponent } from './geotiff/geotiff.component'
 import { ImageComponent } from './image/image.component'
 import { MarkdownComponent } from './markdown/markdown.component'
+import { PlotlyChartComponent } from './plotly-chart/plotly-chart.component'
 import { TableComponent } from './table/table.component'
 
 @Component({
@@ -127,6 +128,10 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         service.chart.subscribe(v => {
             if (!v.data) this.clearContainer()
             else this.display(ChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
+        })
+        service.plotlyChart.subscribe(v => {
+            if (!v.data) this.clearContainer()
+            else this.display(PlotlyChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
         })
     }
 
