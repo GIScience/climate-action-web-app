@@ -17,6 +17,7 @@ import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { NgChartsModule } from 'ng2-charts'
 import { MarkdownModule } from 'ngx-markdown'
+import { AccountComponent } from './account/account.component'
 import { AppComponent } from './app.component'
 import { CustomRouteReuseStrategy } from './app.ext'
 import { AppRoutingModule } from './app.routing.module'
@@ -59,6 +60,7 @@ import { tooltipVariation } from './utils/tooltip-variations'
         MatSnackBarModule,
         PluginCatalogComponent,
         MatDialogModule,
+        AccountComponent,
         FormlyModule.forRoot({
             validationMessages: [
                 { name: 'required', message: 'This field is required' },

@@ -22,7 +22,7 @@
             position: relative;
             transition: width 0.25s ease;
             width: 75%;
-            z-index: 2;
+            z-index: 1;
 
             &:focus,
             &:not(:placeholder-shown) {

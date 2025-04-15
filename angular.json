@@ -41,7 +41,9 @@
                             "rbush",
                             "earcut",
                             "moment",
-                            "plotly.js-cartesian-dist"
+                            "plotly.js-cartesian-dist",
+                            "cross-fetch",
+                            "isomorphic-form-data"
                         ]
                     },
                     "configurations": {

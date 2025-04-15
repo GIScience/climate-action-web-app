@@ -9,12 +9,6 @@ header {
         height: $header-height;
         justify-content: space-between;
 
-        .logo-wrapper,
-        .my-account {
-            flex-basis: 0;
-            flex-grow: 1;
-        }
-
         .logo-wrapper {
             padding: 0 25px;
 
@@ -89,14 +83,6 @@ header {
             cursor: pointer;
             line-height: 50px;
             margin: 0;
-        }
-
-        .my-account {
-            i-lucide {
-                display: none;
-                float: right;
-                margin-right: 25px;
-            }
         }
     }
 

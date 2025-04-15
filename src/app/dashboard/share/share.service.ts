@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { BehaviorSubject, filter, map, take } from 'rxjs'
+import { getCurrentCanonicalUrl } from '../../utils/url.utils'
 
 @Injectable({
     providedIn: 'root'
@@ -31,9 +32,7 @@ export class ShareService {
     }
 
     getShareUrl(computationId: string): string {
-        const currentPath = window.location.pathname.split('?')[0]
-        const baseUrl = window.location.origin
-        return `${baseUrl}${currentPath}?share-id=${computationId}`
+        return `${getCurrentCanonicalUrl()}?share-id=${computationId}`
     }
 
     onComputationToImport() {

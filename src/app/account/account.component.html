@@ -1,0 +1,58 @@
+<div class="account-container">
+    <div class="account-menu">
+        <button class="profile-button" (click)="toggleAccountMenu()">
+            Account
+            <i-lucide [img]="SquareUserRound" size="27.5" color="#666" *ngIf="!user"></i-lucide>
+            <i-lucide [img]="SquareUserRound" size="27.5" color="#008080" *ngIf="user"></i-lucide>
+        </button>
+        <ng-container *ngIf="!user">
+            <div
+                class="account-menu__content"
+                [class.show]="accountMenuOpen"
+                (mouseleave)="closeAccountMenu()"
+                (mouseenter)="cancelAccountMenuClose()">
+                <a [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())" class="account-menu__item">
+                    <i-lucide [img]="KeyRound" size="20"></i-lucide>
+                    Login
+                </a>
+                <a
+                    [href]="getAppwriteUrl('/signup?redirect=' + getRedirectUrl())"
+                    class="account-menu__item"
+                    target="_blank">
+                    <i-lucide [img]="UserPlus" size="20"></i-lucide>
+                    Register
+                </a>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="user">
+            <div
+                class="account-menu__content"
+                [class.show]="accountMenuOpen"
+                (mouseleave)="closeAccountMenu()"
+                (mouseenter)="cancelAccountMenuClose()">
+                <div class="user-info">
+                    <div class="name">{{ user.name }}</div>
+                    <div class="email">{{ user.email }}</div>
+                </div>
+                <div class="divider"></div>
+                <a [href]="getAppwriteUrl('/manage/profile')" class="account-menu__item" target="_blank">
+                    <i-lucide [img]="User" size="20"></i-lucide>
+                    Edit Profile
+                </a>
+                <a [href]="getAppwriteUrl('/manage/key')" class="account-menu__item" target="_blank">
+                    <i-lucide [img]="Percent" size="20"></i-lucide>
+                    View Usage
+                </a>
+                <div class="divider"></div>
+                <a href="mailto:climateactionnavigator@heigit.org" class="account-menu__item" target="_blank">
+                    <i-lucide [img]="LifeBuoy" size="20"></i-lucide>
+                    Support
+                </a>
+                <button (click)="logout()" class="account-menu__item logout-button">
+                    <i-lucide [img]="Logout" size="20"></i-lucide>
+                    Logout
+                </button>
+            </div>
+        </ng-container>
+    </div>
+</div>

@@ -2,26 +2,47 @@
     <div
         class="area-selection-message"
         [ngClass]="{
-            'message--info': !areaSelected,
-            'message--blocked': areaSelected && this.mapService.selectedFeatures.getLength() > 1,
-            'message--warning': areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500
+            'message--info': !user || !areaSelected,
+            'message--blocked': user && areaSelected && this.mapService.selectedFeatures.getLength() > 1,
+            'message--warning':
+                user &&
+                areaSelected &&
+                this.mapService.selectedFeatures.getLength() === 1 &&
+                this.mapService.selectedFeatures.item(0).get('area') > 500
         }"
         *ngIf="
+            !user ||
             !areaSelected ||
             (areaSelected && this.mapService.selectedFeatures.getLength() > 1) ||
-            (areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500)
+            (areaSelected &&
+                this.mapService.selectedFeatures.getLength() === 1 &&
+                this.mapService.selectedFeatures.item(0).get('area') > 500)
         ">
         <i-lucide
-            [img]="!areaSelected ? MapPinPlusInside : this.mapService.selectedFeatures.getLength() > 1 ? TriangleAlert : CircleAlert"
+            [img]="
+                !user
+                    ? UserCheck
+                    : !areaSelected
+                      ? MapPinPlusInside
+                      : this.mapService.selectedFeatures.getLength() > 1
+                        ? TriangleAlert
+                        : CircleAlert
+            "
             size="20"></i-lucide>
         <span>
-            <ng-container *ngIf="!areaSelected">Select an area on the map to continue.</ng-container>
-            <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
-            >Multiple areas selected. Please select only one.</ng-container
+            <ng-container *ngIf="!user">Please login to continue.</ng-container>
+            <ng-container *ngIf="user && !areaSelected">Select an area on the map to continue.</ng-container>
+            <ng-container *ngIf="user && areaSelected && this.mapService.selectedFeatures.getLength() > 1"
+                >Multiple areas selected. Please select only one.</ng-container
             >
             <ng-container
-                *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() === 1 && this.mapService.selectedFeatures.item(0).get('area') > 500"
-            >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
+                *ngIf="
+                    user &&
+                    areaSelected &&
+                    this.mapService.selectedFeatures.getLength() === 1 &&
+                    this.mapService.selectedFeatures.item(0).get('area') > 500
+                "
+                >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
             >
         </span>
     </div>
@@ -41,20 +62,24 @@
                 [form]="form"
                 class="plugin-params-form"></formly-form>
             <div class="btn-container">
-                <button
-                    type="submit"
-                    appearance="primary"
-                    class="btn-primary btn-withtext"
-                    [disabled]="!form.valid || this.mapService.selectedFeatures.getLength() !== 1">
-                    <i-lucide [img]="CirclePlay" size="20"></i-lucide>
-                    Compute
-                </button>
-                <div matTooltip="This plugin does not provide a demo."
-                     [matTooltipDisabled]="this.plugin.demo_config!==null">
+                <div matTooltip="Please login to request a computation." [matTooltipDisabled]="!!user">
+                    <button
+                        type="submit"
+                        appearance="primary"
+                        class="btn-primary btn-withtext"
+                        [disabled]="!user || !form.valid || this.mapService.selectedFeatures.getLength() !== 1">
+                        <i-lucide [img]="CirclePlay" size="20"></i-lucide>
+                        Compute
+                    </button>
+                </div>
+                <div
+                    matTooltip="This plugin does not provide a demo."
+                    [matTooltipDisabled]="this.plugin.demo_config !== null">
                     <button
                         type="button"
                         appearance="primary"
-                        class="btn-primary btn-withtext" (click)="runDemo()"
+                        class="btn-primary btn-withtext"
+                        (click)="runDemo()"
                         [disabled]="!this.plugin.demo_config">
                         <i-lucide [img]="Eye" size="20"></i-lucide>
                         Demo
