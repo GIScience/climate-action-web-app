@@ -141,7 +141,7 @@ describe('mapService', () => {
         mockGeoJson()
 
         beforeCompareSnapshots(
-            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .child-computations, .child-computations-wrapper'
+            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .child-computations, .child-computations-wrapper, .mdc-snackbar'
         )
 
         cy.window().then(win => {

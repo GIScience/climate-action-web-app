@@ -1,9 +1,24 @@
 import { TestBed } from '@angular/core/testing'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { environment } from '@environments/environment'
 import { Account, Models } from 'appwrite'
 import { AppwriteService } from './appwrite.service'
 
+jest.mock('@environments/environment', () => ({
+    environment: {
+        production: false,
+        appwriteEndpoint: 'mock-endpoint',
+        appwriteProjectId: 'mock-project-id'
+    }
+}))
+
 const originalConsoleError = console.error
 console.error = jest.fn()
+
+const mockSnackBar = {
+    open: jest.fn()
+}
 
 jest.mock('appwrite', () => ({
     Account: jest.fn().mockImplementation(() => ({
@@ -39,7 +54,10 @@ describe('AppwriteService', () => {
     } as Models.User<Models.Preferences>
 
     beforeEach(() => {
-        TestBed.configureTestingModule({})
+        TestBed.configureTestingModule({
+            imports: [NoopAnimationsModule],
+            providers: [{ provide: MatSnackBar, useValue: mockSnackBar }]
+        })
         service = TestBed.inject(AppwriteService)
         mockAccount = service['account'] as jest.Mocked<Account>
     })
@@ -63,7 +81,12 @@ describe('AppwriteService', () => {
         it('should handle failed login', async () => {
             mockAccount.get.mockRejectedValue(new Error('Failed to login'))
 
+            const originalProduction = environment.production
+            environment.production = true
+
             const result = await service.tryToLogin()
+
+            environment.production = originalProduction
 
             expect(result).toBe(false)
             service._user.subscribe(user => {
