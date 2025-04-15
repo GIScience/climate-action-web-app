@@ -12,6 +12,9 @@ export class AppwriteService {
     private account = new Account(this.client)
     public _user = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
 
+    // @ts-ignore: Suppress TypeScript error for test environment detection
+    private isTestEnvironment = typeof jest !== 'undefined' || typeof Cypress !== 'undefined'
+
     constructor(private snackBar: MatSnackBar) {
         this.client.setEndpoint(environment.appwriteEndpoint + '/v1').setProject(environment.appwriteProjectId)
 
@@ -28,7 +31,10 @@ export class AppwriteService {
             return true
         } catch (error) {
             if (!environment.production) {
-                console.warn('Login failed, creating a fake user for testing purposes.')
+                if (!this.isTestEnvironment) {
+                    console.warn('Login failed, creating a fake user for testing purposes.')
+                }
+
                 const mockUser: Models.User<Models.Preferences> = {
                     $id: 'fake-user-id',
                     $createdAt: new Date().toISOString(),
@@ -39,12 +45,16 @@ export class AppwriteService {
                     labels: ['signupCompleted'],
                     prefs: {}
                 } as Models.User<Models.Preferences>
+
                 this._user.next(mockUser)
-                this.snackBar.open('Login was unsuccessful. Computations created now will not persist!', 'Close', {
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                })
+
+                if (!this.isTestEnvironment) {
+                    this.snackBar.open('Login was unsuccessful. Computations created now will not persist!', 'Close', {
+                        verticalPosition: 'bottom',
+                        horizontalPosition: 'center',
+                        panelClass: ['error-snackbar']
+                    })
+                }
                 return true
             }
             this._user.next(null)
