@@ -1,10 +1,16 @@
 .app-container {
     display: flex;
     overflow: hidden;
+    z-index: 1;
 
     router-outlet {
         display: contents;
     }
+}
+
+my-account {
+    flex-basis: 0;
+    flex-grow: 1;
 }
 
 app-dashboard {

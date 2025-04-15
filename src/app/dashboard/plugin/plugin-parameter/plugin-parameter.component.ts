@@ -2,18 +2,28 @@ import { CommonModule, NgIf } from '@angular/common'
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatTooltip } from '@angular/material/tooltip'
+import { AppwriteService } from '@app/appwrite.service'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
+import { Models } from 'appwrite'
 import { JSONSchema7 } from 'json-schema'
-import { CircleAlert, CirclePlay, Eye, LucideAngularModule, MapPinPlusInside, TriangleAlert } from 'lucide-angular'
-import Feature from 'ol/Feature'
-import { fromEventPattern, Subscription } from 'rxjs'
-import { FormlyModel } from './plugin-parameter.interface'
+import {
+    CircleAlert,
+    CirclePlay,
+    Eye,
+    LucideAngularModule,
+    MapPinPlusInside,
+    TriangleAlert,
+    UserCheck
+} from 'lucide-angular'
 import moment from 'moment/moment'
-import { MatTooltip } from '@angular/material/tooltip'
+import Feature from 'ol/Feature'
+import { Subscription, fromEventPattern } from 'rxjs'
+import { FormlyModel } from './plugin-parameter.interface'
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -32,11 +42,14 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     model: FormlyModel = {}
     options: FormlyFormOptions = {}
 
+    user: Models.User<Models.Preferences> | null = null
+
     readonly CirclePlay = CirclePlay
     readonly Eye = Eye
     readonly MapPinPlusInside = MapPinPlusInside
     readonly TriangleAlert = TriangleAlert
     readonly CircleAlert = CircleAlert
+    readonly UserCheck = UserCheck
 
     areaSelected = false
     highlightedFeaturesSubscription: Subscription | undefined
@@ -46,7 +59,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         private snackBar: MatSnackBar,
         public mapService: MapService,
         private cdr: ChangeDetectorRef,
-        private formlyJsonschema: FormlyJsonschema
+        private formlyJsonschema: FormlyJsonschema,
+        private appwriteService: AppwriteService
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.selectedFeatures.on('change:length', handler)
@@ -54,6 +68,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
             this.toggleFormState()
+        })
+
+        this.appwriteService._user.subscribe(user => {
+            this.user = user
         })
     }
 
@@ -69,7 +87,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     onSubmit(model: FormlyModel) {
-        if (this.form.valid) {
+        if (this.user && this.form.valid) {
             this.requestCompute(model)
         }
     }

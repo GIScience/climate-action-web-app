@@ -48,4 +48,4 @@ cypress/downloads/*
 Thumbs.db
 
 # API Keys
-/src/environments/api-keys/*.ts
+/src/environments/keys-and-ids/*.ts
