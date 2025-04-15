@@ -16,6 +16,9 @@ jest.mock('@environments/environment', () => ({
 const originalConsoleError = console.error
 console.error = jest.fn()
 
+const originalConsoleWarn = console.warn
+console.warn = jest.fn()
+
 const mockSnackBar = {
     open: jest.fn()
 }
@@ -64,6 +67,7 @@ describe('AppwriteService', () => {
 
     afterAll(() => {
         console.error = originalConsoleError
+        console.warn = originalConsoleWarn
     })
 
     describe('tryToLogin', () => {
