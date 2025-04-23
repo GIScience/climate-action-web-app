@@ -8,6 +8,7 @@ import {
     LucideAngularModule,
     Percent,
     SquareUserRound,
+    TestTubeDiagonal,
     User,
     UserPlus
 } from 'lucide-angular'
@@ -28,6 +29,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     accountMenuOpen = false
     private userSubscription: Subscription
     private closeTimeout: ReturnType<typeof setTimeout> | null = null
+    readonly environment = environment
 
     readonly SquareUserRound = SquareUserRound
     readonly User = User
@@ -36,6 +38,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     readonly Percent = Percent
     readonly LifeBuoy = LifeBuoy
     readonly Logout = LogOut
+    readonly TestTubeDiagonal = TestTubeDiagonal
 
     constructor(private appwriteService: AppwriteService) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
@@ -65,6 +68,10 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     getRedirectUrl(): string {
         return getCurrentCanonicalUrl()
+    }
+
+    loginAsFakeUser() {
+        this.appwriteService.loginAsFakeUser()
     }
 
     toggleAccountMenu() {

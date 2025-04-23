@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
+import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import {
@@ -22,13 +23,18 @@ import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { BehaviorSubject, Subscription, timer } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
-import { ActiveArtifactRef, ArtifactEntity } from '../artifact/artifact.interface'
+import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
-import { ComputationEntity, ComputationMetadata, ComputationParameters } from './computation.interface'
+import {
+    ComputationDatabaseEntity,
+    ComputationDisplayEntity,
+    ComputationMetadata,
+    ComputationParameters
+} from './computation.interface'
 
 const ARTIFACT_ICON_MAP: { [index: string]: string } = {
     IMAGE: 'image',
@@ -93,13 +99,13 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     styleUrl: './computations-index.component.scss'
 })
 export class ComputationsIndexComponent implements OnInit, OnDestroy {
-    computations: ComputationEntity[] = []
-    dataChange = new BehaviorSubject<ComputationEntity[]>([])
-    currentRuns: ComputationEntity[] = []
-    scheduledRuns: ComputationEntity[] = []
-    activeComputation?: ComputationEntity
+    computations: ComputationDisplayEntity[] = []
+    dataChange = new BehaviorSubject<ComputationDisplayEntity[]>([])
+    currentRuns: ComputationDatabaseEntity[] = []
+    scheduledRuns: ComputationDatabaseEntity[] = []
+    activeComputation?: ComputationDisplayEntity
     activeArtifact?: ArtifactEntity
-    archivedComputations: ComputationEntity[] = []
+    archivedComputations: ComputationDatabaseEntity[] = []
     showArchived = false
     newRuns: string[] = []
     currentLocale = navigator.language
@@ -133,7 +139,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private shareService: ShareService,
         private snackBar: MatSnackBar,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private storageService: StorageService
     ) {
         if (this.pluginService.computeState$) {
             this.pluginService.computeState$.subscribe(value => {
@@ -143,10 +150,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             })
         }
 
-        const storedNewRuns = localStorage.getItem('new_runs')
-        if (storedNewRuns) {
-            this.newRuns = JSON.parse(storedNewRuns)
-        }
+        this.newRuns = this.storageService.getNewRuns()
     }
 
     formatTimestamp(timestamp: Date) {
@@ -160,8 +164,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.pluginId = this.route.snapshot.params['name']
 
-        this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-        this.fetchArchivedComputations()
+        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+        this.archivedComputations = this.storageService.getArchivedRuns()
         this.startPeriodicSync()
 
         this.shareService.onComputationToImport().subscribe(computationId => {
@@ -179,20 +183,23 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         this.initializeSuccessfulRuns()
 
-        this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
+        this.scheduledRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED'])
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-            this.scheduledRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED'])
+            this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+            this.scheduledRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED'])
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
-            this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+            this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
             this.startPeriodicSync()
         })
     }
 
     toggleArchivedView(): void {
         this.showArchived = !this.showArchived
+        if (this.showArchived) {
+            this.archivedComputations = this.storageService.getArchivedRuns()
+        }
     }
 
     ngOnDestroy() {
@@ -216,18 +223,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    fetchArchivedComputations() {
-        const archivedItems = localStorage.getItem('archive_runs')
-        if (archivedItems) {
-            this.archivedComputations = JSON.parse(archivedItems).filter(
-                (computation: ComputationEntity) =>
-                    computation.status === 'PENDING' ||
-                    computation.status === 'STARTED' ||
-                    computation.status === 'SUCCESS'
-            )
-        }
-    }
-
     syncRuns() {
         this.currentRuns
             .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
@@ -235,8 +230,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.pluginService.getComputationState(run.correlation_uuid).subscribe({
                     next: stateInfo => {
                         if (stateInfo.state === 'SUCCESS') {
-                            this.newRuns.push(run.correlation_uuid)
-                            this.updateNewRunsStorage()
+                            this.storageService.markAsNew(run.correlation_uuid)
+                            this.newRuns = this.storageService.getNewRuns()
                             this.fetchAndProcessComputations(run)
                             if (this.syncSubscription) {
                                 this.syncSubscription.unsubscribe()
@@ -261,16 +256,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             })
     }
 
-    fetchAndProcessComputations(run: ComputationEntity) {
+    fetchAndProcessComputations(run: ComputationDatabaseEntity) {
         this.pluginService.getComputationMetadata(run.correlation_uuid).subscribe({
             next: (response: ComputationMetadata) => {
                 const computations = response.artifacts
                 if (!computations) return
-                const computation: ComputationEntity = {
+                const computation: ComputationDisplayEntity = {
                     correlation_uuid: run.correlation_uuid,
                     artifacts: [],
-                    status: run.status || 'PENDING',
-                    timestamp: run.timestamp,
+                    status: response.status || 'PENDING',
+                    timestamp: response.timestamp,
                     aoiName: response.aoi?.get('name'),
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.plugin_id,
@@ -316,7 +311,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
-    updateComputation(correlation_uuid: string, computation: ComputationEntity) {
+    updateComputation(correlation_uuid: string, computation: ComputationDisplayEntity) {
         if (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS') {
             this.computations = this.computations.filter(x => x.correlation_uuid != correlation_uuid)
             this.computations.push(computation)
@@ -328,15 +323,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     removeNewRunMark(correlation_uuid: string) {
-        this.newRuns = this.newRuns.filter(uuid => uuid !== correlation_uuid)
-        this.updateNewRunsStorage()
+        this.storageService.markAsViewed(correlation_uuid)
+        this.newRuns = this.storageService.getNewRuns()
     }
 
-    updateNewRunsStorage() {
-        localStorage.setItem('new_runs', JSON.stringify(this.newRuns))
-    }
-
-    toggleComputation(computation: ComputationEntity) {
+    toggleComputation(computation: ComputationDisplayEntity) {
         if (this.pluginService.computeState$) {
             this.pluginService.setComputeState('inactive')
         }
@@ -404,13 +395,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (artifact) {
             this.activeArtifact = artifact
 
-            localStorage.setItem(
-                'active_artifact',
-                JSON.stringify({
-                    correlation_uuid: artifact.correlation_uuid,
-                    store_id: artifact.store_id
-                } as ActiveArtifactRef)
-            )
+            this.storageService.saveActiveArtifact({
+                correlation_uuid: artifact.correlation_uuid,
+                store_id: artifact.store_id
+            })
         } else {
             console.error('Cannot persist active artifact: ', artifact)
         }
@@ -418,9 +406,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     activateArtifact() {
         if (this.computations.length == this.currentRuns.length) {
-            const storedItem = localStorage.getItem('active_artifact')
-            if (storedItem) {
-                const activeArtifactRef = JSON.parse(storedItem) as ActiveArtifactRef
+            const activeArtifactRef = this.storageService.getActiveArtifact()
+            if (activeArtifactRef) {
                 const parentComputation = this.computations.find(
                     x => x.correlation_uuid === activeArtifactRef.correlation_uuid
                 )
@@ -437,7 +424,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    viewParameters(computation: ComputationEntity) {
+    viewParameters(computation: ComputationDisplayEntity) {
         this.dialog.open(this.parametersDialog, {
             data: { parameters: JSON.stringify(computation.params) },
             autoFocus: false
@@ -449,22 +436,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     archiveComputation(correlation_uuid: string): void {
-        const computationToArchive = this.currentRuns.find(
-            (computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid
-        )
         const isCurrentComputation =
             this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
 
-        if (computationToArchive) {
-            this.currentRuns = this.currentRuns.filter(
-                (run: ComputationEntity) => run.correlation_uuid !== correlation_uuid
-            )
-            this.archivedComputations.push(computationToArchive)
-            this.updateLocalStorage()
-            this.refreshDataSource()
-        } else {
-            console.error('Computation to archive not found in current runs')
-        }
+        this.storageService.archiveComputation(correlation_uuid)
+        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+        this.archivedComputations = this.storageService.getArchivedRuns()
+        this.refreshDataSource()
 
         if (isCurrentComputation) {
             this.artifactViewerService.closeArtifactViewer()
@@ -472,26 +450,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     unarchiveComputation(correlation_uuid: string): void {
-        const computationToUnarchive = this.archivedComputations.find(
-            (computation: ComputationEntity) => computation.correlation_uuid === correlation_uuid
-        )
+        this.storageService.unarchiveComputation(correlation_uuid)
+        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+        this.archivedComputations = this.storageService.getArchivedRuns()
 
-        if (computationToUnarchive) {
-            this.archivedComputations = this.archivedComputations.filter(
-                (a: ComputationEntity) => a.correlation_uuid !== correlation_uuid
-            )
-            this.currentRuns.push(computationToUnarchive)
-            this.updateLocalStorage()
-
-            this.fetchAndProcessComputations(computationToUnarchive)
-        } else {
-            console.error('Computation to unarchive not found in archivedComputations')
+        const computationToFetch = this.currentRuns.find(run => run.correlation_uuid === correlation_uuid)
+        if (computationToFetch) {
+            this.fetchAndProcessComputations(computationToFetch)
         }
-    }
-
-    private updateLocalStorage() {
-        localStorage.setItem('plugin_runs', JSON.stringify(this.currentRuns))
-        localStorage.setItem('archive_runs', JSON.stringify(this.archivedComputations))
     }
 
     private refreshDataSource() {
@@ -552,9 +518,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     aoiName: response.aoi?.get('name')
                 }
 
-                this.currentRuns.push(computation as ComputationEntity)
+                this.currentRuns.push(computation as ComputationDisplayEntity)
                 this.pluginService.refreshComputesInLS(this.currentRuns)
-                this.fetchAndProcessComputations(computation as ComputationEntity)
+                this.fetchAndProcessComputations(computation as ComputationDisplayEntity)
                 this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', 'Close', {
                     duration: 4000,
                     verticalPosition: 'bottom',

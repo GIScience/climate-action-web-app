@@ -31,7 +31,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
   users ([#116](https://gitlab.heigit.org/climate-action/web-app/-/issues/116))
 - The user now gets informed about the reason for a failed computation (if the plugin provides this
   information) ([#240](https://gitlab.heigit.org/climate-action/web-app/-/issues/240))
-- Compute now requires User Authentication by means of the HeiGIT Account (implemented via AppWrite) ([#37](https://gitlab.heigit.org/climate-action/web-app/-/issues/37))
+- Compute now requires User Authentication by means of the HeiGIT Account (implemented via Appwrite) ([#37](https://gitlab.heigit.org/climate-action/web-app/-/issues/37))
+- User's local Computations IDs are now synced to the Appwrite database
 
 ## [2.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.1.0) - 2025-01-29
 

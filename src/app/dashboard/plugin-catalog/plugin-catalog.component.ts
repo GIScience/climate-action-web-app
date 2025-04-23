@@ -2,8 +2,10 @@ import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
+import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { PluginService } from '../plugin/plugin.service'
 import { PluginCard } from './plugin-catalog.interface'
@@ -25,7 +27,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     constructor(
         private router: Router,
         private pluginService: PluginService,
-        private artifactViewerService: ArtifactViewerService
+        private artifactViewerService: ArtifactViewerService,
+        private storageService: StorageService
     ) {}
 
     ngAfterViewInit(): void {
@@ -78,13 +81,13 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                     }
                 })
 
-                const storedRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+                const storedRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
                 storedRuns.forEach(run => {
                     const existingCard = this.cards.find(x => x.plugin_id === run.pluginId)
                     if (!existingCard) {
                         const offlineCard = {
                             plugin_id: run.pluginId,
-                            name: run.pluginName,
+                            name: derivePluginNameFromId(run.pluginId || ''),
                             icon: this.pluginService.getIconUrl(run.pluginId || ''),
                             library_version: 'N/A',
                             version: 'N/A',

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, Grid2x2, ListX, LucideAngularModule, Minus, Rows3, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { StorageService } from '../../storage.service'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
 import { LegendComponent } from '../artifact/legend/legend.component'
@@ -50,7 +51,8 @@ export class ReportComponent implements OnInit {
     constructor(
         public reportService: ReportService,
         private pluginService: PluginService,
-        private http: HttpClient
+        private http: HttpClient,
+        private storageService: StorageService
     ) {}
 
     ngOnInit(): void {
@@ -65,7 +67,7 @@ export class ReportComponent implements OnInit {
 
             addedArtifacts.forEach(artifact => {
                 if (this.reportService.isMapArtifact(artifact) && !this.mapServices.has(artifact.store_id)) {
-                    const mapService = new MapService(this.pluginService, this.http)
+                    const mapService = new MapService(this.pluginService, this.http, this.storageService)
                     this.mapServices.set(artifact.store_id, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)

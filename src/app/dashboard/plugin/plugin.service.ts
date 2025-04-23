@@ -6,8 +6,14 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
+import { StorageService } from '../../storage.service'
 import { ComputationState, ComputationStateInfo } from '../common/status.types'
-import { ComputationEntity, ComputationID, ComputationMetadata } from '../computations-index/computation.interface'
+import {
+    ComputationDatabaseEntity,
+    ComputationDisplayEntity,
+    ComputationID,
+    ComputationMetadata
+} from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
 
 @Injectable({
@@ -16,8 +22,8 @@ import { ComputeState, Plugin } from './plugin.interface'
 export class PluginService {
     private apiUrl = environment.climateActionApiUrl
 
-    private pluginRuns: ComputationEntity[] = []
-    private pluginRunsSubject = new BehaviorSubject<ComputationEntity[]>(this.pluginRuns)
+    private pluginRuns: ComputationDisplayEntity[] = []
+    private pluginRunsSubject = new BehaviorSubject<ComputationDisplayEntity[]>(this.pluginRuns)
 
     private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
     private syncTasksSubject = new Subject<void>()
@@ -27,7 +33,10 @@ export class PluginService {
 
     private catalogToggleInput!: HTMLInputElement
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private storageService: StorageService
+    ) {}
 
     getIconUrl(pluginId: string) {
         return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon`
@@ -95,14 +104,6 @@ export class PluginService {
         }
     }
 
-    getComputesFromLS(status: ComputationState[]): ComputationEntity[] {
-        const plugin_runs: string | null = localStorage.getItem('plugin_runs')
-        if (!plugin_runs) return []
-
-        const parsed_runs: ComputationEntity[] = JSON.parse(plugin_runs)
-        return parsed_runs.filter(run => status.includes(run.status as ComputationState))
-    }
-
     setComputeState(computeState: ComputeState): void {
         this.computeStateSubject.next(computeState)
     }
@@ -112,38 +113,33 @@ export class PluginService {
     }
 
     storeNewComputes(id: string, plugin: Plugin, aoiName?: string) {
-        const runs: Array<ComputationEntity> = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-        const currentRunInfo = {
+        const compute: ComputationDatabaseEntity = {
             correlation_uuid: id,
             pluginId: plugin.plugin_id,
-            pluginName: plugin.name,
             timestamp: new Date(),
             status: 'PENDING' as ComputationState,
             aoiName: aoiName
         }
-        runs.push(currentRunInfo as ComputationEntity)
 
-        this.refreshComputesInLS(runs)
-        this.pluginRunsSubject.next([...runs])
+        this.storageService.storeNewCompute(compute)
+
+        const runs = this.storageService.getPluginRuns()
+        this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])
     }
 
-    refreshComputesInLS(runs: ComputationEntity[]) {
-        localStorage.setItem('plugin_runs', JSON.stringify(runs))
+    refreshComputesInLS(runs: ComputationDatabaseEntity[]) {
+        this.storageService.savePluginRuns(runs)
     }
 
     getPluginRuns() {
-        return this.pluginRunsSubject.asObservable()
+        return this.storageService.getPluginRunsObservable()
     }
 
     updateRunStatus(correlationId: string, newStatus: ComputationState) {
-        const runs = this.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
-        const index = runs.findIndex(run => run.correlation_uuid === correlationId)
+        this.storageService.updateComputeStatus(correlationId, newStatus)
 
-        if (index !== -1) {
-            runs[index].status = newStatus
-            this.refreshComputesInLS(runs)
-            this.pluginRunsSubject.next([...runs])
-        }
+        const runs = this.storageService.getPluginRuns()
+        this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])
     }
 
     triggerSyncTasks() {

@@ -1,9 +1,10 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { pickRandomGradient } from '@app/utils/style-utils'
-import { ComputationEntity } from '../computations-index/computation.interface'
-import { PluginService } from '../plugin/plugin.service'
+import { StorageService } from '../../storage.service'
+import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
 
 @Component({
     selector: 'app-landing',
@@ -13,7 +14,7 @@ import { PluginService } from '../plugin/plugin.service'
     styleUrl: './landing.component.scss'
 })
 export class LandingComponent implements OnInit {
-    currentRuns: ComputationEntity[] = []
+    currentRuns: ComputationDatabaseEntity[] = []
     pluginCounts: { pluginName: string; pluginId: string; count: number }[] = []
     private gradientCache: { [key: string]: string } = {}
 
@@ -22,12 +23,12 @@ export class LandingComponent implements OnInit {
     }
 
     constructor(
-        private pluginService: PluginService,
+        private storageService: StorageService,
         private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
-        this.currentRuns = this.pluginService.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])
+        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
         this.calculatePluginCounts()
 
         this.pluginCounts.forEach((_, index) => {
@@ -43,7 +44,7 @@ export class LandingComponent implements OnInit {
             (acc, run) => {
                 if (run.pluginId) {
                     acc[run.pluginId] = {
-                        pluginName: run.pluginName || '',
+                        pluginName: derivePluginNameFromId(run.pluginId),
                         pluginId: run.pluginId,
                         count: (acc[run.pluginId]?.count || 0) + 1
                     }
