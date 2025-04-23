@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable, Injector, Optional } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BehaviorSubject } from 'rxjs'
+import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -74,7 +75,10 @@ export class ReportService {
                 const injector = Injector.create({
                     providers: [
                         { provide: MAP_ID, useValue: mapId },
-                        { provide: MapService, deps: [PluginService, HttpClient, [new Optional(), MAP_ID]] }
+                        {
+                            provide: MapService,
+                            deps: [PluginService, HttpClient, StorageService, [new Optional(), MAP_ID]]
+                        }
                     ],
                     parent: this.injector
                 })
