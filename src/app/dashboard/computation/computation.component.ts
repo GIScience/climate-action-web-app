@@ -9,7 +9,7 @@ import { Observable, Subscription, take } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { ComputationBasicInfo, ComputationEntity } from '../computations-index/computation.interface'
+import { ComputationBasicInfo, ComputationDisplayEntity } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
@@ -47,7 +47,7 @@ import { ReportService } from '../report/report.service'
     styleUrls: ['./computation.component.scss']
 })
 export class ComputationComponent {
-    @Input() computation!: ComputationEntity
+    @Input() computation!: ComputationDisplayEntity
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
 
@@ -64,21 +64,21 @@ export class ComputationComponent {
         private snackBar: MatSnackBar
     ) {}
 
-    onAnimationEvent(event: AnimationEvent, computation: ComputationEntity) {
+    onAnimationEvent(event: AnimationEvent, computation: ComputationDisplayEntity) {
         if (event.toState === 'collapsed') {
             computation.keepInDOM = false
         }
     }
 
-    showMore(computation: ComputationEntity) {
+    showMore(computation: ComputationDisplayEntity) {
         computation.showSecondaryArtifacts = true
     }
 
-    showLess(computation: ComputationEntity) {
+    showLess(computation: ComputationDisplayEntity) {
         computation.showSecondaryArtifacts = false
     }
 
-    hasSecondaryArtifacts(computation: ComputationEntity): boolean {
+    hasSecondaryArtifacts(computation: ComputationDisplayEntity): boolean {
         return computation.artifacts.some(artifact => !artifact.primary)
     }
 

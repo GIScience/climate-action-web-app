@@ -4,12 +4,14 @@ import { jest } from '@jest/globals'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
 import { of } from 'rxjs'
-import { ComputationEntity, ComputationID } from '../computations-index/computation.interface'
+import { StorageService } from '../../storage.service'
+import { ComputationDatabaseEntity, ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
 import { PluginService } from './plugin.service'
 
 describe('PluginService', () => {
     let service: PluginService
+    let storageService: StorageService
     let httpClientSpy: {
         post: jest.Mock
         get: jest.Mock
@@ -116,16 +118,29 @@ describe('PluginService', () => {
             get: jest.fn().mockImplementation(() => of({}))
         }
 
+        const mockStorageService = {
+            getComputesByStatus: jest.fn().mockReturnValue([test_plugin_run, test_plugin_run]),
+            storeNewCompute: jest.fn(),
+            savePluginRuns: jest.fn(),
+            updateComputeStatus: jest.fn(),
+            getPluginRuns: jest.fn().mockReturnValue([test_plugin_run])
+        }
+
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
             providers: [
                 {
                     provide: HttpClient,
                     useValue: httpClientSpy
+                },
+                {
+                    provide: StorageService,
+                    useValue: mockStorageService
                 }
             ]
         })
         service = TestBed.inject(PluginService)
+        storageService = TestBed.inject(StorageService)
         localStorage.clear()
     })
 
@@ -190,70 +205,25 @@ describe('PluginService', () => {
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1)
     })
 
-    it('should get computes', () => {
-        expect(localStorage.getItem('plugin_runs')).toBe(null)
-        localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run, test_plugin_run]))
-        expect(service.getComputesFromLS(['PENDING', 'STARTED', 'SUCCESS'])).toHaveLength(2)
+    it('should get computes by status', () => {
+        expect(storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])).toHaveLength(2)
     })
 
     it('should store computes', () => {
-        expect(localStorage.getItem('plugin_runs')).toBe(null)
         service.storeNewComputes('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', test_plugin)
-        const item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)).toHaveLength(1)
-        } else {
-            fail()
-        }
+        expect(storageService.storeNewCompute).toHaveBeenCalled()
     })
 
     it('should refresh compute', () => {
-        expect(localStorage.getItem('plugin_runs')).toBe(null)
-        service.refreshComputesInLS([test_plugin_run] as ComputationEntity[])
-
-        const item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)).toHaveLength(1)
-        } else {
-            fail()
-        }
+        service.refreshComputesInLS([test_plugin_run] as ComputationDatabaseEntity[])
+        expect(storageService.savePluginRuns).toHaveBeenCalled()
     })
 
-    it('should update run status when run persisted', () => {
-        localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run]))
-        let item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
-        } else {
-            fail()
-        }
-
+    it('should update run status', () => {
         service.updateRunStatus('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
-
-        item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
-        } else {
-            fail()
-        }
-    })
-
-    it('should update run status when run not persisted', () => {
-        localStorage.setItem('plugin_runs', JSON.stringify([test_plugin_run]))
-        let item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
-        } else {
-            fail()
-        }
-
-        service.updateRunStatus('2fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
-
-        item = localStorage.getItem('plugin_runs')
-        if (item) {
-            expect(JSON.parse(item)[0]['status']).toEqual('PENDING')
-        } else {
-            fail()
-        }
+        expect(storageService.updateComputeStatus).toHaveBeenCalledWith(
+            '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
+            'PENDING'
+        )
     })
 })

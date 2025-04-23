@@ -48,7 +48,8 @@ describe('mapService', () => {
             .then(text => {
                 cy.location('origin').then(origin => {
                     cy.getAllLocalStorage().then(result => {
-                        expect(result[origin].selected_map_layer).to.equal(text)
+                        const mapPrefs = JSON.parse(result[origin].map_prefs)
+                        expect(mapPrefs.selectedLayer).to.equal(text)
                     })
                 })
             })
@@ -106,7 +107,8 @@ describe('mapService', () => {
             .then(text => {
                 cy.location('origin').then(origin => {
                     cy.getAllLocalStorage().then(result => {
-                        expect(result[origin].selected_map_layer).to.equal(text)
+                        const mapPrefs = JSON.parse(result[origin].map_prefs)
+                        expect(mapPrefs.selectedLayer).to.equal(text)
                     })
                 })
             })
@@ -127,8 +129,9 @@ describe('mapService', () => {
 
         cy.location('origin').then(origin => {
             cy.getAllLocalStorage().then(result => {
-                expect(result[origin]).to.deep.equal({
-                    layer_switcher_collapsed: 'true'
+                cy.getAllLocalStorage().then(result => {
+                    const mapPrefs = JSON.parse(result[origin].map_prefs)
+                    expect(mapPrefs.layerSwitcherCollapsed).to.equal(true)
                 })
             })
         })

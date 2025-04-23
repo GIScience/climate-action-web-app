@@ -8,10 +8,11 @@ import { Feature } from 'ol'
 import GeoJSON from 'ol/format/GeoJSON'
 import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, of } from 'rxjs'
+import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
-import { ComputationEntity } from './computation.interface'
+import { ComputationDisplayEntity } from './computation.interface'
 import { ComputationsIndexComponent } from './computations-index.component'
 
 describe('ComputationsIndexComponent', () => {
@@ -19,23 +20,39 @@ describe('ComputationsIndexComponent', () => {
     let fixture: ComponentFixture<ComputationsIndexComponent>
 
     let mockPluginService: Partial<PluginService>
+    let mockStorageService: Partial<StorageService>
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
 
-    let pluginRuns$: BehaviorSubject<ComputationEntity[]>
+    let pluginRuns$: BehaviorSubject<ComputationDisplayEntity[]>
 
     beforeEach(async () => {
-        pluginRuns$ = new BehaviorSubject<ComputationEntity[]>([])
+        pluginRuns$ = new BehaviorSubject<ComputationDisplayEntity[]>([])
+
+        mockStorageService = {
+            getPluginRuns: jest.fn(),
+            getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
+            getComputesByStatus: jest.fn(),
+            getArchivedRuns: jest.fn(),
+            archiveComputation: jest.fn(),
+            unarchiveComputation: jest.fn(),
+            savePluginRuns: jest.fn(),
+            getNewRuns: jest.fn().mockReturnValue([]),
+            getActiveArtifact: jest.fn(),
+            saveActiveArtifact: jest.fn(),
+            clearActiveArtifact: jest.fn(),
+            markAsNew: jest.fn(),
+            markAsViewed: jest.fn()
+        }
 
         mockPluginService = {
-            getComputesFromLS: jest.fn(),
             updateRunStatus: jest.fn(),
             getComputationMetadata: jest.fn(),
-            getPluginRuns: jest.fn(),
             setComputeState: jest.fn(),
             getComputationState: jest.fn(),
             collapsePluginCatalog: jest.fn(),
-            syncTasks$: new BehaviorSubject<void>(undefined)
+            syncTasks$: new BehaviorSubject<void>(undefined),
+            getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
         }
 
         mockArtifactService = {
@@ -58,6 +75,7 @@ describe('ComputationsIndexComponent', () => {
             ],
             providers: [
                 { provide: PluginService, useValue: mockPluginService },
+                { provide: StorageService, useValue: mockStorageService },
                 { provide: ArtifactService, useValue: mockArtifactService },
                 { provide: MapService, useValue: mockMapService },
                 provideTippyLoader(() => import('tippy.js')),
@@ -70,12 +88,11 @@ describe('ComputationsIndexComponent', () => {
                 })
             ]
         }).compileComponents()
-
-        mockPluginService.getPluginRuns = jest.fn().mockReturnValue(pluginRuns$.asObservable())
     })
 
     beforeEach(fakeAsync(() => {
-        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([])
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([])
+        mockStorageService.getArchivedRuns = jest.fn().mockReturnValue([])
 
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
@@ -112,9 +129,9 @@ describe('ComputationsIndexComponent', () => {
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
             timestamp: new Date('2023-09-27T16:42:52+01:00')
-        } as ComputationEntity
+        } as ComputationDisplayEntity
 
-        mockPluginService.getComputesFromLS = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
 
         mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
@@ -195,48 +212,38 @@ describe('ComputationsIndexComponent', () => {
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
             timestamp: new Date('2023-09-27T16:42:52+01:00')
-        } as ComputationEntity
+        } as ComputationDisplayEntity
 
         component.currentRuns = [initialRun]
         component.archivedComputations = []
-        localStorage.setItem('plugin_runs', JSON.stringify([initialRun]))
-        localStorage.setItem('archive_runs', JSON.stringify([]))
 
         component.archiveComputation(initialRun.correlation_uuid)
 
-        const archivedItems = JSON.parse(localStorage.getItem('archive_runs') || '[]')
-        const activeItems = JSON.parse(localStorage.getItem('plugin_runs') || '[]')
-        expect(component.archivedComputations.length).toBe(1)
-        expect(component.currentRuns.length).toBe(0)
-        expect(archivedItems.length).toBe(1)
-        expect(activeItems.length).toBe(0)
+        expect(mockStorageService.archiveComputation).toHaveBeenCalledWith(initialRun.correlation_uuid)
+        expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
+        expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
 
         discardPeriodicTasks()
     }))
 
-    it('should unarchive an computation and update the list', fakeAsync(() => {
+    it('should unarchive a computation and update the list', fakeAsync(() => {
         const archivedRun = {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
             timestamp: new Date('2023-09-27T16:42:52+01:00')
-        } as ComputationEntity
+        } as ComputationDisplayEntity
 
         component.currentRuns = []
         component.archivedComputations = [archivedRun]
-        localStorage.setItem('plugin_runs', JSON.stringify([]))
-        localStorage.setItem('archive_runs', JSON.stringify([archivedRun]))
 
         mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of())
         component.unarchiveComputation(archivedRun.correlation_uuid)
 
-        const archivedItems = JSON.parse(localStorage.getItem('archive_runs') || '[]')
-        const activeItems = JSON.parse(localStorage.getItem('plugin_runs') || '[]')
-        expect(component.archivedComputations.length).toBe(0)
-        expect(component.currentRuns.length).toBe(1)
-        expect(archivedItems.length).toBe(0)
-        expect(activeItems.length).toBe(1)
+        expect(mockStorageService.unarchiveComputation).toHaveBeenCalledWith(archivedRun.correlation_uuid)
+        expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
+        expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
 
         discardPeriodicTasks()
     }))

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core'
+import { StorageService } from '@app/storage.service'
 import geojsonvt from 'geojson-vt'
 import { Collection, Feature, Map, MapBrowserEvent, Overlay, View } from 'ol'
 import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
@@ -99,6 +100,7 @@ export class MapService {
     constructor(
         private pluginService: PluginService,
         private http: HttpClient,
+        private storageService: StorageService,
         @Optional() @Inject(MAP_ID) mapId?: string
     ) {
         if (mapId) {
@@ -230,8 +232,6 @@ export class MapService {
             }
         })
 
-        const localStorageSelectedMapLayerKey = 'selected_map_layer'
-        const localStorageLayerSwitcherStateKey = 'layer_switcher_collapsed'
         const osmCartoLayerName = 'OSM Carto'
 
         const osmCarto = new ExtendedTileLayer({
@@ -319,12 +319,12 @@ export class MapService {
             }
         }
 
-        const selectedMapLayer = localStorage.getItem(localStorageSelectedMapLayerKey) || osmCartoLayerName
+        const selectedMapLayer = this.storageService.getSelectedMapLayer(osmCartoLayerName)
         this.map.getLayers().forEach(layer => {
             layer.setVisible(layer.get('name') === selectedMapLayer)
         })
 
-        this.layerSwitcherCollapsed = localStorage.getItem(localStorageLayerSwitcherStateKey) === 'true'
+        this.layerSwitcherCollapsed = this.storageService.getLayerSwitcherCollapsed()
         const layerSwitcher = new LayerSwitcher({
             collapsed: this.layerSwitcherCollapsed,
             reordering: false,
@@ -335,7 +335,9 @@ export class MapService {
                     .find(layer => layer.getVisible() && layer.get('baseLayer') === true)
                 if (visibleBaseLayer) {
                     const selectedLayerName = visibleBaseLayer.get('name')
-                    localStorage.setItem(localStorageSelectedMapLayerKey, selectedLayerName || '')
+                    if (selectedLayerName) {
+                        this.storageService.saveSelectedMapLayer(selectedLayerName)
+                    }
                 }
             }
         })
@@ -344,7 +346,7 @@ export class MapService {
 
         layerSwitcher.on('toggle', toggleEvent => {
             this.layerSwitcherCollapsed = toggleEvent.collapsed
-            localStorage.setItem(localStorageLayerSwitcherStateKey, this.layerSwitcherCollapsed.toString())
+            this.storageService.saveLayerSwitcherCollapsed(this.layerSwitcherCollapsed)
         })
 
         if (this.regionLayer) {

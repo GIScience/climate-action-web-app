@@ -15,6 +15,10 @@
                     <i-lucide [img]="KeyRound" size="20"></i-lucide>
                     Login
                 </a>
+                <button *ngIf="!environment.production" class="account-menu__item" (click)="loginAsFakeUser()">
+                    <i-lucide [img]="TestTubeDiagonal" size="20"></i-lucide>
+                    Login (as Fake User)
+                </button>
                 <a
                     [href]="getAppwriteUrl('/signup?redirect=' + getRedirectUrl())"
                     class="account-menu__item"

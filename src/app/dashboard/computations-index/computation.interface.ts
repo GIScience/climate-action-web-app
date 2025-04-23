@@ -1,8 +1,8 @@
-import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
-import { ComputationState } from '../common/status.types'
-import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
+import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
+import { ComputationFlag, ComputationState } from '../common/status.types'
+import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 
 export interface ComputationParameters {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +20,7 @@ export interface ComputationMetadata {
     message: string
 }
 
-export interface ComputationEntity
+export interface ComputationDisplayEntity
     extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status'> {
     artifacts: ArtifactEntity[]
     aoiName?: string
@@ -30,9 +30,16 @@ export interface ComputationEntity
     showSecondaryArtifacts?: boolean
     isExpanded?: boolean
     keepInDOM?: boolean
+    flag?: ComputationFlag
 }
 
+export interface ComputationDatabaseEntity
+    extends Pick<
+        ComputationDisplayEntity,
+        'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flag'
+    > {}
+
 export interface ComputationBasicInfo
-    extends Pick<ComputationEntity, 'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'> {}
+    extends Pick<ComputationDisplayEntity, 'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'> {}
 
 export type ComputationID = Pick<ComputationMetadata, 'correlation_uuid'>

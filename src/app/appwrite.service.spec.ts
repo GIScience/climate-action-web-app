@@ -14,13 +14,24 @@ jest.mock('@environments/environment', () => ({
 }))
 
 const originalConsoleError = console.error
-console.error = jest.fn()
-
 const originalConsoleWarn = console.warn
-console.warn = jest.fn()
+beforeAll(() => {
+    console.error = jest.fn()
+    console.warn = jest.fn()
+})
+
+afterAll(() => {
+    console.error = originalConsoleError
+    console.warn = originalConsoleWarn
+})
 
 const mockSnackBar = {
     open: jest.fn()
+}
+
+type MockAccount = Partial<Account> & {
+    get: jest.Mock
+    deleteSession: jest.Mock
 }
 
 jest.mock('appwrite', () => ({
@@ -31,14 +42,31 @@ jest.mock('appwrite', () => ({
     Client: jest.fn().mockImplementation(() => ({
         setEndpoint: jest.fn().mockReturnThis(),
         setProject: jest.fn().mockReturnThis()
-    }))
+    })),
+    Databases: jest.fn().mockImplementation(() => ({
+        listDocuments: jest.fn().mockResolvedValue({ documents: [] }),
+        createDocument: jest.fn().mockResolvedValue({ $id: 'mock-document-id' }),
+        updateDocument: jest.fn().mockResolvedValue({})
+    })),
+    ID: {
+        unique: jest.fn().mockReturnValue('unique-mock-id')
+    },
+    Permission: {
+        read: jest.fn().mockReturnValue('read-permission'),
+        update: jest.fn().mockReturnValue('update-permission')
+    },
+    Role: {
+        user: jest.fn().mockReturnValue('user-role')
+    },
+    Query: {
+        equal: jest.fn().mockReturnValue('mock-equal-query')
+    }
 }))
 
 describe('AppwriteService', () => {
     let service: AppwriteService
-    let mockAccount: jest.Mocked<Account>
 
-    const mockUser: Models.User<Models.Preferences> = {
+    const mockUser = {
         $id: '123',
         $createdAt: new Date().toISOString(),
         $updatedAt: new Date().toISOString(),
@@ -47,6 +75,7 @@ describe('AppwriteService', () => {
         emailVerification: true,
         labels: ['signupCompleted'],
         prefs: {},
+        targets: [],
         registration: new Date().toISOString(),
         status: true,
         passwordUpdate: new Date().toISOString(),
@@ -54,7 +83,7 @@ describe('AppwriteService', () => {
         phoneVerification: false,
         mfa: false,
         accessedAt: new Date().toISOString()
-    } as Models.User<Models.Preferences>
+    } as unknown as Models.User<Models.Preferences>
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -62,16 +91,11 @@ describe('AppwriteService', () => {
             providers: [{ provide: MatSnackBar, useValue: mockSnackBar }]
         })
         service = TestBed.inject(AppwriteService)
-        mockAccount = service['account'] as jest.Mocked<Account>
-    })
-
-    afterAll(() => {
-        console.error = originalConsoleError
-        console.warn = originalConsoleWarn
     })
 
     describe('tryToLogin', () => {
         it('should set user when login is successful', async () => {
+            const mockAccount = service['account'] as MockAccount
             mockAccount.get.mockResolvedValue(mockUser)
 
             const result = await service.tryToLogin()
@@ -83,6 +107,7 @@ describe('AppwriteService', () => {
         })
 
         it('should handle failed login', async () => {
+            const mockAccount = service['account'] as MockAccount
             mockAccount.get.mockRejectedValue(new Error('Failed to login'))
 
             const originalProduction = environment.production
@@ -101,6 +126,7 @@ describe('AppwriteService', () => {
 
     describe('tryToLogout', () => {
         it('should clear user on successful logout', async () => {
+            const mockAccount = service['account'] as MockAccount
             mockAccount.deleteSession.mockResolvedValue({})
 
             await service.tryToLogout()
@@ -111,6 +137,7 @@ describe('AppwriteService', () => {
         })
 
         it('should clear user even if logout fails', async () => {
+            const mockAccount = service['account'] as MockAccount
             mockAccount.deleteSession.mockRejectedValue(new Error('Failed to logout'))
 
             await service.tryToLogout()
@@ -119,6 +146,13 @@ describe('AppwriteService', () => {
                 expect(user).toBeNull()
             })
             expect(console.error).toHaveBeenCalledWith('Error deleting session:', expect.any(Error))
+        })
+    })
+
+    describe('getDatabases', () => {
+        it('should return the databases instance', () => {
+            const databases = service.getDatabases()
+            expect(databases).toBeDefined()
         })
     })
 })
