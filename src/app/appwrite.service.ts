@@ -53,6 +53,7 @@ export class AppwriteService {
                 prefs: {}
             } as Models.User<Models.Preferences>
 
+            sessionStorage.setItem('initialSyncCompleted', 'true')
             this._user.next(mockUser)
             return true
         }
