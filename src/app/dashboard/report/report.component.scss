@@ -1,14 +1,15 @@
 .report-window {
     background: linear-gradient(40deg, #fdfdfd9e 0%, #00000057 100%), url('../../../assets/images/dot-grid.png');
     background-blend-mode: difference;
+    border-radius: 10px;
     box-shadow: inset 0px 0px 100px 0px rgb(0 0 0 / 15%);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 50px - 1vw);
-    left: 0;
+    height: calc(100vh - 75px);
+    left: 0.5vw;
     position: absolute;
     top: 50px;
-    width: 100%;
+    width: 99vw;
     z-index: 3;
 
     .circles-background {

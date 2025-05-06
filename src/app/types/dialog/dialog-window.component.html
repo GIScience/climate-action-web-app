@@ -1,0 +1,12 @@
+<div class="dialog-window">
+    <h2>{{ data.props?.label }}</h2>
+    <button (click)="closeDialog()" class="close-dialog">
+        <i-lucide [img]="CircleX" size="25"></i-lucide>
+    </button>
+    <ng-scrollbar orientation="vertical">
+        <div class="optional-attributes">
+            <p *ngIf="data.props?.description">{{ data.props?.description }}</p>
+            <formly-field [field]="data"></formly-field>
+        </div>
+    </ng-scrollbar>
+</div>

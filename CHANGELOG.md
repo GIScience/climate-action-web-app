@@ -13,6 +13,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Date input is now shown in a more human friendly manner
 - It was decided to call the website `Climate Action Navigator` hence all occurrences were
   renamed ([#251](https://gitlab.heigit.org/climate-action/web-app/-/issues/251))
+- Compute Panel has been reorganised and UI elements distributed. Optional Attributes open in a new dialog. ([#263](https://gitlab.heigit.org/climate-action/web-app/-/issues/263))
 
 - Moved the Unit Testing Framework from Karma to
   Jest ([#303](https://gitlab.heigit.org/climate-action/web-app/-/issues/303))

@@ -1,9 +1,9 @@
-<div class="current-plugin-container">
+<div class="plugin-container">
     <div *ngIf="loading">
-        <div class="plugin-name-wrapper is-loading">
+        <div class="plugin-header is-loading">
             <h1>Loading...</h1>
         </div>
-        <div class="current-plugin is-loading">
+        <div class="plugin-content-wrapper is-loading">
             <h2>Loading...</h2>
         </div>
     </div>
@@ -11,23 +11,44 @@
     <ng-container *ngIf="pluginObs$ | async as plugin">
         <div *ngIf="!loading">
             <div
-                class="plugin-name-wrapper"
-                style="background-image: linear-gradient(225deg, rgb(207 217 223 / 65%) 0%, rgb(226, 235, 240) 85%), url('{{
-                    plugin.assets.icon
-                }}')">
-                <h1>{{ plugin.name }}</h1>
-                <i-lucide
-                    [img]="CloudOff"
-                    size="25"
-                    color="#ff7800"
-                    *ngIf="plugin.status === 'unavailable'"
-                    tp="This plugin is currently offline. Previous computations are still available."
-                    tpPlacement="bottom"></i-lucide>
-            </div>
-            <div class="current-plugin" *ngIf="plugin.status !== 'unavailable'" [ngClass]="computeState">
-                <h2>Compute</h2>
-                <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-                    <div class="plugin-content-wrapper" scrollViewport>
+                class="plugin-header"
+                [style.background-image]="
+                    'linear-gradient(225deg, rgb(207 217 223 / 75%) 0%, rgb(226, 235, 240) 85%), url(' +
+                    plugin.assets.icon +
+                    ')'
+                ">
+                <div class="plugin-name-wrapper">
+                    <h1>{{ plugin.name }}</h1>
+                    <i-lucide
+                        [img]="CloudOff"
+                        size="25"
+                        color="#ff7800"
+                        *ngIf="plugin.status === 'unavailable'"
+                        tp="This plugin is currently offline. Previous computations are still available."
+                        tpPlacement="bottom"></i-lucide>
+                </div>
+                <div class="plugin-meta">
+                    <div class="plugin-purpose">
+                        <markdown
+                            [data]="isPurposeExpanded ? plugin.purpose : shortPurpose"
+                            ngPreserveWhitespaces
+                            class="markdown"></markdown>
+                        <div class="read-more-wrapper">
+                            <a
+                                class="read-more"
+                                (click)="togglePurposeExpand()"
+                                (keyup.enter)="togglePurposeExpand()"
+                                tabindex="0"
+                                >{{ isPurposeExpanded ? 'Show less' : 'Read more' }}
+                                <i-lucide [img]="isPurposeExpanded ? ChevronsUp : ChevronsDown" size="15"></i-lucide>
+                            </a>
+                        </div>
+                    </div>
+                    <div
+                        class="plugin-authors"
+                        [@accordion]="isPurposeExpanded ? 'expanded' : 'collapsed'"
+                        *ngIf="plugin.authors.length > 0">
+                        <h3>Credits</h3>
                         <ul class="plugin-authors">
                             <li *ngFor="let author of plugin.authors">
                                 <a
@@ -39,67 +60,48 @@
                                 >
                             </li>
                         </ul>
-                        <div class="plugin-content">
-                            <div class="plugin__short-content">
-                                <markdown
-                                    [data]="extractFirstSentence(plugin.purpose)"
-                                    ngPreserveWhitespaces
-                                    class="markdown"></markdown>
-                                <a
-                                    class="read-more"
-                                    (click)="openDialog(plugin)"
-                                    (keyup.enter)="openDialog(plugin)"
-                                    tabindex="0"
-                                    >Read more »</a
-                                >
-                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plugin-content-wrapper">
+                <div class="computations-list" *ngIf="plugin.status === 'unavailable' || computeState === 'inactive'">
+                    <div class="computations-list__header">
+                        <h2>Computations</h2>
+                        <div
+                            class="new-compute__wrapper"
+                            *ngIf="plugin.status !== 'unavailable'"
+                            tp="Please login to request a computation."
+                            [tpIsEnabled]="!user">
+                            <button
+                                class="new-compute btn-alt btn-small btn-withtext"
+                                (click)="enterComputeState()"
+                                [disabled]="!user">
+                                <i-lucide [img]="DiamondPlus" size="20"></i-lucide> New computation
+                            </button>
                         </div>
+                    </div>
+                    <app-computations-index></app-computations-index>
+                </div>
+
+                <div class="plugin-compute" *ngIf="plugin.status !== 'unavailable' && computeState === 'compute-ready'">
+                    <div class="plugin-compute__header">
+                        <h2>Compute</h2>
+                        <button
+                            class="new-compute btn-light btn-small btn-withtext"
+                            (click)="exitComputeState()"
+                            [disabled]="!user">
+                            <i-lucide [img]="CircleX" size="20"></i-lucide> Cancel
+                        </button>
+                    </div>
+                    <div class="plugin-compute-wrapper">
                         <ng-container *ngIf="plugin?.operator_schema">
                             <app-plugin-parameter
                                 [schema]="plugin.operator_schema"
                                 [plugin]="plugin"></app-plugin-parameter>
                         </ng-container>
                     </div>
-                </ng-scrollbar>
-                <ng-template #pluginContentDialog let-data>
-                    <div class="plugin-content-dialog">
-                        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-                            <div class="plugin__full-content" scrollViewport>
-                                <h3>Purpose</h3>
-                                <markdown [data]="plugin.purpose" ngPreserveWhitespaces class="markdown"></markdown>
-                                <h3>Methodology</h3>
-                                <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
-                                <div *ngIf="plugin.sources">
-                                    <h3>Sources</h3>
-                                    <ul class="plugin-sources">
-                                        <li *ngFor="let source of plugin.sources" class="plugin-sources">
-                                            <strong *ngIf="source.title">{{ source.title }}</strong>
-                                            {{ processSourceText(source) }}{{ source.url ? ',' : '' }}
-                                            <a
-                                                href="{{ source.url }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                *ngIf="source.url"
-                                                >{{ source.url }}</a
-                                            >
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </ng-scrollbar>
-                        <button (click)="closeDialog()" class="close-dialog">
-                            <i-lucide [img]="CircleX" size="30"></i-lucide>
-                        </button>
-                    </div>
-                </ng-template>
-                <div class="new-compute-container">
-                    <button class="new-compute btn-alt btn-withtext" (click)="enableCompute()">
-                        <i-lucide [img]="RedoDot" size="20"></i-lucide> Do a new computation
-                    </button>
                 </div>
-            </div>
-            <div class="computations-list">
-                <app-computations-index></app-computations-index>
             </div>
         </div>
     </ng-container>

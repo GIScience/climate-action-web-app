@@ -3,14 +3,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { MapService } from '@app/dashboard/map/map.service'
+import { Plugin } from '@app/dashboard/plugin/plugin.interface'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
+import { JSONSchema7 } from 'json-schema'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
-import { MapService } from '@app/dashboard/map/map.service'
 import { PluginParameterComponent } from './plugin-parameter.component'
-import { JSONSchema7 } from 'json-schema'
-import { Plugin } from '@app/dashboard/plugin/plugin.interface'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -28,6 +29,16 @@ describe('PluginParameterComponent', () => {
                 PluginParameterComponent,
                 ReactiveFormsModule,
                 HttpClientModule
+            ],
+            providers: [
+                provideTippyLoader(() => import('tippy.js')),
+                provideTippyConfig({
+                    defaultVariation: 'tooltip',
+                    variations: {
+                        tooltip: tooltipVariation,
+                        popper: popperVariation
+                    }
+                })
             ]
         })
         fixture = TestBed.createComponent(PluginParameterComponent)
@@ -35,10 +46,6 @@ describe('PluginParameterComponent', () => {
         component.plugin = test_plugin
         mapService = TestBed.inject(MapService)
         fixture.detectChanges()
-    })
-
-    it('should create', () => {
-        expect(component).toBeTruthy()
     })
 
     it('should return a GEOJSON feature object', () => {
@@ -177,12 +184,12 @@ describe('PluginParameterComponent', () => {
                 },
                 fieldGroup: [
                     {
-                        type: 'expander',
+                        type: 'dialog',
                         fieldGroup: [
                             {
                                 props: {
                                     label: 'Optional Attributes',
-                                    description: 'Click here to access more configurations.'
+                                    description: 'Edit additional parameters.'
                                 },
                                 fieldGroup: [
                                     {
@@ -716,12 +723,12 @@ describe('PluginParameterComponent', () => {
                                 expressions: {}
                             },
                             {
-                                type: 'expander',
+                                type: 'dialog',
                                 fieldGroup: [
                                     {
                                         props: {
                                             label: 'Optional Attributes',
-                                            description: 'Click here to access more configurations.'
+                                            description: 'Edit additional parameters.'
                                         },
                                         fieldGroup: [
                                             {

@@ -26,7 +26,9 @@ describe('AccountComponent', () => {
         appwriteService = {
             _user: userSubject,
             tryToLogin: jest.fn().mockResolvedValue(true),
-            tryToLogout: jest.fn().mockResolvedValue(undefined)
+            tryToLogout: jest.fn().mockResolvedValue(undefined),
+            getAppwriteUrl: jest.fn().mockReturnValue('https://example.com'),
+            getRedirectUrl: jest.fn().mockReturnValue('https://example.com')
         }
 
         await TestBed.configureTestingModule({

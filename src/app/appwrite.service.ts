@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Account, Client, Databases, Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
+import { getCurrentCanonicalUrl } from './utils/url.utils'
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +25,14 @@ export class AppwriteService {
 
     getDatabases(): Databases {
         return this.databases
+    }
+
+    getAppwriteUrl(path: string): string {
+        return `${environment.appwriteWebsiteUrl}${path}`
+    }
+
+    getRedirectUrl(): string {
+        return getCurrentCanonicalUrl()
     }
 
     async tryToLogin(): Promise<boolean> {

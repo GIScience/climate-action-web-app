@@ -261,6 +261,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
+        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
+
         cy.get('.ol-zoom-in').click()
         cy.get('.ol-zoom-in').click()
         cy.get('.ol-zoom-in').click()
@@ -314,6 +316,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
+        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
+
         cy.get('.ol-zoom-in').click()
         cy.get('.ol-zoom-in').click()
         cy.get('.ol-zoom-in').click()
@@ -356,6 +360,8 @@ describe('mapService', () => {
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.wait('@getPluginBlueprint')
+
+        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
 
         cy.get('.ol-zoom-in').click()
         cy.get('.ol-zoom-in').click()
