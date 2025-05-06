@@ -39,12 +39,12 @@ import { ComputationComponent } from './dashboard/computation/computation.compon
 import { ComputationsIndexComponent } from './dashboard/computations-index/computations-index.component'
 import { MapService } from './dashboard/map/map.service'
 import { PluginCatalogComponent } from './dashboard/plugin-catalog/plugin-catalog.component'
-import { FormlyFieldExpansionPanelComponent } from './types/expansion-panel/formlyFieldExpansionPanel.type'
+import { OptionalAttributesTypeComponent } from './types/dialog/optional-attributes'
 import { ObjectTypeComponent } from './types/object/object.type'
 import { tooltipVariation } from './utils/tooltip-variations'
 
 @NgModule({
-    declarations: [AppComponent, ObjectTypeComponent, ChartComponent, FormlyFieldExpansionPanelComponent],
+    declarations: [AppComponent, ObjectTypeComponent, ChartComponent],
     imports: [
         MatInputModule,
         BrowserModule,
@@ -81,7 +81,7 @@ import { tooltipVariation } from './utils/tooltip-variations'
             ],
             types: [
                 { name: 'object', component: ObjectTypeComponent },
-                { name: 'expander', component: FormlyFieldExpansionPanelComponent, wrappers: [] }
+                { name: 'dialog', component: OptionalAttributesTypeComponent, wrappers: [] }
             ]
         }),
         FormlyMatDatepickerModule,

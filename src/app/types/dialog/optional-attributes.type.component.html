@@ -1,0 +1,10 @@
+<div class="optional-attributes-button-container">
+    <button
+        type="button"
+        class="optional-attributes-button btn-alt btn-small btn-withtext"
+        [disabled]="isDisabled"
+        (click)="openDialog()">
+        <i-lucide [img]="ListTodo" size="20"></i-lucide>
+        {{ field.fieldGroup?.[0]?.props?.label || 'Optional Attributes' }}
+    </button>
+</div>

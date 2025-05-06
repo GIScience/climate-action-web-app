@@ -15,7 +15,6 @@ import {
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
 import { AppwriteService } from '../appwrite.service'
-import { getCurrentCanonicalUrl } from '../utils/url.utils'
 
 @Component({
     selector: 'app-account',
@@ -63,11 +62,11 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
 
     getAppwriteUrl(path: string): string {
-        return `${environment.appwriteWebsiteUrl}${path}`
+        return this.appwriteService.getAppwriteUrl(path)
     }
 
     getRedirectUrl(): string {
-        return getCurrentCanonicalUrl()
+        return this.appwriteService.getRedirectUrl()
     }
 
     loginAsFakeUser() {

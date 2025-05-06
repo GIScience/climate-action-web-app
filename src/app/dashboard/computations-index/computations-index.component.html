@@ -1,12 +1,4 @@
 <div class="computations-index">
-    <div class="computations-index__header">
-        <h2 class="mx-2"><span *ngIf="showArchived">Archived </span>Computations</h2>
-        <button class="archive-dropdown-toggle" (click)="toggleArchivedView()">
-            <i-lucide *ngIf="!showArchived" [img]="Archive" size="20" tp="Archived Computations"></i-lucide>
-            <i-lucide *ngIf="showArchived" [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
-        </button>
-    </div>
-
     <div class="computations-index-content">
         <div
             *ngIf="
@@ -15,7 +7,28 @@
                 !showArchived
             "
             class="empty-computations">
-            <p>No computations found.</p>
+            <span class="empty-computations__message">No computations to show yet.</span>
+            <div class="prompt-container" [ngClass]="{ 'with-demo-no-user': !user && demoConfig }">
+                <ng-container *ngIf="demoConfig">
+                    <button
+                        type="button"
+                        class="btn-primary btn-small btn-withtext"
+                        (click)="requestDemo(pluginId)"
+                        (keyup.enter)="requestDemo(pluginId)"
+                        tabindex="0">
+                        Load a demo computation
+                    </button></ng-container
+                >
+                <span *ngIf="!user"
+                    ><p *ngIf="!user && demoConfig">- OR -</p>
+                    <a
+                        [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())"
+                        class="btn-alt btn-small btn-withtext"
+                        >Login</a
+                    >
+                    to request your own computation.</span
+                >
+            </div>
         </div>
 
         <div
@@ -104,10 +117,13 @@
         <div *ngIf="showArchived" class="archive-container">
             <ng-container *ngIf="(archivedComputations | filterByCriteria: pluginId).length === 0; else archivedItems">
                 <div class="empty-archive">
-                    <p>No archived computations found.</p>
+                    <p>No archived computations to display.</p>
                 </div>
             </ng-container>
             <ng-template #archivedItems>
+                <div class="archived-header">
+                    <h3>Archived</h3>
+                </div>
                 <ng-scrollbar visibility="hover" orientation="vertical">
                     <ul class="archive-list">
                         <li
@@ -139,6 +155,23 @@
                 </ng-scrollbar>
             </ng-template>
         </div>
+    </div>
+
+    <div class="archived-toggle-container">
+        <button
+            (click)="toggleArchivedView()"
+            *ngIf="(archivedComputations | filterByCriteria: pluginId).length > 0 && !showArchived"
+            class="toggle-archive btn-small btn-light btn-withtext">
+            <i-lucide [img]="Archive" size="20" tp="Archived Computations"></i-lucide>
+            Archived Computations ({{ (archivedComputations | filterByCriteria: pluginId).length }})
+        </button>
+        <button
+            (click)="toggleArchivedView()"
+            *ngIf="showArchived"
+            class="toggle-archive btn-small btn-light btn-withtext">
+            <i-lucide [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
+            <span> Back to all computations</span>
+        </button>
     </div>
 </div>
 

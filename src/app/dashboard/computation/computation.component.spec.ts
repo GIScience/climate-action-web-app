@@ -43,6 +43,12 @@ describe('ComputationComponent', () => {
             setComputeState: jest.fn(),
             getComputationState: jest.fn(),
             collapsePluginCatalog: jest.fn(),
+            getPluginDetails: jest.fn().mockReturnValue(
+                of({
+                    plugin_id: 'test_plugin',
+                    plugin_version: '1.0.0'
+                })
+            ),
             syncTasks$: new BehaviorSubject<void>(undefined),
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
         }

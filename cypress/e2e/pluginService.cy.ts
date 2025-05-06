@@ -59,7 +59,7 @@ describe('pluginService', () => {
         cy.wait('@getPluginBlueprint404')
         cy.wait('@getPluginBlueprintComputation')
 
-        cy.get('.plugin-name-wrapper h1').should('exist').should('contain.text', 'Plugin Blueprint')
+        cy.get('.plugin-header h1').should('exist').should('contain.text', 'Plugin Blueprint')
         cy.get('.parent-computation').eq(0).should('contain.text', '8649e714')
     })
 })

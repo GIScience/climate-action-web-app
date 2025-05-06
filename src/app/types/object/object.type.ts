@@ -3,7 +3,8 @@ import { FieldType } from '@ngx-formly/core'
 
 @Component({
     selector: 'app-formly-object-type',
-    templateUrl: 'object.type.component.html'
+    templateUrl: 'object.type.component.html',
+    styleUrls: ['object.type.component.scss']
 })
 export class ObjectTypeComponent extends FieldType {}
 

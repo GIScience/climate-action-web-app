@@ -5,9 +5,11 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
+import { AppwriteService } from '@app/appwrite.service'
 import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
+import { Models } from 'appwrite'
 import {
     Archive,
     ArchiveRestore,
@@ -21,7 +23,7 @@ import {
 } from 'lucide-angular'
 import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { BehaviorSubject, Subscription, timer } from 'rxjs'
+import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
@@ -120,6 +122,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Share2 = Share2
 
     @Input() pluginId: string = ''
+    @Input() demoConfig: boolean = false
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
         params: ComputationParameters
@@ -127,8 +130,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     @ViewChild(ComputationComponent) computationComponent!: ComputationComponent
 
+    user: Models.User<Models.Preferences> | null = null
     scheduledRunsSubscription: Subscription = new Subscription()
+    userSubscription: Subscription
     private syncSubscription?: Subscription
+
     private readonly INITIAL_INTERVAL = 2500
     private readonly MAX_INTERVAL = 1800000
 
@@ -140,8 +146,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private shareService: ShareService,
         private snackBar: MatSnackBar,
         private dialog: MatDialog,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private appwriteService: AppwriteService
     ) {
+        this.userSubscription = this.appwriteService._user.subscribe(user => {
+            this.user = user
+        })
+
         if (this.pluginService.computeState$) {
             this.pluginService.computeState$.subscribe(value => {
                 if (value === 'compute-ready') {
@@ -163,6 +174,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.pluginId = this.route.snapshot.params['name']
+        this.pluginService
+            .getPluginDetails(this.pluginId)
+            .pipe(take(1))
+            .subscribe(plugin => {
+                plugin.demo_config ? (this.demoConfig = true) : (this.demoConfig = false)
+            })
 
         this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
         this.archivedComputations = this.storageService.getArchivedRuns()
@@ -215,12 +232,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .forEach(currentRun => {
                 this.fetchAndProcessComputations(currentRun)
             })
+    }
 
-        if (this.currentRuns.filter(run => run.pluginId === this.pluginId).length === 0) {
-            this.pluginService.setComputeState('compute-ready')
-        } else {
-            this.pluginService.setComputeState('inactive')
-        }
+    getAppwriteUrl(path: string): string {
+        return this.appwriteService.getAppwriteUrl(path)
+    }
+
+    getRedirectUrl(): string {
+        return this.appwriteService.getRedirectUrl()
     }
 
     syncRuns() {
@@ -532,6 +551,29 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 console.error('Error importing computation:', error)
                 this.snackBar.open('Error importing computation', 'Close', {
                     duration: 4000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['error-snackbar']
+                })
+            }
+        })
+    }
+
+    requestDemo(pluginId: string) {
+        this.pluginService.computeDemo(pluginId).subscribe({
+            next: data => {
+                this.pluginService.storeNewComputes(data.correlation_uuid, pluginId, 'Demo')
+                this.pluginService.triggerSyncTasks()
+                this.pluginService.setComputeState('inactive')
+                this.snackBar.open('Demo request sent, results will be displayed soon.', 'Dismiss', {
+                    duration: 7000,
+                    verticalPosition: 'bottom',
+                    horizontalPosition: 'center',
+                    panelClass: ['success-snackbar']
+                })
+            },
+            error: () => {
+                this.snackBar.open('Error while computing demo. Please try again.', 'Dismiss', {
                     verticalPosition: 'bottom',
                     horizontalPosition: 'center',
                     panelClass: ['error-snackbar']

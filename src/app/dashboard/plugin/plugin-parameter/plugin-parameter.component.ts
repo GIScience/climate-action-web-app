@@ -1,12 +1,25 @@
 import { CommonModule, NgIf } from '@angular/common'
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
+import {
+    ChangeDetectorRef,
+    Component,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core'
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatTooltip } from '@angular/material/tooltip'
 import { AppwriteService } from '@app/appwrite.service'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
+import { Source } from '@app/types/sources/sources.type'
+import { TippyDirective } from '@ngneat/helipopper'
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { Models } from 'appwrite'
@@ -14,13 +27,15 @@ import { JSONSchema7 } from 'json-schema'
 import {
     CircleAlert,
     CirclePlay,
-    Eye,
+    CircleX,
     LucideAngularModule,
     MapPinPlusInside,
     TriangleAlert,
     UserCheck
 } from 'lucide-angular'
 import moment from 'moment/moment'
+import { MarkdownModule } from 'ngx-markdown'
+import { NgScrollbarModule } from 'ngx-scrollbar'
 import Feature from 'ol/Feature'
 import { Subscription, fromEventPattern } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
@@ -29,13 +44,26 @@ import { FormlyModel } from './plugin-parameter.interface'
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
     styleUrls: ['./plugin-parameter.component.scss'],
-    imports: [FormlyModule, FormsModule, ReactiveFormsModule, NgIf, LucideAngularModule, CommonModule, MatTooltip],
+    imports: [
+        FormlyModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgIf,
+        LucideAngularModule,
+        CommonModule,
+        MatTooltip,
+        NgScrollbarModule,
+        TippyDirective,
+        MarkdownModule
+    ],
     standalone: true,
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
+
+    @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
 
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
@@ -45,11 +73,11 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     user: Models.User<Models.Preferences> | null = null
 
     readonly CirclePlay = CirclePlay
-    readonly Eye = Eye
     readonly MapPinPlusInside = MapPinPlusInside
     readonly TriangleAlert = TriangleAlert
     readonly CircleAlert = CircleAlert
     readonly UserCheck = UserCheck
+    readonly CircleX = CircleX
 
     areaSelected = false
     highlightedFeaturesSubscription: Subscription | undefined
@@ -60,7 +88,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         public mapService: MapService,
         private cdr: ChangeDetectorRef,
         private formlyJsonschema: FormlyJsonschema,
-        private appwriteService: AppwriteService
+        private appwriteService: AppwriteService,
+        private dialog: MatDialog
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.selectedFeatures.on('change:length', handler)
@@ -106,9 +135,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    deactivateCompute(): void {
+    resetForm(): void {
         this.form.reset()
-        this.pluginService.setComputeState('inactive')
+        this.mapService.selectedFeatures.clear()
+        this.snackBar.open('All form values have been reset to their defaults.', 'Dismiss', {
+            duration: 4000,
+            verticalPosition: 'bottom',
+            horizontalPosition: 'center',
+            panelClass: ['info-snackbar']
+        })
     }
 
     toggleFormState(): void {
@@ -144,12 +179,12 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
             if (optionalSubgroup.length > 0) {
                 splittedFieldGroup.push({
-                    type: 'expander',
+                    type: 'dialog',
                     fieldGroup: [
                         {
                             props: {
                                 label: 'Optional Attributes',
-                                description: 'Click here to access more configurations.'
+                                description: 'Edit additional parameters.'
                             },
                             fieldGroup: optionalSubgroup
                         }
@@ -203,7 +238,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
             next: data => {
-                this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, aoiName)
+                this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin.plugin_id, aoiName)
                 this.pluginService.triggerSyncTasks()
                 this.pluginService.setComputeState('inactive')
 
@@ -224,27 +259,30 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         })
     }
 
-    runDemo() {
-        this.pluginService.computeDemo(this.plugin.plugin_id).subscribe({
-            next: data => {
-                this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin, 'Demo')
-                this.pluginService.triggerSyncTasks()
-                this.pluginService.setComputeState('inactive')
+    processSourceText(source: Source) {
+        const commonFields = [source.author, source.year]
 
-                this.snackBar.open('Demo request sent, results will be displayed soon.', 'Dismiss', {
-                    duration: 7000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['success-snackbar']
-                })
-            },
-            error: () => {
-                this.snackBar.open('Error while computing demo. Please try again.', 'Dismiss', {
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                })
-            }
+        switch (source.ENTRYTYPE) {
+            case 'article':
+                return [...commonFields, source.journal, source.volume, source.pages].filter(Boolean).join(', ')
+            case 'inbook':
+            case 'inproceedings':
+                return [...commonFields, source.pages].filter(Boolean).join(', ')
+            case 'misc':
+                return [...commonFields].filter(Boolean).join(', ')
+            default:
+                return ''
+        }
+    }
+
+    openDialog(plugin: Plugin): void {
+        this.dialog.open(this.pluginMethodologyDialog, {
+            data: plugin,
+            autoFocus: false
         })
+    }
+
+    closeDialog(): void {
+        this.dialog.closeAll()
     }
 }

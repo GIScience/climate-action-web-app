@@ -1,5 +1,5 @@
-<div class="mb-3">
-    <legend *ngIf="props.label">{{ props.label }}</legend>
+<div class="object-field">
+    <h4 *ngIf="props.label" class="object-field__label">{{ props.label }}</h4>
     <p *ngIf="props.description">{{ props.description }}</p>
     <div class="alert alert-danger" role="alert" *ngIf="showError && formControl.errors">
         <formly-validation-message [field]="field"></formly-validation-message>

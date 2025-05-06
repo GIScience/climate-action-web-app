@@ -1,0 +1,40 @@
+:host ::ng-deep {
+    .dialog-window {
+        padding: 20px;
+
+        & * {
+            font-family: Manrope !important;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        button.close-dialog {
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            color: #666;
+            cursor: pointer;
+            position: absolute;
+            right: 5px;
+            top: 15px;
+        }
+
+        .ng-scrollbar {
+            max-height: 40vh;
+        }
+
+        .optional-attributes {
+            mat-form-field {
+                margin-bottom: 20px;
+            }
+
+            .mat-mdc-form-field-hint-wrapper,
+            .mat-mdc-form-field-error-wrapper {
+                margin-top: -20px;
+                position: relative !important;
+            }
+        }
+    }
+}
