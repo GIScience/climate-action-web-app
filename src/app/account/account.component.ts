@@ -2,15 +2,14 @@ import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Models } from 'appwrite'
 import {
-    KeyRound,
     LifeBuoy,
+    LogIn,
     LogOut,
     LucideAngularModule,
     Percent,
     SquareUserRound,
     TestTubeDiagonal,
-    User,
-    UserPlus
+    User
 } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
@@ -32,8 +31,7 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     readonly SquareUserRound = SquareUserRound
     readonly User = User
-    readonly UserPlus = UserPlus
-    readonly KeyRound = KeyRound
+    readonly LogIn = LogIn
     readonly Percent = Percent
     readonly LifeBuoy = LifeBuoy
     readonly Logout = LogOut
