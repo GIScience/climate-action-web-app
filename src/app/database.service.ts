@@ -33,7 +33,8 @@ export class DatabaseService {
             if (!this.userId) return []
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('userId', this.userId)
+                Query.equal('userId', this.userId),
+                Query.limit(1000)
             ])
 
             return response.documents.map(
@@ -83,7 +84,8 @@ export class DatabaseService {
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
                 Query.equal('correlation_uuid', correlationId),
-                Query.equal('userId', this.userId)
+                Query.equal('userId', this.userId),
+                Query.limit(1000)
             ])
 
             if (response.documents.length === 0) return false
