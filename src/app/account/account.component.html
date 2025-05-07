@@ -1,34 +1,22 @@
 <div class="account-container">
-    <div class="account-menu">
-        <button class="profile-button" (click)="toggleAccountMenu()">
-            Account
-            <i-lucide [img]="SquareUserRound" size="27.5" color="#666" *ngIf="!user"></i-lucide>
-            <i-lucide [img]="SquareUserRound" size="27.5" color="#008080" *ngIf="user"></i-lucide>
-        </button>
-        <ng-container *ngIf="!user">
-            <div
-                class="account-menu__content"
-                [class.show]="accountMenuOpen"
-                (mouseleave)="closeAccountMenu()"
-                (mouseenter)="cancelAccountMenuClose()">
-                <a [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())" class="account-menu__item">
-                    <i-lucide [img]="KeyRound" size="20"></i-lucide>
-                    Login
-                </a>
-                <button *ngIf="!environment.production" class="account-menu__item" (click)="loginAsFakeUser()">
-                    <i-lucide [img]="TestTubeDiagonal" size="20"></i-lucide>
-                    Login (as Fake User)
-                </button>
-                <a
-                    [href]="getAppwriteUrl('/signup?redirect=' + getRedirectUrl())"
-                    class="account-menu__item"
-                    target="_blank">
-                    <i-lucide [img]="UserPlus" size="20"></i-lucide>
-                    Register
-                </a>
-            </div>
-        </ng-container>
-        <ng-container *ngIf="user">
+    <ng-container *ngIf="!user">
+        <div class="login-container">
+            <button *ngIf="!environment.production" (click)="loginAsFakeUser()" class="fake-user-button">
+                Login (as Fake User)
+                <i-lucide [img]="TestTubeDiagonal" size="27.5" color="#e78400"></i-lucide>
+            </button>
+            <a type="button" class="profile-button" [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())">
+                Login
+                <i-lucide [img]="LogIn" size="27.5" color="#008080"></i-lucide>
+            </a>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="user">
+        <div class="account-menu">
+            <button class="profile-button" (click)="toggleAccountMenu()">
+                Account
+                <i-lucide [img]="SquareUserRound" size="27.5" color="#008080"></i-lucide>
+            </button>
             <div
                 class="account-menu__content"
                 [class.show]="accountMenuOpen"
@@ -57,6 +45,6 @@
                     Logout
                 </button>
             </div>
-        </ng-container>
-    </div>
+        </div>
+    </ng-container>
 </div>
