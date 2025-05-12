@@ -232,13 +232,13 @@ export class MapService {
             }
         })
 
-        const osmCartoLayerName = 'OSM Carto'
+        const positronLayerName = 'Carto Positron'
 
         const osmCarto = new ExtendedTileLayer({
             source: new OSM(),
-            name: osmCartoLayerName,
+            name: 'OSM Carto',
             baseLayer: true,
-            visible: true
+            visible: false
         })
 
         const aerialImagery = new ExtendedTileLayer({
@@ -255,9 +255,9 @@ export class MapService {
         })
 
         const greyscaleBase = new ExtendedTileLayer({
-            name: 'Carto Positron',
+            name: positronLayerName,
             baseLayer: true,
-            visible: false,
+            visible: true,
             source: new XYZ({
                 url: 'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
                 attributions:
@@ -281,7 +281,7 @@ export class MapService {
         })
 
         this.map = new Map({
-            layers: [greyscaleBase, aerialImagery, osmCarto],
+            layers: [aerialImagery, osmCarto, greyscaleBase],
             target: targetId,
             view: initialView,
             overlays: [this.mapPopUp],
@@ -319,7 +319,7 @@ export class MapService {
             }
         }
 
-        const selectedMapLayer = this.storageService.getSelectedMapLayer(osmCartoLayerName)
+        const selectedMapLayer = this.storageService.getSelectedMapLayer(positronLayerName)
         this.map.getLayers().forEach(layer => {
             layer.setVisible(layer.get('name') === selectedMapLayer)
         })
@@ -481,7 +481,7 @@ export class MapService {
             name: artifactName,
             style: this.styleFunction.bind(this) as StyleFunction
         })
-        this.geojsonLayer.setOpacity(0.6)
+        this.geojsonLayer.setOpacity(0.8)
 
         this.map?.addLayer(this.geojsonLayer)
 
@@ -585,7 +585,7 @@ export class MapService {
             source: geoTiffSource,
             name: artifactName
         })
-        geoTiffLayer.setOpacity(0.6)
+        geoTiffLayer.setOpacity(0.8)
 
         this.map?.addLayer(geoTiffLayer)
         return geoTiffLayer
