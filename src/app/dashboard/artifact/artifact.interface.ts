@@ -22,7 +22,7 @@ export interface LegendObject {
 }
 
 export interface AttachmentsObject {
-    LEGEND?: LegendObject
+    legend?: LegendObject
 }
 
 export interface Artifact {

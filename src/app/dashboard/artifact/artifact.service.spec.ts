@@ -35,7 +35,7 @@ describe('ArtifactService', () => {
         description: 'artifact description',
         correlation_uuid: correlation_uuid,
         store_id: store_uuid,
-        attachments: { LEGEND: test_legend }
+        attachments: { legend: test_legend }
     } as Artifact
 
     const test_chart = {

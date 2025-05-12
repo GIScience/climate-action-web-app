@@ -263,244 +263,228 @@ export const mockPluginsList = () => {
 
 export const mockPluginsListWithoutBlueprint = () => {
     cy.intercept('/api/v1/gateway/plugin/', {
-        body:
-            [
-                {
-                    'name': 'Walkability',
-                    'authors': [
-                        {
-                            'name': 'Max Mustermann',
-                            'affiliation': 'XYZ gGmbH',
-                            'website': 'https://example.com/'
+        body: [
+            {
+                name: 'Walkability',
+                authors: [
+                    {
+                        name: 'Max Mustermann',
+                        affiliation: 'XYZ gGmbH',
+                        website: 'https://example.com/'
+                    },
+                    {
+                        name: 'Erika Mustermann',
+                        affiliation: 'Consultant at XYZ gGmbH',
+                        website: 'https://example.com/'
+                    }
+                ],
+                version: '1.0.0',
+                concerns: ['pedestrian'],
+                purpose:
+                    "The Walkability module provides a collection of indicators related to a number of different aspects that determine the perceived quality (safety, comfort, practicality) of walking along a given street or within a given area of interest. In the future, the module will combine the different indicators into a general walkability index.\n\nCurrently available are:\n\n* A categorisation of walkable paths based on which other road users share the path with pedestrians (such as bicycles and motorised traffic).\n* A grading of the paths' surface quality based on its reported smoothness or surface type.\n* A connectivity measure based on the reachability of other paths within a defined area of interest.\n",
+                methodology:
+                    'The indicators are based on the [OpenStreetMap (OSM)](https://www.openstreetmap.org/about) database.\nOSM is a free and open geo-database often called the "Wikipedia of maps".\nIt is a feature-rich collection of e.g. streets and paths maintained by voluntary contributors.\n\nDetailed explanations on the methods can be found in the description of each indicator.',
+                sources: [],
+                assets: {
+                    icon: 'assets/walkability/1.0.0/ICON.jpeg'
+                },
+                plugin_id: 'walkability',
+                operator_schema: {
+                    $defs: {
+                        IDW: {
+                            enum: [
+                                'Polynomial decay related to retail and park amenities according to Frank et al 2021',
+                                'Step function reflecting statistical findings on walking path distance according to Xia et al 2018',
+                                'No distance weighting'
+                            ],
+                            title: 'IDW',
+                            type: 'string'
                         },
-                        {
-                            'name': 'Erika Mustermann',
-                            'affiliation': 'Consultant at XYZ gGmbH',
-                            'website': 'https://example.com/'
+                        PathRating: {
+                            properties: {
+                                designated: {
+                                    default: 1.0,
+                                    description:
+                                        'Qualitative (between 0..1) rating of paths designated for exclusive pedestrian use.',
+                                    examples: [1.0],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Designated Path Rating',
+                                    type: 'number'
+                                },
+                                designated_shared_with_bikes: {
+                                    default: 0.8,
+                                    description: 'Qualitative (between 0..1) rating of paths shared with bikes.',
+                                    examples: [0.8],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Designated Shared with Bikes Path Rating',
+                                    type: 'number'
+                                },
+                                shared_with_motorized_traffic_low_speed: {
+                                    default: 0.6,
+                                    description:
+                                        'Qualitative rating (between 0..1) of streets without a sidewalk, with low speed limits, such as living streets or service ways.',
+                                    examples: [0.6],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Shared with motorized traffic low speed Path Rating',
+                                    type: 'number'
+                                },
+                                shared_with_motorized_traffic_medium_speed: {
+                                    default: 0.4,
+                                    description:
+                                        'Qualitative rating (between 0..1) of streets without a sidewalk, with medium speed limits up to 30 km/h',
+                                    examples: [0.4],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Shared with motorized traffic medium speed Path Rating',
+                                    type: 'number'
+                                },
+                                shared_with_motorized_traffic_high_speed: {
+                                    default: 0.2,
+                                    description:
+                                        'Qualitative rating (between 0..1) of streets without a sidewalk, with higher speed limits up to 50 km/h',
+                                    examples: [0.2],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Shared with motorized traffic high speed Path Rating',
+                                    type: 'number'
+                                },
+                                not_walkable: {
+                                    default: 0.0,
+                                    description: 'Qualitative rating (between 0..1) of paths that are not walkable.',
+                                    examples: [0.0],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Not Walkable Path Rating',
+                                    type: 'number'
+                                },
+                                unknown: {
+                                    default: -9999,
+                                    description:
+                                        'Qualitative (between 0..1) rating of paths that are in principle walkable but cannot be fit in one of the other categories (default -9999, which is out of scale)',
+                                    examples: [0.0],
+                                    maximum: 1.0,
+                                    minimum: 0.0,
+                                    title: 'Unknown Path Rating',
+                                    type: 'number'
+                                }
+                            },
+                            title: 'PathRating',
+                            type: 'object'
+                        },
+                        WalkingSpeed: {
+                            enum: ['slow', 'medium', 'fast'],
+                            title: 'WalkingSpeed',
+                            type: 'string'
                         }
-                    ],
-                    'version': '1.0.0',
-                    'concerns': [
-                        'pedestrian'
-                    ],
-                    'purpose': 'The Walkability module provides a collection of indicators related to a number of different aspects that determine the perceived quality (safety, comfort, practicality) of walking along a given street or within a given area of interest. In the future, the module will combine the different indicators into a general walkability index.\n\nCurrently available are:\n\n* A categorisation of walkable paths based on which other road users share the path with pedestrians (such as bicycles and motorised traffic).\n* A grading of the paths\' surface quality based on its reported smoothness or surface type.\n* A connectivity measure based on the reachability of other paths within a defined area of interest.\n',
-                    'methodology': 'The indicators are based on the [OpenStreetMap (OSM)](https://www.openstreetmap.org/about) database.\nOSM is a free and open geo-database often called the "Wikipedia of maps".\nIt is a feature-rich collection of e.g. streets and paths maintained by voluntary contributors.\n\nDetailed explanations on the methods can be found in the description of each indicator.',
-                    'sources': [],
-                    'assets': {
-                        'icon': 'assets/walkability/1.0.0/ICON.jpeg'
                     },
-                    'plugin_id': 'walkability',
-                    'operator_schema': {
-                        '$defs': {
-                            'IDW': {
-                                'enum': [
-                                    'Polynomial decay related to retail and park amenities according to Frank et al 2021',
-                                    'Step function reflecting statistical findings on walking path distance according to Xia et al 2018',
-                                    'No distance weighting'
-                                ],
-                                'title': 'IDW',
-                                'type': 'string'
-                            },
-                            'PathRating': {
-                                'properties': {
-                                    'designated': {
-                                        'default': 1.0,
-                                        'description': 'Qualitative (between 0..1) rating of paths designated for exclusive pedestrian use.',
-                                        'examples': [
-                                            1.0
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Designated Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'designated_shared_with_bikes': {
-                                        'default': 0.8,
-                                        'description': 'Qualitative (between 0..1) rating of paths shared with bikes.',
-                                        'examples': [
-                                            0.8
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Designated Shared with Bikes Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'shared_with_motorized_traffic_low_speed': {
-                                        'default': 0.6,
-                                        'description': 'Qualitative rating (between 0..1) of streets without a sidewalk, with low speed limits, such as living streets or service ways.',
-                                        'examples': [
-                                            0.6
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Shared with motorized traffic low speed Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'shared_with_motorized_traffic_medium_speed': {
-                                        'default': 0.4,
-                                        'description': 'Qualitative rating (between 0..1) of streets without a sidewalk, with medium speed limits up to 30 km/h',
-                                        'examples': [
-                                            0.4
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Shared with motorized traffic medium speed Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'shared_with_motorized_traffic_high_speed': {
-                                        'default': 0.2,
-                                        'description': 'Qualitative rating (between 0..1) of streets without a sidewalk, with higher speed limits up to 50 km/h',
-                                        'examples': [
-                                            0.2
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Shared with motorized traffic high speed Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'not_walkable': {
-                                        'default': 0.0,
-                                        'description': 'Qualitative rating (between 0..1) of paths that are not walkable.',
-                                        'examples': [
-                                            0.0
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Not Walkable Path Rating',
-                                        'type': 'number'
-                                    },
-                                    'unknown': {
-                                        'default': -9999,
-                                        'description': 'Qualitative (between 0..1) rating of paths that are in principle walkable but cannot be fit in one of the other categories (default -9999, which is out of scale)',
-                                        'examples': [
-                                            0.0
-                                        ],
-                                        'maximum': 1.0,
-                                        'minimum': 0.0,
-                                        'title': 'Unknown Path Rating',
-                                        'type': 'number'
-                                    }
+                    properties: {
+                        walkable_time: {
+                            anyOf: [
+                                {
+                                    minimum: 0.0,
+                                    type: 'number'
                                 },
-                                'title': 'PathRating',
-                                'type': 'object'
-                            },
-                            'WalkingSpeed': {
-                                'enum': [
-                                    'slow',
-                                    'medium',
-                                    'fast'
-                                ],
-                                'title': 'WalkingSpeed',
-                                'type': 'string'
-                            }
+                                {
+                                    type: 'null'
+                                }
+                            ],
+                            default: 15,
+                            description: 'Maximum duration of a single trip in minutes.',
+                            examples: [15],
+                            title: 'Maximum Trip Duration'
                         },
-                        'properties': {
-                            'walkable_time': {
-                                'anyOf': [
-                                    {
-                                        'minimum': 0.0,
-                                        'type': 'number'
-                                    },
-                                    {
-                                        'type': 'null'
-                                    }
-                                ],
-                                'default': 15,
-                                'description': 'Maximum duration of a single trip in minutes.',
-                                'examples': [
-                                    15
-                                ],
-                                'title': 'Maximum Trip Duration'
-                            },
-                            'walking_speed': {
-                                'anyOf': [
-                                    {
-                                        '$ref': '#/$defs/WalkingSpeed'
-                                    },
-                                    {
-                                        'type': 'null'
-                                    }
-                                ],
-                                'default': 'medium',
-                                'description': 'Choose a walking speed category. The categories map to the following speed in km/h: {\'slow\': 2, \'medium\': 4, \'fast\': 6}',
-                                'examples': [
-                                    'medium'
-                                ],
-                                'title': 'Walking Speed'
-                            },
-                            'path_rating': {
-                                'anyOf': [
-                                    {
-                                        '$ref': '#/$defs/PathRating'
-                                    },
-                                    {
-                                        'type': 'null'
-                                    }
-                                ],
-                                'default': {
-                                    'designated': 1.0,
-                                    'designated_shared_with_bikes': 0.8,
-                                    'shared_with_motorized_traffic_low_speed': 0.6,
-                                    'shared_with_motorized_traffic_medium_speed': 0.4,
-                                    'shared_with_motorized_traffic_high_speed': 0.2,
-                                    'not_walkable': 0.0,
-                                    'unknown': -9999.0
+                        walking_speed: {
+                            anyOf: [
+                                {
+                                    $ref: '#/$defs/WalkingSpeed'
                                 },
-                                'description': 'Qualitative rating for each of the available path categories.',
-                                'examples': [
-                                    {
-                                        'designated': 1.0,
-                                        'designated_shared_with_bikes': 0.8,
-                                        'not_walkable': 0.0,
-                                        'shared_with_motorized_traffic_high_speed': 0.2,
-                                        'shared_with_motorized_traffic_low_speed': 0.6,
-                                        'shared_with_motorized_traffic_medium_speed': 0.4,
-                                        'unknown': -9999.0
-                                    }
-                                ],
-                                'title': 'Path Rating Mapping'
-                            },
-                            'admin_level': {
-                                'anyOf': [
-                                    {
-                                        'maximum': 12,
-                                        'minimum': 6,
-                                        'type': 'integer'
-                                    },
-                                    {
-                                        'type': 'null'
-                                    }
-                                ],
-                                'default': 9,
-                                'description': 'The administrative level the results should be aggregated to. See the [OSM wiki documentation](https://wiki.openstreetmap.org/wiki/Tag:boundary=administrative) for available values.',
-                                'examples': [
-                                    9
-                                ],
-                                'title': 'Administrative level'
-                            },
-                            'idw_method': {
-                                'anyOf': [
-                                    {
-                                        '$ref': '#/$defs/IDW'
-                                    },
-                                    {
-                                        'type': 'null'
-                                    }
-                                ],
-                                'default': 'Step function reflecting statistical findings on walking path distance according to Xia et al 2018',
-                                'description': 'The function that should be used to model distance weighting. The approach is often called Inverse Distance Weighting (IDW) or Distance Decay. Walking trips exhibit a certain distribution. Many trips are rather short while long trips are relatively seldom. This attribute defines which function will be used to weight close vs. distant trip targets.',
-                                'examples': [
-                                    'Step function reflecting statistical findings on walking path distance according to Xia et al 2018'
-                                ],
-                                'title': 'Distance Weighting'
-                            }
+                                {
+                                    type: 'null'
+                                }
+                            ],
+                            default: 'medium',
+                            description:
+                                "Choose a walking speed category. The categories map to the following speed in km/h: {'slow': 2, 'medium': 4, 'fast': 6}",
+                            examples: ['medium'],
+                            title: 'Walking Speed'
                         },
-                        'title': 'ComputeInputWalkability',
-                        'type': 'object'
+                        path_rating: {
+                            anyOf: [
+                                {
+                                    $ref: '#/$defs/PathRating'
+                                },
+                                {
+                                    type: 'null'
+                                }
+                            ],
+                            default: {
+                                designated: 1.0,
+                                designated_shared_with_bikes: 0.8,
+                                shared_with_motorized_traffic_low_speed: 0.6,
+                                shared_with_motorized_traffic_medium_speed: 0.4,
+                                shared_with_motorized_traffic_high_speed: 0.2,
+                                not_walkable: 0.0,
+                                unknown: -9999.0
+                            },
+                            description: 'Qualitative rating for each of the available path categories.',
+                            examples: [
+                                {
+                                    designated: 1.0,
+                                    designated_shared_with_bikes: 0.8,
+                                    not_walkable: 0.0,
+                                    shared_with_motorized_traffic_high_speed: 0.2,
+                                    shared_with_motorized_traffic_low_speed: 0.6,
+                                    shared_with_motorized_traffic_medium_speed: 0.4,
+                                    unknown: -9999.0
+                                }
+                            ],
+                            title: 'Path Rating Mapping'
+                        },
+                        admin_level: {
+                            anyOf: [
+                                {
+                                    maximum: 12,
+                                    minimum: 6,
+                                    type: 'integer'
+                                },
+                                {
+                                    type: 'null'
+                                }
+                            ],
+                            default: 9,
+                            description:
+                                'The administrative level the results should be aggregated to. See the [OSM wiki documentation](https://wiki.openstreetmap.org/wiki/Tag:boundary=administrative) for available values.',
+                            examples: [9],
+                            title: 'Administrative level'
+                        },
+                        idw_method: {
+                            anyOf: [
+                                {
+                                    $ref: '#/$defs/IDW'
+                                },
+                                {
+                                    type: 'null'
+                                }
+                            ],
+                            default:
+                                'Step function reflecting statistical findings on walking path distance according to Xia et al 2018',
+                            description:
+                                'The function that should be used to model distance weighting. The approach is often called Inverse Distance Weighting (IDW) or Distance Decay. Walking trips exhibit a certain distribution. Many trips are rather short while long trips are relatively seldom. This attribute defines which function will be used to weight close vs. distant trip targets.',
+                            examples: [
+                                'Step function reflecting statistical findings on walking path distance according to Xia et al 2018'
+                            ],
+                            title: 'Distance Weighting'
+                        }
                     },
-                    'library_version': '6.0.2'
-                }
-            ]
+                    title: 'ComputeInputWalkability',
+                    type: 'object'
+                },
+                library_version: '6.0.2'
+            }
+        ]
     }).as('getPluginsWithoutBlueprint')
 }
 
@@ -900,7 +884,7 @@ export const mockGeoTiffComputation = () => {
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                     store_id: 'a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff',
                     attachments: {
-                        LEGEND: {
+                        legend: {
                             legend_data: {
                                 unknown: '#000',
                                 'built-up': '#f00',
@@ -981,7 +965,7 @@ export const mockGeoJsonComputation = () => {
                     correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                     store_id: '2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson',
                     attachments: {
-                        LEGEND: {
+                        legend: {
                             legend_data: {
                                 cmap_name: 'seismic',
                                 ticks: {
@@ -1061,7 +1045,7 @@ export const mockSimpleGeoJsonComputation = () => {
                     correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
                     store_id: '4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson',
                     attachments: {
-                        LEGEND: {
+                        legend: {
                             legend_data: {
                                 cmap_name: 'seismic',
                                 ticks: {

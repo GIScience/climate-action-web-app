@@ -146,7 +146,7 @@ export class ArtifactService {
     }
 
     getLegend(artifact: Artifact): void {
-        const mapLegend = artifact.attachments.LEGEND
+        const mapLegend = artifact.attachments.legend
         if (mapLegend) {
             mapLegend.title = mapLegend.title ? mapLegend.title : artifact.name
             this.legendSubject.next(mapLegend)
