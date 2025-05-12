@@ -1,7 +1,7 @@
 <div class="plugin-catalog" [ngClass]="{ 'is-loading': loading }">
     <input id="catalog-toggle" type="checkbox" #catalogToggle checked="checked" />
     <div id="catalog-header">
-        <h3 class="plugin-title">Plugins</h3>
+        <h3 class="plugin-title">Assessment Tools</h3>
         <label for="catalog-toggle">
             <span id="catalog-toggle-burger"></span>
         </label>
@@ -10,7 +10,9 @@
         <div *ngIf="loading" class="loading-state">
             <ul>
                 <li class="plugin-card" *ngFor="let i of [1, 2, 3, 4, 5]">
-                    <img ngSrc="assets/images/plugin-icons/loading.png" alt="Loading..." height="100" width="100" />
+                    <div class="plugin-card__icon">
+                        <img src="assets/images/plugin-icons/loading.png" alt="Loading..." />
+                    </div>
                     <div class="plugin-card__text">
                         <h3>Loading...</h3>
                         <span>N/A</span>
@@ -31,7 +33,12 @@
                         tabindex="0"
                         [tp]="tpl"
                         tpPlacement="right">
-                        <img [src]="card.icon" alt="{{ card.icon_credit }}" (error)="onImageError($event)" />
+                        <div class="plugin-card__icon">
+                            <img [src]="card.icon" alt="{{ card.icon_credit }}" (error)="onImageError($event)" />
+                            <div class="plugin-card__icon-text">
+                                <h5>{{ card.name }}</h5>
+                            </div>
+                        </div>
                         <div class="plugin-card__text">
                             <h3>{{ card.name }}</h3>
                             <span *ngIf="card.version && card.library_version"
@@ -40,8 +47,7 @@
                             <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
                         </div>
                         <ng-template #tpl>
-                            <strong>{{ card.name }}</strong>
-                            <p *ngIf="card.purpose">{{ card.purpose }}</p>
+                            <span *ngIf="card.purpose">{{ card.purpose }}</span>
                         </ng-template>
                     </li>
                 </ul>

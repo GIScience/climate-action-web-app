@@ -4,7 +4,11 @@
     <div class="dashboard__left-column" [ngClass]="{ collapsed: leftColumnCollapsed }">
         <app-plugin-catalog></app-plugin-catalog>
         <router-outlet></router-outlet>
-        <button class="left-column-collapser btn-onlyicon btn-onlyicon--large" (click)="collapseLeftColumn()">
+        <button
+            class="left-column-collapser btn-onlyicon btn-onlyicon--large"
+            (click)="collapseLeftColumn()"
+            [tp]="leftColumnCollapsed ? 'Show section' : 'Collapse section'"
+            tpPlacement="bottom">
             <i-lucide [img]="leftColumnCollapsed ? PanelLeftOpen : PanelLeftClose" size="22.5"></i-lucide>
         </button>
     </div>

@@ -35,6 +35,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
   information) ([#240](https://gitlab.heigit.org/climate-action/web-app/-/issues/240))
 - Compute now requires User Authentication by means of the HeiGIT Account (implemented via Appwrite) ([#37](https://gitlab.heigit.org/climate-action/web-app/-/issues/37))
 - User's local Computations IDs are now synced to the Appwrite database
+- We now have a logo! ([#270](https://gitlab.heigit.org/climate-action/web-app/-/issues/270))
 
 ## [2.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.1.0) - 2025-01-29
 

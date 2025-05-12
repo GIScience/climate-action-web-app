@@ -8,21 +8,20 @@ header {
         height: $header-height;
         justify-content: space-between;
 
-        .logo-wrapper {
+        .heigit-logo__wrapper {
             flex-basis: 0;
             flex-grow: 1;
 
-            img.logo {
+            img.heigit-logo {
                 height: 35px;
                 margin-left: 25px;
             }
         }
 
-        h2 {
-            color: #008080;
+        .ca-logo {
             cursor: pointer;
-            line-height: 50px;
-            margin: 0;
+            height: 37.5px;
+            margin-bottom: 2.5px;
         }
 
         app-account {
