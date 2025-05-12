@@ -6,7 +6,7 @@
     color: #fff;
     margin-right: 0.5vw;
     overflow: hidden;
-    padding-top: 20px;
+    padding-top: 15px;
     position: relative;
 
     input[type='checkbox'] {
@@ -58,13 +58,26 @@
             }
         }
 
-        ~ .plugins-list .plugin-card {
-            width: 100px;
-        }
+        ~ .plugins-list {
+            .plugin-card {
+                width: 107.5px;
 
-        ~ .plugins-list .plugin-card__text {
-            opacity: 0;
-            transition: none;
+                .plugin-card__icon {
+                    img {
+                        transform: translateY(-12.5px) scale(0.65);
+                    }
+
+                    .plugin-card__icon-text {
+                        opacity: 1;
+                        transition-delay: 0.5s;
+                    }
+                }
+
+                .plugin-card__text {
+                    opacity: 0;
+                    transition: none;
+                }
+            }
         }
     }
 
@@ -77,6 +90,8 @@
 
         h3.plugin-title {
             margin: 10px 0;
+            position: absolute;
+            text-wrap: nowrap;
             transition: opacity 0.25s ease-in-out;
         }
 
@@ -128,7 +143,7 @@
 
         ::ng-deep {
             .ng-scroll-content {
-                padding-left: 5px;
+                padding-left: 2.5px;
             }
         }
     }
@@ -140,22 +155,16 @@
     width: 240px;
 
     ul {
-        padding: 15px 0 0 5px;
+        padding: 10px 0 0 0;
     }
 
     .loading-state {
         pointer-events: none;
 
         ul {
-            padding-left: 10px;
+            padding-left: 2.5px;
 
             li {
-                padding: 5px;
-
-                img {
-                    opacity: 0.8;
-                }
-
                 .plugin-card__text {
                     h3 {
                         background: rgba(255, 255, 255, 0.6);
@@ -178,12 +187,53 @@
         border-radius: 5px;
         cursor: pointer;
         display: flex;
-        height: 75px;
+        height: 95px;
         margin-bottom: 10px;
         padding: 5px;
         position: relative;
         transition: width 0.25s ease-in-out;
-        width: 220px;
+        width: 227.5px;
+
+        .plugin-card__icon {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+
+            img {
+                aspect-ratio: 1;
+                filter: saturate(1.5);
+                height: 100%;
+                transition: transform 0.25s ease-in-out 0.25s;
+            }
+
+            .plugin-card__icon-text {
+                align-items: center;
+                bottom: 0;
+                display: flex;
+                height: 30px;
+                justify-content: center;
+                left: 0;
+                opacity: 0;
+                position: absolute;
+                transition: opacity 0.25s ease-in-out;
+                width: 100%;
+
+                h5 {
+                    color: #333;
+                    display: -webkit-box;
+                    line-height: 1.2;
+                    margin: 0;
+                    width: 100%;
+                    line-clamp: 2;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-align: center;
+                }
+            }
+        }
 
         .plugin-card__text {
             display: flex;
@@ -200,14 +250,6 @@
             span {
                 font-size: smaller;
             }
-        }
-
-        img {
-            aspect-ratio: 1;
-            border: 2px solid rgba(255, 255, 255, 0.85);
-            border-radius: 5px;
-            height: 100%;
-            object-fit: cover;
         }
 
         &.plugin-card-highlight,

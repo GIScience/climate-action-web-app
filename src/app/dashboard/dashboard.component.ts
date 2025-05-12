@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { TippyDirective } from '@ngneat/helipopper'
 import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
@@ -27,7 +28,8 @@ import { SearchComponent } from './search/search.component'
         MapComponent,
         RouterModule,
         ReportComponent,
-        LucideAngularModule
+        LucideAngularModule,
+        TippyDirective
     ],
     standalone: true
 })

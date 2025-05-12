@@ -1,23 +1,24 @@
 <div class="page-container">
     <header class="navbar">
         <div class="header-container">
-            <div class="logo-wrapper">
+            <div class="heigit-logo__wrapper">
                 <a href="https://heigit.org" target="_blank">
                     <img
                         ngSrc="assets/images/HeiGIT_Logo_base.svg"
                         alt="HeiGIT Logo"
-                        class="logo"
+                        class="heigit-logo"
                         height="35"
                         width="167" />
                 </a>
             </div>
-            <h2
+            <img
+                src="assets/images/ca-logo--horizontal.svg"
+                alt="Climate Action Logo"
+                class="ca-logo"
                 [routerLink]="'/dashboard'"
                 tabindex="0"
                 (click)="clearDashboardState()"
-                (keyup.enter)="clearDashboardState()">
-                {{ title }}
-            </h2>
+                (keyup.enter)="clearDashboardState()" />
             <app-account></app-account>
         </div>
     </header>
@@ -28,11 +29,15 @@
 
     <footer class="footer ta-c fsz-sm c-grey-600">
         <span class="about-info">
-            © {{ currentYear() }} HeiGIT gGmbH |
+            <span>© {{ currentYear() }} HeiGIT gGmbH</span> |
             <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
+            <a href="mailto:climateactionnavigator@heigit.org" target="_blank">Partner with us</a> |
             <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
             <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a>
         </span>
-        <span class="demo-info">Demo website v{{ version }} - changes can occur at any time</span>
+        <span class="contact-info">
+            <span>Version: {{ version }}</span> | <a href="https://icons8.com/" target="_blank">Icons by Icons8</a> |
+            <a href="https://www.openstreetmap.org/fixthemap" target="_blank">Report a problem with the map</a>
+        </span>
     </footer>
 </div>

@@ -33,14 +33,23 @@ footer {
     white-space: pre-line;
     width: 100vw;
 
-    .demo-info {
-        color: #d60039;
-        float: right;
-        margin: 0 20px;
+    a {
+        color: #008080;
+    }
+
+    .about-info,
+    .contact-info {
+        display: flex;
+        gap: 7.5px;
     }
 
     .about-info {
         float: left;
+        margin: 0 20px;
+    }
+
+    .contact-info {
+        float: right;
         margin: 0 20px;
     }
 }
