@@ -2,7 +2,7 @@ import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, APPWRITE_WEBSITE_URL, ORS_API_K
 
 export const environment = {
     production: false,
-    climateActionApiUrl: 'api/v1/gateway',
+    climateActionApiUrl: '/api/v1/gateway',
     climateActionWSUrl: 'ws://localhost',
     orsAPIKey: ORS_API_KEY,
     appwriteProjectId: APPWRITE_PROJECT_ID,
