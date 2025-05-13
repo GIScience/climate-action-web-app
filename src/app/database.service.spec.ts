@@ -83,7 +83,7 @@ describe('DatabaseService', () => {
                 documents: [
                     {
                         correlation_uuid: 'test-uuid-1',
-                        flag: 'NEW',
+                        flags: ['NEW'],
                         pluginId: 'test-plugin-1',
                         timestamp: new Date().toISOString(),
                         status: 'SUCCESS',
@@ -91,7 +91,7 @@ describe('DatabaseService', () => {
                     },
                     {
                         correlation_uuid: 'test-uuid-2',
-                        flag: null,
+                        flags: [],
                         pluginId: 'test-plugin-2',
                         timestamp: new Date().toISOString(),
                         status: 'PENDING',
@@ -126,7 +126,7 @@ describe('DatabaseService', () => {
                 pluginId: 'test-plugin',
                 status: 'PENDING',
                 timestamp: new Date(),
-                flag: null,
+                flags: [],
                 aoiName: 'Test Area'
             })
 
@@ -142,7 +142,7 @@ describe('DatabaseService', () => {
                 pluginId: 'test-plugin',
                 status: 'PENDING',
                 timestamp: new Date(),
-                flag: null,
+                flags: [],
                 aoiName: 'Test Area'
             })
 
@@ -158,7 +158,7 @@ describe('DatabaseService', () => {
                 pluginId: 'test-plugin',
                 status: 'PENDING',
                 timestamp: new Date(),
-                flag: null,
+                flags: [],
                 aoiName: 'Test Area'
             })
 
@@ -224,7 +224,7 @@ describe('DatabaseService', () => {
                     pluginId: 'test-plugin',
                     status: 'PENDING',
                     timestamp: new Date(),
-                    flag: null,
+                    flags: [],
                     aoiName: 'Test Area'
                 }
             ])
@@ -238,7 +238,7 @@ describe('DatabaseService', () => {
                     pluginId: 'test-plugin',
                     status: 'SUCCESS',
                     timestamp: new Date(),
-                    flag: null,
+                    flags: [],
                     aoiName: 'Test Area'
                 },
                 {
@@ -246,7 +246,7 @@ describe('DatabaseService', () => {
                     pluginId: 'test-plugin-2',
                     status: 'PENDING',
                     timestamp: new Date(),
-                    flag: null,
+                    flags: [],
                     aoiName: 'Another Area'
                 }
             ])

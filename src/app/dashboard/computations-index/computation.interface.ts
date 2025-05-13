@@ -1,7 +1,7 @@
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
-import { ComputationFlag, ComputationState } from '../common/status.types'
+import { ComputationFlags, ComputationState } from '../common/status.types'
 import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 
 export interface ComputationParameters {
@@ -30,13 +30,13 @@ export interface ComputationDisplayEntity
     showSecondaryArtifacts?: boolean
     isExpanded?: boolean
     keepInDOM?: boolean
-    flag?: ComputationFlag
+    flags?: ComputationFlags
 }
 
 export interface ComputationDatabaseEntity
     extends Pick<
         ComputationDisplayEntity,
-        'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flag'
+        'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flags'
     > {}
 
 export interface ComputationBasicInfo

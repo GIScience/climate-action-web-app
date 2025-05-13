@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
 import { ActiveArtifactRef } from './dashboard/artifact/artifact.interface'
-import { ComputationState } from './dashboard/common/status.types'
+import { ComputationFlags, ComputationState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
 import { DatabaseService } from './database.service'
 
@@ -60,15 +60,10 @@ export class StorageService {
         try {
             const initialSyncStatus = sessionStorage.getItem('initialSyncCompleted')
 
-            const localRuns = this.getPluginRunsFromLocal()
-            await this.databaseService.syncPluginRuns(localRuns)
-
             const appwriteRuns = await this.databaseService.getPluginRuns()
 
-            const mergedRuns = this.mergeRuns(localRuns, appwriteRuns)
-
-            this.savePluginRunsToLocal(mergedRuns)
-            this.pluginRunsSubject.next(mergedRuns)
+            this.savePluginRunsToLocal(appwriteRuns)
+            this.pluginRunsSubject.next(appwriteRuns)
 
             if (!initialSyncStatus) {
                 sessionStorage.setItem('initialSyncCompleted', 'true')
@@ -79,19 +74,6 @@ export class StorageService {
         } finally {
             this.syncInProgress = false
         }
-    }
-
-    private mergeRuns(
-        localRuns: ComputationDatabaseEntity[],
-        appwriteRuns: ComputationDatabaseEntity[]
-    ): ComputationDatabaseEntity[] {
-        const runMap = new Map<string, ComputationDatabaseEntity>()
-
-        localRuns.forEach(run => runMap.set(run.correlation_uuid, run))
-
-        appwriteRuns.forEach(run => runMap.set(run.correlation_uuid, run))
-
-        return Array.from(runMap.values())
     }
 
     // Storage utility methods
@@ -150,38 +132,46 @@ export class StorageService {
 
     getComputesByStatus(statuses: ComputationState[]): ComputationDatabaseEntity[] {
         return this.getPluginRuns().filter(
-            run => statuses.includes(run.status as ComputationState) && run.flag !== 'ARCHIVED'
+            run => statuses.includes(run.status as ComputationState) && !run.flags?.includes('ARCHIVED')
         )
     }
 
     // Archived runs
 
     getArchivedRuns(): ComputationDatabaseEntity[] {
-        return this.getPluginRuns().filter(run => run.flag === 'ARCHIVED')
+        return this.getPluginRuns().filter(run => run.flags?.includes('ARCHIVED'))
     }
 
     async archiveComputation(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { flag: 'ARCHIVED' })
+        await this.addFlag(correlationId, 'ARCHIVED')
     }
 
     async unarchiveComputation(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { flag: null })
+        await this.removeFlag(correlationId, 'ARCHIVED')
     }
 
     // New runs tracking
 
     getNewRuns(): string[] {
         return this.getPluginRuns()
-            .filter(run => run.flag === 'NEW')
+            .filter(run => run.flags?.includes('NEW'))
             .map(run => run.correlation_uuid)
     }
 
     async markAsNew(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { flag: 'NEW' })
+        await this.addFlag(correlationId, 'NEW')
     }
 
     async markAsViewed(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { flag: null })
+        await this.removeFlag(correlationId, 'NEW')
+    }
+
+    // Demo runs tracking
+
+    getDemoRuns(pluginId: string): string[] {
+        return this.getPluginRuns()
+            .filter(run => run.flags?.includes('DEMO') && run.pluginId === pluginId)
+            .map(run => run.correlation_uuid)
     }
 
     // Helper method for updating computation properties
@@ -197,6 +187,31 @@ export class StorageService {
 
         if (this.appwriteService._user.getValue()) {
             await this.databaseService.updatePluginRun(correlationId, updates)
+        }
+    }
+
+    // Helper methods for flags
+    private getCurrentFlags(run: ComputationDatabaseEntity): ComputationFlags {
+        return run.flags || []
+    }
+
+    private async addFlag(correlationId: string, flagToAdd: ComputationFlags[number]): Promise<void> {
+        const runs = this.getPluginRuns()
+        const run = runs.find(r => r.correlation_uuid === correlationId)
+        if (run) {
+            const currentFlags = this.getCurrentFlags(run)
+            if (!currentFlags.includes(flagToAdd)) {
+                await this.updateComputation(correlationId, { flags: [...currentFlags, flagToAdd] })
+            }
+        }
+    }
+
+    private async removeFlag(correlationId: string, flagToRemove: ComputationFlags[number]): Promise<void> {
+        const runs = this.getPluginRuns()
+        const run = runs.find(r => r.correlation_uuid === correlationId)
+        if (run) {
+            const currentFlags = this.getCurrentFlags(run)
+            await this.updateComputation(correlationId, { flags: currentFlags.filter(f => f !== flagToRemove) })
         }
     }
 

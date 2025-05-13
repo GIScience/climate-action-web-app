@@ -38,6 +38,7 @@ describe('ComputationsIndexComponent', () => {
             unarchiveComputation: jest.fn(),
             savePluginRuns: jest.fn(),
             getNewRuns: jest.fn().mockReturnValue([]),
+            getDemoRuns: jest.fn().mockReturnValue([]),
             getActiveArtifact: jest.fn(),
             saveActiveArtifact: jest.fn(),
             clearActiveArtifact: jest.fn(),
@@ -58,7 +59,9 @@ describe('ComputationsIndexComponent', () => {
                 })
             ),
             syncTasks$: new BehaviorSubject<void>(undefined),
-            getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
+            getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
+            computeDemo: jest.fn(),
+            storeNewComputes: jest.fn()
         }
 
         mockArtifactService = {
@@ -250,6 +253,80 @@ describe('ComputationsIndexComponent', () => {
         expect(mockStorageService.unarchiveComputation).toHaveBeenCalledWith(archivedRun.correlation_uuid)
         expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
         expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
+
+        discardPeriodicTasks()
+    }))
+
+    it('should fetch a demo computation when no demos exist and the plugin is configured for demos', fakeAsync(() => {
+        component.demoConfig = true
+        component.demoRuns = []
+        component.pluginId = 'test_plugin'
+
+        const demoResponse = { correlation_uuid: 'demo-uuid-123' }
+        const stateResponse = { state: 'SUCCESS' }
+
+        mockPluginService.computeDemo = jest.fn().mockReturnValue(of(demoResponse))
+        mockPluginService.getComputationState = jest.fn().mockReturnValue(of(stateResponse))
+        mockPluginService.storeNewComputes = jest.fn()
+
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === 'demo-uuid-123') {
+                return of({
+                    correlation_uuid: 'demo-uuid-123',
+                    timestamp: new Date(),
+                    params: {},
+                    aoi: new GeoJSON().readFeature({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'MultiPolygon',
+                            coordinates: [
+                                [
+                                    [
+                                        [0, 0],
+                                        [1, 0],
+                                        [1, 1],
+                                        [0, 1],
+                                        [0, 0]
+                                    ]
+                                ]
+                            ]
+                        },
+                        properties: {
+                            name: 'Demo'
+                        }
+                    }) as Feature<MultiPolygon>,
+                    artifacts: [],
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
+                    },
+                    status: 'SUCCESS',
+                    message: ''
+                })
+            }
+            return of({})
+        })
+
+        const fetchDemoSpy = jest.spyOn(component, 'fetchDemoComputation')
+
+        component.ngOnInit()
+        fixture.detectChanges()
+        tick()
+
+        expect(fetchDemoSpy).toHaveBeenCalled()
+        expect(mockPluginService.computeDemo).toHaveBeenCalledWith('test_plugin')
+
+        const expectedCompute = {
+            correlation_uuid: 'demo-uuid-123',
+            pluginId: 'test_plugin',
+            timestamp: expect.any(Date),
+            aoiName: 'Demo',
+            status: 'SUCCESS',
+            flags: ['DEMO']
+        }
+        expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expect.objectContaining(expectedCompute))
+
+        expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith('demo-uuid-123')
 
         discardPeriodicTasks()
     }))

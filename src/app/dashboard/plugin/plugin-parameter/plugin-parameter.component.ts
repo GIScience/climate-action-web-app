@@ -15,6 +15,8 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatTooltip } from '@angular/material/tooltip'
 import { AppwriteService } from '@app/auth/appwrite.service'
+import { ComputationState } from '@app/dashboard/common/status.types'
+import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
@@ -39,7 +41,6 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 import Feature from 'ol/Feature'
 import { Subscription, fromEventPattern } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
-
 @Component({
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
@@ -238,7 +239,14 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
             next: data => {
-                this.pluginService.storeNewComputes(data.correlation_uuid, this.plugin.plugin_id, aoiName)
+                const compute: ComputationDatabaseEntity = {
+                    correlation_uuid: data.correlation_uuid,
+                    pluginId: this.plugin.plugin_id,
+                    aoiName: aoiName,
+                    status: 'PENDING' as ComputationState,
+                    timestamp: new Date()
+                }
+                this.pluginService.storeNewComputes(compute)
                 this.pluginService.triggerSyncTasks()
                 this.pluginService.setComputeState('inactive')
 

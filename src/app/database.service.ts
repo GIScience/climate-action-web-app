@@ -49,7 +49,7 @@ export class DatabaseService {
                 doc =>
                     ({
                         correlation_uuid: doc['correlation_uuid'],
-                        flag: doc['flag'],
+                        flags: doc['flags'],
                         pluginId: doc['pluginId'],
                         timestamp: doc['timestamp'],
                         status: doc['status'],

@@ -30,6 +30,7 @@ describe('ComputationComponent', () => {
             getPluginRuns: jest.fn(),
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             getNewRuns: jest.fn().mockReturnValue([]),
+            getDemoRuns: jest.fn().mockReturnValue([]),
             getComputesByStatus: jest.fn().mockReturnValue([]),
             getActiveArtifact: jest.fn(),
             saveActiveArtifact: jest.fn(),
