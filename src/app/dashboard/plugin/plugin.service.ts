@@ -114,15 +114,7 @@ export class PluginService {
         return this.computeState$
     }
 
-    storeNewComputes(id: string, pluginId: string, aoiName?: string) {
-        const compute: ComputationDatabaseEntity = {
-            correlation_uuid: id,
-            pluginId: pluginId,
-            timestamp: new Date(),
-            status: 'PENDING' as ComputationState,
-            aoiName: aoiName
-        }
-
+    storeNewComputes(compute: ComputationDatabaseEntity) {
         this.storageService.storeNewCompute(compute)
 
         const runs = this.storageService.getPluginRuns()

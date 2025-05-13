@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.2.0...main)
 
+### Changed
+
+- Demo computations are now pre-fetched and displayed for a new user ([#336](https://gitlab.heigit.org/climate-action/web-app/-/issues/336))
+
 ## [2.2.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.2.0) - 2025-05-13
 
 ### Changed

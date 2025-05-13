@@ -1,7 +1,7 @@
 <div class="welcome-content">
-    <div *ngIf="currentRuns.length > 0" class="welcome-content__revisit">
+    <div *ngIf="customRuns.length > 0" class="welcome-content__revisit">
         <div class="plugin-bubbles-container">
-            <h2>You have run a total of {{ currentRuns.length }} computations so far.</h2>
+            <h2>You have run a total of {{ customRuns.length }} computations so far.</h2>
 
             <ul class="plugin-bubbles">
                 <a
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div *ngIf="currentRuns.length === 0" class="welcome-content__new">
+    <div *ngIf="customRuns.length === 0" class="welcome-content__new">
         <h1>Welcome to the HeiGIT <br />Climate Action Navigator</h1>
 
         <div class="image-slideshow">

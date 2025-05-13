@@ -41,34 +41,20 @@
             .empty-computations__message {
                 font-variation-settings: 'wght' 500;
             }
-
-            .prompt-container {
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                margin-top: 5px;
-                padding: 15px;
-
-                &.with-demo-no-user {
-                    background-color: #f0f0f0;
-                    border-radius: 10px;
-                    margin-bottom: 20px;
-                    margin-top: 10px;
-
-                    p {
-                        margin: 5px 0;
-                    }
-
-                    & a {
-                        color: #008080;
-                    }
-                }
-            }
         }
 
         .computations-container {
             width: 100%;
+        }
+    }
+
+    .prompt-container {
+        color: #999;
+        padding: 25px 10px;
+        text-align: center;
+
+        a {
+            color: #008080;
         }
     }
 
@@ -84,7 +70,7 @@
         .scheduled-parent-computation {
             align-items: center;
             display: grid;
-            grid-template-columns: 1fr 40px;
+            grid-template-columns: 1fr 65px;
             padding: 10px 5px;
         }
 

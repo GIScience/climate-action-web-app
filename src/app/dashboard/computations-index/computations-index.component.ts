@@ -110,6 +110,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     archivedComputations: ComputationDatabaseEntity[] = []
     showArchived = false
     newRuns: string[] = []
+    demoRuns: string[] = []
     currentLocale = navigator.language
 
     readonly Archive = Archive
@@ -122,7 +123,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Share2 = Share2
 
     @Input() pluginId: string = ''
-    @Input() demoConfig: boolean = false
+    @Input() demoConfig: boolean = true
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
         params: ComputationParameters
@@ -153,6 +154,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.user = user
         })
 
+        this.pluginId = this.route.snapshot.params['name']
+        this.pluginService
+            .getPluginDetails(this.pluginId)
+            .pipe(take(1))
+            .subscribe(plugin => {
+                plugin.demo_config ? (this.demoConfig = true) : (this.demoConfig = false)
+            })
+
         if (this.pluginService.computeState$) {
             this.pluginService.computeState$.subscribe(value => {
                 if (value === 'compute-ready') {
@@ -162,6 +171,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
 
         this.newRuns = this.storageService.getNewRuns()
+        this.demoRuns = this.storageService.getDemoRuns(this.pluginId)
     }
 
     formatTimestamp(timestamp: Date) {
@@ -173,13 +183,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.pluginId = this.route.snapshot.params['name']
-        this.pluginService
-            .getPluginDetails(this.pluginId)
-            .pipe(take(1))
-            .subscribe(plugin => {
-                plugin.demo_config ? (this.demoConfig = true) : (this.demoConfig = false)
-            })
+        if (this.demoRuns.length == 0 && this.demoConfig) {
+            this.fetchDemoComputation()
+        }
 
         this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
         this.archivedComputations = this.storageService.getArchivedRuns()
@@ -559,25 +565,40 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
-    requestDemo(pluginId: string) {
-        this.pluginService.computeDemo(pluginId).subscribe({
+    fetchDemoComputation(): void {
+        this.pluginService.computeDemo(this.pluginId).subscribe({
             next: data => {
-                this.pluginService.storeNewComputes(data.correlation_uuid, pluginId, 'Demo')
-                this.pluginService.triggerSyncTasks()
-                this.pluginService.setComputeState('inactive')
-                this.snackBar.open('Demo request sent, results will be displayed soon.', 'Dismiss', {
-                    duration: 7000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['success-snackbar']
+                this.pluginService.getComputationState(data.correlation_uuid).subscribe({
+                    next: stateInfo => {
+                        if (stateInfo.state === 'SUCCESS') {
+                            const compute: ComputationDatabaseEntity = {
+                                correlation_uuid: data.correlation_uuid,
+                                pluginId: this.pluginId,
+                                timestamp: new Date(),
+                                aoiName: 'Demo',
+                                status: stateInfo.state,
+                                flags: ['DEMO']
+                            }
+                            this.pluginService.storeNewComputes(compute)
+                            this.demoRuns.push(data.correlation_uuid)
+                            this.fetchAndProcessComputations(compute)
+                        } else {
+                            const compute: ComputationDatabaseEntity = {
+                                correlation_uuid: data.correlation_uuid,
+                                pluginId: this.pluginId,
+                                timestamp: new Date(),
+                                aoiName: 'Demo',
+                                status: stateInfo.state,
+                                flags: ['DEMO']
+                            }
+                            this.pluginService.storeNewComputes(compute)
+                            this.pluginService.triggerSyncTasks()
+                        }
+                    }
                 })
             },
             error: () => {
-                this.snackBar.open('Error while computing demo. Please try again.', 'Dismiss', {
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                })
+                console.warn('Could not fetch a demo computation for', this.pluginId)
             }
         })
     }

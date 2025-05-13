@@ -14,7 +14,7 @@ import { ComputationDatabaseEntity } from '../computations-index/computation.int
     styleUrl: './landing.component.scss'
 })
 export class LandingComponent implements OnInit {
-    currentRuns: ComputationDatabaseEntity[] = []
+    customRuns: ComputationDatabaseEntity[] = []
     pluginCounts: { pluginName: string; pluginId: string; count: number }[] = []
     private gradientCache: { [key: string]: string } = {}
 
@@ -28,7 +28,9 @@ export class LandingComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+        this.customRuns = this.storageService
+            .getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+            .filter(run => !run.flags?.includes('DEMO'))
         this.calculatePluginCounts()
 
         this.pluginCounts.forEach((_, index) => {
@@ -40,7 +42,7 @@ export class LandingComponent implements OnInit {
     }
 
     private calculatePluginCounts() {
-        const counts = this.currentRuns.reduce(
+        const counts = this.customRuns.reduce(
             (acc, run) => {
                 if (run.pluginId) {
                     acc[run.pluginId] = {

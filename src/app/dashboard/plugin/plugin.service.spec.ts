@@ -210,7 +210,13 @@ describe('PluginService', () => {
     })
 
     it('should store computes', () => {
-        service.storeNewComputes('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'test_plugin', 'Test Area')
+        service.storeNewComputes({
+            correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
+            pluginId: 'test_plugin',
+            aoiName: 'Test Area',
+            status: 'PENDING',
+            timestamp: new Date()
+        })
         expect(storageService.storeNewCompute).toHaveBeenCalled()
     })
 
