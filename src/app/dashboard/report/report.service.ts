@@ -9,7 +9,6 @@ import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { MAP_ID, MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
-
 @Injectable({
     providedIn: 'root'
 })

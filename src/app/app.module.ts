@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common'
-import { HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatMomentDateModule, provideMomentDateAdapter } from '@angular/material-moment-adapter'
@@ -34,6 +34,7 @@ import {
     multipleOfValidationMessage,
     typeValidationMessage
 } from './app.validation-messages'
+import { AuthInterceptor } from './auth/auth.interceptor'
 import { ChartComponent } from './dashboard/artifact/chart/chart.component'
 import { ComputationComponent } from './dashboard/computation/computation.component'
 import { ComputationsIndexComponent } from './dashboard/computations-index/computations-index.component'
@@ -115,6 +116,11 @@ import { tooltipVariation } from './utils/tooltip-variations'
         },
         {
             provide: MapService
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
         },
         provideTippyLoader(() => import('tippy.js')),
         provideTippyConfig({

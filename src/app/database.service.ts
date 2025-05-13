@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core'
-import { Databases, ID, Permission, Query, Role } from 'appwrite'
-import { AppwriteService } from './appwrite.service'
+import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
+import { AppwriteService } from './auth/appwrite.service'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
+
+export interface BasicKeyInfo extends Models.Document {
+    hash: string
+    tyk_user_id: string
+    ors_policy: string
+    policy_upgrade_requests: string[]
+    key: string
+}
 
 @Injectable({
     providedIn: 'root'
@@ -124,5 +132,10 @@ export class DatabaseService {
             this.logError('Error syncing plugin runs with Appwrite:', error)
             return false
         }
+    }
+
+    getBasicKey(): Promise<BasicKeyInfo | null> {
+        if (!this.userId) return Promise.resolve(null)
+        return this.databases.getDocument('tyk_integration', 'basic_keys', this.userId) as Promise<BasicKeyInfo>
     }
 }

@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Account, Client, Databases, Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
-import { getCurrentCanonicalUrl } from './utils/url.utils'
+import { getCurrentCanonicalUrl } from '../utils/url.utils'
 
 @Injectable({
     providedIn: 'root'

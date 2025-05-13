@@ -1,5 +1,7 @@
+import { cypressEnvironment } from './cypress-environment'
+
 export const mockPluginsList = () => {
-    cy.intercept('/api/v1/gateway/plugin/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin`, {
         body: [
             {
                 name: 'Plugin Blueprint',
@@ -262,7 +264,7 @@ export const mockPluginsList = () => {
 }
 
 export const mockPluginsListWithoutBlueprint = () => {
-    cy.intercept('/api/v1/gateway/plugin/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin`, {
         body: [
             {
                 name: 'Walkability',
@@ -489,7 +491,7 @@ export const mockPluginsListWithoutBlueprint = () => {
 }
 
 export const mockPluginBlueprint = () => {
-    cy.intercept('/api/v1/gateway/plugin/plugin_blueprint', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint`, {
         body: {
             name: 'Plugin Blueprint',
             authors: [
@@ -739,25 +741,25 @@ export const mockPluginBlueprint = () => {
 }
 
 export const mockPluginBlueprint404 = () => {
-    cy.intercept('/api/v1/gateway/plugin/plugin_blueprint', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint`, {
         statusCode: 404
     }).as('getPluginBlueprint404')
 }
 
 export const mockPluginBluePrintIcon = () => {
-    cy.intercept('/api/v1/gateway/store/plugin_blueprint/icon', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/plugin_blueprint/icon`, {
         fixture: 'plugin_bp_icon.jpeg'
     }).as('getPluginBlueprintIcon')
 }
 
 export const mockPluginWalkabilitytIcon = () => {
-    cy.intercept('/api/v1/gateway/store/walkability/icon', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/walkability/icon`, {
         fixture: 'plugin_walkability_icon.jpeg'
     }).as('getPluginWalkabiityIcon')
 }
 
 export const mockPluginBlueprintComputation = () => {
-    cy.intercept('/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/metadata/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/8649e714-f29d-423f-85ce-cd55f4e5022a/metadata`, {
         body: {
             correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
             timestamp: '2024-12-17T08:55:23.807074Z',
@@ -823,7 +825,7 @@ export const mockPluginBlueprintComputation = () => {
 
 export const mockBlueprintTable = () => {
     cy.intercept(
-        '/api/v1/gateway/store/8649e714-f29d-423f-85ce-cd55f4e5022a/2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv',
+        `${cypressEnvironment.apiBasePath}/store/8649e714-f29d-423f-85ce-cd55f4e5022a/2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv`,
         {
             fixture: 'sample_table_blueprint.csv'
         }
@@ -831,7 +833,7 @@ export const mockBlueprintTable = () => {
 }
 
 export const mockGeoTiffComputation = () => {
-    cy.intercept('/api/v1/gateway/store/8a897536-c4b4-4e5a-9d70-50430183ac66/metadata/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/8a897536-c4b4-4e5a-9d70-50430183ac66/metadata`, {
         body: {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             timestamp: new Date('2023-09-27T16:42:52+01:00'),
@@ -910,7 +912,7 @@ export const mockGeoTiffComputation = () => {
 }
 
 export const mockGeoJsonComputation = () => {
-    cy.intercept('/api/v1/gateway/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/metadata/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/metadata`, {
         body: {
             correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
             timestamp: new Date('2023-09-27T16:42:52+01:00'),
@@ -990,7 +992,7 @@ export const mockGeoJsonComputation = () => {
 }
 
 export const mockSimpleGeoJsonComputation = () => {
-    cy.intercept('/api/v1/gateway/store/1cfd2634-1724-43a2-ab1e-6466ba433364/metadata/', {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/1cfd2634-1724-43a2-ab1e-6466ba433364/metadata`, {
         body: {
             correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
             timestamp: new Date('2023-09-27T16:42:52+01:00'),
@@ -1071,7 +1073,7 @@ export const mockSimpleGeoJsonComputation = () => {
 
 export const mockGeoTiff = () => {
     cy.intercept(
-        '/api/v1/gateway/store/8a897536-c4b4-4e5a-9d70-50430183ac66/a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff',
+        `${cypressEnvironment.apiBasePath}/store/8a897536-c4b4-4e5a-9d70-50430183ac66/a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff`,
         {
             fixture: 'sample_raster_blueprint.tiff'
         }
@@ -1080,7 +1082,7 @@ export const mockGeoTiff = () => {
 
 export const mockGeoJson = () => {
     cy.intercept(
-        '/api/v1/gateway/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson',
+        `${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson`,
         {
             fixture: 'sample_vector_blueprint.geojson'
         }
@@ -1089,7 +1091,7 @@ export const mockGeoJson = () => {
 
 export const mockSimpleGeoJson = () => {
     cy.intercept(
-        '/api/v1/gateway/store/1cfd2634-1724-43a2-ab1e-6466ba433364/4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson',
+        `${cypressEnvironment.apiBasePath}/store/1cfd2634-1724-43a2-ab1e-6466ba433364/4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson`,
         {
             fixture: 'simple_vector_blueprint.geojson'
         }

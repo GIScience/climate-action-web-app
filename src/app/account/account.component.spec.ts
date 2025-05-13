@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
-import { AppwriteService } from '../appwrite.service'
+import { AppwriteService } from '../auth/appwrite.service'
 import { AccountComponent } from './account.component'
 
 describe('AccountComponent', () => {
