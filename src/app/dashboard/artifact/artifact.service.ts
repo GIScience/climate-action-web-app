@@ -4,6 +4,7 @@ import { SafeUrl } from '@angular/platform-browser'
 import { environment } from '@environments/environment'
 import { BehaviorSubject } from 'rxjs'
 import { Artifact, ArtifactData, ChartData, LegendObject, PlotlyChartData } from './artifact.interface'
+
 @Injectable({
     providedIn: 'root'
 })
@@ -47,28 +48,28 @@ export class ArtifactService {
 
     getMarkdown(artifact: Artifact): void {
         this.markdownSubject.next({
-            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             ...artifact
         })
     }
 
     getImage(artifact: Artifact): void {
         this.imageSubject.next({
-            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             ...artifact
         })
     }
 
     getTable(artifact: Artifact): void {
         this.tableSubject.next({
-            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             ...artifact
         })
     }
 
     getChart(artifact: Artifact): void {
         this.http
-            .get<ChartData>(`${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+            .get<ChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`)
             .subscribe(data => {
                 this.chartSubject.next({
                     data: data,
@@ -79,9 +80,7 @@ export class ArtifactService {
 
     getPlotlyChart(artifact: Artifact): void {
         this.http
-            .get<PlotlyChartData>(
-                `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`
-            )
+            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`)
             .subscribe(data => {
                 this.plotlyChartSubject.next({
                     data: data,
@@ -92,14 +91,14 @@ export class ArtifactService {
 
     getGeoTiff(artifact: Artifact): void {
         this.geotiffSubject.next({
-            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             ...artifact
         })
     }
 
     getGeoJson(artifact: Artifact): void {
         this.geojsonSubject.next({
-            url: `${this.apiUrl}/api/v1/gateway/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
             ...artifact
         })
     }

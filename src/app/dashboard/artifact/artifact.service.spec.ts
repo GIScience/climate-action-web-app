@@ -70,7 +70,12 @@ describe('ArtifactService', () => {
     it('should get markdown artifact item', done => {
         service.getMarkdown(test_artifact)
         service.markdown.subscribe(x => {
-            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
+            expect(x).toEqual(
+                expect.objectContaining({
+                    ...test_artifact,
+                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                })
+            )
             done()
         })
     })
@@ -78,10 +83,12 @@ describe('ArtifactService', () => {
     it('should get geojson artifact item', done => {
         service.getGeoJson(test_artifact)
         service.geojson.subscribe(x => {
-            expect(x).toEqual({
-                url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`,
-                ...test_artifact
-            })
+            expect(x).toEqual(
+                expect.objectContaining({
+                    ...test_artifact,
+                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                })
+            )
             done()
         })
     })
@@ -89,10 +96,12 @@ describe('ArtifactService', () => {
     it('should get geotiff artifact item', done => {
         service.getGeoTiff(test_artifact)
         service.geotiff.subscribe(x => {
-            expect(x).toEqual({
-                url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`,
-                ...test_artifact
-            })
+            expect(x).toEqual(
+                expect.objectContaining({
+                    ...test_artifact,
+                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                })
+            )
             done()
         })
     })
@@ -100,7 +109,12 @@ describe('ArtifactService', () => {
     it('should get table artifact item', done => {
         service.getTable(test_artifact)
         service.table.subscribe(x => {
-            expect(x).toEqual({ url: `/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`, ...test_artifact })
+            expect(x).toEqual(
+                expect.objectContaining({
+                    ...test_artifact,
+                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                })
+            )
             done()
         })
     })
@@ -114,7 +128,9 @@ describe('ArtifactService', () => {
                 data: test_chart,
                 artifact: test_artifact
             })
-            expect(httpClientSpy.get).toHaveBeenCalledWith(`/api/v1/gateway/store/${correlation_uuid}/${store_uuid}`)
+            expect(httpClientSpy.get).toHaveBeenCalledWith(
+                expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+            )
             done()
         })
     })

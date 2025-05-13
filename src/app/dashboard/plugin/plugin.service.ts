@@ -4,7 +4,7 @@ import { environment } from '@environments/environment'
 import { Feature } from 'ol'
 import GeoJSON from 'ol/format/GeoJSON'
 import { MultiPolygon } from 'ol/geom'
-import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
+import { BehaviorSubject, Observable, Subject, map, of, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
 import { ComputationState, ComputationStateInfo } from '../common/status.types'
@@ -39,34 +39,34 @@ export class PluginService {
     ) {}
 
     getIconUrl(pluginId: string) {
-        return `${this.apiUrl}/api/v1/gateway/store/${pluginId}/icon`
+        return `${this.apiUrl}/store/${pluginId}/icon`
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http.get<Plugin[]>(`${this.apiUrl}/api/v1/gateway/plugin/`)
+        return this.http.get<Plugin[]>(`${this.apiUrl}/plugin`)
     }
 
     getPluginDetails(pluginName: string): Observable<Plugin> {
-        return this.http.get<Plugin>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginName}`)
+        return this.http.get<Plugin>(`${this.apiUrl}/plugin/${pluginName}`)
     }
 
     computePlugin(pluginId: string, params: object): Observable<ComputationID> {
-        return this.http.post<ComputationID>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}`, params)
+        return this.http.post<ComputationID>(`${this.apiUrl}/plugin/${pluginId}`, params)
     }
 
     computeDemo(pluginId: string): Observable<ComputationID> {
-        return this.http.get<ComputationID>(`${this.apiUrl}/api/v1/gateway/plugin/${pluginId}/demo`)
+        return this.http.get<ComputationID>(`${this.apiUrl}/plugin/${pluginId}/demo`)
     }
 
     getComputationState(id: string): Observable<ComputationStateInfo> {
-        return this.http.get<ComputationStateInfo>(`${this.apiUrl}/api/v1/gateway/computation/${id}/state`)
+        return this.http.get<ComputationStateInfo>(`${this.apiUrl}/computation/${id}/state`)
     }
 
     getComputationMetadata(id: string): Observable<ComputationMetadata> {
         const gj = new GeoJSON()
         const requestTimeout = 5000
         const maxRetries = 3
-        return this.http.get<ComputationMetadata>(`${this.apiUrl}/api/v1/gateway/store/${id}/metadata/`).pipe(
+        return this.http.get<ComputationMetadata>(`${this.apiUrl}/store/${id}/metadata`).pipe(
             timeout(requestTimeout),
             retryWhen(errors =>
                 errors.pipe(
@@ -86,7 +86,9 @@ export class PluginService {
                 return throwError(() => error)
             }),
             map((metadata: ComputationMetadata) => {
-                const feat = gj.readFeature(metadata.aoi, { featureProjection: 'EPSG:3857' }) as Feature<MultiPolygon>
+                const feat = gj.readFeature(metadata.aoi, {
+                    featureProjection: 'EPSG:3857'
+                }) as Feature<MultiPolygon>
                 feat.set('renderStyle', 'AOI')
                 metadata.aoi = feat
                 return metadata

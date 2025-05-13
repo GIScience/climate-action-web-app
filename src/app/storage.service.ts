@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { AppwriteService } from './appwrite.service'
+import { AppwriteService } from './auth/appwrite.service'
 import { ActiveArtifactRef } from './dashboard/artifact/artifact.interface'
 import { ComputationState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'

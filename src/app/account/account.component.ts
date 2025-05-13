@@ -13,7 +13,7 @@ import {
 } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
-import { AppwriteService } from '../appwrite.service'
+import { AppwriteService } from '../auth/appwrite.service'
 
 @Component({
     selector: 'app-account',

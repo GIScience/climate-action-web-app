@@ -3,8 +3,7 @@ describe('External Requests', () => {
         'http://localhost',
         'https://tile.openstreetmap.org',
         'https://api.openrouteservice.org',
-        'https://maps.heigit.org',
-        'https://*.account.heigit.org',
+        'https://*.heigit.org',
         'https://a.basemaps.cartocdn.com',
         'https://server.arcgisonline.com'
     ]

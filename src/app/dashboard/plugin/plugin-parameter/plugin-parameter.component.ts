@@ -14,7 +14,7 @@ import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@a
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatTooltip } from '@angular/material/tooltip'
-import { AppwriteService } from '@app/appwrite.service'
+import { AppwriteService } from '@app/auth/appwrite.service'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
