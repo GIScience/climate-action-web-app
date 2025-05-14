@@ -100,6 +100,12 @@ export class PluginService {
         this.catalogToggleInput = input
     }
 
+    expandPluginCatalog() {
+        if (this.catalogToggleInput && this.catalogToggleInput.checked) {
+            this.catalogToggleInput.checked = false
+        }
+    }
+
     collapsePluginCatalog() {
         if (this.catalogToggleInput && !this.catalogToggleInput.checked) {
             this.catalogToggleInput.checked = true

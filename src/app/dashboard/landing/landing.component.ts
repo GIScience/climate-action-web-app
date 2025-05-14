@@ -5,6 +5,7 @@ import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { pickRandomGradient } from '@app/utils/style-utils'
 import { StorageService } from '../../storage.service'
 import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
+import { PluginService } from '../plugin/plugin.service'
 
 @Component({
     selector: 'app-landing',
@@ -24,8 +25,13 @@ export class LandingComponent implements OnInit {
 
     constructor(
         private storageService: StorageService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private pluginService: PluginService
     ) {}
+
+    toggleCatalog(): void {
+        this.pluginService.expandPluginCatalog()
+    }
 
     ngOnInit() {
         this.customRuns = this.storageService
@@ -38,7 +44,6 @@ export class LandingComponent implements OnInit {
         })
 
         this.cdr.detectChanges()
-        this.cdr.detach()
     }
 
     private calculatePluginCounts() {

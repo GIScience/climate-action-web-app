@@ -22,33 +22,68 @@
     </div>
 
     <div *ngIf="customRuns.length === 0" class="welcome-content__new">
-        <h1>Welcome to the HeiGIT <br />Climate Action Navigator</h1>
+        <div class="bg"></div>
+        <div class="bg bg2"></div>
+        <div class="bg bg3"></div>
 
-        <div class="image-slideshow">
-            <div class="image-slideshow__inner">
-                <img
-                    ngSrc="assets/images/landing/amsterdam.jpg"
-                    alt="Amsterdam; Credit: https://unsplash.com/@jacegrandinetti"
-                    height="577"
-                    width="800" />
-                <img
-                    ngSrc="assets/images/landing/kenya.jpg"
-                    alt="Kenya; Credit: https://unsplash.com/@davidclode"
-                    height="526"
-                    width="800" />
-                <img
-                    ngSrc="assets/images/landing/vietnam.jpg"
-                    alt="Bali; Credit: https://unsplash.com/@nathan_cima"
-                    height="533"
-                    width="800" />
+        <div class="intro-section">
+            <h1>Welcome to the Climate Action Navigator (CAN)</h1>
+            <p>
+                CAN is your entry point to exploring climate solutions at the local level. CAN offers high-resolution
+                data and insights on key climate indicators, from heating emissions to walkability, helping you identify
+                both strengths and areas for improvement in your city or region.
+            </p>
+        </div>
+
+        <div class="notes-section">
+            <h3>A few notes before you begin…</h3>
+
+            <div class="note-cards">
+                <div class="note-card" style="animation-delay: 0s">
+                    <div class="icon-wrapper">
+                        <img ngSrc="assets/images/landing/hourglass.png" alt="Lazy computing" height="65" width="65" />
+                    </div>
+                    <p>
+                        To reduce our carbon footprint, CAN employs <strong>lazy computing</strong> for more efficient
+                        data processing. This can sometimes impact performance, with computations taking up to 90
+                        minutes during high traffic.
+                    </p>
+                </div>
+                <div class="note-card" style="animation-delay: 0.15s">
+                    <div class="icon-wrapper">
+                        <img ngSrc="assets/images/landing/urban.png" alt="Lazy computing" height="65" width="65" />
+                    </div>
+                    <p>
+                        Our tools are <strong>adapted to urban areas</strong>, where free and open source data quality
+                        is better. Results in rural areas may be less accurate.
+                    </p>
+                </div>
+                <div class="note-card" style="animation-delay: 0.3s">
+                    <div class="icon-wrapper">
+                        <img ngSrc="assets/images/landing/expert.png" alt="Lazy computing" height="65" width="65" />
+                    </div>
+                    <p>
+                        While CAN is open to everyone, our plugins are <strong>tailored to experts</strong>. As such
+                        plugins and assessment tools may include technical terms.
+                    </p>
+                </div>
+                <div class="note-card" style="animation-delay: 0.45s">
+                    <div class="icon-wrapper">
+                        <img ngSrc="assets/images/landing/tools.png" alt="Lazy computing" height="65" width="65" />
+                    </div>
+                    <p>
+                        All tools and assessments within CAN are <strong>works in progress</strong> and will be
+                        continuously improved as new methods and datasets become available.
+                    </p>
+                </div>
             </div>
         </div>
 
-        <p>
-            Make informed decisions about climate action in your community. This app provides high-resolution data and
-            analysis on key climate indicators, from energy sources to transportation options. Discover local strengths,
-            identify areas for improvement, and explore tailored solutions for a more sustainable future.
-        </p>
-        <p class="cta-explore">To start, select a plugin from the sidebar on the left.</p>
+        <div class="cta-section" (click)="toggleCatalog()" (keydown)="toggleCatalog()" tabindex="0">
+            <p>
+                Start exploring your region now and see where climate action can take you.<br />
+                <span></span>Begin by selecting an Assessment Tool from the sidebar on the left.
+            </p>
+        </div>
     </div>
 </div>
