@@ -26,7 +26,7 @@ export class DatabaseService {
         return this.appwriteService.getDatabases()
     }
 
-    private get userId(): string | null {
+    private get user_id(): string | null {
         return this.appwriteService._user.value?.$id || null
     }
 
@@ -38,10 +38,10 @@ export class DatabaseService {
 
     async getPluginRuns(): Promise<ComputationDatabaseEntity[]> {
         try {
-            if (!this.userId) return []
+            if (!this.user_id) return []
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('userId', this.userId),
+                Query.equal('user_id', this.user_id),
                 Query.limit(1000)
             ])
 
@@ -64,9 +64,9 @@ export class DatabaseService {
 
     async createPluginRun(run: ComputationDatabaseEntity): Promise<string | null> {
         try {
-            if (!this.userId) return null
+            if (!this.user_id) return null
 
-            const permissions = [Permission.read(Role.user(this.userId)), Permission.update(Role.user(this.userId))]
+            const permissions = [Permission.read(Role.user(this.user_id)), Permission.update(Role.user(this.user_id))]
 
             const response = await this.databases.createDocument(
                 this.DATABASE_ID,
@@ -74,7 +74,7 @@ export class DatabaseService {
                 ID.unique(),
                 {
                     ...run,
-                    userId: this.userId
+                    user_id: this.user_id
                 },
                 permissions
             )
@@ -88,11 +88,11 @@ export class DatabaseService {
 
     async updatePluginRun(correlationId: string, updates: Partial<ComputationDatabaseEntity>): Promise<boolean> {
         try {
-            if (!this.userId) return false
+            if (!this.user_id) return false
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
                 Query.equal('correlation_uuid', correlationId),
-                Query.equal('userId', this.userId),
+                Query.equal('user_id', this.user_id),
                 Query.limit(1000)
             ])
 
@@ -114,7 +114,7 @@ export class DatabaseService {
 
     async syncPluginRuns(runs: ComputationDatabaseEntity[]): Promise<boolean> {
         try {
-            if (!this.userId) return false
+            if (!this.user_id) return false
 
             const existingRuns = await this.getPluginRuns()
             const existingIds = new Set(existingRuns.map(run => run.correlation_uuid))
@@ -135,7 +135,7 @@ export class DatabaseService {
     }
 
     getBasicKey(): Promise<BasicKeyInfo | null> {
-        if (!this.userId) return Promise.resolve(null)
-        return this.databases.getDocument('tyk_integration', 'basic_keys', this.userId) as Promise<BasicKeyInfo>
+        if (!this.user_id) return Promise.resolve(null)
+        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
     }
 }
