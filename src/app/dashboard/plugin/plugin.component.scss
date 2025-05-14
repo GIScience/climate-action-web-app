@@ -17,7 +17,8 @@
 }
 
 .plugin-header {
-    background-color: rgb(231 231 231 / 85%);
+    backdrop-filter: blur(10px);
+    background-image: linear-gradient(225deg, rgb(207 217 223 / 75%) 0%, rgb(226, 235, 240) 85%);
     border-radius: 15px 15px 0 0;
     display: flex;
     flex-direction: column;
@@ -26,7 +27,7 @@
 
     &.is-loading {
         animation: 1.5s shine linear infinite;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(10px);
         background: linear-gradient(
             110deg,
             rgba(236, 236, 236, 0.8) 8%,
@@ -138,7 +139,7 @@
 }
 
 .plugin-content-wrapper {
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
     background-color: rgb(255 255 255 / 85%);
     border-radius: 15px;
     border-radius: 15px;
@@ -149,7 +150,7 @@
 
     &.is-loading {
         animation: 1.5s shine linear infinite;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(10px);
         background: linear-gradient(
             110deg,
             rgba(236, 236, 236, 0.8) 8%,

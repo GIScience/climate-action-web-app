@@ -195,7 +195,7 @@
         width: 227.5px;
 
         .plugin-card__icon {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: #fafafa;
             border: 2px solid rgba(255, 255, 255, 0.85);
             border-radius: 5px;
             padding: 10px;
@@ -206,6 +206,7 @@
                 filter: saturate(1.5);
                 height: 100%;
                 transition: transform 0.25s ease-in-out 0.25s;
+                width: 60px;
             }
 
             .plugin-card__icon-text {

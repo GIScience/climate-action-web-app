@@ -10,13 +10,7 @@
 
     <ng-container *ngIf="pluginObs$ | async as plugin">
         <div *ngIf="!loading">
-            <div
-                class="plugin-header"
-                [style.background-image]="
-                    'linear-gradient(225deg, rgb(207 217 223 / 75%) 0%, rgb(226, 235, 240) 85%), url(' +
-                    plugin.assets.icon +
-                    ')'
-                ">
+            <div class="plugin-header">
                 <div class="plugin-name-wrapper">
                     <h1>{{ plugin.name }}</h1>
                     <i-lucide
