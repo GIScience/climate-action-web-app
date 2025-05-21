@@ -7,6 +7,15 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.3.0...main)
 
+### Added
+
+- Added a warning for those visiting from mobile devices
+
+### Fixed
+
+- Display the correct timestamp of the computations after converting from UTC ([#349](https://gitlab.heigit.org/climate-action/web-app/-/issues/349))
+- Fix CSS glitch preventing further navigation on MacOS Safari ([#351](https://gitlab.heigit.org/climate-action/web-app/-/issues/351))
+
 ## [2.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.3.0) - 2025-05-14
 
 ### Changed

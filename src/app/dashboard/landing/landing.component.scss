@@ -208,15 +208,8 @@
 }
 
 .welcome-content__new {
-    max-height: 70vh;
-    overflow-x: hidden;
-    overflow-y: auto;
     position: relative;
-    scrollbar-color: rgba(42, 109, 109, 0.5) rgba(255, 255, 255, 0.1);
-
-    /* For Firefox */
-    scrollbar-width: thin;
-    width: 750px;
+    width: 800px;
     z-index: 1;
 
     &::-webkit-scrollbar {
@@ -245,7 +238,7 @@
         left: -50%;
         margin: -10px;
         opacity: 0.2;
-        position: fixed;
+        position: absolute;
         right: -50%;
         top: 0;
         z-index: -1;
@@ -297,10 +290,6 @@
         }
     }
 
-    .notes-section {
-        padding-top: 10px;
-    }
-
     h3 {
         color: #333;
         display: inline-block;
@@ -313,45 +302,48 @@
     }
 
     .note-cards {
-        display: flex;
+        display: grid;
         flex-direction: column;
-        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 15px;
+        padding: 10px 15px;
     }
 
     .note-card {
         align-items: center;
         background-color: #fff;
         background-color: rgb(255 255 255 / 50%);
+        border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         display: flex;
         overflow: hidden;
-        padding: 5px 20px;
+        padding: 12.5px 17.5px;
         position: relative;
         transition: all 0.3s ease;
 
         .icon-wrapper {
-            opacity: 0.75;
+            opacity: 0.85;
+        }
+
+        p {
+            margin: 0;
         }
 
         &:nth-child(odd) {
             animation: fadeSlideInLeft 0.5s ease-out both;
-            border-radius: 0 10px 10px 0;
             flex-direction: row;
-            margin-right: 20px;
 
             .icon-wrapper {
-                margin-right: 1.5em;
+                margin-right: 10px;
             }
         }
 
         &:nth-child(even) {
             animation: fadeSlideInRight 0.5s ease-out both;
-            border-radius: 10px 0 0 10px;
             flex-direction: row-reverse;
-            margin-left: 20px;
 
             .icon-wrapper {
-                margin-left: 1.5em;
+                margin-left: 10px;
             }
         }
     }
@@ -359,9 +351,9 @@
     .cta-section {
         background: rgb(0 0 0 / 25%);
         cursor: pointer;
-        margin: 20px 0 0;
+        margin: 15px 0 0;
         overflow: hidden;
-        padding: 20px;
+        padding: 15px;
         position: relative;
         p {
             color: #fcfcfc;

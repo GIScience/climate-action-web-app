@@ -1,0 +1,32 @@
+.mobile-warning {
+    align-items: center;
+    background: linear-gradient(30deg, rgba(189, 195, 199), rgba(44, 62, 80));
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 9999;
+}
+
+.mobile-warning__content {
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    width: 80vw;
+
+    h2 {
+        color: #333;
+        margin: 0;
+    }
+
+    p {
+        color: #666;
+    }
+}

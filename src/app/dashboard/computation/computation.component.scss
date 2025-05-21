@@ -1,10 +1,11 @@
 .child-computations-wrapper {
     overflow: hidden;
+    transition: max-height 0.25s ease-in-out;
 
-    .child-computations {
+    ul.child-computations {
         border: 1px solid #ccc;
         border-radius: 10px;
-        margin: 5px 0 10px;
+        margin: 5px 5px 10px;
         overflow: hidden;
 
         &:has(.loading) {

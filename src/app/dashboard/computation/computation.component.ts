@@ -23,16 +23,14 @@ import { ReportService } from '../report/report.service'
             state(
                 'collapsed',
                 style({
-                    height: '0',
-                    padding: '0',
+                    maxHeight: '0',
                     visibility: 'hidden'
                 })
             ),
             state(
                 'expanded',
                 style({
-                    height: '*',
-                    padding: '*',
+                    maxHeight: '1000px',
                     visibility: 'visible'
                 })
             ),
