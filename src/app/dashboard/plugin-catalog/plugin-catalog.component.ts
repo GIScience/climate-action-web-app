@@ -7,6 +7,7 @@ import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
+import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { PluginCard } from './plugin-catalog.interface'
 
@@ -28,7 +29,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         private router: Router,
         private pluginService: PluginService,
         private artifactViewerService: ArtifactViewerService,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private mapService: MapService
     ) {}
 
     ngAfterViewInit(): void {
@@ -116,6 +118,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     showPlugin(card: PluginCard) {
         this.artifactViewerService.closeArtifactViewer()
+        this.mapService.removeFocusedLayer()
         this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
             this.activeCard = card
         })

@@ -26,7 +26,9 @@
             "
             size="20"></i-lucide>
         <span>
-            <ng-container *ngIf="!areaSelected">Select an area on the map to continue.</ng-container>
+            <ng-container *ngIf="!areaSelected">
+                Search or zoom in on a location, and then select the area on the map to continue.
+            </ng-container>
             <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
                 >Multiple areas selected. Please select only one.</ng-container
             >

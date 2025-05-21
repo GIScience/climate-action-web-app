@@ -175,7 +175,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     formatTimestamp(timestamp: Date) {
-        return moment(timestamp).locale(this.currentLocale).format('lll')
+        return moment.utc(timestamp).local().locale(this.currentLocale).format('lll')
     }
 
     formatUUID(correlation_uuid: string): string {
