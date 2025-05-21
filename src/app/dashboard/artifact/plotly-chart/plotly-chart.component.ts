@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core'
-import Plotly, { Data, Layout, PlotlyInstance } from 'plotly.js-cartesian-dist'
+import Plotly, { Data, Layout, PlotlyInstance } from 'plotly.js-strict-dist'
 import { Artifact, PlotlyChartData } from '../artifact.interface'
 
 @Component({
