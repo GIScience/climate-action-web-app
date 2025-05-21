@@ -1,5 +1,5 @@
 import { HexColor } from '@app/types/color/color.type'
-import type { Data, Layout } from 'plotly.js-cartesian-dist'
+import type { Data, Layout } from 'plotly.js-strict-dist'
 
 export interface DiscreteLegendData {
     [key: string]: HexColor
