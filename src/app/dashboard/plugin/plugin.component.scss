@@ -51,6 +51,14 @@
             margin: 0;
         }
 
+        a {
+            display: flex;
+
+            .plugin-state-badge {
+                margin-left: 10px;
+            }
+        }
+
         i-lucide {
             margin-left: 10px;
         }

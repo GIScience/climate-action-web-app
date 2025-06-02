@@ -13,6 +13,15 @@
             <div class="plugin-header">
                 <div class="plugin-name-wrapper">
                     <h1>{{ plugin.name }}</h1>
+                    <a
+                        *ngIf="plugin.state && plugin.state !== 'active'"
+                        href="https://github.com/GIScience/badges#{{ plugin.state }}"
+                        target="_blank">
+                        <img
+                            src="https://github.com/GIScience/badges/raw/master/status/{{ plugin.state }}.svg"
+                            alt="Assesment Tool Development State"
+                            class="plugin-state-badge" />
+                    </a>
                     <i-lucide
                         [img]="CloudOff"
                         size="25"
@@ -71,7 +80,8 @@
                                 class="new-compute btn-alt btn-small btn-withtext"
                                 (click)="enterComputeState()"
                                 [disabled]="!user">
-                                <i-lucide [img]="DiamondPlus" size="20"></i-lucide> New computation
+                                <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
+                                New computation
                             </button>
                         </div>
                     </div>
@@ -85,7 +95,8 @@
                             class="new-compute btn-light btn-small btn-withtext"
                             (click)="exitComputeState()"
                             [disabled]="!user">
-                            <i-lucide [img]="CircleX" size="20"></i-lucide> Cancel
+                            <i-lucide [img]="CircleX" size="20"></i-lucide>
+                            Cancel
                         </button>
                     </div>
                     <div class="plugin-compute-wrapper">
