@@ -1,7 +1,7 @@
+import { Source } from '@app/types/sources/sources.type'
 import { JSONSchema7 } from 'json-schema'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
-import { Source } from '@app/types/sources/sources.type'
 
 export interface PluginAuthor {
     name: string
@@ -27,6 +27,7 @@ export interface Plugin {
     operator_schema: JSONSchema7
     library_version: string
     status?: 'active' | 'unavailable' | 'releasing-soon'
+    state?: 'experimental' | 'active' | 'hibernate' | 'archive' // Development state
 }
 
 export interface PluginBaseInfo {
