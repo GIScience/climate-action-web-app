@@ -11,7 +11,7 @@
         "build:dev": "ng build --configuration development --base-href /webapp/",
         "build:int": "ng build --configuration integration",
         "build:stats": "ng build --stats-json",
-        "analyze": "webpack-bundle-analyzer dist/stats.json",
+        "analyze": "webpack-bundle-analyzer dist/browser/stats.json",
         "watch": "ng build --watch --configuration development",
         "test": "jest --setupFiles=./jest-setup.ts",
         "test:watch": "jest --watch --setupFiles=./jest-setup.ts",
