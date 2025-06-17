@@ -62,8 +62,8 @@
                         <img ngSrc="assets/images/landing/expert.png" alt="Lazy computing" height="50" width="50" />
                     </div>
                     <p>
-                        While CAN is open to everyone, our plugins are <strong>tailored to experts</strong>. As such
-                        plugins and assessment tools may include technical terms.
+                        While CAN is open to everyone, our assessment tools are <strong>tailored to experts</strong>. As
+                        such, they may include technical terms.
                     </p>
                 </div>
                 <div class="note-card" style="animation-delay: 0.45s">
@@ -78,11 +78,13 @@
             </div>
         </div>
 
-        <div class="cta-section" (click)="toggleCatalog()" (keydown)="toggleCatalog()" tabindex="0">
+        <div class="cta-section">
+            <p>Start exploring your region now and see where climate action can take you.</p>
             <p>
-                Start exploring your region now and see where climate action can take you.<br />
-                <span></span>Begin by selecting an Assessment Tool from the sidebar on the left.
+                <strong><span></span>Begin by selecting an Assessment Tool from the sidebar on the left.</strong>
             </p>
+            <p class="or-text">OR</p>
+            <button class="btn-primary btn-withtext" (click)="startTour()">Take our guided walkthrough</button>
         </div>
     </div>
 </div>

@@ -24,7 +24,8 @@ export class StorageService {
     private readonly STORAGE_KEYS = {
         PLUGIN_RUNS: 'plugin_runs',
         ACTIVE_ARTIFACT: 'active_artifact',
-        MAP_PREFERENCES: 'map_prefs'
+        MAP_PREFERENCES: 'map_prefs',
+        TOUR_AFTER_LOGIN: 'start_tour_after_login'
     }
 
     private pluginRunsSubject = new BehaviorSubject<ComputationDatabaseEntity[]>([])
@@ -259,5 +260,19 @@ export class StorageService {
         const prefs = this.getMapPreferences()
         prefs.layerSwitcherCollapsed = isCollapsed
         this.saveMapPreferences(prefs)
+    }
+
+    // Tour preferences
+
+    getPendingTourState(): boolean {
+        return this.getItem(this.STORAGE_KEYS.TOUR_AFTER_LOGIN, false)
+    }
+
+    setTourAfterLoginFlag(shouldStart: boolean): void {
+        this.setItem(this.STORAGE_KEYS.TOUR_AFTER_LOGIN, shouldStart)
+    }
+
+    clearTourAfterLoginFlag(): void {
+        this.setItem(this.STORAGE_KEYS.TOUR_AFTER_LOGIN, false)
     }
 }

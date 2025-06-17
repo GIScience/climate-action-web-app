@@ -11,11 +11,13 @@ describe('pluginService', () => {
     it('fetch and display the plugin icon', () => {
         mockPluginsList()
         mockPluginBluePrintIcon()
+        mockPluginWalkabilitytIcon()
 
         cy.visit('/')
 
         cy.wait('@getPlugins')
         cy.wait('@getPluginBlueprintIcon')
+        cy.wait('@getPluginWalkabilityIcon')
 
         expect(
             cy
@@ -53,9 +55,9 @@ describe('pluginService', () => {
         cy.visit('/')
 
         cy.wait('@getPluginsWithoutBlueprint')
-        cy.wait('@getPluginWalkabiityIcon')
+        cy.wait('@getPluginWalkabilityIcon')
 
-        cy.get('.plugin-card').eq(0).click()
+        cy.get('.plugin-card').eq(1).click()
         cy.wait('@getPluginBlueprint404')
         cy.wait('@getPluginBlueprintComputation')
 

@@ -1,15 +1,14 @@
-import { Component } from '@angular/core'
+import { AfterViewInit, Component } from '@angular/core'
 import { default as packageInfo } from '../../package.json'
-import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
-import { MapService } from './dashboard/map/map.service'
-import { ReportService } from './dashboard/report/report.service'
+import { DashboardService } from './dashboard/dashboard.service'
+import { TourEngine } from './dashboard/walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
     title = 'Climate Action Navigator'
     name = 'HeiGIT'
     version: string = packageInfo.version
@@ -19,16 +18,15 @@ export class AppComponent {
     }
 
     constructor(
-        public artifactViewerService: ArtifactViewerService,
-        public mapService: MapService,
-        public reportService: ReportService
+        private dashboardService: DashboardService,
+        private tourEngine: TourEngine
     ) {}
 
+    ngAfterViewInit(): void {
+        this.tourEngine.checkForPendingTour()
+    }
+
     clearDashboardState() {
-        this.artifactViewerService.closeArtifactViewer()
-        this.mapService.removeFocusedLayer()
-        this.mapService.removeComputeLayers()
-        this.reportService.closeReport()
-        this.reportService.collapseLeftColumn(false)
+        this.dashboardService.clearDashboardState()
     }
 }

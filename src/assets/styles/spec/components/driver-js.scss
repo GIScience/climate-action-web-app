@@ -1,0 +1,41 @@
+.driver-popover {
+    max-width: 350px;
+
+    .driver-popover-title {
+        font-family: Manrope;
+        width: 100%;
+    }
+
+    .driver-popover-description {
+        color: #111;
+        font-family: Manrope;
+        font-variation-settings: 'wght' 400;
+        line-height: 1.6;
+        padding-right: 15px;
+    }
+
+    .driver-popover-prev-btn {
+        @extend button, .btn-light;
+        @extend button, .btn-small;
+
+        text-shadow: none;
+
+        &.driver-popover-btn-disabled {
+            visibility: hidden;
+        }
+    }
+
+    .driver-popover-next-btn {
+        @extend button, .btn-alt;
+        @extend button, .btn-small;
+
+        text-shadow: none;
+    }
+
+    .driver-popover-close-btn {
+        font-size: 24px;
+        right: 2.5px;
+        top: 10px;
+        z-index: 5;
+    }
+}

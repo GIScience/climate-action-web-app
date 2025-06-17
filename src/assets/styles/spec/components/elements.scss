@@ -98,3 +98,11 @@ i-lucide {
 mat-snack-bar-container.mdc-snackbar {
     padding-bottom: 30px;
 }
+
+.cdk-overlay-dark-backdrop {
+    backdrop-filter: grayscale(0.75) blur(5px);
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: 10px !important;
+}

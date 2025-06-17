@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - A badge for plugins if their development state differs from "active"
+- Product Walkthrough to guide first-time users through their first computation ([#296](https://gitlab.heigit.org/climate-action/web-app/-/issues/296))
 
 ## [2.3.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.3.1) - 2025-05-21
 

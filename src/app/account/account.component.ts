@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Models } from 'appwrite'
 import {
+    Footprints,
     LifeBuoy,
     LogIn,
     LogOut,
@@ -14,6 +15,8 @@ import {
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
 import { AppwriteService } from '../auth/appwrite.service'
+import { DashboardService } from '../dashboard/dashboard.service'
+import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-account',
@@ -36,8 +39,13 @@ export class AccountComponent implements OnInit, OnDestroy {
     readonly LifeBuoy = LifeBuoy
     readonly Logout = LogOut
     readonly TestTubeDiagonal = TestTubeDiagonal
+    readonly Footprints = Footprints
 
-    constructor(private appwriteService: AppwriteService) {
+    constructor(
+        private appwriteService: AppwriteService,
+        private tourEngine: TourEngine,
+        private dashboardService: DashboardService
+    ) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
         })
@@ -69,6 +77,11 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     loginAsFakeUser() {
         this.appwriteService.loginAsFakeUser()
+    }
+
+    async startTour() {
+        this.dashboardService.clearDashboardState()
+        this.tourEngine.initializeTour()
     }
 
     toggleAccountMenu() {

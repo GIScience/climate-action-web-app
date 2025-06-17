@@ -5,7 +5,7 @@ import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { pickRandomGradient } from '@app/utils/style-utils'
 import { StorageService } from '../../storage.service'
 import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
-import { PluginService } from '../plugin/plugin.service'
+import { TourEngine } from '../walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-landing',
@@ -26,12 +26,8 @@ export class LandingComponent implements OnInit {
     constructor(
         private storageService: StorageService,
         private cdr: ChangeDetectorRef,
-        private pluginService: PluginService
+        private tourEngine: TourEngine
     ) {}
-
-    toggleCatalog(): void {
-        this.pluginService.expandPluginCatalog()
-    }
 
     ngOnInit() {
         this.customRuns = this.storageService
@@ -74,5 +70,9 @@ export class LandingComponent implements OnInit {
         const maxCount = Math.max(...this.pluginCounts.map(p => p.count))
         const scale = maxCount === 1 ? 0 : (count - 1) / (maxCount - 1)
         return minSize + (maxSize - minSize) * scale
+    }
+
+    startTour() {
+        this.tourEngine.initializeTour()
     }
 }
