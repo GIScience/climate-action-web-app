@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common'
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatMomentDateModule, provideMomentDateAdapter } from '@angular/material-moment-adapter'
@@ -47,13 +47,13 @@ import { tooltipVariation } from './utils/tooltip-variations'
 
 @NgModule({
     declarations: [AppComponent, ObjectTypeComponent, ChartComponent, MobileWarningComponent],
+    bootstrap: [AppComponent],
     imports: [
         MatInputModule,
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
         AppRoutingModule,
-        HttpClientModule,
         NgOptimizedImage,
         ReactiveFormsModule,
         FormlyMaterialModule,
@@ -130,8 +130,8 @@ import { tooltipVariation } from './utils/tooltip-variations'
                 tooltip: tooltipVariation,
                 popper: popperVariation
             }
-        })
-    ],
-    bootstrap: [AppComponent]
+        }),
+        provideHttpClient(withInterceptorsFromDi())
+    ]
 })
 export class AppModule {}
