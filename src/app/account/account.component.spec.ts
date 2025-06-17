@@ -2,12 +2,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
 import { AppwriteService } from '../auth/appwrite.service'
+import { DashboardService } from '../dashboard/dashboard.service'
+import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 import { AccountComponent } from './account.component'
 
 describe('AccountComponent', () => {
     let component: AccountComponent
     let fixture: ComponentFixture<AccountComponent>
     let appwriteService: Partial<AppwriteService>
+    let dashboardService: Partial<DashboardService>
+    let tourEngine: Partial<TourEngine>
     let userSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
 
     const mockUser: Models.User<Models.Preferences> = {
@@ -28,12 +32,25 @@ describe('AccountComponent', () => {
             tryToLogin: jest.fn().mockResolvedValue(true),
             tryToLogout: jest.fn().mockResolvedValue(undefined),
             getAppwriteUrl: jest.fn().mockReturnValue('https://example.com'),
-            getRedirectUrl: jest.fn().mockReturnValue('https://example.com')
+            getRedirectUrl: jest.fn().mockReturnValue('https://example.com'),
+            loginAsFakeUser: jest.fn().mockResolvedValue(undefined)
+        }
+
+        dashboardService = {
+            clearDashboardState: jest.fn()
+        }
+
+        tourEngine = {
+            initializeTour: jest.fn()
         }
 
         await TestBed.configureTestingModule({
             imports: [AccountComponent],
-            providers: [{ provide: AppwriteService, useValue: appwriteService }]
+            providers: [
+                { provide: AppwriteService, useValue: appwriteService },
+                { provide: DashboardService, useValue: dashboardService },
+                { provide: TourEngine, useValue: tourEngine }
+            ]
         }).compileComponents()
 
         fixture = TestBed.createComponent(AccountComponent)

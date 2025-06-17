@@ -220,7 +220,7 @@ describe('mapService', () => {
         cy.waitForRenderComplete()
 
         cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-root')).mapService
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
 
             const coordinate = [12952933.57136454, 4853791.28861462]
             const pixel = mapService.map.getPixelFromCoordinate(coordinate)

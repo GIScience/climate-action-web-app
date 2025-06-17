@@ -83,7 +83,7 @@ describe('Search', () => {
         let clickedCoordinates = null
 
         cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-root')).mapService
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
             focusedCoordinates = mapService.markerFeatures.item(0).getGeometry().getCoordinates()
         })
 
@@ -92,7 +92,7 @@ describe('Search', () => {
         cy.wait(500)
 
         cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-root')).mapService
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
             clickedCoordinates = mapService.markerFeatures.item(0).getGeometry().getCoordinates()
 
             expect(focusedCoordinates).to.deep.equal(clickedCoordinates)
