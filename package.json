@@ -21,7 +21,8 @@
         "cy:run": "cypress run --headless --browser chrome",
         "test:all": "npm run test && npm run cy:run",
         "lint": "ng lint --max-warnings 0",
-        "lint:fix": "ng lint --fix"
+        "lint:fix": "ng lint --fix",
+        "serve:dist": "node serve-dist.js"
     },
     "private": true,
     "dependencies": {
