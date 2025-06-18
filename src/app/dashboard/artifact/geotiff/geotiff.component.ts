@@ -6,7 +6,6 @@ import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geotiff',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './geotiff.component.html',
     styleUrls: ['./geotiff.component.scss']

@@ -33,13 +33,14 @@ export interface ComputationDisplayEntity
     flags?: ComputationFlags
 }
 
-export interface ComputationDatabaseEntity
-    extends Pick<
-        ComputationDisplayEntity,
-        'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flags'
-    > {}
+export type ComputationDatabaseEntity = Pick<
+    ComputationDisplayEntity,
+    'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flags'
+>
 
-export interface ComputationBasicInfo
-    extends Pick<ComputationDisplayEntity, 'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'> {}
+export type ComputationBasicInfo = Pick<
+    ComputationDisplayEntity,
+    'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'
+>
 
 export type ComputationID = Pick<ComputationMetadata, 'correlation_uuid'>

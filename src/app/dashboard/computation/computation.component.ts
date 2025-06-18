@@ -16,7 +16,6 @@ import { ReportService } from '../report/report.service'
 
 @Component({
     selector: 'app-computation',
-    standalone: true,
     imports: [CommonModule, LucideAngularModule, MatIconModule, TippyDirective],
     animations: [
         trigger('expandCollapse', [

@@ -6,7 +6,6 @@ import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geojson',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './geojson.component.html',
     styleUrls: ['./geojson.component.scss']

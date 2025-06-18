@@ -8,7 +8,7 @@ describe('PlotlyChartComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [PlotlyChartComponent]
+            imports: [PlotlyChartComponent]
         }).compileComponents()
 
         fixture = TestBed.createComponent(PlotlyChartComponent)

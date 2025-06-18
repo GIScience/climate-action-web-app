@@ -20,7 +20,6 @@ import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-account',
-    standalone: true,
     imports: [CommonModule, LucideAngularModule],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'

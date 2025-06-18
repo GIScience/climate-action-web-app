@@ -15,8 +15,7 @@
         <ng-scrollbar orientation="vertical">
             <div
                 class="location-suggestion__item"
-                *ngFor="let suggestion of suggestions; let first = index"
-                [attr.autofocus]="first ? '' : null"
+                *ngFor="let suggestion of suggestions"
                 (click)="selectSuggestion(suggestion)"
                 (keyup.enter)="selectSuggestion(suggestion)"
                 (keydown)="onSuggestionKeydown($event)"

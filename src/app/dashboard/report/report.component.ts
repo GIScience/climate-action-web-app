@@ -16,7 +16,6 @@ import { ReportService } from './report.service'
 
 @Component({
     selector: 'app-report',
-    standalone: true,
     imports: [CommonModule, ArtifactComponent, MatIconModule, LucideAngularModule, NgScrollbarModule, TippyDirective],
     templateUrl: './report.component.html',
     styleUrls: ['./report.component.scss'],

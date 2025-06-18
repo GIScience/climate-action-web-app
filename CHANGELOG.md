@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.3.1...main)
 
+### Changed
+
+- Updated Angular (and associated libraries) to v19
+
 ### Added
 
 - A badge for plugins if their development state differs from "active"

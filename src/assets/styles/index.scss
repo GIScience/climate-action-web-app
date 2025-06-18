@@ -1,6 +1,5 @@
 @use 'globals';
-
-@import 'spec/settings/index';
-@import 'spec/tools/index';
-@import 'spec/index';
-@import 'vendor/index';
+@use 'spec/settings/index';
+@use 'spec/tools/index' as index2;
+@use 'spec/index' as index3;
+@use 'vendor/index' as index4;

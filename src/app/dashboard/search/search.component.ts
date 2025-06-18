@@ -12,7 +12,6 @@ import Point from 'ol/geom/Point'
 
 @Component({
     selector: 'app-search',
-    standalone: true,
     imports: [
         CommonModule,
         FormsModule,

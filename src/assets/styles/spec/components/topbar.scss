@@ -1,3 +1,9 @@
+@use "sass:color";
+@use "../settings/baseColors";
+@use "../settings/breakpoints";
+@use "../tools/mixins/mediaQueriesRanges";
+@use "../tools/mixins/placeholder";
+
 header {
     width: 100vw;
     z-index: 2;
@@ -5,7 +11,7 @@ header {
     .header-container {
         align-items: center;
         display: flex;
-        height: $header-height;
+        height: baseColors.$header-height;
         justify-content: space-between;
 
         .heigit-logo__wrapper {
@@ -63,12 +69,12 @@ header {
             outline: none;
             padding: 5px;
 
-            @include to($breakpoint-sm) {
+            @include mediaQueriesRanges.to(breakpoints.$breakpoint-sm) {
                 width: 85px;
             }
 
-            @include placeholder {
-                color: lighten($default-text-color, 20%);
+            @include placeholder.placeholder {
+                color: color.adjust(baseColors.$default-text-color, $lightness: 20%);
                 font-style: italic;
             }
         }
@@ -81,15 +87,15 @@ header {
 
 .is-collapsed {
     .header {
-        width: calc(100% - #{$collapsed-size});
+        width: calc(100% - #{baseColors.$collapsed-size});
 
-        @include to($breakpoint-md) {
+        @include mediaQueriesRanges.to(breakpoints.$breakpoint-md) {
             width: 100%;
         }
 
-        @include between($breakpoint-md, $breakpoint-xl) {
+        @include mediaQueriesRanges.between(breakpoints.$breakpoint-md, breakpoints.$breakpoint-xl) {
             // width: calc(100% - #{$offscreen-size});
-            width: calc(100% - #{$collapsed-size});
+            width: calc(100% - #{baseColors.$collapsed-size});
         }
     }
 }

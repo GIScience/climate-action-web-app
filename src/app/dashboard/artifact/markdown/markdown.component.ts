@@ -6,7 +6,6 @@ import { Remarkable } from 'remarkable'
 
 @Component({
     selector: 'app-markdown',
-    standalone: true,
     imports: [CommonModule],
     templateUrl: './markdown.component.html',
     styleUrls: ['./markdown.component.scss'],

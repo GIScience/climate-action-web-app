@@ -1,3 +1,6 @@
+@use "../mixins/generateResponsive";
+@use "../utils/center";
+
 // ---------------------------------------------------------
 // @TOC
 // ---------------------------------------------------------
@@ -14,7 +17,7 @@
 // @Variables
 // ---------------------------------------------------------
 
-$responsive: true;
+center.$responsive: true;
 
 // ---------------------------------------------------------
 // @Display
@@ -44,29 +47,29 @@ $responsive: true;
     display: none !important;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .d-b\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .d-b\@#{generateResponsive.$breakpointAlias} {
             display: block !important;
         }
 
-        .d-ib\@#{$breakpointAlias} {
+        .d-ib\@#{generateResponsive.$breakpointAlias} {
             display: inline-block !important;
         }
 
-        .d-i\@#{$breakpointAlias} {
+        .d-i\@#{generateResponsive.$breakpointAlias} {
             display: inline !important;
         }
 
-        .d-tb\@#{$breakpointAlias} {
+        .d-tb\@#{generateResponsive.$breakpointAlias} {
             display: table !important;
         }
 
-        .d-tbc\@#{$breakpointAlias} {
+        .d-tbc\@#{generateResponsive.$breakpointAlias} {
             display: table-cell !important;
         }
 
-        .d-n\@#{$breakpointAlias} {
+        .d-n\@#{generateResponsive.$breakpointAlias} {
             display: none !important;
         }
     }
@@ -112,41 +115,41 @@ $responsive: true;
     overflow-x: scroll !important;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .ov-h\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .ov-h\@#{generateResponsive.$breakpointAlias} {
             overflow: hidden !important;
         }
 
-        .ov-a\@#{$breakpointAlias} {
+        .ov-a\@#{generateResponsive.$breakpointAlias} {
             overflow: auto !important;
         }
 
-        .ov-s\@#{$breakpointAlias} {
+        .ov-s\@#{generateResponsive.$breakpointAlias} {
             overflow: scroll !important;
         }
 
-        .ovY-h\@#{$breakpointAlias} {
+        .ovY-h\@#{generateResponsive.$breakpointAlias} {
             overflow-y: hidden !important;
         }
 
-        .ovX-h\@#{$breakpointAlias} {
+        .ovX-h\@#{generateResponsive.$breakpointAlias} {
             overflow-x: hidden !important;
         }
 
-        .ovY-a\@#{$breakpointAlias} {
+        .ovY-a\@#{generateResponsive.$breakpointAlias} {
             overflow-y: auto !important;
         }
 
-        .ovX-a\@#{$breakpointAlias} {
+        .ovX-a\@#{generateResponsive.$breakpointAlias} {
             overflow-x: auto !important;
         }
 
-        .ovY-s\@#{$breakpointAlias} {
+        .ovY-s\@#{generateResponsive.$breakpointAlias} {
             overflow-y: scroll !important;
         }
 
-        .ovX-s\@#{$breakpointAlias} {
+        .ovX-s\@#{generateResponsive.$breakpointAlias} {
             overflow-x: scroll !important;
         }
     }
@@ -168,17 +171,17 @@ $responsive: true;
     float: none !important;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fl-l\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fl-l\@#{generateResponsive.$breakpointAlias} {
             float: left !important;
         }
 
-        .fl-r\@#{$breakpointAlias} {
+        .fl-r\@#{generateResponsive.$breakpointAlias} {
             float: right !important;
         }
 
-        .fl-n\@#{$breakpointAlias} {
+        .fl-n\@#{generateResponsive.$breakpointAlias} {
             float: none !important;
         }
     }
@@ -200,17 +203,17 @@ $responsive: true;
     vertical-align: bottom !important;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .va-t\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .va-t\@#{generateResponsive.$breakpointAlias} {
             vertical-align: top !important;
         }
 
-        .va-m\@#{$breakpointAlias} {
+        .va-m\@#{generateResponsive.$breakpointAlias} {
             vertical-align: middle !important;
         }
 
-        .va-b\@#{$breakpointAlias} {
+        .va-b\@#{generateResponsive.$breakpointAlias} {
             vertical-align: bottom !important;
         }
     }
@@ -240,25 +243,25 @@ $responsive: true;
     position: fixed !important;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .pos-s\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .pos-s\@#{generateResponsive.$breakpointAlias} {
             position: static !important;
         }
 
-        .pos-st\@#{$breakpointAlias} {
+        .pos-st\@#{generateResponsive.$breakpointAlias} {
             position: sticky !important;
         }
 
-        .pos-r\@#{$breakpointAlias} {
+        .pos-r\@#{generateResponsive.$breakpointAlias} {
             position: relative !important;
         }
 
-        .pos-a\@#{$breakpointAlias} {
+        .pos-a\@#{generateResponsive.$breakpointAlias} {
             position: absolute !important;
         }
 
-        .pos-f\@#{$breakpointAlias} {
+        .pos-f\@#{generateResponsive.$breakpointAlias} {
             position: fixed !important;
         }
     }
@@ -273,9 +276,9 @@ $responsive: true;
         z-index: ($i * 1000) !important;
     }
 
-    @if ($responsive ==true) {
-        @include generateResponsive() {
-            .z-#{$i}\@#{$breakpointAlias} {
+    @if (center.$responsive ==true) {
+        @include generateResponsive.generateResponsive() {
+            .z-#{$i}\@#{generateResponsive.$breakpointAlias} {
                 z-index: ($i * 1000) !important;
             }
         }

@@ -15,8 +15,7 @@ export enum TourChoice {
     selector: 'app-tour-choice-dialog',
     imports: [CommonModule, MatDialogModule, MatButtonModule, LucideAngularModule],
     templateUrl: './tour-choice-dialog.component.html',
-    styleUrls: ['./tour-choice-dialog.component.scss'],
-    standalone: true
+    styleUrls: ['./tour-choice-dialog.component.scss']
 })
 export class TourChoiceDialogComponent {
     readonly CircleX = CircleX

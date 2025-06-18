@@ -28,7 +28,6 @@ import { TableComponent } from './table/table.component'
     templateUrl: './artifact.component.html',
     styleUrls: ['./artifact.component.scss'],
     imports: [CommonModule, MatExpansionModule, NgScrollbarModule, MarkdownComponent],
-    standalone: true,
     encapsulation: ViewEncapsulation.None
 })
 export class ArtifactComponent implements OnInit, AfterViewInit {

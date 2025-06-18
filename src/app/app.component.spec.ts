@@ -50,8 +50,7 @@ describe('AppComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule],
-            declarations: [AppComponent],
+            imports: [HttpClientModule, RouterTestingModule, AppComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 { provide: ArtifactViewerService, useValue: mockArtifactViewerService },

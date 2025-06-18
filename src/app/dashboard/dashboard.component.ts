@@ -30,8 +30,7 @@ import { SearchComponent } from './search/search.component'
         ReportComponent,
         LucideAngularModule,
         TippyDirective
-    ],
-    standalone: true
+    ]
 })
 export class DashboardComponent implements OnInit {
     @ViewChild(ComputationsIndexComponent) computationsIndexComponent?: ComputationsIndexComponent

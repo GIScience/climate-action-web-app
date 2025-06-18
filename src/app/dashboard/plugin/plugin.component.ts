@@ -49,8 +49,7 @@ import { PluginService } from './plugin.service'
             ),
             transition('collapsed <=> expanded', animate('300ms ease-in-out'))
         ])
-    ],
-    standalone: true
+    ]
 })
 export class PluginComponent implements AfterViewInit {
     pluginObs$: Observable<Plugin> | undefined

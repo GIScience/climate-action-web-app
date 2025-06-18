@@ -278,9 +278,6 @@
     }
 
     ::ng-deep {
-        @import 'ol';
-        @import 'ol-popup';
-
         .ol-zoom {
             right: 0.5vw;
             top: 0.5em;

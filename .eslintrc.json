@@ -1,7 +1,6 @@
 {
     "root": true,
     "ignorePatterns": ["projects/**/*"],
-    "plugins": ["@stylistic"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": "./tsconfig.json",
@@ -18,7 +17,15 @@
                 "plugin:prettier/recommended"
             ],
             "rules": {
-                "@typescript-eslint/semi": ["warn", "never"],
+                "semi": ["warn", "never"],
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    {
+                        "argsIgnorePattern": "^_",
+                        "varsIgnorePattern": "^_",
+                        "caughtErrorsIgnorePattern": "^_"
+                    }
+                ],
                 "@typescript-eslint/ban-ts-comment": [
                     "error",
                     {

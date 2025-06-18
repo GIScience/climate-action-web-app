@@ -43,7 +43,7 @@ export class AppwriteService {
             }
             this._user.next(user)
             return true
-        } catch (error) {
+        } catch (_error) {
             this._user.next(null)
             return false
         }

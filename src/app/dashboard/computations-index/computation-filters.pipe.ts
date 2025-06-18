@@ -1,8 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core'
 
 @Pipe({
-    name: 'filterByCriteria',
-    standalone: true
+    name: 'filterByCriteria'
 })
 export class FilterByCriteriaPipe implements PipeTransform {
     // Disabling any type rule for flexibility in pipe input for filtering
