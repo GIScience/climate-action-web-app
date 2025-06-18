@@ -51,8 +51,7 @@ describe('ChartComponent', () => {
         HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue(mockContext)
 
         TestBed.configureTestingModule({
-            imports: [NgChartsModule],
-            declarations: [ChartComponent]
+            imports: [NgChartsModule, ChartComponent]
         }).compileComponents()
 
         fixture = TestBed.createComponent(ChartComponent)

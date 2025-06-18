@@ -15,8 +15,8 @@
     }
 
     .driver-popover-prev-btn {
-        @extend button, .btn-light;
-        @extend button, .btn-small;
+        @extend button, .btn-light !optional;
+        @extend button, .btn-small !optional;
 
         text-shadow: none;
 
@@ -26,8 +26,8 @@
     }
 
     .driver-popover-next-btn {
-        @extend button, .btn-alt;
-        @extend button, .btn-small;
+        @extend button, .btn-alt !optional;
+        @extend button, .btn-small !optional;
 
         text-shadow: none;
     }

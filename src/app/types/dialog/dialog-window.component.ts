@@ -8,7 +8,6 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 
 @Component({
     selector: 'app-dialog-window',
-    standalone: true,
     imports: [CommonModule, FormlyModule, MatDialogModule, MatButtonModule, LucideAngularModule, NgScrollbarModule],
     templateUrl: './dialog-window.component.html',
     styleUrls: ['./dialog-window.component.scss']

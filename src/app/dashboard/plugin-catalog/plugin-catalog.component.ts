@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
@@ -15,8 +15,7 @@ import { PluginCard } from './plugin-catalog.interface'
     selector: 'app-plugin-catalog',
     templateUrl: './plugin-catalog.component.html',
     styleUrls: ['./plugin-catalog.component.scss'],
-    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule, NgOptimizedImage],
-    standalone: true
+    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule]
 })
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
     @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>

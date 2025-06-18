@@ -60,7 +60,6 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
 
 @Component({
     selector: 'app-computations-index',
-    standalone: true,
     imports: [
         MatIconModule,
         TippyDirective,
@@ -158,8 +157,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.pluginService
             .getPluginDetails(this.pluginId)
             .pipe(take(1))
-            .subscribe(plugin => {
-                plugin.demo_config ? (this.demoConfig = true) : (this.demoConfig = false)
+            .subscribe(({ demo_config }) => {
+                this.demoConfig = !!demo_config
             })
 
         if (this.pluginService.computeState$) {

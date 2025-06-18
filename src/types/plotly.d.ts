@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // TODO: Remove this file once the types are updated for plotly.js v3
 declare module 'plotly.js-strict-dist' {
-    interface PlotlyHTMLElement extends HTMLElement {
+    interface _PlotlyHTMLElement extends HTMLElement {
         _fullLayout: any
         _fullData: any
     }

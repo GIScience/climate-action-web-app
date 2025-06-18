@@ -9,7 +9,6 @@ import { ArtifactViewerService } from './artifact-viewer.service'
 
 @Component({
     selector: 'app-artifact-viewer',
-    standalone: true,
     imports: [CommonModule, CdkDrag, CdkDragHandle, LucideAngularModule, TippyDirective, ArtifactComponent],
     templateUrl: './artifact-viewer.component.html',
     styleUrl: './artifact-viewer.component.scss'

@@ -9,7 +9,6 @@ import { TourEngine } from '../walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-landing',
-    standalone: true,
     imports: [CommonModule, RouterModule, NgOptimizedImage],
     templateUrl: './landing.component.html',
     styleUrl: './landing.component.scss'

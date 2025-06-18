@@ -13,7 +13,6 @@ import {
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { MatTooltip } from '@angular/material/tooltip'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
@@ -52,12 +51,10 @@ import { FormlyModel } from './plugin-parameter.interface'
         NgIf,
         LucideAngularModule,
         CommonModule,
-        MatTooltip,
         NgScrollbarModule,
         TippyDirective,
         MarkdownModule
     ],
-    standalone: true,
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {

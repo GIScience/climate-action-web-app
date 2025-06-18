@@ -9,8 +9,7 @@ import { DialogWindowComponent } from './dialog-window.component'
     selector: 'app-optional-attributes-type',
     templateUrl: './optional-attributes.type.component.html',
     styleUrls: ['./optional-attributes.type.component.scss'],
-    imports: [LucideAngularModule, CommonModule],
-    standalone: true
+    imports: [LucideAngularModule, CommonModule]
 })
 export class OptionalAttributesTypeComponent extends FieldType implements DoCheck {
     isDisabled = false

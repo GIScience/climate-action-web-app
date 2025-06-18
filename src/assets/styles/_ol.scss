@@ -1,3 +1,5 @@
+@import 'ol/ol.css';
+
 .ol-control {
     button {
         border: 1px solid #e1eae8;
@@ -25,7 +27,7 @@
     top: calc(0.5vw + 40px);
 }
 
-.ol-attribution {
+.ol-attribution.ol-uncollapsible {
     border-radius: 5px;
     bottom: 0.5em;
     right: 0.5vw;

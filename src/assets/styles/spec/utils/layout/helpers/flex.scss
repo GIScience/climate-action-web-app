@@ -1,3 +1,6 @@
+@use "../mixins/generateResponsive";
+@use "../utils/center";
+
 // ---------------------------------------------------------
 // @TOC
 // ---------------------------------------------------------
@@ -15,7 +18,7 @@
 // @Variables
 // ---------------------------------------------------------
 
-$responsive: true;
+center.$responsive: true;
 
 // ---------------------------------------------------------
 // @Display
@@ -29,13 +32,13 @@ $responsive: true;
     display: inline-flex;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .d-f\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .d-f\@#{generateResponsive.$breakpointAlias} {
             display: flex;
         }
 
-        .d-if\@#{$breakpointAlias} {
+        .d-if\@#{generateResponsive.$breakpointAlias} {
             display: inline-flex;
         }
     }
@@ -57,17 +60,17 @@ $responsive: true;
     flex-wrap: nowrap;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fxw-w\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fxw-w\@#{generateResponsive.$breakpointAlias} {
             flex-wrap: wrap;
         }
 
-        .fxw-wr\@#{$breakpointAlias} {
+        .fxw-wr\@#{generateResponsive.$breakpointAlias} {
             flex-wrap: wrap-reverse;
         }
 
-        .fxw-nw\@#{$breakpointAlias} {
+        .fxw-nw\@#{generateResponsive.$breakpointAlias} {
             flex-wrap: nowrap;
         }
     }
@@ -93,21 +96,21 @@ $responsive: true;
     flex-direction: row-reverse;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fxd-c\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fxd-c\@#{generateResponsive.$breakpointAlias} {
             flex-direction: column;
         }
 
-        .fxd-cr\@#{$breakpointAlias} {
+        .fxd-cr\@#{generateResponsive.$breakpointAlias} {
             flex-direction: column-reverse;
         }
 
-        .fxd-r\@#{$breakpointAlias} {
+        .fxd-r\@#{generateResponsive.$breakpointAlias} {
             flex-direction: row;
         }
 
-        .fxd-rr\@#{$breakpointAlias} {
+        .fxd-rr\@#{generateResponsive.$breakpointAlias} {
             flex-direction: row-reverse;
         }
     }
@@ -137,25 +140,25 @@ $responsive: true;
     align-items: stretch;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .ai-fs\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .ai-fs\@#{generateResponsive.$breakpointAlias} {
             align-items: flex-start;
         }
 
-        .ai-fe\@#{$breakpointAlias} {
+        .ai-fe\@#{generateResponsive.$breakpointAlias} {
             align-items: flex-end;
         }
 
-        .ai-c\@#{$breakpointAlias} {
+        .ai-c\@#{generateResponsive.$breakpointAlias} {
             align-items: center;
         }
 
-        .ai-b\@#{$breakpointAlias} {
+        .ai-b\@#{generateResponsive.$breakpointAlias} {
             align-items: baseline;
         }
 
-        .ai-s\@#{$breakpointAlias} {
+        .ai-s\@#{generateResponsive.$breakpointAlias} {
             align-items: stretch;
         }
     }
@@ -185,25 +188,25 @@ $responsive: true;
     align-self: stretch;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .as-fs\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .as-fs\@#{generateResponsive.$breakpointAlias} {
             align-self: flex-start;
         }
 
-        .as-fe\@#{$breakpointAlias} {
+        .as-fe\@#{generateResponsive.$breakpointAlias} {
             align-self: flex-end;
         }
 
-        .as-c\@#{$breakpointAlias} {
+        .as-c\@#{generateResponsive.$breakpointAlias} {
             align-self: center;
         }
 
-        .as-b\@#{$breakpointAlias} {
+        .as-b\@#{generateResponsive.$breakpointAlias} {
             align-self: baseline;
         }
 
-        .as-s\@#{$breakpointAlias} {
+        .as-s\@#{generateResponsive.$breakpointAlias} {
             align-self: stretch;
         }
     }
@@ -237,29 +240,29 @@ $responsive: true;
     align-content: space-around;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .ac-fs\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .ac-fs\@#{generateResponsive.$breakpointAlias} {
             align-content: flex-start;
         }
 
-        .ac-fe\@#{$breakpointAlias} {
+        .ac-fe\@#{generateResponsive.$breakpointAlias} {
             align-content: flex-end;
         }
 
-        .ac-c\@#{$breakpointAlias} {
+        .ac-c\@#{generateResponsive.$breakpointAlias} {
             align-content: center;
         }
 
-        .ac-s\@#{$breakpointAlias} {
+        .ac-s\@#{generateResponsive.$breakpointAlias} {
             align-content: stretch;
         }
 
-        .ac-sb\@#{$breakpointAlias} {
+        .ac-sb\@#{generateResponsive.$breakpointAlias} {
             align-content: space-between;
         }
 
-        .ac-sa\@#{$breakpointAlias} {
+        .ac-sa\@#{generateResponsive.$breakpointAlias} {
             align-content: space-around;
         }
     }
@@ -289,25 +292,25 @@ $responsive: true;
     justify-content: space-around;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .jc-fs\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .jc-fs\@#{generateResponsive.$breakpointAlias} {
             justify-content: flex-start;
         }
 
-        .jc-fe\@#{$breakpointAlias} {
+        .jc-fe\@#{generateResponsive.$breakpointAlias} {
             justify-content: flex-end;
         }
 
-        .jc-c\@#{$breakpointAlias} {
+        .jc-c\@#{generateResponsive.$breakpointAlias} {
             justify-content: center;
         }
 
-        .jc-sb\@#{$breakpointAlias} {
+        .jc-sb\@#{generateResponsive.$breakpointAlias} {
             justify-content: space-between;
         }
 
-        .jc-sa\@#{$breakpointAlias} {
+        .jc-sa\@#{generateResponsive.$breakpointAlias} {
             justify-content: space-around;
         }
     }
@@ -325,13 +328,13 @@ $responsive: true;
     flex: 1;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fx-n\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fx-n\@#{generateResponsive.$breakpointAlias} {
             flex: none;
         }
 
-        .fx-1\@#{$breakpointAlias} {
+        .fx-1\@#{generateResponsive.$breakpointAlias} {
             flex: 1;
         }
     }
@@ -349,13 +352,13 @@ $responsive: true;
     flex-basis: 0;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fxb-a\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fxb-a\@#{generateResponsive.$breakpointAlias} {
             flex-basis: auto;
         }
 
-        .fxb-0\@#{$breakpointAlias} {
+        .fxb-0\@#{generateResponsive.$breakpointAlias} {
             flex-basis: 0;
         }
     }
@@ -373,13 +376,13 @@ $responsive: true;
     flex-grow: 0;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fxg-1\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fxg-1\@#{generateResponsive.$breakpointAlias} {
             flex-grow: 1;
         }
 
-        .fxg-0\@#{$breakpointAlias} {
+        .fxg-0\@#{generateResponsive.$breakpointAlias} {
             flex-grow: 0;
         }
     }
@@ -397,13 +400,13 @@ $responsive: true;
     flex-shrink: 0;
 }
 
-@if ($responsive ==true) {
-    @include generateResponsive() {
-        .fxs-1\@#{$breakpointAlias} {
+@if (center.$responsive ==true) {
+    @include generateResponsive.generateResponsive() {
+        .fxs-1\@#{generateResponsive.$breakpointAlias} {
             flex-shrink: 1;
         }
 
-        .fxs-0\@#{$breakpointAlias} {
+        .fxs-0\@#{generateResponsive.$breakpointAlias} {
             flex-shrink: 0;
         }
     }
@@ -418,9 +421,9 @@ $responsive: true;
         order: $i;
     }
 
-    @if ($responsive ==true) {
-        @include generateResponsive() {
-            .ord-#{$i}\@#{$breakpointAlias} {
+    @if (center.$responsive ==true) {
+        @include generateResponsive.generateResponsive() {
+            .ord-#{$i}\@#{generateResponsive.$breakpointAlias} {
                 order: $i;
             }
         }

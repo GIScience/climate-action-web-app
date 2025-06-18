@@ -12,7 +12,6 @@ interface LegendItem {
 
 @Component({
     selector: 'app-legend',
-    standalone: true,
     imports: [CommonModule, NgScrollbar],
     templateUrl: './legend.component.html',
     styleUrls: ['./legend.component.scss']

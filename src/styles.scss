@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-@import 'assets/styles/index';
-
-@import 'ol/ol.css';
+@use 'assets/styles/index';
+@use 'assets/styles/ol';
+@use 'assets/styles/ol-popup';
 
 @import 'tippy.js/dist/tippy.css';
 @import 'tippy.js/themes/material.css';

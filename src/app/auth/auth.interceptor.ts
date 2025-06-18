@@ -35,7 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
         try {
             const keyInfo = await this.databaseService.getBasicKey()
             this.apiKey = keyInfo?.key || null
-        } catch (err) {
+        } catch (_err) {
             this.apiKey = null
         }
     }

@@ -1,13 +1,14 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { convertToTitleCase } from '@app/utils/artifact-utils'
 import { ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem } from 'chart.js'
-
+import { NgChartsModule } from 'ng2-charts'
 import { Artifact, ChartData } from '../artifact.interface'
 
 @Component({
     selector: 'app-chart',
     templateUrl: './chart.component.html',
-    styleUrls: ['./chart.component.scss']
+    styleUrls: ['./chart.component.scss'],
+    imports: [NgChartsModule]
 })
 export class ChartComponent implements OnInit {
     @ViewChild('chartCanvas') chartCanvas?: ElementRef
