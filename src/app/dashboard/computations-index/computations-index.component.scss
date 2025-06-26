@@ -25,14 +25,13 @@
 
     .computations-index-content {
         display: flex;
-        max-height: 52.5vh;
-        min-height: 20vh;
         transition: max-height 0.25s ease-in-out;
 
         .empty-computations {
             align-items: center;
             display: flex;
             flex-direction: column;
+            height: 20vh;
             justify-content: center;
             padding: 20px 0;
             text-align: center;
@@ -45,6 +44,11 @@
 
         .computations-container {
             width: 100%;
+
+            .ng-scrollbar {
+                max-height: 45vh;
+                min-height: 20vh;
+            }
         }
     }
 
@@ -235,16 +239,20 @@
         .empty-archive {
             align-items: center;
             display: flex;
-            height: 100%;
+            height: 20vh;
             justify-content: center;
             width: 100%;
+        }
+
+        .ng-scrollbar {
+            max-height: 45vh;
+            min-height: 20vh;
         }
 
         .archived-header {
             background: #818181;
             color: #fff;
             letter-spacing: 20px;
-            margin-bottom: 10px;
             margin-left: -20px;
             padding: 5px 5px 5px 25px;
             text-align: center;

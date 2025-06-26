@@ -105,8 +105,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     currentRuns: ComputationDatabaseEntity[] = []
     scheduledRuns: ComputationDatabaseEntity[] = []
     activeComputation?: ComputationDisplayEntity
-    activeArtifact?: ArtifactEntity
     archivedComputations: ComputationDatabaseEntity[] = []
+    private _activeArtifact?: ArtifactEntity
+
     showArchived = false
     newRuns: string[] = []
     demoRuns: string[] = []
@@ -129,6 +130,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }>
 
     @ViewChild(ComputationComponent) computationComponent!: ComputationComponent
+
+    get activeArtifact(): ArtifactEntity | undefined {
+        return this.artifactViewerService.isViewerVisible ? this._activeArtifact : undefined
+    }
 
     user: Models.User<Models.Preferences> | null = null
     scheduledRunsSubscription: Subscription = new Subscription()
@@ -367,7 +372,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (previousActiveComputation === computation) {
             this.activeComputation = undefined
-            this.activeArtifact = undefined
+            this._activeArtifact = undefined
         } else {
             computation.keepInDOM = true
             setTimeout(() => (computation.isExpanded = true), 0)
@@ -417,7 +422,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     storeActiveArtifact(artifact: ArtifactEntity) {
         if (artifact) {
-            this.activeArtifact = artifact
+            this._activeArtifact = artifact
 
             this.storageService.saveActiveArtifact({
                 correlation_uuid: artifact.correlation_uuid,
@@ -437,11 +442,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 )
                 if (parentComputation) {
                     this.toggleComputation(parentComputation)
-                    this.activeArtifact = parentComputation.artifacts.find(
+                    this._activeArtifact = parentComputation.artifacts.find(
                         x => x.store_id === activeArtifactRef.store_id
                     )
-                    if (this.activeArtifact) {
-                        this.computationComponent.renderArtifact(this.activeArtifact)
+                    if (this._activeArtifact) {
+                        this.computationComponent.renderArtifact(this._activeArtifact)
                     }
                 }
             }
