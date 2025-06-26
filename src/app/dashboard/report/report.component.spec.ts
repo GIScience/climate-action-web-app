@@ -1,5 +1,7 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ToastrService } from 'ngx-toastr'
+import { MockToastrService } from '../../../../jest.mocks'
 import { ReportComponent } from './report.component'
 
 describe('ReportComponent', () => {
@@ -8,7 +10,8 @@ describe('ReportComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [ReportComponent, HttpClientModule]
+            imports: [ReportComponent, HttpClientModule],
+            providers: [{ provide: ToastrService, useClass: MockToastrService }]
         }).compileComponents()
 
         fixture = TestBed.createComponent(ReportComponent)

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, Injector, Optional } from '@angular/core'
-import { MatSnackBar } from '@angular/material/snack-bar'
+import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
 import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -28,7 +28,7 @@ export class ReportService {
     constructor(
         private http: HttpClient,
         private injector: Injector,
-        private snackBar: MatSnackBar
+        private toastr: ToastrService
     ) {}
 
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
@@ -36,22 +36,16 @@ export class ReportService {
         const existingIndex = this.artifacts.findIndex(a => a.artifact.store_id === artifact.store_id)
 
         if (existingIndex >= 0) {
-            this.snackBar.open('This artifact is already in the report.', 'Close', {
-                duration: 4000,
-                verticalPosition: 'bottom',
-                horizontalPosition: 'center',
-                panelClass: ['snackbar']
+            this.toastr.warning('This artifact is already in the report.', '', {
+                timeOut: 4000
             })
             return
         } else if (this.artifacts.length >= this.MAX_ARTIFACTS) {
-            this.snackBar.open(
+            this.toastr.warning(
                 'Maximum of 4 artifacts allowed in the report. Please remove an existing artifact first.',
-                'Close',
+                '',
                 {
-                    duration: 4000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['snackbar']
+                    timeOut: 4000
                 }
             )
             return

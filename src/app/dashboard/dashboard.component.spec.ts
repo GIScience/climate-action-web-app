@@ -2,6 +2,8 @@ import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { ToastrService } from 'ngx-toastr'
+import { MockToastrService } from '../../../jest.mocks'
 import { ArtifactComponent } from './artifact/artifact.component'
 import { ComputationComponent } from './computation/computation.component'
 import { DashboardComponent } from './dashboard.component'
@@ -31,6 +33,7 @@ describe('DashboardComponent', () => {
             ],
             providers: [
                 { provide: MapService, useValue: mockMapService },
+                { provide: ToastrService, useClass: MockToastrService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',

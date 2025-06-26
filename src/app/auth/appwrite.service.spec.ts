@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing'
-import { MatSnackBar } from '@angular/material/snack-bar'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from '@environments/environment'
 import { Account, Models } from 'appwrite'
@@ -24,10 +23,6 @@ afterAll(() => {
     console.error = originalConsoleError
     console.warn = originalConsoleWarn
 })
-
-const mockSnackBar = {
-    open: jest.fn()
-}
 
 type MockAccount = Partial<Account> & {
     get: jest.Mock
@@ -87,8 +82,7 @@ describe('AppwriteService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [NoopAnimationsModule],
-            providers: [{ provide: MatSnackBar, useValue: mockSnackBar }]
+            imports: [NoopAnimationsModule]
         })
         service = TestBed.inject(AppwriteService)
     })

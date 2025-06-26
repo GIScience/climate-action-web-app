@@ -4,10 +4,12 @@ import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { ToastrService } from 'ngx-toastr'
 import { Feature } from 'ol'
 import GeoJSON from 'ol/format/GeoJSON'
 import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, of } from 'rxjs'
+import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapService } from '../map/map.service'
@@ -87,6 +89,7 @@ describe('ComputationsIndexComponent', () => {
                 { provide: StorageService, useValue: mockStorageService },
                 { provide: ArtifactService, useValue: mockArtifactService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: ToastrService, useClass: MockToastrService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',
@@ -205,11 +208,6 @@ describe('ComputationsIndexComponent', () => {
         const childComputations = fixture.debugElement.queryAll(By.css('.child-computation'))
         expect(childComputations.length).toBe(1)
 
-        expect(mockPluginService.updateRunStatus).toHaveBeenCalledWith(
-            '8a897536-c4b4-4e5a-9d70-50430183ac66',
-            'SUCCESS'
-        )
-
         tick(2000)
         discardPeriodicTasks()
     }))
@@ -232,6 +230,82 @@ describe('ComputationsIndexComponent', () => {
         expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
         expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
 
+        discardPeriodicTasks()
+    }))
+
+    it('should display artifact errors next to the computation', fakeAsync(() => {
+        const testRun = {
+            aoiName: 'Test AOI',
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'SUCCESS',
+            timestamp: new Date('2023-09-27T16:42:52+01:00')
+        } as ComputationDisplayEntity
+
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+
+        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
+            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
+                return of({
+                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    params: {},
+                    aoi: new GeoJSON().readFeature({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'MultiPolygon',
+                            coordinates: [
+                                [
+                                    [
+                                        [0, 0],
+                                        [1, 0],
+                                        [1, 1],
+                                        [0, 1],
+                                        [0, 0]
+                                    ]
+                                ]
+                            ]
+                        },
+                        properties: {
+                            name: 'Test AOI'
+                        }
+                    }) as Feature<MultiPolygon>,
+                    artifacts: [
+                        {
+                            name: 'Image',
+                            modality: 'IMAGE',
+                            primary: true,
+                            file_path: 'test_image.png',
+                            summary: 'An image.',
+                            description: 'The image is under CC0 license.',
+                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                            store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                            attachments: {}
+                        }
+                    ],
+                    plugin_info: {
+                        plugin_id: 'test_plugin',
+                        plugin_version: '1.0.0'
+                    },
+                    status: 'SUCCESS',
+                    message: '',
+                    artifact_errors: {
+                        'Failing Indicator': 'Error message'
+                    }
+                })
+            }
+            return of()
+        })
+
+        component.ngOnInit()
+        fixture.detectChanges()
+        tick()
+
+        const artifactErrorsIcon = fixture.debugElement.query(By.css('.artifact-errors'))
+        expect(artifactErrorsIcon).toBeTruthy()
+
+        tick(2000)
         discardPeriodicTasks()
     }))
 

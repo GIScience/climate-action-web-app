@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
-import { convertToTitleCase } from '@app/utils/artifact-utils'
+import { convertToTitleCase } from '@app/utils/artifact.utils'
 import { ChartConfiguration, ChartType, ChartTypeRegistry, TooltipItem } from 'chart.js'
 import { NgChartsModule } from 'ng2-charts'
 import { Artifact, ChartData } from '../artifact.interface'
