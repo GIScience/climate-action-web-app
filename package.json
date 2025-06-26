@@ -1,6 +1,6 @@
 {
     "name": "climate-action-app",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "scripts": {
         "ng": "ng",
         "start": "ng serve --no-hmr --host=127.0.0.1",
