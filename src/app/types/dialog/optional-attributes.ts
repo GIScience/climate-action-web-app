@@ -30,7 +30,8 @@ export class OptionalAttributesTypeComponent extends FieldType implements DoChec
             width: '600px',
             data: this.field.fieldGroup?.[0],
             autoFocus: false,
-            maxHeight: '90vh'
+            maxHeight: '90vh',
+            disableClose: true
         })
     }
 }
