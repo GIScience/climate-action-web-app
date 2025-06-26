@@ -18,10 +18,11 @@ export interface ComputationMetadata {
     plugin_info: PluginBaseInfo
     status: ComputationState
     message: string
+    artifact_errors: { [key: string]: string }
 }
 
 export interface ComputationDisplayEntity
-    extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status'> {
+    extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status' | 'artifact_errors'> {
     artifacts: ArtifactEntity[]
     aoiName?: string
     geometry?: ComputationMetadata['aoi']

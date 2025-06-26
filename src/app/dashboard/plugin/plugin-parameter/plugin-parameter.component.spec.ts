@@ -9,8 +9,10 @@ import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariati
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { JSONSchema7 } from 'json-schema'
+import { ToastrService } from 'ngx-toastr'
 import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
+import { MockToastrService } from '../../../../../jest.mocks'
 import { PluginParameterComponent } from './plugin-parameter.component'
 
 describe('PluginParameterComponent', () => {
@@ -31,6 +33,7 @@ describe('PluginParameterComponent', () => {
                 HttpClientModule
             ],
             providers: [
+                { provide: ToastrService, useClass: MockToastrService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',

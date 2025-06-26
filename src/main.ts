@@ -2,7 +2,7 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { importProvidersFrom } from '@angular/core'
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy, Routes, provideRouter } from '@angular/router'
 import { AppComponent } from '@app/app.component'
 import { CustomRouteReuseStrategy } from '@app/app.ext'
@@ -27,11 +27,12 @@ import { PluginComponent } from '@app/dashboard/plugin/plugin.component'
 import { PageNotFoundComponent } from '@app/page-not-found/page-not-found.component'
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { ObjectTypeComponent } from '@app/types/object/object.type'
-import { tooltipVariation } from '@app/utils/tooltip-variations'
+import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
 import { popperVariation, provideTippyConfig, provideTippyLoader } from '@ngneat/helipopper/config'
 import { FormlyModule } from '@ngx-formly/core'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
+import { provideToastr } from 'ngx-toastr'
 
 const routes: Routes = [
     {
@@ -127,6 +128,16 @@ bootstrapApplication(AppComponent, {
                 tooltip: tooltipVariation,
                 popper: popperVariation
             }
+        }),
+        provideAnimations(),
+        provideToastr({
+            positionClass: 'toast-bottom-center',
+            preventDuplicates: true,
+            maxOpened: 10,
+            easeTime: 100,
+            autoDismiss: true,
+            progressBar: true,
+            closeButton: true
         }),
         provideHttpClient(withInterceptorsFromDi())
     ]

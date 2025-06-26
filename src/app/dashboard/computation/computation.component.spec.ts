@@ -4,7 +4,9 @@ import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
+import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationDisplayEntity, ComputationMetadata } from '../computations-index/computation.interface'
@@ -79,6 +81,7 @@ describe('ComputationComponent', () => {
                         queryParams: of({})
                     }
                 },
+                { provide: ToastrService, useClass: MockToastrService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',
@@ -220,7 +223,8 @@ describe('ComputationComponent', () => {
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         attachments: {}
                     }
-                ]
+                ],
+                artifact_errors: {}
             }
         ])
         fixture.detectChanges()
@@ -314,7 +318,8 @@ describe('ComputationComponent', () => {
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         attachments: {}
                     }
-                ]
+                ],
+                artifact_errors: {}
             }
         ])
         fixture.detectChanges()
@@ -421,7 +426,8 @@ describe('ComputationComponent', () => {
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         attachments: {}
                     }
-                ]
+                ],
+                artifact_errors: {}
             }
         ])
         fixture.detectChanges()

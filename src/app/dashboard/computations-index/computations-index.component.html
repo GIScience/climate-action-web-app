@@ -23,13 +23,26 @@
                     class="scheduled-computation">
                     <div class="scheduled-parent-computation">
                         <div class="card-header">
-                            <h3>{{ scheduledRun.aoiName }}</h3>
+                            <div class="card-title">
+                                <h3>{{ scheduledRun.aoiName }}</h3>
+                            </div>
                             <p class="card-subtitle m-0">
-                                <i-lucide [img]="Clock" size="12"></i-lucide>
-                                {{ formatTimestamp(scheduledRun.timestamp) }} • Scheduled
+                                <i-lucide [img]="Clock" size="15"></i-lucide>
+                                {{ formatTimestamp(scheduledRun.timestamp) }} •
+                                <i-lucide [img]="Hash" size="15"></i-lucide>
+                                {{ formatUUID(scheduledRun.correlation_uuid) }}
                             </p>
                         </div>
-                        <div class="scheduled-run-dot"></div>
+                        <div class="computation-status" [ngClass]="scheduledRun.status">
+                            <ng-container *ngIf="scheduledRun.status === 'PENDING'">
+                                <i-lucide [img]="Loader" size="15"></i-lucide>
+                                Queued
+                            </ng-container>
+                            <ng-container *ngIf="scheduledRun.status === 'STARTED'">
+                                <i-lucide [img]="LoaderCircle" size="15"></i-lucide>
+                                Running
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
                 <div *ngFor="let computation of computations | filterByCriteria: pluginId" class="computation">
@@ -52,11 +65,22 @@
                                 fontIcon="chevron_right"></mat-icon>
                         </div>
                         <div class="card-header">
-                            <h3>{{ computation.aoiName }}</h3>
+                            <div class="card-title">
+                                <h3>{{ computation.aoiName }}</h3>
+                                <i-lucide
+                                    *ngIf="hasArtifactErrors(computation.artifact_errors)"
+                                    [img]="FileWarning"
+                                    size="20"
+                                    color="#ff7800"
+                                    class="artifact-errors"
+                                    [tp]="artifactErrorsTooltip"
+                                    [tpData]="computation.artifact_errors"
+                                    tpPlacement="right"></i-lucide>
+                            </div>
                             <p class="card-subtitle m-0">
-                                <i-lucide [img]="Clock" size="12"></i-lucide>
+                                <i-lucide [img]="Clock" size="15"></i-lucide>
                                 {{ formatTimestamp(computation.timestamp) }} •
-                                <i-lucide [img]="Hash" size="12"></i-lucide
+                                <i-lucide [img]="Hash" size="15"></i-lucide
                                 >{{ formatUUID(computation.correlation_uuid) }}
                             </p>
                         </div>
@@ -66,24 +90,30 @@
                                 aria-label="Share Computation"
                                 tp="Share Computation"
                                 class="btn-onlyicon btn-onlyicon--cta">
-                                <i-lucide [img]="Share2" size="15"></i-lucide>
+                                <i-lucide [img]="Share2" size="17"></i-lucide>
                             </button>
                             <button
                                 (click)="viewParameters(computation)"
                                 aria-label="View Parameters"
                                 tp="View Parameters"
                                 class="btn-onlyicon btn-onlyicon--cta">
-                                <i-lucide [img]="ListTodo" size="15"></i-lucide>
+                                <i-lucide [img]="ListTodo" size="17"></i-lucide>
                             </button>
                             <button
                                 (click)="archiveComputation(computation.correlation_uuid)"
                                 aria-label="Archive Computation"
                                 tp="Archive Computation"
                                 class="archive-computation btn-onlyicon btn-onlyicon--cta">
-                                <i-lucide [img]="Archive" size="15"></i-lucide>
+                                <i-lucide [img]="Archive" size="17"></i-lucide>
                             </button>
                         </div>
-                        <div *ngIf="newRuns.includes(computation.correlation_uuid)" class="new-run-dot"></div>
+                        <div
+                            *ngIf="newRuns.includes(computation.correlation_uuid)"
+                            class="computation-status"
+                            [ngClass]="computation.status">
+                            <i-lucide [img]="Check" size="15"></i-lucide>
+                            Done
+                        </div>
                     </div>
                     <app-computation
                         [computation]="computation"
@@ -114,11 +144,11 @@
                             class="archived-computation">
                             <div class="archived-item">
                                 <div>
-                                    <h4>{{ archivedComputation.aoiName }}</h4>
+                                    <h3>{{ archivedComputation.aoiName }}</h3>
                                     <p class="card-subtitle m-0">
-                                        <i-lucide [img]="Clock" size="12"></i-lucide>
+                                        <i-lucide [img]="Clock" size="15"></i-lucide>
                                         {{ formatTimestamp(archivedComputation.timestamp) }} •
-                                        <i-lucide [img]="Hash" size="12"></i-lucide
+                                        <i-lucide [img]="Hash" size="15"></i-lucide
                                         >{{ formatUUID(archivedComputation.correlation_uuid) }}
                                     </p>
                                 </div>
@@ -127,7 +157,7 @@
                                     aria-label="Un-archive Computation"
                                     tp="Un-archive Computation"
                                     class="pX-5 pY-3 btn-onlyicon btn-onlyicon--cta">
-                                    <i-lucide [img]="ArchiveRestore" size="15"></i-lucide>
+                                    <i-lucide [img]="ArchiveRestore" size="17"></i-lucide>
                                 </button>
                             </div>
                         </li>
@@ -186,5 +216,14 @@
         <button (click)="closeDialog()" class="close-dialog">
             <i-lucide [img]="CircleX" size="30"></i-lucide>
         </button>
+    </div>
+</ng-template>
+
+<ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
+    <div class="artifact-errors-tooltip">
+        <h3 class="tooltip-title">Some results could not be computed.</h3>
+        <p *ngFor="let error of getArtifactErrorEntries(artifactErrors)" class="error-item">
+            <strong>{{ error[0] }}:</strong> {{ error[1] }}
+        </p>
     </div>
 </ng-template>

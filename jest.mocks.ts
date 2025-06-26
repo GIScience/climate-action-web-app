@@ -1,9 +1,30 @@
 // Mock browser APIs that might not be available in test environment
 
+// Mock URL.createObjectURL used by Plotly Maps
 if (typeof window !== 'undefined') {
-    // Mock URL.createObjectURL used by Plotly Maps
     window.URL.createObjectURL = () => ''
     window.URL.revokeObjectURL = () => {}
+}
+
+// Export the mock class for manual use if needed
+export class MockToastrService {
+    success = jest.fn()
+    error = jest.fn()
+    warning = jest.fn()
+    info = jest.fn()
+    show = jest.fn()
+    clear = jest.fn()
+    remove = jest.fn()
+    toastrConfig = {
+        positionClass: 'toast-bottom-center',
+        preventDuplicates: true,
+        maxOpened: 10,
+        easeTime: 100,
+        autoDismiss: true,
+        extendedTimeOut: 2000,
+        progressBar: true,
+        closeButton: true
+    }
 }
 
 const originalConsoleError = console.error

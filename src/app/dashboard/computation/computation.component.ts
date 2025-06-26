@@ -2,9 +2,9 @@ import { AnimationEvent, animate, state, style, transition, trigger } from '@ang
 import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { MatSnackBar } from '@angular/material/snack-bar'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
+import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription, take } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
@@ -58,7 +58,7 @@ export class ComputationComponent {
         private mapService: MapService,
         private reportService: ReportService,
         private artifactViewerService: ArtifactViewerService,
-        private snackBar: MatSnackBar
+        private toastr: ToastrService
     ) {}
 
     onAnimationEvent(event: AnimationEvent, computation: ComputationDisplayEntity) {
@@ -85,16 +85,9 @@ export class ComputationComponent {
         this.reportService.isVisible$.pipe(take(1)).subscribe(isVisible => {
             isReportVisible = isVisible
             if (isVisible) {
-                this.snackBar.open(
-                    'Please exit the Report Builder first, or add this artifact to the report.',
-                    'Close',
-                    {
-                        duration: 4000,
-                        verticalPosition: 'bottom',
-                        horizontalPosition: 'center',
-                        panelClass: ['snackbar']
-                    }
-                )
+                this.toastr.warning('Please exit the Report Builder first, or add this artifact to the report.', '', {
+                    timeOut: 4000
+                })
             }
         })
 

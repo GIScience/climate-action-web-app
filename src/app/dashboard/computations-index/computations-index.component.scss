@@ -74,40 +74,12 @@
         .scheduled-parent-computation {
             align-items: center;
             display: grid;
-            grid-template-columns: 1fr 65px;
+            grid-template-columns: 1fr 100px;
             padding: 10px 5px;
         }
 
         .card-header {
-            margin-left: 40px;
-
-            h3 {
-                margin-bottom: 5px;
-                margin-top: 0;
-            }
-
-            .card-subtitle {
-                color: gray;
-                font-size: small;
-            }
-        }
-
-        .scheduled-run-dot {
-            animation: rotate 1s infinite linear;
-            aspect-ratio: 1;
-            background:
-                radial-gradient(farthest-side, #ffa516 94%, #0000) top/4px 4px no-repeat,
-                conic-gradient(#0000 30%, #ffa516);
-            border-radius: 50%;
-            margin: 7.5px;
-            -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
-            width: 25px;
-        }
-
-        @keyframes rotate {
-            100% {
-                transform: rotate(1turn);
-            }
+            margin-left: 32.5px;
         }
     }
 
@@ -129,7 +101,7 @@
             border-radius: 10px;
             cursor: pointer;
             display: grid;
-            grid-template-columns: 40px 1fr 90px;
+            grid-template-columns: 32.5px 1fr 100px;
             padding: 10px 5px;
             transition: background-color 0.15s ease-in-out;
             width: 100%;
@@ -137,35 +109,6 @@
             &.is-new {
                 .computation-actions {
                     display: none;
-                }
-
-                .new-run-dot {
-                    animation: pulse 1s alternate infinite;
-                    background: rgba(255, 255, 255, 0.7);
-                    border-radius: 100%;
-                    box-shadow:
-                        inset 0px 0px 10px 2px rgba(0, 255, 140, 0.75),
-                        0px 0px 10px 2px rgba(0, 255, 135, 0.3);
-                    display: block;
-                    height: 15px;
-                    justify-self: center;
-                    width: 15px;
-                }
-
-                @keyframes pulse {
-                    0% {
-                        background: rgba(255, 255, 255, 0.9);
-                        box-shadow:
-                            inset 0px 0px 10px 2px rgba(0, 255, 140, 0.75),
-                            0px 0px 5px 2px rgba(0, 255, 135, 0.3);
-                    }
-
-                    100% {
-                        background: rgba(255, 255, 255, 1);
-                        box-shadow:
-                            inset 0px 0px 10px 2px rgba(0, 255, 140, 0.75),
-                            0px 0px 10px 2px rgba(0, 255, 135, 1);
-                    }
                 }
             }
 
@@ -198,10 +141,10 @@
 
                 mat-icon {
                     color: #666;
-                    font-size: 30px;
-                    height: 30px;
+                    font-size: 27.5px;
+                    height: 27.5px;
                     transition: transform 0.3s ease-in-out;
-                    width: 30px;
+                    width: 27.5px;
                 }
             }
 
@@ -211,24 +154,95 @@
                 }
             }
 
-            .card-header {
-                h3 {
-                    margin-bottom: 5px;
-                    margin-top: 0;
-                }
-
-                .card-subtitle {
-                    color: gray;
-                    font-size: small;
-                }
-            }
-
             .computation-actions {
                 display: flex;
                 gap: 2.5px;
                 margin-left: auto;
                 visibility: hidden;
             }
+        }
+    }
+
+    .card-title {
+        align-items: center;
+        display: flex;
+        gap: 5px;
+        margin-bottom: 5px;
+
+        h3 {
+            margin: 0;
+        }
+    }
+
+    .card-subtitle {
+        align-items: center;
+        color: #666;
+        display: flex;
+        font-size: 12px;
+        gap: 2.5px;
+
+        i-lucide:first-of-type {
+            margin-right: 2.5px;
+        }
+    }
+
+    .computation-status {
+        align-items: center;
+        border-radius: 15px;
+        display: flex;
+        font-size: 13px;
+        gap: 5px;
+        justify-self: center;
+        padding: 2.5px 7.5px;
+        text-align: center;
+
+        &.PENDING {
+            background-color: lightgray;
+
+            i-lucide {
+                animation: fadeInOut 1s alternate infinite;
+            }
+        }
+
+        &.STARTED {
+            background-color: lightblue;
+
+            i-lucide {
+                animation: spin 1s linear infinite;
+            }
+        }
+
+        &.SUCCESS {
+            animation: pulse 1s alternate infinite;
+            background-color: lightgreen;
+        }
+    }
+
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0px 0px 2.5px 1px rgba(0, 255, 135, 0.3);
+        }
+
+        100% {
+            box-shadow: 0px 0px 5px 1px rgba(0, 255, 135, 0.5);
         }
     }
 
@@ -274,14 +288,9 @@
                 display: flex;
                 justify-content: space-between;
 
-                h4 {
+                h3 {
                     margin-bottom: 5px;
                     margin-top: 0;
-                }
-
-                .card-subtitle {
-                    color: gray;
-                    font-size: small;
                 }
 
                 button {
@@ -343,5 +352,26 @@
         position: absolute;
         right: 0;
         top: 10px;
+    }
+}
+
+.artifact-errors-tooltip {
+    .tooltip-title {
+        font-size: 14px;
+        margin-top: 0;
+    }
+
+    .error-item {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+
+        &:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        strong {
+            font-variation-settings: 'wght' 600;
+        }
     }
 }

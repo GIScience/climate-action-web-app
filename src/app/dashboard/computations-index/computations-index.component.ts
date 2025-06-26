@@ -3,7 +3,6 @@ import { CommonModule, NgClass, NgIf } from '@angular/common'
 import { Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
-import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
@@ -13,16 +12,21 @@ import { Models } from 'appwrite'
 import {
     Archive,
     ArchiveRestore,
+    Check,
     CircleArrowLeft,
     CircleX,
     Clock,
+    FileWarning,
     Hash,
     ListTodo,
+    Loader,
+    LoaderCircle,
     LucideAngularModule,
     Share2
 } from 'lucide-angular'
 import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
@@ -121,12 +125,20 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Hash = Hash
     readonly ListTodo = ListTodo
     readonly Share2 = Share2
+    readonly Check = Check
+    readonly Loader = Loader
+    readonly LoaderCircle = LoaderCircle
+    readonly FileWarning = FileWarning
 
     @Input() pluginId: string = ''
     @Input() demoConfig: boolean = true
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
         params: ComputationParameters
+    }>
+
+    @ViewChild('artifactErrorsTooltip') artifactErrorsTooltip!: TemplateRef<{
+        artifactErrors: ComputationDisplayEntity['artifact_errors']
     }>
 
     @ViewChild(ComputationComponent) computationComponent!: ComputationComponent
@@ -149,7 +161,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private mapService: MapService,
         private route: ActivatedRoute,
         private shareService: ShareService,
-        private snackBar: MatSnackBar,
+        private toastr: ToastrService,
         private dialog: MatDialog,
         private storageService: StorageService,
         private appwriteService: AppwriteService
@@ -258,22 +270,32 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .forEach(run => {
                 this.pluginService.getComputationState(run.correlation_uuid).subscribe({
                     next: stateInfo => {
+                        if (stateInfo.state === 'STARTED') {
+                            this.pluginService.updateRunStatus(run.correlation_uuid, 'STARTED')
+                        }
                         if (stateInfo.state === 'SUCCESS') {
                             this.storageService.markAsNew(run.correlation_uuid)
                             this.newRuns = this.storageService.getNewRuns()
+                            this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
                             this.fetchAndProcessComputations(run)
-                            if (this.syncSubscription) {
-                                this.syncSubscription.unsubscribe()
-                            }
+                            this.syncSubscription?.unsubscribe()
+                            this.toastr.success(
+                                `<strong>${derivePluginNameFromId(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
+                                '',
+                                {
+                                    timeOut: 7000,
+                                    enableHtml: true
+                                }
+                            )
                         } else if (stateInfo.state === 'FAILURE') {
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.snackBar.open(
-                                `Error while computing plugin${stateInfo.message ? ': ' + stateInfo.message : ''}.`,
-                                'Close',
+                            this.syncSubscription?.unsubscribe()
+                            this.toastr.error(
+                                `Error while computing <strong>${derivePluginNameFromId(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${stateInfo.message ? ' — ' + stateInfo.message : ''}.`,
+                                '',
                                 {
-                                    verticalPosition: 'bottom',
-                                    horizontalPosition: 'center',
-                                    panelClass: ['error-snackbar']
+                                    disableTimeOut: true,
+                                    enableHtml: true
                                 }
                             )
                         }
@@ -293,12 +315,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 const computation: ComputationDisplayEntity = {
                     correlation_uuid: run.correlation_uuid,
                     artifacts: [],
-                    status: response.status || 'PENDING',
+                    status: response.status,
                     timestamp: response.timestamp,
                     aoiName: response.aoi?.get('name'),
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.plugin_id,
-                    params: response.params
+                    params: response.params,
+                    artifact_errors: response.artifact_errors
                 }
 
                 if (Array.isArray(computations) && computations.length > 0) {
@@ -330,7 +353,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                             }
                             return 0
                         })
-                    this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
                 }
                 this.updateComputation(run.correlation_uuid, computation)
             },
@@ -412,11 +434,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         const shareLink = this.shareService.getShareUrl(correlation_uuid)
 
         navigator.clipboard.writeText(shareLink)
-        this.snackBar.open('Computation link copied to clipboard', 'Close', {
-            duration: 4000,
-            verticalPosition: 'bottom',
-            horizontalPosition: 'center',
-            panelClass: ['success-snackbar']
+        this.toastr.info('Computation link copied to clipboard', '', {
+            timeOut: 4000
         })
     }
 
@@ -527,11 +546,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     importComputation(correlationUuid: string): void {
         if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
-            this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' is already present', 'Close', {
-                duration: 4000,
-                verticalPosition: 'bottom',
-                horizontalPosition: 'center',
-                panelClass: ['error-snackbar']
+            this.toastr.warning('Computation ID #' + this.formatUUID(correlationUuid) + ' is already present', '', {
+                timeOut: 4000
             })
             return
         }
@@ -550,20 +566,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.currentRuns.push(computation as ComputationDisplayEntity)
                 this.pluginService.refreshComputesInLS(this.currentRuns)
                 this.fetchAndProcessComputations(computation as ComputationDisplayEntity)
-                this.snackBar.open('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', 'Close', {
-                    duration: 4000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['success-snackbar']
+                this.toastr.success('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', '', {
+                    timeOut: 4000
                 })
             },
             error: error => {
                 console.error('Error importing computation:', error)
-                this.snackBar.open('Error importing computation', 'Close', {
-                    duration: 4000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
+                this.toastr.error('Error importing computation', '', {
+                    disableTimeOut: true
                 })
             }
         })
@@ -605,5 +615,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 console.warn('Could not fetch a demo computation for', this.pluginId)
             }
         })
+    }
+
+    hasArtifactErrors(artifactErrors: ComputationDisplayEntity['artifact_errors']): boolean {
+        return !!(artifactErrors && Object.keys(artifactErrors).length > 0)
+    }
+
+    getArtifactErrorEntries(artifactErrors: ComputationDisplayEntity['artifact_errors']): [string, string][] {
+        if (!artifactErrors || Object.keys(artifactErrors).length === 0) {
+            return []
+        }
+        return Object.entries(artifactErrors)
     }
 }

@@ -12,7 +12,6 @@ import {
 } from '@angular/core'
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
-import { MatSnackBar } from '@angular/material/snack-bar'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
@@ -37,6 +36,7 @@ import {
 import moment from 'moment/moment'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { ToastrService } from 'ngx-toastr'
 import Feature from 'ol/Feature'
 import { Subscription, fromEventPattern } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
@@ -82,7 +82,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     constructor(
         private pluginService: PluginService,
-        private snackBar: MatSnackBar,
+        private toastr: ToastrService,
         public mapService: MapService,
         private cdr: ChangeDetectorRef,
         private formlyJsonschema: FormlyJsonschema,
@@ -136,11 +136,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     resetForm(): void {
         this.form.reset()
         this.mapService.selectedFeatures.clear()
-        this.snackBar.open('All form values have been reset to their defaults.', 'Dismiss', {
-            duration: 4000,
-            verticalPosition: 'bottom',
-            horizontalPosition: 'center',
-            panelClass: ['info-snackbar']
+        this.toastr.info('All form values have been reset to their defaults.', '', {
+            timeOut: 4000
         })
     }
 
@@ -215,10 +212,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         const aoiName = aoi.properties?.name
 
         if (!aoi) {
-            this.snackBar.open('Please select an area on the map first.', 'Dismiss', {
-                verticalPosition: 'bottom',
-                horizontalPosition: 'center',
-                panelClass: ['error-snackbar']
+            this.toastr.warning('Please select an area on the map first.', '', {
+                timeOut: 4000
             })
             return
         }
@@ -247,19 +242,45 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 this.pluginService.triggerSyncTasks()
                 this.pluginService.setComputeState('inactive')
 
-                this.snackBar.open('Compute request sent, results will be displayed soon.', 'Dismiss', {
-                    duration: 7000,
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['success-snackbar']
-                })
+                this.toastr.info(
+                    'This may take up to 60 minutes to complete, depending on the area size and complexity. Feel free to navigate away and check back later.',
+                    'Compute request sent!',
+                    {
+                        timeOut: 7000
+                    }
+                )
             },
-            error: () => {
-                this.snackBar.open('Error while computing plugin. Please try again.', 'Dismiss', {
-                    verticalPosition: 'bottom',
-                    horizontalPosition: 'center',
-                    panelClass: ['error-snackbar']
-                })
+            error: error => {
+                switch (error.status) {
+                    case 401:
+                        this.toastr.error('Please ensure that you are logged in and have verified your email.', '', {
+                            timeOut: 7000
+                        })
+                        break
+                    case 403:
+                        this.toastr.error(
+                            'There is an issue with your account. Please contact support via the Account menu.',
+                            '',
+                            {
+                                timeOut: 7000
+                            }
+                        )
+                        break
+                    case 429:
+                        this.toastr.error(
+                            'You have reached the maximum number of requests. Please try after a few minutes.',
+                            '',
+                            {
+                                timeOut: 7000
+                            }
+                        )
+                        break
+                    default:
+                        this.toastr.error('Error while submitting your request. Please try again.', '', {
+                            timeOut: 7000
+                        })
+                        break
+                }
             }
         })
     }

@@ -5,7 +5,6 @@ import { MatMomentDateModule } from '@angular/material-moment-adapter'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
-import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { RouterLink, RouterOutlet } from '@angular/router'
 import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
@@ -32,7 +31,6 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         FormlyMaterialModule,
         MatMomentDateModule,
         MatExpansionModule,
-        MatSnackBarModule,
         MobileWarningComponent,
         MatDialogModule,
         AccountComponent,

@@ -29,6 +29,7 @@
                             "node_modules/material-icons-font/material-icons-font.css",
                             "@angular/material/prebuilt-themes/deeppurple-amber.css",
                             "node_modules/driver.js/dist/driver.css",
+                            "node_modules/ngx-toastr/toastr.css",
                             "src/styles.scss"
                         ],
                         "scripts": ["node_modules/marked/marked.min.js", "src/assets/scripts/js-colormaps.js"],

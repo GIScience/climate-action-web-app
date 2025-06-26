@@ -15,6 +15,11 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - A badge for plugins if their development state differs from "active"
 - Product Walkthrough to guide first-time users through their first computation ([#296](https://gitlab.heigit.org/climate-action/web-app/-/issues/296))
+- Partial failures in computations (missing artifacts) are now conveyed to the user ([#312](https://gitlab.heigit.org/climate-action/web-app/-/issues/312))
+
+### Fixed
+
+- Toasts are now much more stable, and provide more context about states in general ([#341](https://gitlab.heigit.org/climate-action/web-app/-/issues/341))
 
 ## [2.3.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.3.1) - 2025-05-21
 

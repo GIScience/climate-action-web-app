@@ -29,7 +29,7 @@
 
 .ol-attribution.ol-uncollapsible {
     border-radius: 5px;
-    bottom: 0.5em;
+    bottom: 0.5vw;
     right: 0.5vw;
 }
 
@@ -61,7 +61,7 @@
 
 .ol-layerswitcher {
     background-color: transparent;
-    bottom: 2.5em;
+    bottom: calc(0.5vw + 30px);
     right: 0.5vw;
 
     .panel-container {
