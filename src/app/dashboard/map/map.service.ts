@@ -658,7 +658,7 @@ export class MapService {
         }
     }
 
-    getSelectedRegion(): GeoJSONFeatureCollection {
+    getSelectedRegion(): GeoJSONFeature | null {
         const feature = this.selectedFeatures.getLength() > 0 ? this.selectedFeatures.item(0) : undefined
         if (feature) {
             return new GeoJSON().writeFeatureObject(feature, {
@@ -667,7 +667,7 @@ export class MapService {
                 decimals: 7
             })
         }
-        return undefined
+        return null
     }
 
     getSelectedRegions(): Feature[] {
