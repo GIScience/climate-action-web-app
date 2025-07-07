@@ -1,6 +1,6 @@
 import { Source } from '@app/types/sources/sources.type'
 import { JSONSchema7 } from 'json-schema'
-import { Feature } from 'ol'
+import { GeoJSONFeature } from 'ol/format/GeoJSON'
 import { MultiPolygon } from 'ol/geom'
 
 export interface PluginAuthor {
@@ -40,7 +40,7 @@ export interface Concern {
 }
 
 export interface ComputeRequest {
-    aoi: Feature<MultiPolygon>
+    aoi: GeoJSONFeature
     params: Record<string, unknown>
 }
 

@@ -209,7 +209,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
-        const aoiName = aoi.properties?.name
+        const aoiName = aoi?.properties?.['name']
 
         if (!aoi) {
             this.toastr.warning('Please select an area on the map first.', '', {
