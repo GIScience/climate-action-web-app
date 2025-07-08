@@ -554,18 +554,17 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         this.pluginService.getComputationMetadata(correlationUuid).subscribe({
             next: (response: ComputationMetadata) => {
-                const computation = {
+                const computation: ComputationDatabaseEntity = {
                     correlation_uuid: correlationUuid,
                     pluginId: response.plugin_info?.plugin_id,
-                    pluginName: derivePluginNameFromId(response.plugin_info.plugin_id),
                     timestamp: response.timestamp,
                     status: 'SUCCESS',
                     aoiName: response.aoi?.get('name')
                 }
 
-                this.currentRuns.push(computation as ComputationDisplayEntity)
+                this.currentRuns.push(computation)
                 this.pluginService.refreshComputesInLS(this.currentRuns)
-                this.fetchAndProcessComputations(computation as ComputationDisplayEntity)
+                this.fetchAndProcessComputations(computation)
                 this.toastr.success('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', '', {
                     timeOut: 4000
                 })

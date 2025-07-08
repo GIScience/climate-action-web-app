@@ -63,7 +63,8 @@ describe('ComputationsIndexComponent', () => {
             syncTasks$: new BehaviorSubject<void>(undefined),
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             computeDemo: jest.fn(),
-            storeNewComputes: jest.fn()
+            storeNewComputes: jest.fn(),
+            refreshComputesInLS: jest.fn()
         }
 
         mockArtifactService = {
@@ -401,6 +402,62 @@ describe('ComputationsIndexComponent', () => {
         expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expect.objectContaining(expectedCompute))
 
         expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith('demo-uuid-123')
+
+        discardPeriodicTasks()
+    }))
+
+    it('should successfully import a new computation', fakeAsync(() => {
+        component.currentRuns = []
+
+        const mockMetadata = {
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            timestamp: new Date('2023-09-27T16:42:52+01:00'),
+            params: {},
+            aoi: new GeoJSON().readFeature({
+                type: 'Feature',
+                geometry: {
+                    type: 'MultiPolygon',
+                    coordinates: [
+                        [
+                            [
+                                [0, 0],
+                                [1, 0],
+                                [1, 1],
+                                [0, 1],
+                                [0, 0]
+                            ]
+                        ]
+                    ]
+                },
+                properties: { name: 'Imported AOI' }
+            }) as Feature<MultiPolygon>,
+            plugin_info: {
+                plugin_id: 'test_plugin',
+                plugin_version: '1.0.0'
+            },
+            status: 'SUCCESS'
+        }
+
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(mockMetadata))
+        const fetchAndProcessSpy = jest.spyOn(component, 'fetchAndProcessComputations')
+
+        component.importComputation('8a897536-c4b4-4e5a-9d70-50430183ac66')
+        tick()
+
+        const expectedComputation = {
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            timestamp: mockMetadata.timestamp,
+            status: 'SUCCESS',
+            aoiName: 'Imported AOI'
+        }
+
+        expect(component.currentRuns).toHaveLength(1)
+        expect(component.currentRuns[0]).toEqual(expectedComputation)
+
+        expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66')
+        expect(mockPluginService.refreshComputesInLS).toHaveBeenCalledWith(component.currentRuns)
+        expect(fetchAndProcessSpy).toHaveBeenCalledWith(expectedComputation)
 
         discardPeriodicTasks()
     }))
