@@ -10,7 +10,7 @@ import {
     ViewChild,
     ViewEncapsulation
 } from '@angular/core'
-import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationState } from '@app/dashboard/common/status.types'
@@ -26,10 +26,15 @@ import { Models } from 'appwrite'
 import { JSONSchema7 } from 'json-schema'
 import {
     CircleAlert,
+    CircleDot,
     CirclePlay,
     CircleX,
+    Info,
     LucideAngularModule,
     MapPinPlusInside,
+    Pentagon,
+    Square,
+    Trash2,
     TriangleAlert,
     UserCheck
 } from 'lucide-angular'
@@ -76,9 +81,16 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     readonly CircleAlert = CircleAlert
     readonly UserCheck = UserCheck
     readonly CircleX = CircleX
+    readonly CircleDot = CircleDot
+    readonly Square = Square
+    readonly Pentagon = Pentagon
+    readonly Trash2 = Trash2
+    readonly Info = Info
 
     areaSelected = false
     highlightedFeaturesSubscription: Subscription | undefined
+    currentSelectionMode: 'Boundary' | 'Circle' | 'Box' | 'Polygon' = 'Boundary'
+    areaLabelControl = new FormControl('')
 
     constructor(
         private pluginService: PluginService,
@@ -104,6 +116,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnInit(): void {
         this.form.disable()
+        this.mapService.enableBoundarySelection()
     }
 
     ngOnChanges(): void {
@@ -123,20 +136,18 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         if (this.highlightedFeaturesSubscription) {
             this.highlightedFeaturesSubscription.unsubscribe()
         }
-    }
-
-    deselectRegion(region: Feature): void {
-        this.mapService.selectedFeatures.remove(region)
-
-        if (this.mapService.selectedFeatures.getLength() === 0) {
-            this.toggleFormState()
-        }
+        this.mapService.stopDrawing()
     }
 
     resetForm(): void {
         this.form.reset()
         this.mapService.selectedFeatures.clear()
-        this.toastr.info('All form values have been reset to their defaults.', '', {
+        this.mapService.clearDrawnFeatures()
+        this.areaLabelControl.setValue('')
+        if (this.currentSelectionMode !== 'Boundary') {
+            this.mapService.startDrawing(this.currentSelectionMode)
+        }
+        this.toastr.info('All selections have been cleared.', '', {
             timeOut: 4000
         })
     }
@@ -209,6 +220,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
+        if (this.currentSelectionMode !== 'Boundary' && aoi?.properties) {
+            aoi.properties['name'] = this.areaLabelControl.value || 'Custom Area'
+        }
         const aoiName = aoi?.properties?.['name']
 
         if (!aoi) {
@@ -266,6 +280,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                             }
                         )
                         break
+                    case 422:
+                        this.toastr.error(
+                            'There is an issue with your selected area. Please try another area or contact support via the Account menu.',
+                            '',
+                            {
+                                timeOut: 7000
+                            }
+                        )
+                        break
                     case 429:
                         this.toastr.error(
                             'You have reached the maximum number of requests. Please try after a few minutes.',
@@ -310,5 +333,44 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     closeDialog(): void {
         this.dialog.closeAll()
+    }
+
+    hasValidAreaSelection(): boolean {
+        const hasValidArea = this.mapService.selectedFeatures.getLength() === 1
+
+        if (this.currentSelectionMode !== 'Boundary') {
+            return hasValidArea && this.areaLabelControl.valid
+        }
+
+        return hasValidArea
+    }
+
+    setSelectionMode(mode: 'Boundary' | 'Circle' | 'Box' | 'Polygon'): void {
+        const previousMode = this.currentSelectionMode
+        this.currentSelectionMode = mode
+        if (previousMode !== this.currentSelectionMode) {
+            this.mapService.clearDrawnFeatures()
+            if (mode === 'Boundary') {
+                this.areaLabelControl.setValue('')
+                this.areaLabelControl.clearValidators()
+                this.mapService.stopDrawing()
+                this.mapService.enableBoundarySelection()
+            } else {
+                this.areaLabelControl.setValidators([Validators.required])
+                this.areaLabelControl.updateValueAndValidity()
+                this.mapService.disableBoundarySelection()
+                this.mapService.startDrawing(mode)
+            }
+        }
+    }
+
+    removeSelectedRegion(region: Feature): void {
+        this.mapService.selectedFeatures.remove(region)
+        if (this.currentSelectionMode !== 'Boundary') {
+            this.mapService.clearDrawnFeatures()
+            this.mapService.stopDrawing()
+            this.areaLabelControl.setValue('')
+            this.mapService.startDrawing(this.currentSelectionMode)
+        }
     }
 }

@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.4.0...main)
 
+### Added
+
+- Custom areas can now be drawn on the map and used for computations ([#127](https://gitlab.heigit.org/climate-action/web-app/-/issues/127))
+
 ## [2.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.4.0) - 2025-06-27
 
 ### Changed

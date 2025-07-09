@@ -7,19 +7,22 @@ import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
 import FeatureLike from 'ol/Feature'
 import VectorTile from 'ol/VectorTile'
 import { ScaleLine } from 'ol/control'
-import { ZoomToExtent, defaults as defaultControls } from 'ol/control.js'
+import { defaults as defaultControls, ZoomToExtent } from 'ol/control.js'
 import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
 import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
 import GeoJSON, { GeoJSONFeature } from 'ol/format/GeoJSON.js'
-import { MultiPolygon } from 'ol/geom'
+import { Circle, MultiPolygon } from 'ol/geom'
 import { Geometry, Polygon } from 'ol/geom.js'
 import Point from 'ol/geom/Point'
+import { fromCircle } from 'ol/geom/Polygon'
+import { Draw, Snap } from 'ol/interaction'
 import { defaults as defaultInteractions } from 'ol/interaction.js'
+import { createBox, DrawEvent } from 'ol/interaction/Draw'
 import VectorLayer, { Options as VectorLayerOptions } from 'ol/layer/Vector'
 import VectorTileLayer, { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'
 import TileLayer, { Options as TileLayerOptions } from 'ol/layer/WebGLTile.js'
-import { fromLonLat, transformExtent } from 'ol/proj'
+import { fromLonLat, toLonLat, transformExtent } from 'ol/proj'
 import Projection from 'ol/proj/Projection'
 import RenderFeature from 'ol/render/Feature'
 import GeoTIFF from 'ol/source/GeoTIFF'
@@ -28,7 +31,7 @@ import TileWMS from 'ol/source/TileWMS'
 import VectorSource from 'ol/source/Vector'
 import VectorTileSource from 'ol/source/VectorTile'
 import XYZ from 'ol/source/XYZ'
-import { getArea } from 'ol/sphere'
+import { getArea, getDistance } from 'ol/sphere'
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style } from 'ol/style'
 import { StyleFunction } from 'ol/style/Style'
 import { Observable } from 'rxjs'
@@ -89,6 +92,14 @@ export class MapService {
     featureClickOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
     markerFeatures: Collection<Feature<Point>> = new Collection([])
     selectedFeatures: Collection<FeatureLike> = new Collection([])
+
+    drawLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
+    currentDrawInteraction: Draw | undefined
+    snapInteraction: Snap | undefined
+    isDrawingMode: boolean = false
+    measureTooltipElement: HTMLElement | undefined
+    measureTooltip: Overlay | undefined
+
     layerSwitcherCollapsed: boolean = false
     windowWidth?: number
     windowResolution?: number
@@ -210,6 +221,16 @@ export class MapService {
                     displacement: [0, 15]
                 })
             }),
+            displayInLayerSwitcher: false
+        })
+
+        this.drawLayer = new ExtendedVectorLayer({
+            source: new VectorSource(),
+            style: {
+                'stroke-color': 'rgba(0, 0, 0, 0)',
+                'stroke-width': 0,
+                'fill-color': 'rgba(0, 0, 0, 0)'
+            },
             displayInLayerSwitcher: false
         })
 
@@ -358,6 +379,10 @@ export class MapService {
         }
 
         this.map.addLayer(selectedRegionLayer)
+
+        if (this.drawLayer) {
+            this.map.addLayer(this.drawLayer)
+        }
 
         this.map.on('pointermove', evt => {
             if (!this.map || evt.dragging) {
@@ -601,6 +626,9 @@ export class MapService {
         if (this.selectedFeatures.getLength() > 0) {
             this.selectedFeatures.clear()
         }
+        if (this.drawLayer) {
+            this.drawLayer.setVisible(false)
+        }
     }
 
     removeFocusedLayer(): void {
@@ -617,6 +645,9 @@ export class MapService {
             }
             if (this.selectedRegionLayer) {
                 this.selectedRegionLayer.setVisible(true)
+            }
+            if (this.drawLayer) {
+                this.drawLayer.setVisible(true)
             }
         }
     }
@@ -696,6 +727,22 @@ export class MapService {
         return popupElement
     }
 
+    private createMeasureTooltip() {
+        if (this.measureTooltipElement) {
+            this.measureTooltipElement.parentNode?.removeChild(this.measureTooltipElement)
+        }
+        this.measureTooltipElement = document.createElement('div')
+        this.measureTooltipElement.className = 'ol-tooltip'
+        this.measureTooltip = new Overlay({
+            element: this.measureTooltipElement,
+            offset: [0, -15],
+            positioning: 'bottom-center',
+            stopEvent: false,
+            insertFirst: false
+        })
+        this.map?.addOverlay(this.measureTooltip)
+    }
+
     createFeatureOverlay(opacity: number): ExtendedVectorLayer<Feature<Geometry>> {
         const highlightStrokeWidth = 15
         return new ExtendedVectorLayer({
@@ -761,5 +808,162 @@ export class MapService {
         })
 
         return features
+    }
+
+    startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
+        this.stopDrawing()
+
+        if (!this.map || !this.drawLayer) return
+
+        const drawConfig = this.getDrawConfiguration(type)
+        this.currentDrawInteraction = new Draw({
+            source: this.drawLayer.getSource() as VectorSource,
+            style: new Style({
+                fill: new Fill({
+                    color: 'rgba(231, 138, 195, 0.1)'
+                }),
+                stroke: new Stroke({
+                    color: 'rgba(231, 138, 195, 1)',
+                    width: 2
+                })
+            }),
+            ...drawConfig,
+            stopClick: false,
+            freehand: false
+        })
+
+        this.currentDrawInteraction.on('drawstart', (event: DrawEvent) => {
+            this.createMeasureTooltip()
+            const feature = event.feature
+            let tooltipCoord: Coordinate = [0, 0]
+            feature.getGeometry()?.on('change', evt => {
+                const geom = evt.target
+                if (geom instanceof Circle) {
+                    const center = geom.getCenter()
+                    const edge = geom.getLastCoordinate()
+                    const centerGeo = toLonLat(center)
+                    const edgeGeo = toLonLat(edge)
+                    const radius = getDistance(centerGeo, edgeGeo)
+
+                    tooltipCoord = edge
+                    this.measureTooltipElement!.innerHTML = '<span>Radius: ' + this.formatRadius(radius) + '</span>'
+                    this.measureTooltip?.setPosition(tooltipCoord)
+                }
+            })
+        })
+
+        this.currentDrawInteraction.on('drawend', (event: DrawEvent) => {
+            this.measureTooltipElement?.remove()
+            const feature = event.feature as Feature<Geometry>
+            this.onDrawEnd(feature, type)
+        })
+
+        this.setupDrawingInteractions()
+        this.isDrawingMode = true
+    }
+
+    private getDrawConfiguration(type: 'Polygon' | 'Circle' | 'Box') {
+        switch (type) {
+            case 'Circle':
+                return { type: 'Circle' as const }
+            case 'Box':
+                return {
+                    type: 'Circle' as const,
+                    geometryFunction: createBox()
+                }
+            case 'Polygon':
+                return { type: 'Polygon' as const }
+            default:
+                throw new Error(`Unsupported drawing type: ${type}`)
+        }
+    }
+
+    private formatRadius(radius: number): string {
+        if (radius > 1000) {
+            return `${(radius / 1000).toFixed(2)} km`
+        } else {
+            return `${radius.toFixed(0)} m`
+        }
+    }
+
+    private setupDrawingInteractions(): void {
+        if (!this.map || !this.drawLayer) return
+
+        this.map.addInteraction(this.currentDrawInteraction!)
+
+        this.snapInteraction = new Snap({
+            source: this.drawLayer.getSource() as VectorSource
+        })
+        this.map.addInteraction(this.snapInteraction)
+    }
+
+    stopDrawing(): void {
+        if (this.map) {
+            if (this.currentDrawInteraction) {
+                this.map.removeInteraction(this.currentDrawInteraction)
+                this.currentDrawInteraction = undefined
+            }
+            if (this.snapInteraction) {
+                this.map.removeInteraction(this.snapInteraction)
+                this.snapInteraction = undefined
+            }
+        }
+        this.measureTooltipElement?.remove()
+        this.isDrawingMode = false
+    }
+
+    clearDrawnFeatures(): void {
+        if (this.drawLayer) {
+            this.drawLayer.getSource()?.clear()
+        }
+        this.selectedFeatures.clear()
+    }
+
+    private onDrawEnd(feature: Feature<Geometry>, originalType: 'Polygon' | 'Circle' | 'Box'): void {
+        feature.set('name', 'Custom Area')
+        feature.set('originalType', originalType)
+        feature.set('id', Math.random().toString(36).substring(2, 9).toString())
+
+        const geometry = feature.getGeometry()
+        if (geometry) {
+            let convertedGeometry: MultiPolygon
+
+            if (geometry.getType() === 'Circle') {
+                const circle = geometry as Circle
+                const polygon = fromCircle(circle)
+
+                convertedGeometry = new MultiPolygon([polygon.getCoordinates()])
+            } else if (geometry.getType() === 'Polygon') {
+                const polygon = geometry as Polygon
+
+                convertedGeometry = new MultiPolygon([polygon.getCoordinates()])
+            } else {
+                if (geometry.getType() === 'MultiPolygon') {
+                    convertedGeometry = geometry as MultiPolygon
+                } else {
+                    throw new Error(`Unsupported geometry type for conversion to MultiPolygon: ${geometry.getType()}`)
+                }
+            }
+
+            const area = getArea(convertedGeometry) * MapService.sqmToSqkmFactor
+
+            feature.set('area', Number(area.toFixed(2)))
+            feature.setGeometry(convertedGeometry)
+        }
+
+        this.selectedFeatures.push(feature)
+        this.stopDrawing()
+    }
+
+    enableBoundarySelection(): void {
+        if (this.regionLayer) {
+            this.regionLayer.setVisible(true)
+        }
+    }
+
+    disableBoundarySelection(): void {
+        if (this.regionLayer) {
+            this.regionLayer.setVisible(false)
+        }
     }
 }
