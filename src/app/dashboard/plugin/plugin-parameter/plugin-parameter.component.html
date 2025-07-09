@@ -1,54 +1,119 @@
 <div class="plugin-parameter-container">
-    <div
-        class="area-selection-message"
-        [ngClass]="{
-            'message--info': !areaSelected,
-            'message--blocked': areaSelected && this.mapService.selectedFeatures.getLength() > 1,
-            'message--warning':
-                areaSelected &&
-                this.mapService.selectedFeatures.getLength() === 1 &&
-                this.mapService.selectedFeatures.item(0).get('area') > 500
-        }"
-        *ngIf="
-            !areaSelected ||
-            (areaSelected && this.mapService.selectedFeatures.getLength() > 1) ||
-            (areaSelected &&
-                this.mapService.selectedFeatures.getLength() === 1 &&
-                this.mapService.selectedFeatures.item(0).get('area') > 500)
-        ">
-        <i-lucide
-            [img]="
-                !areaSelected
-                    ? MapPinPlusInside
-                    : this.mapService.selectedFeatures.getLength() > 1
-                      ? TriangleAlert
-                      : CircleAlert
-            "
-            size="20"></i-lucide>
-        <span>
-            <ng-container *ngIf="!areaSelected">
-                Search or zoom in on a location, and then select the area on the map to continue.
-            </ng-container>
-            <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
-                >Multiple areas selected. Please select only one.</ng-container
-            >
-            <ng-container
-                *ngIf="
+    <div class="area-selection">
+        <h4>Area Selection</h4>
+        <div class="area-selection-buttons">
+            <button
+                type="button"
+                class="draw-button"
+                [class.active]="currentSelectionMode === 'Boundary'"
+                (click)="setSelectionMode('Boundary')"
+                title="Select from Boundaries">
+                <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
+                Boundary
+            </button>
+            <button
+                type="button"
+                class="draw-button"
+                [class.active]="currentSelectionMode === 'Circle'"
+                (click)="setSelectionMode('Circle')"
+                title="Draw Circle">
+                <i-lucide [img]="CircleDot" size="16"></i-lucide>
+                Circle
+            </button>
+            <button
+                type="button"
+                class="draw-button"
+                [class.active]="currentSelectionMode === 'Box'"
+                (click)="setSelectionMode('Box')"
+                title="Draw Rectangle">
+                <i-lucide [img]="Square" size="16"></i-lucide>
+                Rectangle
+            </button>
+            <button
+                type="button"
+                class="draw-button"
+                [class.active]="currentSelectionMode === 'Polygon'"
+                (click)="setSelectionMode('Polygon')"
+                title="Draw Polygon">
+                <i-lucide [img]="Pentagon" size="16"></i-lucide>
+                Polygon
+            </button>
+        </div>
+
+        <div
+            class="area-selection-message"
+            [ngClass]="{
+                'message--info': !areaSelected,
+                'message--blocked': areaSelected && this.mapService.selectedFeatures.getLength() > 1,
+                'message--warning':
                     areaSelected &&
                     this.mapService.selectedFeatures.getLength() === 1 &&
                     this.mapService.selectedFeatures.item(0).get('area') > 500
+            }"
+            *ngIf="
+                !areaSelected ||
+                (areaSelected && this.mapService.selectedFeatures.getLength() > 1) ||
+                (areaSelected &&
+                    this.mapService.selectedFeatures.getLength() === 1 &&
+                    this.mapService.selectedFeatures.item(0).get('area') > 500)
+            ">
+            <i-lucide
+                [img]="
+                    !areaSelected
+                        ? Info
+                        : this.mapService.selectedFeatures.getLength() > 1
+                          ? TriangleAlert
+                          : CircleAlert
                 "
-                >The selected region is large (> 500 km²).<br />Processing may take longer, or even fail.</ng-container
-            >
-        </span>
-    </div>
-    <div *ngIf="areaSelected" class="selected-regions">
-        <div *ngFor="let region of this.mapService.selectedFeatures.getArray()" class="region-item">
-            <span class="region-name">{{ region.get('name') }}</span>
-            <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
-            <button class="deselect-region" (click)="deselectRegion(region)">×</button>
+                size="20"></i-lucide>
+            <span>
+                <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Boundary'">
+                    Search or zoom in on a location, then click on a boundary to select an area.
+                </ng-container>
+                <ng-container
+                    *ngIf="!areaSelected && (currentSelectionMode === 'Circle' || currentSelectionMode === 'Box')">
+                    Click once and move the pointer to draw a
+                    {{ currentSelectionMode === 'Box' ? 'rectangle' : 'circle' }}. Click again to finish.
+                </ng-container>
+                <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Polygon'">
+                    Click on multiple points to draw a polygon, or hold <em>Shift</em> and click and drag the pointer to
+                    draw freehand. Double-click anywhere to finish.
+                </ng-container>
+                <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
+                    >Multiple areas selected. Please select only one.</ng-container
+                >
+                <ng-container
+                    *ngIf="
+                        areaSelected &&
+                        this.mapService.selectedFeatures.getLength() === 1 &&
+                        this.mapService.selectedFeatures.item(0).get('area') > 500
+                    "
+                    >The selected region is large (> 500 km²).<br />Processing may take longer, or even
+                    fail.</ng-container
+                >
+            </span>
+        </div>
+
+        <div *ngIf="areaSelected" class="selected-regions">
+            <div *ngFor="let region of this.mapService.selectedFeatures.getArray()" class="region-item">
+                <span *ngIf="currentSelectionMode === 'Boundary'" class="region-name">{{ region.get('name') }}</span>
+                <input
+                    *ngIf="currentSelectionMode !== 'Boundary'"
+                    type="text"
+                    id="custom-area-label"
+                    class="region-name"
+                    placeholder="Custom Area Name"
+                    [formControl]="areaLabelControl"
+                    [value]="areaLabelControl.value" />
+                <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
+                <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
+            </div>
+            <div *ngIf="areaLabelControl.invalid && currentSelectionMode !== 'Boundary'" class="error-message">
+                Area name is required
+            </div>
         </div>
     </div>
+
     <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
         <ng-scrollbar orientation="vertical">
             <formly-form
@@ -69,7 +134,7 @@
                     type="submit"
                     appearance="primary"
                     class="btn-primary btn-withtext"
-                    [disabled]="!user || !form.valid || this.mapService.selectedFeatures.getLength() !== 1">
+                    [disabled]="!user || !form.valid || !hasValidAreaSelection()">
                     <i-lucide [img]="CirclePlay" size="20"></i-lucide>
                     Compute
                 </button>

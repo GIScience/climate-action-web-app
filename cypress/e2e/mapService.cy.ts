@@ -384,4 +384,39 @@ describe('mapService', () => {
             expect(selectedFeature.geometry.coordinates).to.be.an('array')
         })
     })
+
+    it('should be able to draw custom shapes on the map', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
+
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.ol-zoom-in').click()
+        cy.get('.draw-button').eq(1).click()
+
+        cy.waitForRenderComplete()
+
+        cy.get('canvas.ol-layer').click(800, 425, { force: true })
+        cy.get('canvas.ol-layer').click(850, 550, { force: true })
+
+        cy.waitForRenderComplete()
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            const selectedFeature = mapService.getSelectedRegion()
+
+            expect(selectedFeature).to.exist
+            expect(selectedFeature.geometry.type).to.equal('MultiPolygon')
+        })
+    })
 })
