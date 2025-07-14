@@ -130,7 +130,7 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         })
         service.plotlyChart.subscribe(v => {
             if (!v.data) this.clearContainer()
-            else this.display(PlotlyChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
+            else this.display(PlotlyChartComponent, 'inputData', { data: v.data, artifact: v.artifact }, v.artifact)
         })
     }
 

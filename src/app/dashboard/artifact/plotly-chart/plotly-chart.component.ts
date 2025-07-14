@@ -37,7 +37,16 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.plotlyLayout,
                 {
                     responsive: true,
-                    displayModeBar: false
+                    displayModeBar: true,
+                    displaylogo: false,
+                    toImageButtonOptions: {
+                        filename: this.inputData?.artifact?.name,
+                        format: 'jpeg',
+                        height: 1000,
+                        width: 1500,
+                        scale: 1.5
+                    },
+                    modeBarButtonsToRemove: ['zoom', 'pan', 'select', 'lasso2d', 'resetScale2d']
                 }
             )
         } catch (error) {
