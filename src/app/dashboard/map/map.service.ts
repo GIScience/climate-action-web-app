@@ -921,7 +921,7 @@ export class MapService {
 
     private onDrawEnd(feature: Feature<Geometry>, originalType: 'Polygon' | 'Circle' | 'Box'): void {
         feature.set('name', 'Custom Area')
-        feature.set('originalType', originalType)
+        feature.set('original_type', originalType)
         feature.set('id', Math.random().toString(36).substring(2, 9).toString())
 
         const geometry = feature.getGeometry()
