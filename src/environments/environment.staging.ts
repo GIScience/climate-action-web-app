@@ -2,6 +2,7 @@ import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, APPWRITE_WEBSITE_URL, ORS_API_K
 
 export const environment = {
     production: false,
+    environmentType: 'staging',
     climateActionApiUrl: 'https://staging.api.heigit.org/climate-action-platform',
     climateActionWSUrl: 'wss://staging.climate-action.heigit.org',
     orsAPIKey: ORS_API_KEY,

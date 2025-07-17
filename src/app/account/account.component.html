@@ -1,7 +1,10 @@
 <div class="account-container">
     <ng-container *ngIf="!user">
         <div class="login-container">
-            <button *ngIf="!environment.production" (click)="loginAsFakeUser()" class="fake-user-button">
+            <button
+                *ngIf="environment.environmentType === 'development' || environment.environmentType === 'testing'"
+                (click)="loginAsFakeUser()"
+                class="fake-user-button">
                 Login (as Fake User)
                 <i-lucide [img]="TestTubeDiagonal" size="27.5" color="#e78400"></i-lucide>
             </button>
