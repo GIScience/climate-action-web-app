@@ -2,6 +2,7 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Observable, from, lastValueFrom } from 'rxjs'
+import { default as packageInfo } from '../../../package.json'
 import { DatabaseService } from '../database.service'
 import { AppwriteService } from './appwrite.service'
 
@@ -10,6 +11,7 @@ export class AuthInterceptor implements HttpInterceptor {
     private apiKey: string | null = null
     private apiBaseUrl = environment.climateActionApiUrl
     private authInitPromise: Promise<void> | null = null
+    private readonly clientInfo = `${packageInfo.name}/${packageInfo.version}`
 
     constructor(
         private databaseService: DatabaseService,
@@ -54,11 +56,15 @@ export class AuthInterceptor implements HttpInterceptor {
             this.authInitPromise = null
         }
 
+        const headers: { [key: string]: string } = { 'X-Client-Info': this.clientInfo }
+
         if (this.appwriteService._user.value && this.apiKey) {
-            request = request.clone({
-                setHeaders: { Authorization: this.apiKey }
-            })
+            headers['Authorization'] = this.apiKey
         }
+
+        request = request.clone({
+            setHeaders: headers
+        })
 
         return lastValueFrom(next.handle(request))
     }

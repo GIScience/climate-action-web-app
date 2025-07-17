@@ -1,5 +1,5 @@
 {
-    "name": "climate-action-app",
+    "name": "climate-action-navigator",
     "version": "2.4.0",
     "scripts": {
         "ng": "ng",
