@@ -12,6 +12,7 @@ cache:
 
 test_jest_and_lint:
     stage: test
+    tags: [climate-action]
     rules:
         - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     image:
@@ -38,6 +39,7 @@ test_jest_and_lint:
 
 test_cypress:
     stage: test
+    tags: [climate-action]
     rules:
         - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     variables:
@@ -71,15 +73,14 @@ test_cypress:
 
 docker_build_deploy_development:
     stage: deploy
+    tags: [k8s]
     cache: []
     rules:
         - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker.io/docker:cli
     before_script:
-        - mkdir -p /kaniko/.docker
-        - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
         - |
             cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
             export const ORS_API_KEY = '${ORS_API_KEY}'
@@ -88,37 +89,36 @@ docker_build_deploy_development:
             export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
             EOF
     script:
-        - >
-            /kaniko/executor \
-                --context "${CI_PROJECT_DIR}" \
-                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-                --cache \
-                --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
-                --cache-copy-layers \
+        - |
+            docker --config ~/ca_config \
+                buildx build \
+                --builder=kube \
+                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
+                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
                 --build-arg BUILD_TARGET=dev \
-                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel" \
-                --cleanup
-            /kaniko/executor \
-                --context "${CI_PROJECT_DIR}" \
-                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-                --cache \
-                --cache-repo "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-cache" \
-                --cache-copy-layers \
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
+                --push \
+                .
+            docker --config ~/ca_config \
+                buildx build \
+                --builder=kube \
+                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
+                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
                 --build-arg BUILD_TARGET=staging \
-                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging" \
-                --cleanup
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
+                --push \
+                .
 
 docker_build_deploy_release:
     stage: deploy
+    tags: [k8s]
     cache: []
     rules:
         - if: $CI_COMMIT_TAG
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker.io/docker:cli
     before_script:
-        - mkdir -p /kaniko/.docker
-        - echo "{\"auths\":{\"${REGISTRY_URL}\":{\"auth\":\"$(printf "%s:%s" "${CI_DOCKER_USER}" "${CI_DOCKER_TOKEN}" | base64 | tr -d '\n')\"}}}}" > /kaniko/.docker/config.json
+        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
         - |
             cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
             export const ORS_API_KEY = '${ORS_API_KEY}'
@@ -127,10 +127,12 @@ docker_build_deploy_release:
             export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_PROD}'
             EOF
     script:
-        - >
-            /kaniko/executor \
-                --context "${CI_PROJECT_DIR}" \
-                --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+        - |
+            docker --config ~/ca_config \
+                buildx build \
+                --builder=kube \
+                --platform=linux/amd64 \
                 --build-arg BUILD_TARGET=prod \
-                --destination "${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}" \
-                --cleanup
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
+                --push \
+                .
