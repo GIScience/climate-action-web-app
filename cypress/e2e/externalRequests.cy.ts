@@ -11,6 +11,7 @@ describe('External Requests', () => {
     const cypressInternalPatterns = [
         'https://content-autofill.googleapis.com',
         'https://safebrowsingohttpgateway.googleapis.com',
+        'https://safebrowsing.googleapis.com',
         'https://optimizationguide-pa.googleapis.com'
     ]
 
