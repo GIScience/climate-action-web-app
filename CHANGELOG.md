@@ -11,6 +11,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Custom areas can now be drawn on the map and used for computations ([#127](https://gitlab.heigit.org/climate-action/web-app/-/issues/127))
 - Limited set of controls now provided within Plotly charts, including export as JPEG ([#98](https://gitlab.heigit.org/climate-action/web-app/-/issues/98))
+- App name and version is now included in API calls header ([#374](https://gitlab.heigit.org/climate-action/web-app/-/issues/374))
 
 ## [2.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.4.0) - 2025-06-27
 
