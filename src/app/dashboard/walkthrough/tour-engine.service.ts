@@ -104,7 +104,7 @@ export class TourEngine {
 
     private presentTourOptions() {
         const dialogRef = this.dialog.open(TourChoiceDialogComponent, {
-            width: '500px',
+            width: '550px',
             autoFocus: false
         })
 
