@@ -56,7 +56,11 @@ export class AuthInterceptor implements HttpInterceptor {
             this.authInitPromise = null
         }
 
-        const headers: { [key: string]: string } = { 'X-Client-Info': this.clientInfo }
+        const headers: { [key: string]: string } = {}
+
+        if (environment.environmentType === 'development') {
+            headers['X-Client-Info'] = this.clientInfo
+        }
 
         if (this.appwriteService._user.value && this.apiKey) {
             headers['Authorization'] = this.apiKey

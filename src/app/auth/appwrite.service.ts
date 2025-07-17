@@ -50,7 +50,7 @@ export class AppwriteService {
     }
 
     loginAsFakeUser() {
-        if (!environment.production) {
+        if (environment.environmentType === 'development' || environment.environmentType === 'testing') {
             const mockUser: Models.User<Models.Preferences> = {
                 $id: 'fake-user-id',
                 $createdAt: new Date().toISOString(),

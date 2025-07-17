@@ -1,5 +1,6 @@
 export const environment = {
     production: false,
+    environmentType: 'testing',
     climateActionApiUrl: 'http://mock-api-url',
     climateActionWSUrl: 'ws://mock-ws-url',
     orsAPIKey: 'mock-ors-api-key',
