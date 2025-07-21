@@ -14,9 +14,6 @@ export class AppwriteService {
     public _user = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
     public onLogout = new EventEmitter<void>()
 
-    // @ts-ignore: Suppress TypeScript error for test environment detection
-    private isTestEnvironment = typeof jest !== 'undefined' || typeof Cypress !== 'undefined'
-
     constructor() {
         this.client.setEndpoint(environment.appwriteEndpoint + '/v1').setProject(environment.appwriteProjectId)
 

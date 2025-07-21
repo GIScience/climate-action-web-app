@@ -404,7 +404,7 @@ export class MapService {
             this.selectRegions(evt.pixel)
         })
 
-        if (!environment.production) {
+        if (environment.environmentType === 'testing' || environment.environmentType === 'development') {
             // Allow flexibility in window object for debugging in Cypress
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ;(window as any).olMap = this.map

@@ -1,5 +1,6 @@
-export const environment = {
-    production: false,
+import { Environment } from '../types/environment'
+
+export const environment: Environment = {
     environmentType: 'testing',
     climateActionApiUrl: 'http://mock-api-url',
     climateActionWSUrl: 'ws://mock-ws-url',

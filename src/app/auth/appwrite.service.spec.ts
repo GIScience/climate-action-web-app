@@ -104,12 +104,12 @@ describe('AppwriteService', () => {
             const mockAccount = service['account'] as MockAccount
             mockAccount.get.mockRejectedValue(new Error('Failed to login'))
 
-            const originalProduction = environment.production
-            environment.production = true
+            const originalEnvironmentType = environment.environmentType
+            environment.environmentType = 'production'
 
             const result = await service.tryToLogin()
 
-            environment.production = originalProduction
+            environment.environmentType = originalEnvironmentType
 
             expect(result).toBe(false)
             service._user.subscribe(user => {
