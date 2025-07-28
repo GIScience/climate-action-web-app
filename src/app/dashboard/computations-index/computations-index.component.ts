@@ -15,6 +15,7 @@ import {
     Check,
     CircleArrowLeft,
     CircleX,
+    Clipboard,
     Clock,
     FileWarning,
     Hash,
@@ -33,6 +34,7 @@ import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import {
@@ -116,6 +118,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     newRuns: string[] = []
     demoRuns: string[] = []
     currentLocale = navigator.language
+    isReportVisible = false
 
     readonly Archive = Archive
     readonly ArchiveRestore = ArchiveRestore
@@ -129,6 +132,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Loader = Loader
     readonly LoaderCircle = LoaderCircle
     readonly FileWarning = FileWarning
+    readonly Clipboard = Clipboard
 
     @Input() pluginId: string = ''
     @Input() demoConfig: boolean = true
@@ -151,6 +155,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     scheduledRunsSubscription: Subscription = new Subscription()
     userSubscription: Subscription
     private syncSubscription?: Subscription
+    private reportVisibilitySubscription: Subscription = new Subscription()
 
     private readonly INITIAL_INTERVAL = 2500
     private readonly MAX_INTERVAL = 1800000
@@ -164,7 +169,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private toastr: ToastrService,
         private dialog: MatDialog,
         private storageService: StorageService,
-        private appwriteService: AppwriteService
+        private appwriteService: AppwriteService,
+        private reportService: ReportService
     ) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
@@ -232,6 +238,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
             this.startPeriodicSync()
         })
+
+        this.reportService.isVisible$.subscribe(isVisible => {
+            this.isReportVisible = isVisible
+        })
     }
 
     toggleArchivedView(): void {
@@ -245,6 +255,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (this.scheduledRunsSubscription) this.scheduledRunsSubscription.unsubscribe()
         if (this.syncSubscription) {
             this.syncSubscription.unsubscribe()
+        }
+        if (this.reportVisibilitySubscription) {
+            this.reportVisibilitySubscription.unsubscribe()
         }
     }
 
@@ -310,8 +323,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     fetchAndProcessComputations(run: ComputationDatabaseEntity) {
         this.pluginService.getComputationMetadata(run.correlation_uuid).subscribe({
             next: (response: ComputationMetadata) => {
-                const computations = response.artifacts
-                if (!computations) return
+                const artifacts = response.artifacts
+                if (!artifacts) return
                 const computation: ComputationDisplayEntity = {
                     correlation_uuid: run.correlation_uuid,
                     artifacts: [],
@@ -324,8 +337,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     artifact_errors: response.artifact_errors
                 }
 
-                if (Array.isArray(computations) && computations.length > 0) {
-                    computation.artifacts = computations
+                if (Array.isArray(artifacts) && artifacts.length > 0) {
+                    computation.artifacts = artifacts
                         .map<ArtifactEntity>(x => {
                             return {
                                 name: x.name,
@@ -614,6 +627,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 console.warn('Could not fetch a demo computation for', this.pluginId)
             }
         })
+    }
+
+    openReport() {
+        this.reportService.openReport()
+    }
+
+    closeReport() {
+        this.reportService.closeReport()
     }
 
     hasArtifactErrors(artifactErrors: ComputationDisplayEntity['artifact_errors']): boolean {

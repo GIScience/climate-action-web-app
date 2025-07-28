@@ -1,6 +1,7 @@
 <div
     [@expandCollapse]="computation.isExpanded ? 'expanded' : 'collapsed'"
     class="child-computations-wrapper"
+    [ngClass]="{ 'report-active': isReportVisible }"
     (@expandCollapse.done)="onAnimationEvent($event, computation)">
     <ul *ngIf="computation.isExpanded || computation.keepInDOM" class="child-computations">
         <ng-container *ngFor="let artifact of computation.artifacts; let i = index">
@@ -26,11 +27,16 @@
                     <div>{{ artifact.name }}</div>
                 </div>
                 <button
-                    class="add-to-report-btn btn-onlyicon btn-onlyicon--cta"
+                    class="add-to-report-btn"
+                    [ngClass]="{
+                        'btn-onlyicon btn-onlyicon--cta': !isReportVisible,
+                        'btn-small btn-alt btn-withtext': isReportVisible
+                    }"
                     (click)="addToReport(artifact)"
                     tp="Add to Report"
                     tpPlacement="left">
                     <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
+                    <span *ngIf="isReportVisible">Add »</span>
                 </button>
                 <div *ngIf="artifact.isLoading" class="loading-circle"></div>
             </li>

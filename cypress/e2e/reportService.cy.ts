@@ -51,8 +51,6 @@ describe('report builder', () => {
         cy.get('.child-computation').eq(1).realHover()
         cy.get('.child-computation').eq(1).find('.add-to-report-btn').click()
 
-        cy.get('.left-column-collapser').click()
-
         cy.get('.report-item').should('exist').should('have.length', 2)
 
         cy.get('.report-item').eq(0).find('.report-item-header').should('contain', 'A Text')
@@ -61,7 +59,7 @@ describe('report builder', () => {
 
         cy.get('.report-item').should('exist').should('have.length', 1)
 
-        cy.get('.report-controls').find('button').last().click()
+        cy.get('.report-controls').find('.remove-all-btn').click()
 
         cy.get('.report-item').should('not.exist')
 

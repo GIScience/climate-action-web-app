@@ -95,8 +95,28 @@ i-lucide {
     display: inline-flex;
 }
 
-.toast-container.toast-bottom-center {
-    margin-bottom: calc(25px + 0.5vw);
+.toast-container {
+    &.toast-bottom-center {
+        margin-bottom: calc(25px + 0.5vw);
+        margin-top: 0;
+
+        .ngx-toastr {
+            margin-bottom: 0;
+            margin-top: 10px;
+            width: 450px;
+        }
+    }
+
+    &.toast-top-center {
+        margin-bottom: 0;
+        margin-top: 0.5vw;
+
+        .ngx-toastr {
+            margin-bottom: 0;
+            margin-top: -5px;
+            width: 450px;
+        }
+    }
 
     .ngx-toastr {
         backdrop-filter: blur(10px);
@@ -105,10 +125,7 @@ i-lucide {
         display: flex;
         flex-direction: column;
         line-height: 1.5;
-        margin-bottom: 0;
-        margin-top: 10px;
         padding: 10px 25px 10px 50px;
-        width: 450px;
 
         &:hover {
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);

@@ -1,3 +1,14 @@
+.computations-index-toolbar {
+    background-color: #dcdcdc;
+    box-shadow: 0 0 10px -5px #666 inset;
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    margin-left: -20px;
+    padding: 10px 20px;
+    width: calc(100% + 40px);
+}
+
 .computations-index {
     .computations-index__header {
         align-items: center;
@@ -9,17 +20,6 @@
             cursor: pointer;
             font-size: 20px;
             margin-left: auto;
-        }
-    }
-
-    .archived-toggle-container {
-        .toggle-archive {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            box-shadow: 0px -5px 7.5px -5px hsla(172, 20.75%, 51.51%, 0.75);
-            display: flex;
-            justify-content: center;
-            width: 100%;
         }
     }
 

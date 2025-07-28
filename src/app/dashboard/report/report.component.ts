@@ -1,17 +1,19 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, ComponentRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
+import { Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { TippyDirective } from '@ngneat/helipopper'
-import { ClipboardPlus, Grid2x2, ListX, LucideAngularModule, Minus, Rows3, X } from 'lucide-angular'
+import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { StorageService } from '../../storage.service'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
 import { LegendComponent } from '../artifact/legend/legend.component'
+import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { ExportPDFService } from './export-pdf.service'
 import { ReportService } from './report.service'
 
 @Component({
@@ -31,18 +33,21 @@ import { ReportService } from './report.service'
 export class ReportComponent implements OnInit {
     artifacts: ArtifactEntity[] = []
     isVisible = false
-    reportLayout = 'grid'
+    hasExported = false
     maxArtifacts = this.reportService.MAX_ARTIFACTS
 
     readonly X = X
     readonly Minus = Minus
-    readonly Grid2x2 = Grid2x2
-    readonly Rows3 = Rows3
     readonly ListX = ListX
     readonly ClipboardPlus = ClipboardPlus
+    readonly Printer = Printer
+    readonly FileDown = FileDown
 
     @ViewChildren('legendContainer', { read: ViewContainerRef })
     legendContainers!: QueryList<ViewContainerRef>
+
+    @ViewChildren('artifactContainer', { read: ElementRef })
+    artifactContainers!: QueryList<ElementRef>
 
     private mapServices: Map<string, MapService> = new Map()
     private legendComponents: Map<string, ComponentRef<LegendComponent>> = new Map()
@@ -51,7 +56,8 @@ export class ReportComponent implements OnInit {
         public reportService: ReportService,
         private pluginService: PluginService,
         private http: HttpClient,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private ExportPDFService: ExportPDFService
     ) {}
 
     ngOnInit(): void {
@@ -146,11 +152,27 @@ export class ReportComponent implements OnInit {
         })
     }
 
-    getMapService(artifact: ArtifactEntity): MapService | undefined {
-        return this.mapServices.get(artifact.store_id)
+    closeReport() {
+        if (!this.hasExported) {
+            if (confirm('Are you sure you want to close the report without exporting? It will not be saved.')) {
+                this.reportService.closeReport()
+            }
+            return
+        } else {
+            this.reportService.closeReport()
+        }
     }
 
-    setReportLayout(layout: 'rows' | 'grid') {
-        this.reportLayout = layout
+    getComputationInfo(artifact: ArtifactEntity): ComputationBasicInfo | undefined {
+        return this.reportService.getComputationInfoForArtifact(artifact)
+    }
+
+    async exportToPDF() {
+        await this.ExportPDFService.exportToPDF(
+            this.artifacts,
+            this.artifactContainers,
+            this.getComputationInfo.bind(this)
+        )
+        this.hasExported = true
     }
 }

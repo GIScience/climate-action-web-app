@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
+import { Component, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
 import { RouterModule } from '@angular/router'
-import { TippyDirective } from '@ngneat/helipopper'
 import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
@@ -28,8 +27,7 @@ import { SearchComponent } from './search/search.component'
         MapComponent,
         RouterModule,
         ReportComponent,
-        LucideAngularModule,
-        TippyDirective
+        LucideAngularModule
     ]
 })
 export class DashboardComponent implements OnInit {
@@ -39,13 +37,16 @@ export class DashboardComponent implements OnInit {
     legendSubscription!: Subscription
 
     leftColumnCollapsed = false
+    isReportVisible = false
+    private collapseTimeout?: number
 
     readonly PanelLeftClose = PanelLeftClose
     readonly PanelLeftOpen = PanelLeftOpen
     constructor(
         public artifactService: ArtifactService,
         public artifactViewerService: ArtifactViewerService,
-        public reportService: ReportService
+        public reportService: ReportService,
+        private elementRef: ElementRef
     ) {}
 
     ngOnInit(): void {
@@ -59,6 +60,10 @@ export class DashboardComponent implements OnInit {
 
         this.reportService.collapseLeftColumn$.subscribe(collapse => {
             this.leftColumnCollapsed = collapse
+        })
+
+        this.reportService.isVisible$.subscribe(isVisible => {
+            this.isReportVisible = isVisible
         })
     }
 
@@ -78,5 +83,35 @@ export class DashboardComponent implements OnInit {
     collapseLeftColumn(): void {
         this.leftColumnCollapsed = !this.leftColumnCollapsed
         this.reportService.collapseLeftColumn(this.leftColumnCollapsed)
+    }
+
+    onMouseEnterLeftColumn(): void {
+        if (this.collapseTimeout) clearTimeout(this.collapseTimeout)
+        if (this.isReportVisible && this.leftColumnCollapsed) {
+            this.leftColumnCollapsed = false
+            this.reportService.collapseLeftColumn(false)
+        }
+    }
+
+    onMouseLeaveLeftColumn(): void {
+        if (this.isReportVisible && !this.leftColumnCollapsed) {
+            this.collapseTimeout = window.setTimeout(() => this.setCollapsed(true), 800)
+        }
+    }
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent): void {
+        if (this.isReportVisible && !this.leftColumnCollapsed) {
+            const leftColumn = this.elementRef.nativeElement.querySelector('.dashboard__left-column')
+            if (leftColumn && !leftColumn.contains(event.target)) {
+                if (this.collapseTimeout) clearTimeout(this.collapseTimeout)
+                this.setCollapsed(true)
+            }
+        }
+    }
+
+    private setCollapsed(collapsed: boolean): void {
+        this.leftColumnCollapsed = collapsed
+        this.reportService.collapseLeftColumn(collapsed)
     }
 }

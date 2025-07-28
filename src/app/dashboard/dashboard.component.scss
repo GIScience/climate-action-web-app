@@ -41,14 +41,6 @@ main.dashboard {
             }
         }
 
-        .left-column-collapser {
-            background-color: #fff;
-            cursor: pointer;
-            position: absolute;
-            right: -15px;
-            top: 17.5px;
-        }
-
         &.collapsed {
             transform: translateX(-500px);
         }

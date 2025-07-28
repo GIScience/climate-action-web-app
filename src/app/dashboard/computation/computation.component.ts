@@ -1,11 +1,12 @@
 import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
+import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription, take } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -43,12 +44,14 @@ import { ReportService } from '../report/report.service'
     templateUrl: './computation.component.html',
     styleUrls: ['./computation.component.scss']
 })
-export class ComputationComponent {
+export class ComputationComponent implements OnInit, OnDestroy {
     @Input() computation!: ComputationDisplayEntity
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
 
-    private subscription: Subscription | undefined
+    private artifactFetchSubscription: Subscription | undefined
+    private reportVisibilitySubscription: Subscription | undefined
+    isReportVisible = false
 
     readonly ClipboardPlus = ClipboardPlus
 
@@ -60,6 +63,21 @@ export class ComputationComponent {
         private artifactViewerService: ArtifactViewerService,
         private toastr: ToastrService
     ) {}
+
+    ngOnInit(): void {
+        this.reportVisibilitySubscription = this.reportService.isVisible$.subscribe(isVisible => {
+            this.isReportVisible = isVisible
+        })
+    }
+
+    ngOnDestroy(): void {
+        if (this.artifactFetchSubscription) {
+            this.artifactFetchSubscription.unsubscribe()
+        }
+        if (this.reportVisibilitySubscription) {
+            this.reportVisibilitySubscription.unsubscribe()
+        }
+    }
 
     onAnimationEvent(event: AnimationEvent, computation: ComputationDisplayEntity) {
         if (event.toState === 'collapsed') {
@@ -80,18 +98,10 @@ export class ComputationComponent {
     }
 
     renderArtifact(artifact: ArtifactEntity) {
-        let isReportVisible = false
-
-        this.reportService.isVisible$.pipe(take(1)).subscribe(isVisible => {
-            isReportVisible = isVisible
-            if (isVisible) {
-                this.toastr.warning('Please exit the Report Builder first, or add this artifact to the report.', '', {
-                    timeOut: 4000
-                })
-            }
-        })
-
-        if (isReportVisible) {
+        if (this.isReportVisible) {
+            this.toastr.warning('Please exit the Report Builder first, or add this artifact to the report.', '', {
+                timeOut: 4000
+            })
             return
         }
 
@@ -111,20 +121,20 @@ export class ComputationComponent {
         // Allow for any type of report
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const waitForArtifactFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
-            this.subscription = observable.subscribe({
+            this.artifactFetchSubscription = observable.subscribe({
                 next: data => {
                     if (dataCheck(data)) {
                         artifact.isLoading = false
-                        if (this.subscription) {
-                            this.subscription.unsubscribe()
+                        if (this.artifactFetchSubscription) {
+                            this.artifactFetchSubscription.unsubscribe()
                         }
                     }
                 },
                 error: err => {
                     console.error('Error fetching artifact:', err)
                     artifact.isLoading = false
-                    if (this.subscription) {
-                        this.subscription.unsubscribe()
+                    if (this.artifactFetchSubscription) {
+                        this.artifactFetchSubscription.unsubscribe()
                     }
                 }
             })
@@ -170,7 +180,9 @@ export class ComputationComponent {
             correlation_uuid: this.computation.correlation_uuid,
             aoiName: this.computation.aoiName,
             geometry: this.computation.geometry,
-            timestamp: this.computation.timestamp
+            timestamp: this.computation.timestamp,
+            pluginId: this.computation.pluginId,
+            pluginName: derivePluginNameFromId(this.computation.pluginId || '')
         }
 
         this.reportService.addArtifact(artifact, computationBasicInfo)

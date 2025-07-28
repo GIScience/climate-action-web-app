@@ -1,16 +1,13 @@
 <main class="dashboard">
     <app-map></app-map>
 
-    <div class="dashboard__left-column" [ngClass]="{ collapsed: leftColumnCollapsed }">
+    <div
+        class="dashboard__left-column"
+        [ngClass]="{ collapsed: leftColumnCollapsed, 'report-visible': isReportVisible }"
+        (mouseenter)="onMouseEnterLeftColumn()"
+        (mouseleave)="onMouseLeaveLeftColumn()">
         <app-plugin-catalog></app-plugin-catalog>
         <router-outlet></router-outlet>
-        <button
-            class="left-column-collapser btn-onlyicon btn-onlyicon--large"
-            (click)="collapseLeftColumn()"
-            [tp]="leftColumnCollapsed ? 'Show section' : 'Collapse section'"
-            tpPlacement="bottom">
-            <i-lucide [img]="leftColumnCollapsed ? PanelLeftOpen : PanelLeftClose" size="22.5"></i-lucide>
-        </button>
     </div>
     <div class="dashboard__middle-column">
         <app-artifact-viewer [hidden]="!artifactViewerService.isViewerVisible"></app-artifact-viewer>

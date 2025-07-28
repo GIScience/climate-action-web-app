@@ -132,6 +132,7 @@ bootstrapApplication(AppComponent, {
         provideAnimations(),
         provideToastr({
             positionClass: 'toast-bottom-center',
+            extendedTimeOut: 0,
             preventDuplicates: true,
             maxOpened: 10,
             easeTime: 100,

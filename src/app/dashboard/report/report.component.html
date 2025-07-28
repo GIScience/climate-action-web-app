@@ -1,36 +1,57 @@
 <div class="report-window" *ngIf="isVisible" [@reportAnimation]>
     <div class="report-header">
         <h2>Report Builder</h2>
-        <span class="artifact-counter">{{ artifacts.length }}/{{ maxArtifacts }} items</span>
         <div class="report-controls">
-            <button (click)="setReportLayout('rows')" tp="View as Rows" tpPlacement="bottom">
-                <i-lucide [img]="Rows3" size="20"></i-lucide>
+            <button (click)="exportToPDF()" class="export-btn btn-withtext" [disabled]="artifacts.length === 0">
+                <i-lucide [img]="FileDown" size="20"></i-lucide>
+                Export to PDF
             </button>
-            <button (click)="setReportLayout('grid')" tp="View as Grid" tpPlacement="bottom">
-                <i-lucide [img]="Grid2x2" size="20"></i-lucide>
-            </button>
-            <button (click)="removeAllReportItems()" tp="Remove all items" tpPlacement="bottom">
-                <i-lucide [img]="ListX" size="20"></i-lucide>
-            </button>
+            <div class="report-controls__clear-exit">
+                <button
+                    class="remove-all-btn btn-onlyicon"
+                    (click)="removeAllReportItems()"
+                    tp="Remove all items"
+                    tpPlacement="bottom"
+                    [disabled]="artifacts.length === 0">
+                    <i-lucide [img]="ListX" size="20"></i-lucide>
+                </button>
+                <button
+                    class="close-btn btn-onlyicon"
+                    (click)="closeReport()"
+                    tp="Exit Report Builder"
+                    tpPlacement="bottom">
+                    <i-lucide [img]="X" size="20"></i-lucide>
+                </button>
+            </div>
         </div>
-        <button class="close-btn btn-onlyicon" (click)="reportService.closeReport()" tp="Exit" tpPlacement="bottom">
-            <i-lucide [img]="X" size="20"></i-lucide>
-        </button>
+        <span class="artifact-counter">{{ artifacts.length }}/{{ maxArtifacts }} items</span>
     </div>
 
     <div class="report-body">
         <div *ngIf="artifacts.length === 0" class="empty-report-message">
             <p>
                 Click <span>"Add to Report" <i-lucide [img]="ClipboardPlus" size="20"></i-lucide></span> next to any
-                result in a computation to build your report.
+                result under a computation to build your report.
             </p>
         </div>
 
         <ng-scrollbar>
-            <div class="report-contents" [ngClass]="reportLayout">
-                <div *ngFor="let artifact of artifacts" class="report-item">
+            <div class="report-contents">
+                <div
+                    *ngFor="let artifact of artifacts"
+                    class="report-item"
+                    #artifactContainer
+                    [attr.data-artifact-id]="artifact.store_id">
                     <div class="report-item-header">
-                        <h3>{{ artifact.name }}</h3>
+                        <div class="report-item-info">
+                            <h3>{{ artifact.name }}</h3>
+                            <div class="report-item-metadata" *ngIf="getComputationInfo(artifact) as computationInfo">
+                                (<span>{{ computationInfo.aoiName }}</span> |
+                                <span>{{ computationInfo.pluginName }}</span> |
+                                <span>#{{ computationInfo.correlation_uuid.substring(0, 8) }}</span
+                                >)
+                            </div>
+                        </div>
                         <button class="remove-btn btn-onlyicon" (click)="removeReportItem(artifact)">
                             <i-lucide [img]="Minus" size="22.5"></i-lucide>
                         </button>
