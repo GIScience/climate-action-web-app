@@ -41,7 +41,7 @@ export type ComputationDatabaseEntity = Pick<
 
 export type ComputationBasicInfo = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp'
+    'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp' | 'pluginId' | 'pluginName'
 >
 
 export type ComputationID = Pick<ComputationMetadata, 'correlation_uuid'>

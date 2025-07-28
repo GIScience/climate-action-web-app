@@ -1,0 +1,76 @@
+body {
+    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+.pdf-container {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    max-width: 100%;
+}
+.report-item {
+    border: 0.5mm solid #aaa;
+    border-radius: 5mm;
+    break-inside: avoid;
+    padding: 5mm 10mm;
+}
+.report-item-header {
+    align-items: center;
+    border-bottom: 0.5mm solid #aaa;
+    display: flex;
+    font-size: 16pt;
+    margin-bottom: 7.5mm;
+    padding-bottom: 5mm;
+}
+.report-item h3 {
+    color: #333;
+    margin: 0;
+}
+.report-item-metadata {
+    margin-left: 5mm;
+}
+.report-item-metadata span {
+    display: inline-block;
+    margin: 0 0.5mm;
+}
+.map-image-container {
+    margin: 10px 0;
+    text-align: center;
+}
+.map-image-container img {
+    max-width: 100%;
+    min-height: 175mm;
+}
+app-artifact {
+    display: block;
+    font-size: 16pt;
+    margin: 10px 0;
+}
+button,
+.ol-control,
+.modebar {
+    display: none !important;
+}
+img,
+canvas,
+svg {
+    height: auto;
+    max-width: 100%;
+}
+table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    width: 100%;
+}
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}

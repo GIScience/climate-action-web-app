@@ -13,7 +13,11 @@ import { PluginService } from '../plugin/plugin.service'
     providedIn: 'root'
 })
 export class ReportService {
-    private artifacts: { artifact: ArtifactEntity; service: ArtifactService }[] = []
+    private artifacts: {
+        artifact: ArtifactEntity
+        service: ArtifactService
+        computationInfo: ComputationBasicInfo
+    }[] = []
     private isVisibleSubject = new BehaviorSubject<boolean>(false)
     isVisible$ = this.isVisibleSubject.asObservable()
 
@@ -28,7 +32,8 @@ export class ReportService {
     constructor(
         private http: HttpClient,
         private injector: Injector,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private artifactViewerService: ArtifactViewerService
     ) {}
 
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
@@ -51,13 +56,13 @@ export class ReportService {
             return
         }
 
-        const artifactViewerService = this.injector.get(ArtifactViewerService)
-        artifactViewerService.closeArtifactViewer()
+        this.artifactViewerService.closeArtifactViewer()
 
-        const service = new ArtifactService(this.http)
+        const artifactService = new ArtifactService(this.http)
         this.artifacts.push({
             artifact: artifactInstance,
-            service: service
+            service: artifactService,
+            computationInfo: computationBasicInfo
         })
         this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
 
@@ -96,8 +101,8 @@ export class ReportService {
                     }
 
                     if (artifactInstance.modality === 'MAP_LAYER_GEOJSON') {
-                        service.getGeoJson(artifactInstance)
-                        service.geojson.subscribe(data => {
+                        artifactService.getGeoJson(artifactInstance)
+                        artifactService.geojson.subscribe(data => {
                             if (data) {
                                 this.http.get(data.url).subscribe(geoJsonData => {
                                     mapService.addGeoJsonLayer(geoJsonData, artifactInstance.name)
@@ -105,8 +110,8 @@ export class ReportService {
                             }
                         })
                     } else if (artifactInstance.modality === 'MAP_LAYER_GEOTIFF') {
-                        service.getGeoTiff(artifactInstance)
-                        service.geotiff.subscribe(data => {
+                        artifactService.getGeoTiff(artifactInstance)
+                        artifactService.geotiff.subscribe(data => {
                             if (data) {
                                 mapService.addGeoTiffLayer(data.url, artifactInstance.name)
                             }
@@ -128,6 +133,15 @@ export class ReportService {
 
     getServiceForArtifact(artifact: ArtifactEntity): ArtifactService | undefined {
         return this.artifacts.find(a => a.artifact.store_id === artifact.store_id)?.service
+    }
+
+    getComputationInfoForArtifact(artifact: ArtifactEntity): ComputationBasicInfo | undefined {
+        return this.artifacts.find(a => a.artifact.store_id === artifact.store_id)?.computationInfo
+    }
+
+    openReport() {
+        this.artifactViewerService.closeArtifactViewer()
+        this.isVisibleSubject.next(true)
     }
 
     closeReport() {

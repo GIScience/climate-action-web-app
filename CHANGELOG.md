@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.5.1...main)
 
+### Added
+
+- Provide ability within Report Builder to export it to PDF ([#298](https://gitlab.heigit.org/climate-action/web-app/-/issues/298))
+
 ## [2.5.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.5.1) - 2025-07-21
 
 ### Fixed

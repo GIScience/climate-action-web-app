@@ -1,0 +1,309 @@
+import { HttpClient } from '@angular/common/http'
+import { ElementRef, Injectable, QueryList } from '@angular/core'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+import { ToastrService } from 'ngx-toastr'
+import { lastValueFrom } from 'rxjs'
+import { ArtifactEntity } from '../artifact/artifact.interface'
+import { ComputationBasicInfo } from '../computations-index/computation.interface'
+import { ReportService } from './report.service'
+
+type Html2CanvasType = typeof html2canvas
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ExportPDFService {
+    constructor(
+        private http: HttpClient,
+        private toastr: ToastrService,
+        private reportService: ReportService
+    ) {}
+
+    async exportToPDF(
+        artifacts: ArtifactEntity[],
+        artifactContainers: QueryList<ElementRef>,
+        getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined
+    ) {
+        try {
+            this.toastr.info('Preparing PDF export, please wait...', '', {
+                timeOut: 30000,
+                positionClass: 'toast-top-center'
+            })
+
+            const imageCache: Record<string, string> = {}
+            await this.prepareArtifactImages(artifacts, artifactContainers, imageCache, html2canvas)
+
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            })
+
+            await this.generatePdfPages(pdf, html2canvas, imageCache, artifacts, getComputationInfo, artifactContainers)
+
+            pdf.save(`climate-action-navigator_report-${new Date().toISOString().split('T')[0]}.pdf`)
+            this.toastr.clear()
+        } catch (error) {
+            console.error('Error exporting PDF:', error)
+            this.toastr.error('Error exporting PDF. Please try again.')
+        }
+    }
+
+    private async generatePdfPages(
+        pdf: jsPDF,
+        html2canvas: Html2CanvasType,
+        imageCache: Record<string, string>,
+        artifacts: ArtifactEntity[],
+        getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined,
+        artifactContainers: QueryList<ElementRef>
+    ) {
+        const pageWidth = pdf.internal.pageSize.getWidth()
+        const pageHeight = pdf.internal.pageSize.getHeight()
+        const margin = 10
+        const contentWidth = pageWidth - 2 * margin
+        const itemsPerPage = 2
+        const totalPages = Math.ceil(artifacts.length / itemsPerPage)
+
+        const css = await lastValueFrom(this.http.get('./assets/styles/pdf-report.css', { responseType: 'text' }))
+
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+            if (pageIndex > 0) {
+                pdf.addPage()
+            }
+
+            this.addPageHeaderFooter(pdf, pageIndex + 1, totalPages)
+
+            const startIndex = pageIndex * itemsPerPage
+            const pageArtifacts = artifacts.slice(startIndex, startIndex + itemsPerPage)
+
+            const element = document.createElement('div')
+            element.innerHTML = `
+                <div class="pdf-container">
+                    ${this.getPageContent(pageArtifacts, imageCache, getComputationInfo, artifactContainers)}
+                </div>
+            `
+
+            const style = document.createElement('style')
+            style.textContent = css
+            element.appendChild(style)
+
+            document.body.appendChild(element)
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            })
+
+            document.body.removeChild(element)
+
+            const imgHeight = (canvas.height * contentWidth) / canvas.width
+            pdf.addImage(
+                canvas.toDataURL('image/jpeg', 0.98),
+                'JPEG',
+                margin,
+                margin + 15,
+                contentWidth,
+                Math.min(imgHeight, pageHeight - 2 * margin - 20)
+            )
+        }
+    }
+
+    private addPageHeaderFooter(pdf: jsPDF, pageNumber: number, totalPages: number) {
+        const { width: pageWidth, height: pageHeight } = pdf.internal.pageSize
+        const margin = 10
+
+        // Header
+        pdf.addImage('assets/images/ca-logo--horizontal.png', 'PNG', pageWidth / 2 - 25, margin, 50, 6.5)
+
+        pdf.setDrawColor(0, 88, 88)
+        pdf.line(margin, margin + 10, pageWidth - margin, margin + 10)
+
+        // Footer
+        pdf.setDrawColor(0, 88, 88)
+        pdf.line(margin, pageHeight - margin - 8, pageWidth - margin, pageHeight - margin - 8)
+
+        pdf.setFontSize(10)
+        pdf.setTextColor(100)
+        pdf.text('© ' + new Date().getFullYear() + ' HeiGIT gGmbH', margin, pageHeight - margin)
+
+        pdf.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, pageHeight - margin, {
+            align: 'right'
+        })
+    }
+
+    private getPageContent(
+        artifacts: ArtifactEntity[],
+        imageCache: Record<string, string>,
+        getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined,
+        artifactContainers: QueryList<ElementRef>
+    ): string {
+        return artifacts
+            .map(artifact => {
+                const computationInfo = getComputationInfo(artifact)
+                return `
+                <div class="report-item">
+                    <div class="report-item-header">
+                        <h3>${artifact.name}</h3>
+                        ${
+                            computationInfo
+                                ? `
+                            <div class="report-item-metadata">
+                                (<span>${computationInfo.aoiName}</span> |
+                                <span>${computationInfo.pluginName}</span> |
+                                <span>#${computationInfo.correlation_uuid.substring(0, 8)}</span>)
+                            </div>
+                        `
+                                : ''
+                        }
+                    </div>
+                    <div class="artifact-content">
+                        ${this.getArtifactContent(artifact, imageCache, artifactContainers)}
+                    </div>
+                </div>
+            `
+            })
+            .join('')
+    }
+
+    private async prepareArtifactImages(
+        artifacts: ArtifactEntity[],
+        artifactContainers: QueryList<ElementRef>,
+        imageCache: Record<string, string>,
+        html2canvas: Html2CanvasType
+    ): Promise<void> {
+        const imageArtifacts = artifacts.filter(artifact => artifact.modality === 'IMAGE')
+        const mapArtifacts = artifacts.filter(artifact => this.reportService.isMapArtifact(artifact))
+
+        const mapCapturePromises = mapArtifacts.map(artifact =>
+            this.captureMapFromDOM(artifact, imageCache, html2canvas)
+        )
+
+        const imagePromises = imageArtifacts.map(async artifact => {
+            const artifactElement = artifactContainers?.find(
+                container => container.nativeElement.getAttribute('data-artifact-id') === artifact.store_id
+            )
+
+            if (artifactElement) {
+                const img = artifactElement.nativeElement.querySelector('app-artifact img') as HTMLImageElement
+                if (img && img.src) {
+                    try {
+                        imageCache[artifact.store_id] = await this.convertImageToBase64(img.src)
+                    } catch (error) {
+                        console.warn(`Failed to convert image for ${artifact.name}:`, error)
+                    }
+                }
+            }
+        })
+
+        await Promise.all([...mapCapturePromises, ...imagePromises])
+    }
+
+    private async captureMapFromDOM(
+        artifact: ArtifactEntity,
+        mapImageCache: Record<string, string>,
+        html2canvas: Html2CanvasType
+    ): Promise<void> {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000))
+
+            const mapContainerElement = document.querySelector<HTMLElement>(
+                `[data-artifact-id="${artifact.store_id}"] .report-map-container`
+            )
+
+            if (!mapContainerElement) {
+                console.warn(`Map container not found for ${artifact.name}`)
+                return
+            }
+
+            const images = Array.from(mapContainerElement.querySelectorAll('img'))
+            await Promise.all(
+                images.map(img =>
+                    img.complete
+                        ? Promise.resolve()
+                        : new Promise(resolve => {
+                              img.onload = img.onerror = resolve
+                              setTimeout(resolve, 2000)
+                          })
+                )
+            )
+
+            const canvas = await html2canvas(mapContainerElement, {
+                useCORS: true,
+                allowTaint: false,
+                scale: 2,
+                logging: false,
+                ignoreElements: (element: Element) =>
+                    element.tagName === 'BUTTON' || element.classList.contains('ol-control')
+            })
+
+            mapImageCache[artifact.store_id] = canvas.toDataURL('image/png')
+        } catch (error) {
+            console.warn(`Failed to capture map for ${artifact.name}:`, error)
+        }
+    }
+
+    private convertImageToBase64(url: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const img = new Image()
+            img.crossOrigin = 'anonymous'
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas')
+                canvas.width = img.width
+                canvas.height = img.height
+
+                const ctx = canvas.getContext('2d')
+                if (!ctx) {
+                    reject(new Error('Failed to get canvas context'))
+                    return
+                }
+
+                ctx.drawImage(img, 0, 0)
+
+                try {
+                    const dataURL = canvas.toDataURL('image/png')
+                    resolve(dataURL)
+                } catch (error) {
+                    reject(error)
+                }
+            }
+
+            img.onerror = () => reject(new Error('Failed to load image'))
+            img.src = url
+        })
+    }
+
+    private getArtifactContent(
+        artifact: ArtifactEntity,
+        imageCache: Record<string, string>,
+        artifactContainers: QueryList<ElementRef>
+    ) {
+        const isMap = this.reportService.isMapArtifact(artifact)
+        const isImage = artifact.modality === 'IMAGE'
+
+        if (isMap || isImage) {
+            if (imageCache[artifact.store_id]) {
+                return `
+                    <div class="map-image-container">
+                        <img src="${imageCache[artifact.store_id]}" alt="${artifact.name}" />
+                    </div>
+                `
+            }
+            return `<p><em>${isMap ? 'Map' : 'Image'} could not be rendered, please try again.</em></p>`
+        }
+
+        const artifactComponent = artifactContainers
+            ?.find(container => container.nativeElement.getAttribute('data-artifact-id') === artifact.store_id)
+            ?.nativeElement.querySelector('app-artifact')
+
+        if (artifactComponent) {
+            const clonedComponent = artifactComponent.cloneNode(true) as HTMLElement
+            clonedComponent.querySelectorAll('button').forEach(btn => btn.remove())
+            return clonedComponent.outerHTML
+        }
+
+        return `<p><em>There was an error rendering <strong>${artifact.name}</strong>, please try again.</em></p>`
+    }
+}

@@ -1,3 +1,32 @@
+<div class="computations-index-toolbar" *ngIf="(computations | filterByCriteria: pluginId).length > 0">
+    <button
+        *ngIf="!showArchived && !isReportVisible"
+        (click)="openReport()"
+        class="toggle-archive btn-small btn-alt btn-withtext"
+        tp="Create a PDF report by collating multiple results"
+        tpPlacement="bottom">
+        <i-lucide [img]="Clipboard" size="20" color="#008080"></i-lucide>
+        Report Builder
+    </button>
+    <button *ngIf="isReportVisible" class="toggle-archive btn-small btn-alt btn-withtext" (click)="closeReport()">
+        <i-lucide [img]="CircleX" size="20" color="#008080"></i-lucide>
+        Exit Report Builder
+    </button>
+    <button
+        *ngIf="!showArchived"
+        (click)="toggleArchivedView()"
+        class="toggle-archive btn-small btn-alt btn-withtext"
+        tp="View archived computations"
+        tpPlacement="bottom">
+        <i-lucide [img]="Archive" size="20" color="#008080"></i-lucide>
+        Archive ({{ (archivedComputations | filterByCriteria: pluginId).length }})
+    </button>
+    <button (click)="toggleArchivedView()" *ngIf="showArchived" class="toggle-archive btn-small btn-alt btn-withtext">
+        <i-lucide [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
+        <span> Back to all computations</span>
+    </button>
+</div>
+
 <div class="computations-index">
     <div class="computations-index-content">
         <div
@@ -84,7 +113,7 @@
                                 >{{ formatUUID(computation.correlation_uuid) }}
                             </p>
                         </div>
-                        <div class="computation-actions">
+                        <div class="computation-actions" *ngIf="!isReportVisible">
                             <button
                                 (click)="shareComputation(computation.correlation_uuid, $event)"
                                 aria-label="Share Computation"
@@ -173,23 +202,6 @@
             ><strong>Login</strong></a
         >
         to proceed.
-    </div>
-
-    <div class="archived-toggle-container">
-        <button
-            (click)="toggleArchivedView()"
-            *ngIf="(archivedComputations | filterByCriteria: pluginId).length > 0 && !showArchived"
-            class="toggle-archive btn-small btn-light btn-withtext">
-            <i-lucide [img]="Archive" size="20" tp="Archived Computations"></i-lucide>
-            Archived Computations ({{ (archivedComputations | filterByCriteria: pluginId).length }})
-        </button>
-        <button
-            (click)="toggleArchivedView()"
-            *ngIf="showArchived"
-            class="toggle-archive btn-small btn-light btn-withtext">
-            <i-lucide [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
-            <span> Back to all computations</span>
-        </button>
     </div>
 </div>
 

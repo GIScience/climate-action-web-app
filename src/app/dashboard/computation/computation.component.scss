@@ -92,6 +92,7 @@
     transition: opacity 0.2s;
 }
 
-.child-computation:hover .add-to-report-btn {
+.child-computation:hover .add-to-report-btn,
+.child-computations-wrapper.report-active .add-to-report-btn {
     opacity: 1;
 }
