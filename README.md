@@ -35,18 +35,18 @@ This is the repository of the frontend website of HeiGIT's [Climate Action](http
 
 ### Prerequisites
 
-- Node Packet Manager `npm install npm@latest -g`
-- Angular CLI `npm install -g @angular/cli`
+- [pnpm](https://pnpm.io/installation)
+- Angular CLI `pnpm install -g @angular/cli`
 - [Docker Engine](https://docs.docker.com/engine/install/) for Linux or [Docker Desktop](https://docs.docker.com/desktop/) for Mac/Windows in case you wish to run the backend server
 
 ### Installation
 
-Clone the repository locally, and run `npm install` to install the dependencies.
+Clone the repository locally, and run `pnpm install` to install the dependencies.
 
-Run `npm run dev` or `ng serve` for a dev server and navigate to `http://localhost:4200/`.
+Run `pnpm dev` or `ng serve` for a dev server and navigate to `http://localhost:4200/`.
 The application will automatically reload if you change any of the source files.
 
-For the Search function to work, you'll need to acquire an API key from our search results provider, [OpenRouteService (ORS)](https://openrouteservice.org/). Once you have the key, fill it in `src/environments/api-keys/keys.ts.example` and rename it to `keys.ts`.
+For the Search function to work, you'll need to acquire an API key from our search results provider, [OpenRouteService (ORS)](https://openrouteservice.org/). Once you have the key, create a copy of `src/environments/keys-and-ids/keys-and-ids.ts.example`, rename it to `keys-and-ids.ts` and fill it against `ORS_API_KEY`.
 
 ### Backend Server
 
@@ -56,7 +56,7 @@ Make sure to start at least one plugin along with the API Gateway, for example `
 
 ## Build
 
-Run `npm run build:{build_target}` to build the project.
+Run `pnpm build:{build_target}` to build the project.
 Currently available `build_target`s are
 
 - dev
@@ -82,7 +82,7 @@ docker image push repo.heigit.org/climate-action/web-app:{build_target}
 
 ## Tests
 
-Run `npm run test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
+Run `pnpm test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
 
 ## References
 
