@@ -5,10 +5,11 @@ stages:
 cache:
     key:
         files:
-            - package-lock.json
+            - pnpm-lock.yaml
         prefix: $CI_COMMIT_REF_NAME
     paths:
         - node_modules
+        - /root/.cache/Cypress
 
 test_jest_and_lint:
     stage: test
@@ -27,10 +28,10 @@ test_jest_and_lint:
             export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_STAGING}'
             export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
             EOF
-        - npm install
+        - pnpm install
     script:
-        - npm run lint
-        - npm test
+        - pnpm lint
+        - pnpm test
     artifacts:
         reports:
             coverage_report:
@@ -57,12 +58,12 @@ test_cypress:
             export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_STAGING}'
             export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
             EOF
-        - npm install
-        - npm install -g wait-on
-        - npx cypress install
+        - npm install -g pnpm
+        - pnpm install
+        - pnpm exec cypress install
     script:
-        - npm start & wait-on http://localhost:4200
-        - npm run cy:run
+        - pnpm start & pnpm exec wait-on http://localhost:4200
+        - pnpm cy:run
     artifacts:
         when: on_failure
         paths:

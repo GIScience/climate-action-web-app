@@ -3,13 +3,14 @@ ARG BUILD_TARGET=prod
 
 WORKDIR /ca-web-app
 
-COPY package*.json ./
-RUN npm ci
+COPY package*.json pnpm-lock.yaml ./
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
 
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
-RUN npm run build:$BUILD_TARGET --omit=dev
+RUN pnpm run build:$BUILD_TARGET --omit=dev
 
 FROM httpd:2.4 AS runtime
 COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf
