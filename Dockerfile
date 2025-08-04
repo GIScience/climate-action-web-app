@@ -10,7 +10,7 @@ RUN pnpm install --frozen-lockfile
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
-RUN pnpm run build:$BUILD_TARGET --omit=dev
+RUN pnpm run build:$BUILD_TARGET
 
 FROM httpd:2.4 AS runtime
 COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf
