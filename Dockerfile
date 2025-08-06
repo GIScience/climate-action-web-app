@@ -12,7 +12,10 @@ COPY angular.json ./angular.json
 COPY tsconfig*.json ./
 RUN pnpm run build:$BUILD_TARGET
 
-FROM httpd:2.4 AS runtime
-COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf
+FROM nginx:1.28-alpine AS runtime
+COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=build /ca-web-app/dist/browser/ /usr/local/apache2/htdocs/
+COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
