@@ -1,122 +1,128 @@
 import { HttpClient } from '@angular/common/http'
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core'
 import { StorageService } from '@app/storage.service'
-import geojsonvt from 'geojson-vt'
-import { Collection, Feature, Map, MapBrowserEvent, Overlay, View } from 'ol'
-import LayerSwitcher from 'ol-ext/control/LayerSwitcher'
-import FeatureLike from 'ol/Feature'
-import VectorTile from 'ol/VectorTile'
-import { ScaleLine } from 'ol/control'
-import { defaults as defaultControls, ZoomToExtent } from 'ol/control.js'
+import area from '@turf/area'
+import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
+import type {
+    BBox,
+    FeatureCollection,
+    Feature as GeoJSONFeature,
+    Point as GeoJSONPoint,
+    MultiPolygon,
+    Position
+} from 'geojson'
+import { fromUrl as geoTiffFromUrl } from 'geotiff'
+import maplibregl, {
+    GeoJSONSource,
+    IControl,
+    LngLatBounds,
+    LngLatLike,
+    Map,
+    Marker,
+    Popup,
+    StyleSpecification
+} from 'maplibre-gl'
+import { Collection } from 'ol'
 import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
-import { GeoJSONFeatureCollection } from 'ol/format/GeoJSON'
-import GeoJSON, { GeoJSONFeature } from 'ol/format/GeoJSON.js'
-import { Circle, MultiPolygon } from 'ol/geom'
-import { Geometry, Polygon } from 'ol/geom.js'
-import Point from 'ol/geom/Point'
-import { fromCircle } from 'ol/geom/Polygon'
-import { Draw, Snap } from 'ol/interaction'
-import { defaults as defaultInteractions } from 'ol/interaction.js'
-import { createBox, DrawEvent } from 'ol/interaction/Draw'
-import VectorLayer, { Options as VectorLayerOptions } from 'ol/layer/Vector'
-import VectorTileLayer, { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'
-import TileLayer, { Options as TileLayerOptions } from 'ol/layer/WebGLTile.js'
-import { fromLonLat, toLonLat, transformExtent } from 'ol/proj'
-import Projection from 'ol/proj/Projection'
-import RenderFeature from 'ol/render/Feature'
-import GeoTIFF from 'ol/source/GeoTIFF'
-import OSM from 'ol/source/OSM'
-import TileWMS from 'ol/source/TileWMS'
-import VectorSource from 'ol/source/Vector'
-import VectorTileSource from 'ol/source/VectorTile'
-import XYZ from 'ol/source/XYZ'
-import { getArea, getDistance } from 'ol/sphere'
-import { Circle as CircleStyle, Fill, Icon, Stroke, Style } from 'ol/style'
-import { StyleFunction } from 'ol/style/Style'
+import Feature from 'ol/Feature'
+import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
-import { replacer } from './utils/geojson-vt.utils'
+import { MapDrawingService } from './map-drawing.service'
+import { MapControlsUtils } from './utils/map-controls.utils'
+import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
+import { MapGeoJsonUtils } from './utils/map-geojson.utils'
+import { MapGeoTiffUtils } from './utils/map-geotiff.utils'
+import { MapStyle, MapStyleSwitcherControl } from './utils/map-style-switcher.utils'
 
 export const MAP_ID = new InjectionToken<string>('MAP_ID')
 
-class ExtendedTileLayer extends TileLayer {
-    name?: string
-    baseLayer?: boolean
-    displayInLayerSwitcher?: boolean
+export interface AutocompleteFeature extends GeoJSONFeature<GeoJSONPoint> {
+    properties: {
+        // Required properties
+        label: string
+        name: string
 
-    constructor(options: TileLayerOptions & { name?: string; baseLayer?: boolean; displayInLayerSwitcher?: boolean }) {
-        super(options)
-        this.name = options.name
-        this.baseLayer = options.baseLayer
-        this.displayInLayerSwitcher = options.displayInLayerSwitcher
+        // OpenRouteService specific properties
+        layer?: string
+        locality?: string
+        county?: string
+        region?: string
+        country?: string
+
+        // Optional metadata
+        id?: string | number
+
+        // Allow additional properties from API response
+        [key: string]: string | number | boolean | null | undefined
     }
+    bbox?: BBox
 }
 
-class ExtendedVectorTileLayer extends VectorTileLayer<RenderFeature> {
-    name?: string
-    displayInLayerSwitcher?: boolean
-
-    constructor(options: VectorTileLayerOptions<RenderFeature> & { name?: string; displayInLayerSwitcher?: boolean }) {
-        super(options)
-        this.name = options.name
-        this.displayInLayerSwitcher = options.displayInLayerSwitcher
-    }
+interface VectorLayerGroup {
+    layerIds: string[]
+    sourceId: string
+    name: string
+    visible?: boolean
 }
 
-class ExtendedVectorLayer<T extends Feature<Geometry | Point>> extends VectorLayer<T> {
-    name?: string
-    displayInLayerSwitcher?: boolean
-
-    constructor(options: VectorLayerOptions<T> & { name?: string; displayInLayerSwitcher?: boolean }) {
-        super(options)
-        this.name = options.name
-        this.displayInLayerSwitcher = options.displayInLayerSwitcher
-    }
+interface RasterLayer {
+    layerId: string
+    sourceId: string
+    visible?: boolean
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class MapService {
+    // Core Map Instance
     map: Map | undefined
-    mapPopUp: Overlay | undefined
-    focusedLayer: ExtendedVectorLayer<Feature<MultiPolygon> | Feature<Polygon>> | undefined
-    regionLayer: ExtendedTileLayer | undefined
-    selectedRegionLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
-    markerLayer: ExtendedVectorLayer<Feature<Point>> | undefined
-    geojsonLayer: ExtendedVectorTileLayer | undefined
-    featureHoverOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
-    featureClickOverlay: ExtendedVectorLayer<Feature<Geometry>> | undefined
-    markerFeatures: Collection<Feature<Point>> = new Collection([])
-    selectedFeatures: Collection<FeatureLike> = new Collection([])
-
-    drawLayer: ExtendedVectorLayer<Feature<Geometry>> | undefined
-    currentDrawInteraction: Draw | undefined
-    snapInteraction: Snap | undefined
-    isDrawingMode: boolean = false
-    measureTooltipElement: HTMLElement | undefined
-    measureTooltip: Overlay | undefined
-
-    layerSwitcherCollapsed: boolean = false
-    windowWidth?: number
-    windowResolution?: number
     mapId: string = 'main-map'
 
-    private orsAPIKey = environment.orsAPIKey
+    // UI Controls & Overlays
+    mapPopUp: Popup | undefined
+    featureHoverOverlay: Popup | undefined
+    layerSwitcherControl: MapStyleSwitcherControl | undefined
+    layerSwitcherCollapsed: boolean = false
+    currentBasemapStyle: string = 'Graybeard'
+
+    // Window & Display Properties
+    windowWidth?: number
+    windowResolution?: number
+
+    // Marker Management
+    markerLayer: Marker[] = []
+    markerFeatures: AutocompleteFeature[] = []
+
+    // Feature Selection
+    selectedOlFeatures: Collection<Feature<Geometry>> = new Collection([])
+    selectedGeoJSONFeatures: GeoJSONFeature[] = [] // Track GeoJSON features for MapLibre
+
+    // Layer Management
+    focusedLayer: { aoiLayerId: string; fowLayerId: string; sourceId: string } | undefined
+    regionLayer: RasterLayer | undefined
+    selectedRegionLayer: VectorLayerGroup | undefined
+    geojsonLayer: VectorLayerGroup | undefined
+
+    // Drawing & Measurement Tools
+    terraDrawControl: MaplibreTerradrawControl | undefined
+
+    private readonly orsAPIKey = environment.orsAPIKey
     static readonly sqmToSqkmFactor = 1 / 1000000
 
     constructor(
         private pluginService: PluginService,
         private http: HttpClient,
-        private storageService: StorageService,
+        public storageService: StorageService,
+        @Optional() private mapDrawingService?: MapDrawingService,
         @Optional() @Inject(MAP_ID) mapId?: string
     ) {
-        if (mapId) {
-            this.mapId = mapId
-        }
+        if (mapId) this.mapId = mapId
+
         this.pluginService.computeState$.subscribe(value => {
             if (value === 'compute-ready') {
                 this.enableComputeLayers()
@@ -124,846 +130,883 @@ export class MapService {
                 this.removeComputeLayers()
             }
         })
-    }
 
-    goToLocation(suggestion: Feature<Point>) {
-        if (suggestion) {
-            this.addMarker(suggestion)
-            this.fitMapViewToSearchResult(suggestion)
-        }
-    }
+        this.mapDrawingService?.drawnFeatures$.subscribe(drawnFeatures => {
+            this.selectedOlFeatures.clear()
+            this.selectedGeoJSONFeatures = []
 
-    getAutoCompleteSuggestions(query: string): Observable<Feature<Point>[]> {
-        const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
-        const gj = new GeoJSON()
-
-        function transformer(coll: GeoJSONFeatureCollection): Feature<Point>[] {
-            const feats = coll.features.map((feature: GeoJSONFeature) => {
-                const feat = gj.readFeature(feature, { featureProjection: 'EPSG:3857' })
-                feat.set('extent', feature.bbox ? transformExtent(feature.bbox, 'EPSG:4326', 'EPSG:3857') : undefined)
-                return feat
+            drawnFeatures.forEach(({ geoJsonFeature, olFeature }) => {
+                this.selectedOlFeatures.push(olFeature)
+                this.selectedGeoJSONFeatures.push(geoJsonFeature)
             })
-            return feats.filter(
-                (feature: Feature<Geometry>) => feature.getGeometry()?.getType() == 'Point'
-            ) as Feature<Point>[]
-        }
 
-        const observable: Observable<GeoJSONFeatureCollection> = this.http.get<GeoJSONFeatureCollection>(orsUrl)
-        return observable.pipe(map(transformer))
-    }
-
-    addMarker(feature: Feature<Point>) {
-        this.markerFeatures.clear()
-        this.markerFeatures.push(feature)
-    }
-
-    fitMapViewToSearchResult(result: Feature<Point>) {
-        const extent = result.get('extent') || result.getGeometry()?.getExtent()
-        if (this.map && extent) {
-            this.map.getView().fit(extent, {
-                padding: this.calculateMapPadding(),
-                maxZoom: 15
-            })
-        }
-    }
-
-    calculateMapPadding() {
-        this.windowWidth = window.innerWidth
-        this.windowResolution = window.devicePixelRatio
-        const horMapPadding = 250 / this.windowResolution
-        if (this.windowWidth > 2000) {
-            return [horMapPadding, 200, horMapPadding, 200]
-        } else if (this.windowWidth > 1600) {
-            return [horMapPadding, 100, horMapPadding, 400]
-        } else {
-            return [horMapPadding, 100, horMapPadding, 500]
-        }
-    }
-
-    initLayers() {
-        this.regionLayer = new ExtendedTileLayer({
-            source: new TileWMS({
-                url: 'https://maps.heigit.org/ohsome/service/wms',
-                params: {
-                    LAYERS: 'ohsome:admin_world_water',
-                    TRANSPARENT: true,
-                    FORMAT: 'image/png'
-                },
-                attributions:
-                    'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
-            }),
-            displayInLayerSwitcher: false,
-            visible: false
+            if (this.selectedRegionLayer && this.map) {
+                const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+                source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
+            }
         })
-
-        this.selectedRegionLayer = new ExtendedVectorLayer({
-            source: new VectorSource({
-                features: this.selectedFeatures
-            }),
-            map: this.map,
-            style: {
-                'stroke-color': 'rgba(0, 0, 255, 0.7)',
-                'stroke-width': 2,
-                'fill-color': 'rgba(0, 0, 255, 0.1)'
-            },
-            displayInLayerSwitcher: false
-        })
-
-        this.markerLayer = new ExtendedVectorLayer<Feature<Point>>({
-            source: new VectorSource({
-                features: this.markerFeatures
-            }),
-            style: new Style({
-                image: new Icon({
-                    opacity: 1,
-                    src: 'assets/images/map-pin.svg',
-                    scale: 1.5,
-                    displacement: [0, 15]
-                })
-            }),
-            displayInLayerSwitcher: false
-        })
-
-        this.drawLayer = new ExtendedVectorLayer({
-            source: new VectorSource(),
-            style: {
-                'stroke-color': 'rgba(0, 0, 0, 0)',
-                'stroke-width': 0,
-                'fill-color': 'rgba(0, 0, 0, 0)'
-            },
-            displayInLayerSwitcher: false
-        })
-
-        return this.selectedRegionLayer
     }
 
     initMap(targetId: string, isReportMap: boolean = false) {
         this.mapId = targetId
 
-        const selectedRegionLayer: ExtendedVectorLayer<FeatureLike> = this.initLayers()
+        const availableStyles = ['Graybeard', 'Colorful', 'ESRI World Imagery']
+        const storedStyle = this.storageService.getSelectedMapLayer('')
 
-        const popupElement = this.createPopupElements()
-
-        this.mapPopUp = new Overlay({
-            element: popupElement!,
-            autoPan: {
-                animation: {
-                    duration: 250
-                }
-            }
-        })
-
-        const positronLayerName = 'Carto Positron'
-
-        const osmCarto = new ExtendedTileLayer({
-            source: new OSM(),
-            name: 'OSM Carto',
-            baseLayer: true,
-            visible: false
-        })
-
-        const aerialImagery = new ExtendedTileLayer({
-            name: 'ESRI World Imagery',
-            baseLayer: true,
-            visible: false,
-            source: new XYZ({
-                url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                attributions:
-                    'Powered by <a href="https://www.esri.com/" target="_blank">ESRI</a> | Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-                attributionsCollapsible: false,
-                maxZoom: 19
-            })
-        })
-
-        const greyscaleBase = new ExtendedTileLayer({
-            name: positronLayerName,
-            baseLayer: true,
-            visible: true,
-            source: new XYZ({
-                url: 'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                attributions:
-                    '<a href="https://carto.com/" target="_blank">© CARTO</a> <a href="https://openmaptiles.org/" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>.',
-                attributionsCollapsible: false
-            })
-        })
-
-        const heidelbergCoords = [8.6759928, 49.4187355]
-        const initialView = new View({
-            center: fromLonLat(heidelbergCoords),
-            zoom: 0,
-            maxZoom: 20
-        })
-
-        const customZoomOutLabel = document.createElement('span')
-        customZoomOutLabel.innerHTML = '<img src="assets/images/globe.svg" style="width: 16px; height: 16px;">'
-
-        const interactions = defaultInteractions({
-            mouseWheelZoom: !isReportMap
-        })
+        this.currentBasemapStyle = availableStyles.includes(storedStyle) ? storedStyle : 'Graybeard'
 
         this.map = new Map({
-            layers: [aerialImagery, osmCarto, greyscaleBase],
-            target: targetId,
-            view: initialView,
-            overlays: [this.mapPopUp],
-            interactions: interactions,
-            controls: defaultControls().extend([
-                new ScaleLine(),
-                new ZoomToExtent({
-                    extent: initialView.calculateExtent(),
-                    label: customZoomOutLabel,
-                    tipLabel: 'Zoom out max'
-                })
-            ])
+            container: targetId,
+            style: this.getInitialMapStyle(),
+            center: [8.6759928, 49.4187355],
+            zoom: 3,
+            maxZoom: 20,
+            renderWorldCopies: false
         })
 
-        if (isReportMap) {
-            const mapElement = this.map.getTargetElement()
-            const noteId = `map-zoom-note-${targetId.replace('report-map-', '')}`
-            const noteElement = document.getElementById(noteId)
+        const navigationControl = new maplibregl.NavigationControl({
+            visualizePitch: true,
+            visualizeRoll: true
+        })
+        navigationControl._container.className += ' navigation-controls'
+        this.map!.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'top-right')
+        this.map!.addControl(navigationControl, 'top-right')
+        this.map!.addControl(MapControlsUtils.createZoomToZeroControl(), 'top-right')
 
-            if (mapElement && noteElement) {
-                let hideTimeout: number | null = null
+        this.addLayerSwitcher()
 
-                mapElement.addEventListener('wheel', () => {
-                    noteElement.classList.add('visible')
+        if (!isReportMap) {
+            this.map!.scrollZoom.enable()
+        } else {
+            this.map!.scrollZoom.disable()
+            this.setupReportMapZoomNote()
+        }
 
-                    if (hideTimeout) {
-                        window.clearTimeout(hideTimeout)
-                    }
+        this.mapPopUp = new Popup({ closeButton: false, closeOnClick: false })
+        this.setupEventHandlers()
 
-                    hideTimeout = window.setTimeout(() => {
-                        noteElement.classList.remove('visible')
-                        hideTimeout = null
-                    }, 3000)
-                })
+        this.map!.on('load', () => {
+            this.setupLayers()
+            if (this.mapDrawingService) {
+                this.terraDrawControl = this.mapDrawingService.initializeTerraDraw(this.map!)
             }
-        }
-
-        const selectedMapLayer = this.storageService.getSelectedMapLayer(positronLayerName)
-        this.map.getLayers().forEach(layer => {
-            layer.setVisible(layer.get('name') === selectedMapLayer)
-        })
-
-        this.layerSwitcherCollapsed = this.storageService.getLayerSwitcherCollapsed()
-        const layerSwitcher = new LayerSwitcher({
-            collapsed: this.layerSwitcherCollapsed,
-            reordering: false,
-            onchangeCheck: () => {
-                const visibleBaseLayer = this.map
-                    ?.getLayers()
-                    .getArray()
-                    .find(layer => layer.getVisible() && layer.get('baseLayer') === true)
-                if (visibleBaseLayer) {
-                    const selectedLayerName = visibleBaseLayer.get('name')
-                    if (selectedLayerName) {
-                        this.storageService.saveSelectedMapLayer(selectedLayerName)
-                    }
-                }
-            }
-        })
-        layerSwitcher.setHeader('<h3>Layers</h3>')
-        this.map.addControl(layerSwitcher)
-
-        layerSwitcher.on('toggle', toggleEvent => {
-            this.layerSwitcherCollapsed = toggleEvent.collapsed
-            this.storageService.saveLayerSwitcherCollapsed(this.layerSwitcherCollapsed)
-        })
-
-        if (this.regionLayer) {
-            this.map.addLayer(this.regionLayer)
-        }
-
-        if (this.markerLayer) {
-            this.map.addLayer(this.markerLayer)
-        }
-
-        this.map.addLayer(selectedRegionLayer)
-
-        if (this.drawLayer) {
-            this.map.addLayer(this.drawLayer)
-        }
-
-        this.map.on('pointermove', evt => {
-            if (!this.map || evt.dragging) {
-                return
-            }
-
-            const pixel = this.map.getEventPixel(evt.originalEvent)
-            const hasValidFeature = this.map.hasFeatureAtPixel(pixel, {
-                layerFilter: layer => {
-                    return layer === this.geojsonLayer
-                }
-            })
-
-            const showPointer = hasValidFeature || this.regionLayer?.getVisible()
-            this.map.getTargetElement().style.cursor = showPointer ? 'pointer' : ''
-        })
-
-        this.map.on('click', evt => {
-            this.selectRegions(evt.pixel)
         })
 
         if (environment.environmentType === 'testing' || environment.environmentType === 'development') {
-            // Allow flexibility in window object for debugging in Cypress
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ;(window as any).olMap = this.map
+            ;(window as Window & { map?: Map }).map = this.map
         }
     }
 
-    highlightAoI(feature: Feature<MultiPolygon>): Extent {
-        this.removeComputeLayers()
+    private setupLayers() {
+        if (!this.map) return
 
-        const extent = feature.getGeometry()!.getExtent()
-
-        const scissor = feature.getGeometry()!
-        const fogOfWar = this.cutFromGlobalPolygon(scissor)
-
-        const vectorSource = new VectorSource({
-            features: [feature, fogOfWar]
-        })
-
-        const aoiStyle = new Style({
-            stroke: new Stroke({
-                color: '#008080',
-                width: 3
-            })
-        })
-
-        const fowStyle = new Style({ fill: new Fill({ color: '#80808050' }) })
-
-        this.focusedLayer = new ExtendedVectorLayer({
-            source: vectorSource,
-            style: function (feature) {
-                return feature.get('renderStyle') == 'AOI' ? aoiStyle : fowStyle
+        // Layer configuration
+        const layers = {
+            markers: { sourceId: 'markers' },
+            regions: {
+                sourceId: 'region-wms-source',
+                layerId: 'region-wms-layer',
+                tiles: 'https://maps.heigit.org/ohsome/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=ohsome:admin_world_water&WIDTH=256&HEIGHT=256&SRS=EPSG:3857&STYLES=&BBOX={bbox-epsg-3857}',
+                attribution:
+                    'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
             },
-            displayInLayerSwitcher: false
-        })
+            selectedRegions: {
+                sourceId: 'selected-regions',
+                fillLayerId: 'selected-regions-fill',
+                outlineLayerId: 'selected-regions-outline'
+            }
+        }
 
-        this.map?.addLayer(this.focusedLayer)
-        return extent
-    }
-
-    cutFromGlobalPolygon(scissor: MultiPolygon): Feature<Polygon> {
-        const global = new Polygon([
-            [
-                [-180, -90],
-                [180, -90],
-                [180, 90],
-                [-180, 90],
-                [-180, -90]
-            ].map(coordinate => fromLonLat(coordinate))
-        ])
-
-        const clipped = new Polygon([
-            global.getLinearRing(0)!.getCoordinates(),
-            ...scissor.getPolygons().map(polygon => polygon.getLinearRing(0)!.getCoordinates())
-        ])
-
-        return new Feature({ name: 'FogOfWar', geometry: clipped })
-    }
-
-    addGeoJsonLayer(data: object, artifactName: string): ExtendedVectorTileLayer {
-        const tileIndex = geojsonvt(data, {
-            extent: 4096,
-            maxZoom: 20
-        })
-
-        const format = new GeoJSON({
-            dataProjection: new Projection({
-                code: 'TILE_PIXELS',
-                units: 'tile-pixels',
-                extent: [0, 0, 4096, 4096]
-            })
-        })
-
-        const vectorSource = new VectorTileSource({
-            tileUrlFunction: function (tileCoord) {
-                return JSON.stringify(tileCoord)
-            },
-            tileLoadFunction: (tile, url) => {
-                const tileCoord = JSON.parse(url)
-                const [x, y, zoom] = tileCoord
-                const data = tileIndex.getTile(x, y, zoom)
-                const geojson = JSON.stringify(
-                    {
-                        type: 'FeatureCollection',
-                        features: data ? data.features : []
-                    },
-                    replacer
-                )
-
-                const tileFeatures = format.readFeatures(geojson, {
-                    extent: vectorSource.getTileGrid()?.getTileCoordExtent(tileCoord),
-                    featureProjection: 'EPSG:3857'
-                })
-                ;(tile as VectorTile).setFeatures(tileFeatures)
+        // Marker Source
+        this.map.addSource(layers.markers.sourceId, {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: []
             }
         })
 
-        this.geojsonLayer = new ExtendedVectorTileLayer({
-            source: vectorSource,
-            name: artifactName,
-            style: this.styleFunction.bind(this) as StyleFunction
-        })
-        this.geojsonLayer.setOpacity(0.8)
-
-        this.map?.addLayer(this.geojsonLayer)
-
-        const features = format.readFeatures(data, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
+        // Region WMS Layer
+        this.map.addSource(layers.regions.sourceId, {
+            type: 'raster',
+            tiles: [layers.regions.tiles],
+            tileSize: 256,
+            attribution: layers.regions.attribution
         })
 
-        const geojsonLayerSource = new VectorSource({
-            features: features
+        this.map.addLayer({
+            id: layers.regions.layerId,
+            type: 'raster',
+            source: layers.regions.sourceId,
+            paint: { 'raster-opacity': 1 },
+            layout: { visibility: 'none' }
         })
 
-        const originalGeojsonLayer = new VectorLayer({
-            source: geojsonLayerSource
-        })
-
-        this.featureHoverOverlay = this.createFeatureOverlay(0.5)
-        this.featureClickOverlay = this.createFeatureOverlay(0.75)
-        if (this.featureHoverOverlay) {
-            this.map?.addLayer(this.featureHoverOverlay)
-        }
-        if (this.featureClickOverlay) {
-            this.map?.addLayer(this.featureClickOverlay)
+        this.regionLayer = {
+            layerId: layers.regions.layerId,
+            sourceId: layers.regions.sourceId,
+            visible: false
         }
 
-        this.map?.on(
-            'pointermove',
-            function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
-                if (!this.featureHoverOverlay) return
+        // Selected Regions Layers
+        this.map.addSource(layers.selectedRegions.sourceId, {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: []
+            }
+        })
 
-                const features = this.getFeaturesAtPixel(evt.pixel, originalGeojsonLayer)
-                this.handleFeaturesTooltip(features, this.featureHoverOverlay)
-            }.bind(this)
+        this.map.addLayer({
+            id: layers.selectedRegions.fillLayerId,
+            type: 'fill',
+            source: layers.selectedRegions.sourceId,
+            paint: { 'fill-color': 'rgba(0, 0, 255, 0.1)', 'fill-outline-color': 'rgba(0, 0, 255, 0.7)' }
+        })
+
+        this.map.addLayer({
+            id: layers.selectedRegions.outlineLayerId,
+            type: 'line',
+            source: layers.selectedRegions.sourceId,
+            paint: { 'line-color': 'rgba(0, 0, 255, 0.7)', 'line-width': 2 }
+        })
+
+        this.selectedRegionLayer = {
+            sourceId: layers.selectedRegions.sourceId,
+            layerIds: [layers.selectedRegions.fillLayerId, layers.selectedRegions.outlineLayerId],
+            name: 'Selected Regions'
+        }
+    }
+
+    private setupEventHandlers() {
+        if (!this.map) return
+
+        this.map.on('mousemove', e => {
+            if (!this.map) return
+            let showPointer = false
+
+            if (this.regionLayer?.visible) {
+                showPointer = true
+            } else if (this.geojsonLayer) {
+                const existingLayers = this.geojsonLayer.layerIds.filter(id => this.map!.getLayer(id))
+                if (existingLayers.length > 0) {
+                    const features = this.map.queryRenderedFeatures(e.point, { layers: existingLayers })
+                    showPointer = features.length > 0
+                }
+            }
+
+            this.map.getCanvas().style.cursor = showPointer ? 'pointer' : ''
+        })
+
+        this.map.on('click', e => {
+            this.selectRegions([e.point.x, e.point.y])
+        })
+    }
+
+    private setupReportMapZoomNote() {
+        if (!this.map) return
+
+        const mapElement = this.map.getContainer()
+        const noteId = `map-zoom-note-${this.mapId.replace('report-map-', '')}`
+        const noteElement = document.getElementById(noteId)
+
+        if (mapElement && noteElement) {
+            let hideTimeout: number | null = null
+
+            mapElement.addEventListener('wheel', () => {
+                noteElement.classList.add('visible')
+
+                if (hideTimeout) {
+                    window.clearTimeout(hideTimeout)
+                }
+
+                hideTimeout = window.setTimeout(() => {
+                    noteElement.classList.remove('visible')
+                    hideTimeout = null
+                }, 3000)
+            })
+        }
+    }
+
+    getAutoCompleteSuggestions(query: string): Observable<AutocompleteFeature[]> {
+        const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
+
+        return this.http.get<FeatureCollection>(orsUrl).pipe(
+            map(collection => {
+                return collection.features
+                    .filter(
+                        (feature: GeoJSONFeature): feature is AutocompleteFeature => feature.geometry!.type === 'Point'
+                    )
+                    .map(
+                        (feature: GeoJSONFeature): AutocompleteFeature => ({
+                            ...feature,
+                            geometry: feature.geometry as GeoJSONPoint,
+                            // Ensure required properties exist with fallbacks
+                            properties: {
+                                ...feature.properties,
+                                name: feature.properties?.['name'] || 'Unknown location',
+                                label:
+                                    feature.properties?.['label'] || feature.properties?.['name'] || 'Unknown location'
+                            },
+                            bbox: feature.bbox
+                        })
+                    )
+            })
+        )
+    }
+
+    addMarker(feature: AutocompleteFeature) {
+        if (!this.map) return
+
+        // Clear existing markers
+        this.markerLayer.forEach(marker => marker.remove())
+        this.markerLayer = []
+        this.markerFeatures = []
+
+        // Get coordinates from the GeoJSON feature
+        const coords = (feature.geometry as GeoJSONPoint).coordinates
+        if (!coords || coords.length < 2) return
+
+        // Add new marker
+        const el = document.createElement('div')
+        el.className = 'marker'
+        el.style.backgroundImage = 'url(assets/images/map-pin.svg)'
+        el.style.width = '30px'
+        el.style.height = '30px'
+        el.style.backgroundSize = '100%'
+
+        const marker = new Marker({ element: el }).setLngLat([coords[0], coords[1]] as LngLatLike).addTo(this.map)
+
+        this.markerLayer.push(marker)
+        this.markerFeatures.push(feature)
+    }
+
+    calculateMapPadding() {
+        this.windowWidth = window.innerWidth
+        this.windowResolution = window.devicePixelRatio
+        const horMapPadding = 150 / this.windowResolution
+
+        if (this.windowWidth > 1600) {
+            return { top: horMapPadding, right: 100, bottom: horMapPadding, left: 225 }
+        } else {
+            return { top: horMapPadding, right: 100, bottom: horMapPadding, left: 250 }
+        }
+    }
+
+    fitToExtent(extent: Extent, options?: maplibregl.FitBoundsOptions) {
+        if (!this.map || !extent || extent.length !== 4) return
+
+        // Convert extent from EPSG:3857 to EPSG:4326
+        const wgs84Extent = MapConvertMeasureUtils.transformExtentToWgs84(extent)
+
+        // Create bounds from extent [minLng, minLat, maxLng, maxLat]
+        const bounds = new LngLatBounds(
+            [wgs84Extent[0], wgs84Extent[1]], // southwest
+            [wgs84Extent[2], wgs84Extent[3]] // northeast
         )
 
-        this.map?.on(
-            'click',
-            function (this: MapService, evt: MapBrowserEvent<PointerEvent>) {
-                const pixel = this.map?.getEventPixel(evt.originalEvent)
-                if (!pixel) return
+        // Default options with padding
+        const fitOptions = {
+            padding: this.calculateMapPadding(),
+            animate: false, // Disable animation by default for instant jump
+            ...options
+        }
 
-                this.geojsonLayer?.getFeatures(pixel).then(features => {
-                    if (this.featureClickOverlay) {
-                        this.handleFeaturesTooltip(features, this.featureClickOverlay, evt.coordinate, artifactName)
-                    }
+        this.map.fitBounds(bounds, fitOptions)
+    }
+
+    // Fly to extent with smooth animation - handles coordinates, bounding boxes, and features
+    flyToExtent(target: Extent | AutocompleteFeature | LngLatLike, options?: maplibregl.FlyToOptions) {
+        if (!this.map) return
+
+        let bounds: LngLatBounds | null = null
+        let center: LngLatLike | null = null
+        const defaultZoom = 15
+
+        // Handle AutocompleteFeature (from search)
+        if (target && typeof target === 'object' && 'geometry' in target) {
+            const feature = target as AutocompleteFeature
+
+            if (feature.geometry!.type === 'Point') {
+                this.addMarker(feature)
+                const coords = (feature.geometry as GeoJSONPoint).coordinates
+                if (feature.bbox?.length === 4) {
+                    bounds = new LngLatBounds([feature.bbox[0], feature.bbox[1]], [feature.bbox[2], feature.bbox[3]])
+                } else if (coords?.length >= 2) {
+                    center = [coords[0], coords[1]] as LngLatLike
+                }
+            }
+        }
+        // Handle extent array [minX, minY, maxX, maxY] in EPSG:3857
+        else if (Array.isArray(target) && target.length === 4) {
+            const wgs84Extent = MapConvertMeasureUtils.transformExtentToWgs84(target)
+            bounds = new LngLatBounds([wgs84Extent[0], wgs84Extent[1]], [wgs84Extent[2], wgs84Extent[3]])
+        }
+        // Handle LngLatLike (coordinate pair)
+        else if (
+            (Array.isArray(target) && target.length === 2) ||
+            (typeof target === 'object' && 'lng' in target && 'lat' in target)
+        ) {
+            center = target as LngLatLike
+        }
+
+        // Execute the flyTo animation
+        if (bounds) {
+            const padding = this.calculateMapPadding()
+            const zoom = this.map.cameraForBounds(bounds, { padding })
+            if (zoom?.zoom !== undefined) {
+                this.map.flyTo({
+                    center: zoom.center,
+                    zoom: Math.min(zoom.zoom, defaultZoom),
+                    bearing: zoom.bearing || 0,
+                    duration: 1500,
+                    padding,
+                    ...options
                 })
-            }.bind(this)
+            }
+        } else if (center) {
+            this.map.flyTo({ center, zoom: defaultZoom, duration: 1500, ...options })
+        }
+    }
+
+    highlightAoI(feature: Feature<Geometry>): Extent | null {
+        this.removeFocusedLayer()
+        const geometry = feature?.getGeometry?.() as OLMultiPolygon | OLPolygon | null
+        if (!geometry) return null
+
+        const extent = geometry.getExtent()
+        if (!extent?.length) return null
+
+        try {
+            const transformCoords = (coords: Coordinate[]) =>
+                coords.map(c => MapConvertMeasureUtils.mercatorToWgs84(c[0], c[1]))
+            const coords = geometry.getCoordinates()
+            const transformedCoordinates: Position[][][] =
+                geometry instanceof OLMultiPolygon
+                    ? (coords as Coordinate[][][]).map(poly => poly.map(transformCoords))
+                    : [(coords as Coordinate[][]).map(transformCoords)]
+
+            const [aoiLayerId, fowLayerId, sourceId] = ['focused-aoi-layer', 'focused-fow-layer', 'focused-source']
+            ;[aoiLayerId, fowLayerId].forEach(id => this.map?.getLayer(id) && this.map.removeLayer(id))
+            if (this.map?.getSource(sourceId)) this.map.removeSource(sourceId)
+
+            this.map?.addSource(sourceId, {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            geometry: { type: 'MultiPolygon', coordinates: transformedCoordinates },
+                            properties: { renderStyle: 'AOI' }
+                        },
+                        this.cutFromGlobalPolygon(geometry)
+                    ]
+                }
+            })
+
+            this.map?.addLayer({
+                id: fowLayerId,
+                type: 'fill',
+                source: sourceId,
+                filter: ['==', ['get', 'renderStyle'], 'FoW'],
+                paint: { 'fill-color': 'rgba(128, 128, 128, 0.3)', 'fill-outline-color': 'rgba(128, 128, 128, 0.3)' }
+            })
+
+            this.map?.addLayer({
+                id: aoiLayerId,
+                type: 'line',
+                source: sourceId,
+                filter: ['==', ['get', 'renderStyle'], 'AOI'],
+                paint: { 'line-color': '#008080', 'line-width': 3 }
+            })
+
+            this.focusedLayer = { aoiLayerId, fowLayerId, sourceId }
+            return extent
+        } catch (error) {
+            console.error('Error highlighting AOI:', error)
+            return null
+        }
+    }
+
+    cutFromGlobalPolygon(scissor: OLMultiPolygon | OLPolygon): GeoJSONFeature<MultiPolygon> {
+        // Create a global polygon covering the entire world in EPSG:4326
+        const globalCoords: Position[] = [
+            [-180, -90],
+            [180, -90],
+            [180, 90],
+            [-180, 90],
+            [-180, -90]
+        ]
+
+        // Get the scissor coordinates and convert from EPSG:3857 to EPSG:4326
+        const scissorPolygons =
+            'getPolygons' in scissor ? (scissor as OLMultiPolygon).getPolygons() : [scissor as OLPolygon]
+
+        // Collect all holes (each polygon becomes a hole in the global polygon)
+        const holes: Position[][] = scissorPolygons.map(polygon =>
+            polygon
+                .getLinearRing(0)!
+                .getCoordinates()
+                .map((coord: Coordinate) => MapConvertMeasureUtils.mercatorToWgs84(coord[0], coord[1]))
         )
+
+        // Create a single polygon with the global boundary as outer ring and all AOI polygons as holes
+        const coordinates: Position[][][] = [[globalCoords, ...holes]]
+
+        // Create the FoW feature as a MultiPolygon
+        return {
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPolygon',
+                coordinates
+            },
+            properties: {
+                name: 'FogOfWar',
+                renderStyle: 'FoW'
+            }
+        } as GeoJSONFeature<MultiPolygon>
+    }
+
+    addGeoJsonLayer(data: FeatureCollection, artifactName: string): VectorLayerGroup | undefined {
+        if (!this.map) return undefined
+
+        const layerId = `geojson-${artifactName}-${Date.now()}`
+        const sourceId = `source-${layerId}`
+        const layerIds: string[] = []
+
+        this.map.addSource(sourceId, { type: 'geojson', data })
+
+        const features = data.features || []
+        const geomTypes = new Set(features.map((f: GeoJSONFeature) => f.geometry?.type))
+
+        const layerConfigs = [
+            {
+                check: geomTypes.has('Polygon') || geomTypes.has('MultiPolygon'),
+                layers: [
+                    {
+                        id: `${layerId}-fill`,
+                        type: 'fill' as const,
+                        filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+                        paint: { 'fill-color': ['coalesce', ['get', 'color'], '#3388ff'], 'fill-opacity': 0.5 }
+                    },
+                    {
+                        id: `${layerId}-outline`,
+                        type: 'line' as const,
+                        filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+                        paint: { 'line-color': ['coalesce', ['get', 'color'], '#3388ff'], 'line-width': 2 }
+                    }
+                ]
+            },
+            {
+                check: geomTypes.has('LineString') || geomTypes.has('MultiLineString'),
+                layers: [
+                    {
+                        id: `${layerId}-line`,
+                        type: 'line' as const,
+                        filter: ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]],
+                        paint: {
+                            'line-color': ['coalesce', ['get', 'color'], '#3388ff'],
+                            'line-width': 3,
+                            'line-opacity': 0.8
+                        },
+                        layout: { 'line-cap': 'round', 'line-join': 'round' }
+                    }
+                ]
+            },
+            {
+                check: geomTypes.has('Point') || geomTypes.has('MultiPoint'),
+                layers: [
+                    {
+                        id: `${layerId}-point`,
+                        type: 'circle' as const,
+                        filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
+                        paint: {
+                            'circle-radius': 5,
+                            'circle-color': ['coalesce', ['get', 'color'], '#3388ff'],
+                            'circle-stroke-color': '#000000',
+                            'circle-stroke-width': 1,
+                            'circle-opacity': 0.8
+                        }
+                    }
+                ]
+            }
+        ]
+
+        layerConfigs.forEach(config => {
+            if (config.check) {
+                config.layers.forEach(layer => {
+                    this.map!.addLayer({ source: sourceId, ...layer } as maplibregl.LayerSpecification)
+                    layerIds.push(layer.id)
+                })
+            }
+        })
+
+        this.geojsonLayer = { layerIds, sourceId, name: artifactName }
+        MapGeoJsonUtils.setupGeoJsonInteractions(this.map, layerId, artifactName, this.featureHoverOverlay, overlay => {
+            this.featureHoverOverlay = overlay
+        })
+
+        this.layerSwitcherControl?.updateLayerControls()
 
         return this.geojsonLayer
     }
 
-    styleFunction(feature: FeatureLike, resolution: number): Style {
-        const widthUnits = 15
-        const strokeWidth = Math.min(Math.max(Math.pow(1.15, widthUnits / resolution), 1.5), 5)
-        const color = feature.get('color')
-        let strokeColor = [0, 0, 0, 1]
+    async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
+        if (!this.map) return undefined
 
-        const geom = feature.getGeometry()
-        if (geom && (geom.getType() == 'LineString' || geom.getType() == 'MultiLineString')) {
-            strokeColor = color
-        }
+        const layerId = `geotiff-${artifactName || 'layer'}-${Date.now()}`
+        const sourceId = `source-${layerId}`
 
-        return new Style({
-            fill: new Fill({
-                color: color
-            }),
-            stroke: new Stroke({
-                color: strokeColor,
-                width: strokeWidth
-            }),
-            image: new CircleStyle({
-                radius: 5,
-                stroke: new Stroke({
-                    color: strokeColor
-                }),
-                fill: new Fill({
-                    color: color
-                })
+        try {
+            const tiff = await geoTiffFromUrl(sourceURL)
+            const image = await tiff.getImage()
+            const bbox = image.getBoundingBox()
+            const { rasters, width, height } = await MapGeoTiffUtils.readDownsampledGeoTiffRasters(tiff)
+            const canvas = MapGeoTiffUtils.renderPalettedGeoTiff(
+                width,
+                height,
+                MapGeoTiffUtils.getFirstRaster(rasters),
+                image.getFileDirectory().ColorMap
+            )
+
+            this.map.addSource(sourceId, {
+                type: 'image',
+                url: canvas.toDataURL(),
+                coordinates: [
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                ]
             })
-        })
-    }
 
-    async addGeoTiffLayer(sourceURL: string, artifactName: string | undefined) {
-        const geoTiffSource = new GeoTIFF({
-            sources: [
-                {
-                    url: sourceURL,
-                    // The following options are due to https://github.com/openlayers/openlayers/issues/15894
-                    bands: [1, 2, 3],
-                    nodata: 0
-                }
-            ],
-            convertToRGB: true,
-            interpolate: false
-        })
+            this.map.addLayer({
+                id: layerId,
+                source: sourceId,
+                type: 'raster',
+                paint: { 'raster-opacity': 0.8, 'raster-resampling': 'linear' }
+            })
 
-        await geoTiffSource.getView()
+            this.layerSwitcherControl?.updateLayerControls()
 
-        const geoTiffLayer = new ExtendedTileLayer({
-            source: geoTiffSource,
-            name: artifactName
-        })
-        geoTiffLayer.setOpacity(0.8)
-
-        this.map?.addLayer(geoTiffLayer)
-        return geoTiffLayer
+            return {
+                id: layerId,
+                sourceId,
+                name: artifactName || 'GeoTIFF Layer',
+                setOpacity: (opacity: number) => this.map?.setPaintProperty(layerId, 'raster-opacity', opacity),
+                setVisible: (visible: boolean) =>
+                    this.map?.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none')
+            }
+        } catch (error) {
+            console.error('Error loading GeoTIFF:', error)
+            if (this.map?.getLayer(layerId)) {
+                this.map.removeLayer(layerId)
+            }
+            if (this.map?.getSource(sourceId)) {
+                this.map.removeSource(sourceId)
+            }
+            throw error
+        }
     }
 
     removeComputeLayers(): void {
-        if (this.regionLayer) {
-            this.regionLayer.setVisible(false)
+        if (this.regionLayer && this.map) {
+            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'none')
+            this.regionLayer.visible = false
         }
-        if (this.selectedRegionLayer) {
-            this.selectedRegionLayer.setVisible(false)
+
+        if (this.selectedRegionLayer && this.map) {
+            this.selectedRegionLayer.layerIds.forEach(layerId =>
+                this.map!.setLayoutProperty(layerId, 'visibility', 'none')
+            )
+
+            if (this.selectedOlFeatures.getLength() > 0) {
+                this.selectedOlFeatures.clear()
+                this.selectedGeoJSONFeatures = []
+                const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+                source?.setData({ type: 'FeatureCollection', features: [] })
+            }
         }
-        if (this.selectedFeatures.getLength() > 0) {
-            this.selectedFeatures.clear()
-        }
-        if (this.drawLayer) {
-            this.drawLayer.setVisible(false)
-        }
+
+        this.stopDrawing()
+        this.clearDrawnFeatures()
     }
 
     removeFocusedLayer(): void {
-        if (this.focusedLayer) {
-            this.map?.removeLayer(this.focusedLayer)
-            this.focusedLayer = undefined
+        if (!this.focusedLayer || !this.map) return
+        ;[this.focusedLayer.aoiLayerId, this.focusedLayer.fowLayerId].forEach(id => {
+            if (this.map!.getLayer(id)) this.map!.removeLayer(id)
+        })
+
+        if (this.map.getSource(this.focusedLayer.sourceId)) {
+            this.map.removeSource(this.focusedLayer.sourceId)
         }
+        this.focusedLayer = undefined
     }
 
     enableComputeLayers() {
-        if (this.map) {
-            if (this.regionLayer) {
-                this.regionLayer.setVisible(true)
-            }
-            if (this.selectedRegionLayer) {
-                this.selectedRegionLayer.setVisible(true)
-            }
-            if (this.drawLayer) {
-                this.drawLayer.setVisible(true)
-            }
+        if (this.regionLayer && this.map) {
+            // Show the region WMS layer
+            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'visible')
+            this.regionLayer.visible = true
+        }
+
+        if (this.selectedRegionLayer && this.map) {
+            this.selectedRegionLayer.layerIds.forEach(layerId =>
+                this.map!.setLayoutProperty(layerId, 'visibility', 'visible')
+            )
+        }
+
+        if (this.mapDrawingService?.currentDrawModeValue) {
+            this.terraDrawControl?.getTerraDrawInstance()?.setMode(this.mapDrawingService.currentDrawModeValue)
         }
     }
 
-    selectRegions(pixel: Array<number>) {
-        if (this.regionLayer?.getVisible() && this.map) {
-            const source = this.regionLayer.getSource() as TileWMS
-            const resolution = this.map.getView().getResolution()
-            const projection = this.map.getView().getProjection()
+    selectRegions(pixel: [number, number]) {
+        if (!this.regionLayer?.visible || !this.map) return
 
-            if (resolution) {
-                const url = source.getFeatureInfoUrl(this.map.getCoordinateFromPixel(pixel), resolution, projection, {
-                    INFO_FORMAT: 'application/json',
-                    FEATURE_COUNT: 10
-                })
+        const canvas = this.map.getCanvas()
+        const bbox = this.map.getBounds()
+        const [sw, ne] = [bbox.getSouthWest(), bbox.getNorthEast()]
+        const [swM, neM]: [Position, Position] = [
+            MapConvertMeasureUtils.lngLatToMercator(sw.lng, sw.lat),
+            MapConvertMeasureUtils.lngLatToMercator(ne.lng, ne.lat)
+        ]
 
-                if (url) {
-                    this.http.get<GeoJSONFeatureCollection>(url).subscribe(response => {
-                        if (response.features && response.features.length > 0) {
-                            this.selectedFeatures.clear()
-                            response.features.forEach((geoJsonFeature: GeoJSONFeature) => {
-                                const feature = new GeoJSON().readFeature(geoJsonFeature)
-                                feature.set('name', feature.get('name') || 'Unnamed Region')
-                                feature.set(
-                                    'id',
-                                    (feature.get('id') || Math.random().toString(36).substring(2, 9)).toString()
-                                )
-                                const geometry = feature.getGeometry()
-                                feature.set(
-                                    'area',
-                                    geometry ? Number((getArea(geometry) * MapService.sqmToSqkmFactor).toFixed(2)) : 0
-                                )
-                                this.selectedFeatures.push(feature)
-                            })
+        const wmsParams = new URLSearchParams({
+            SERVICE: 'WMS',
+            VERSION: '1.1.1',
+            REQUEST: 'GetFeatureInfo',
+            FORMAT: 'image/png',
+            TRANSPARENT: 'true',
+            INFO_FORMAT: 'application/json',
+            QUERY_LAYERS: 'ohsome:admin_world_water',
+            LAYERS: 'ohsome:admin_world_water',
+            FEATURE_COUNT: '10',
+            STYLES: '',
+            SRS: 'EPSG:3857',
+            X: Math.round(pixel[0]).toString(),
+            Y: Math.round(pixel[1]).toString(),
+            WIDTH: canvas.clientWidth.toString(),
+            HEIGHT: canvas.clientHeight.toString(),
+            BBOX: `${swM[0]},${swM[1]},${neM[0]},${neM[1]}`
+        })
+
+        this.http.get(`https://maps.heigit.org/ohsome/service/wms?${wmsParams}`, { responseType: 'text' }).subscribe({
+            next: responseText => {
+                try {
+                    const response = JSON.parse(responseText) as FeatureCollection
+                    if (!response.features?.length) return
+
+                    this.selectedOlFeatures.clear()
+                    this.selectedGeoJSONFeatures = []
+                    const features: GeoJSONFeature[] = response.features.map((feature: GeoJSONFeature) => {
+                        // Transform geometry if needed (WMS returns EPSG:3857)
+                        const needsTransform =
+                            feature.geometry?.type === 'MultiPolygon' &&
+                            Math.abs(feature.geometry.coordinates[0]?.[0]?.[0]?.[0] || 0) > 180
+
+                        const geometry = needsTransform
+                            ? MapConvertMeasureUtils.transformGeometryToWgs84(feature.geometry!)
+                            : feature.geometry
+
+                        const processedFeature: GeoJSONFeature = {
+                            type: 'Feature',
+                            geometry,
+                            properties: {
+                                name: feature.properties?.['name'] || 'Unnamed Region',
+                                id: (
+                                    feature.properties?.['id'] || Math.random().toString(36).substring(2, 9)
+                                ).toString(),
+                                area: 0
+                            }
                         }
+
+                        // Calculate area after feature is created
+                        if (geometry) {
+                            processedFeature.properties!['area'] = Number(
+                                (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
+                            )
+                        }
+
+                        // Add OpenLayers compatibility wrapper
+                        this.selectedOlFeatures.push({
+                            get: (key: string) => processedFeature.properties![key],
+                            set: (key: string, value: string | number | boolean | null | undefined) => {
+                                processedFeature.properties![key] = value
+                            },
+                            getGeometry: () => processedFeature.geometry,
+                            getProperties: () => processedFeature.properties
+                        } as unknown as Feature)
+
+                        return processedFeature
                     })
+
+                    // Store GeoJSON features for easy removal
+                    this.selectedGeoJSONFeatures = features
+
+                    // Update map layer
+                    if (this.selectedRegionLayer) {
+                        const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+                        source?.setData({ type: 'FeatureCollection', features })
+                    }
+                } catch (error) {
+                    if (responseText.includes('ServiceException')) {
+                        const xmlDoc = new DOMParser().parseFromString(responseText, 'text/xml')
+                        console.error('WMS Service Exception:', xmlDoc.querySelector('ServiceException')?.textContent)
+                    } else {
+                        console.error('Failed to parse GetFeatureInfo response:', error)
+                    }
                 }
-            }
-        }
+            },
+            error: error => console.error('Error fetching WMS feature info:', error)
+        })
     }
 
     getSelectedRegion(): GeoJSONFeature | null {
-        const feature = this.selectedFeatures.getLength() > 0 ? this.selectedFeatures.item(0) : undefined
-        if (feature) {
-            return new GeoJSON().writeFeatureObject(feature, {
-                dataProjection: 'EPSG:4326',
-                featureProjection: 'EPSG:3857',
-                decimals: 7
-            })
-        }
-        return null
-    }
-
-    getSelectedRegions(): Feature[] {
-        return this.selectedFeatures.getArray()
+        return this.selectedGeoJSONFeatures.length > 0 ? this.selectedGeoJSONFeatures[0] : null
     }
 
     removeSelectedRegion(feature: Feature): void {
-        this.selectedFeatures.remove(feature)
-    }
+        this.selectedOlFeatures.remove(feature)
 
-    private createPopupElements() {
-        const mapContainer = document.getElementById(this.mapId)
-        if (!mapContainer) return
-
-        const popupElement = document.createElement('div')
-        popupElement.id = `map-popup-${this.mapId}`
-        popupElement.className = 'ol-popup'
-
-        const popupContent = document.createElement('div')
-        popupContent.id = `map-popup-content-${this.mapId}`
-        popupContent.className = 'ol-popup-content'
-
-        popupElement.appendChild(popupContent)
-        mapContainer.appendChild(popupElement)
-
-        return popupElement
-    }
-
-    private createMeasureTooltip() {
-        if (this.measureTooltipElement) {
-            this.measureTooltipElement.parentNode?.removeChild(this.measureTooltipElement)
+        const featureId = feature.get('id')
+        if (featureId) {
+            this.selectedGeoJSONFeatures = this.selectedGeoJSONFeatures.filter(
+                geoJsonFeature => geoJsonFeature.properties?.['id'] !== featureId
+            )
         }
-        this.measureTooltipElement = document.createElement('div')
-        this.measureTooltipElement.className = 'ol-tooltip'
-        this.measureTooltip = new Overlay({
-            element: this.measureTooltipElement,
-            offset: [0, -15],
-            positioning: 'bottom-center',
-            stopEvent: false,
-            insertFirst: false
-        })
-        this.map?.addOverlay(this.measureTooltip)
-    }
 
-    createFeatureOverlay(opacity: number): ExtendedVectorLayer<Feature<Geometry>> {
-        const highlightStrokeWidth = 15
-        return new ExtendedVectorLayer({
-            source: new VectorSource(),
-            style: new Style({
-                stroke: new Stroke({
-                    color: `rgba(255, 255, 255, ${opacity})`,
-                    width: highlightStrokeWidth
-                }),
-                image: new CircleStyle({
-                    radius: 5,
-                    stroke: new Stroke({
-                        color: `rgba(255, 255, 255, ${opacity})`,
-                        width: highlightStrokeWidth
-                    })
-                })
-            }),
-            displayInLayerSwitcher: false
-        })
-    }
-
-    handleFeaturesTooltip(
-        features: Array<Feature<Geometry> | RenderFeature>,
-        overlay: ExtendedVectorLayer<Feature<Geometry>>,
-        coordinate?: Coordinate,
-        artifactName?: string
-    ) {
-        const popupContent = document.getElementById(`map-popup-content-${this.mapId}`)!
-        if (features.length > 0) {
-            overlay.getSource()?.clear()
-            overlay.getSource()?.addFeatures(features as Feature<Geometry>[])
-
-            if (coordinate) {
-                popupContent.innerHTML =
-                    '<span><strong>' +
-                    artifactName +
-                    '</strong> : ' +
-                    features.map(feature => feature.get('label')) +
-                    '</span>'
-                this.mapPopUp?.setPosition(coordinate)
-            }
-        } else {
-            overlay.getSource()?.clear()
-            if (coordinate) {
-                this.mapPopUp?.setPosition(undefined)
-            }
+        if (this.selectedRegionLayer && this.map) {
+            const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+            source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
         }
-    }
-
-    getFeaturesAtPixel(
-        pixel: number[],
-        originalGeojsonLayer: ExtendedVectorLayer<Feature<Geometry>>
-    ): Array<Feature<Geometry>> {
-        const features: Array<Feature<Geometry>> = []
-
-        this.map?.forEachFeatureAtPixel(pixel, feature => {
-            if (feature.getId()) {
-                const originalFeature = originalGeojsonLayer.getSource()?.getFeatureById(feature.getId() as number)
-                if (originalFeature) {
-                    features.push(originalFeature as Feature<Geometry>)
-                }
-            }
-        })
-
-        return features
     }
 
     startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
-        this.stopDrawing()
-
-        if (!this.map || !this.drawLayer) return
-
-        const drawConfig = this.getDrawConfiguration(type)
-        this.currentDrawInteraction = new Draw({
-            source: this.drawLayer.getSource() as VectorSource,
-            style: new Style({
-                fill: new Fill({
-                    color: 'rgba(231, 138, 195, 0.1)'
-                }),
-                stroke: new Stroke({
-                    color: 'rgba(231, 138, 195, 1)',
-                    width: 2
-                })
-            }),
-            ...drawConfig,
-            stopClick: false,
-            freehand: false
-        })
-
-        this.currentDrawInteraction.on('drawstart', (event: DrawEvent) => {
-            this.createMeasureTooltip()
-            const feature = event.feature
-            let tooltipCoord: Coordinate = [0, 0]
-            feature.getGeometry()?.on('change', evt => {
-                const geom = evt.target
-                if (geom instanceof Circle) {
-                    const center = geom.getCenter()
-                    const edge = geom.getLastCoordinate()
-                    const centerGeo = toLonLat(center)
-                    const edgeGeo = toLonLat(edge)
-                    const radius = getDistance(centerGeo, edgeGeo)
-
-                    tooltipCoord = edge
-                    this.measureTooltipElement!.innerHTML = '<span>Radius: ' + this.formatRadius(radius) + '</span>'
-                    this.measureTooltip?.setPosition(tooltipCoord)
-                }
-            })
-        })
-
-        this.currentDrawInteraction.on('drawend', (event: DrawEvent) => {
-            this.measureTooltipElement?.remove()
-            const feature = event.feature as Feature<Geometry>
-            this.onDrawEnd(feature, type)
-        })
-
-        this.setupDrawingInteractions()
-        this.isDrawingMode = true
-    }
-
-    private getDrawConfiguration(type: 'Polygon' | 'Circle' | 'Box') {
-        switch (type) {
-            case 'Circle':
-                return { type: 'Circle' as const }
-            case 'Box':
-                return {
-                    type: 'Circle' as const,
-                    geometryFunction: createBox()
-                }
-            case 'Polygon':
-                return { type: 'Polygon' as const }
-            default:
-                throw new Error(`Unsupported drawing type: ${type}`)
-        }
-    }
-
-    private formatRadius(radius: number): string {
-        if (radius > 1000) {
-            return `${(radius / 1000).toFixed(2)} km`
-        } else {
-            return `${radius.toFixed(0)} m`
-        }
-    }
-
-    private setupDrawingInteractions(): void {
-        if (!this.map || !this.drawLayer) return
-
-        this.map.addInteraction(this.currentDrawInteraction!)
-
-        this.snapInteraction = new Snap({
-            source: this.drawLayer.getSource() as VectorSource
-        })
-        this.map.addInteraction(this.snapInteraction)
+        this.mapDrawingService?.startDrawing(type)
     }
 
     stopDrawing(): void {
-        if (this.map) {
-            if (this.currentDrawInteraction) {
-                this.map.removeInteraction(this.currentDrawInteraction)
-                this.currentDrawInteraction = undefined
-            }
-            if (this.snapInteraction) {
-                this.map.removeInteraction(this.snapInteraction)
-                this.snapInteraction = undefined
-            }
-        }
-        this.measureTooltipElement?.remove()
-        this.isDrawingMode = false
+        this.mapDrawingService?.stopDrawing()
     }
 
     clearDrawnFeatures(): void {
-        if (this.drawLayer) {
-            this.drawLayer.getSource()?.clear()
-        }
-        this.selectedFeatures.clear()
-    }
+        this.mapDrawingService?.clearDrawnFeatures()
 
-    private onDrawEnd(feature: Feature<Geometry>, originalType: 'Polygon' | 'Circle' | 'Box'): void {
-        feature.set('name', 'Custom Area')
-        feature.set('original_type', originalType)
-        feature.set('id', Math.random().toString(36).substring(2, 9).toString())
+        this.selectedOlFeatures.clear()
+        this.selectedGeoJSONFeatures = []
 
-        const geometry = feature.getGeometry()
-        if (geometry) {
-            let convertedGeometry: MultiPolygon
-
-            if (geometry.getType() === 'Circle') {
-                const circle = geometry as Circle
-                const polygon = fromCircle(circle)
-
-                convertedGeometry = new MultiPolygon([polygon.getCoordinates()])
-            } else if (geometry.getType() === 'Polygon') {
-                const polygon = geometry as Polygon
-
-                convertedGeometry = new MultiPolygon([polygon.getCoordinates()])
-            } else {
-                if (geometry.getType() === 'MultiPolygon') {
-                    convertedGeometry = geometry as MultiPolygon
-                } else {
-                    throw new Error(`Unsupported geometry type for conversion to MultiPolygon: ${geometry.getType()}`)
-                }
+        if (this.selectedRegionLayer && this.map) {
+            const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+            if (source) {
+                source.setData({
+                    type: 'FeatureCollection',
+                    features: []
+                })
             }
-
-            const area = getArea(convertedGeometry) * MapService.sqmToSqkmFactor
-
-            feature.set('area', Number(area.toFixed(2)))
-            feature.setGeometry(convertedGeometry)
         }
-
-        this.selectedFeatures.push(feature)
-        this.stopDrawing()
     }
 
     enableBoundarySelection(): void {
-        if (this.regionLayer) {
-            this.regionLayer.setVisible(true)
+        if (this.regionLayer && this.map) {
+            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'visible')
+            this.regionLayer.visible = true
         }
     }
 
     disableBoundarySelection(): void {
-        if (this.regionLayer) {
-            this.regionLayer.setVisible(false)
+        if (this.regionLayer && this.map) {
+            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'none')
+            this.regionLayer.visible = false
         }
+    }
+
+    private getInitialMapStyle(): string | StyleSpecification {
+        const isVectorStyle = ['Graybeard', 'Colorful'].includes(this.currentBasemapStyle)
+        if (isVectorStyle) {
+            return `assets/map-schema/${this.currentBasemapStyle.toLowerCase()}/style.json`
+        }
+
+        return this.createRasterStyle()
+    }
+
+    private createRasterStyle(): StyleSpecification {
+        return {
+            version: 8,
+            sources: {
+                'raster-tiles': {
+                    type: 'raster',
+                    tiles: [
+                        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                    ],
+                    tileSize: 256,
+                    attribution:
+                        'Powered by <a href="https://www.esri.com/" target="_blank">ESRI</a> | Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+                    maxzoom: 19
+                }
+            },
+            layers: [
+                {
+                    id: 'simple-tiles',
+                    type: 'raster',
+                    source: 'raster-tiles',
+                    minzoom: 0,
+                    maxzoom: 19
+                }
+            ]
+        }
+    }
+
+    private addLayerSwitcher(): void {
+        if (!this.map) return
+
+        const styles: MapStyle[] = [
+            { title: 'Graybeard', uri: 'assets/map-schema/graybeard/style.json' },
+            { title: 'Colorful', uri: 'assets/map-schema/colorful/style.json' },
+            { title: 'ESRI World Imagery', uri: this.createRasterStyle() }
+        ]
+
+        const initialExpanded = !this.storageService.getLayerSwitcherCollapsed()
+
+        this.layerSwitcherControl = MapControlsUtils.createLayerSwitcherControl(
+            styles,
+            this.currentBasemapStyle,
+            (styleName: string) => {
+                this.currentBasemapStyle = styleName
+                this.storageService.saveSelectedMapLayer(styleName)
+
+                this.map!.once('style.load', () => {
+                    if (this.mapDrawingService) {
+                        this.terraDrawControl = this.mapDrawingService.initializeTerraDraw(this.map!)
+                    }
+
+                    if (this.mapDrawingService?.isDrawingModeValue && this.mapDrawingService.currentDrawModeValue) {
+                        let mode: 'Box' | 'Circle' | 'Polygon'
+                        switch (this.mapDrawingService.currentDrawModeValue) {
+                            case 'rectangle':
+                                mode = 'Box'
+                                break
+                            case 'circle':
+                                mode = 'Circle'
+                                break
+                            case 'polygon':
+                                mode = 'Polygon'
+                                break
+                            default:
+                                throw new Error(`Unknown draw mode: ${this.mapDrawingService.currentDrawModeValue}`)
+                        }
+                        this.startDrawing(mode)
+                    }
+                })
+            },
+            (isExpanded: boolean) => {
+                this.storageService.saveLayerSwitcherCollapsed(!isExpanded)
+            },
+            initialExpanded
+        )
+
+        this.map.addControl(this.layerSwitcherControl as IControl, 'bottom-right')
     }
 }

@@ -102,7 +102,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         private dialog: MatDialog
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
-            this.mapService.selectedFeatures.on('change:length', handler)
+            this.mapService.selectedOlFeatures.on('change:length', handler)
         )
 
         this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
@@ -141,7 +141,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     resetForm(): void {
         this.form.reset()
-        this.mapService.selectedFeatures.clear()
+        this.mapService.selectedOlFeatures.clear()
         this.mapService.clearDrawnFeatures()
         this.areaLabelControl.setValue('')
         if (this.currentSelectionMode !== 'Boundary') {
@@ -153,7 +153,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     toggleFormState(): void {
-        if (this.mapService.selectedFeatures.getLength() > 0) {
+        if (this.mapService.selectedOlFeatures.getLength() > 0) {
             this.form.enable()
             this.areaSelected = true
         } else {
@@ -336,7 +336,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     hasValidAreaSelection(): boolean {
-        const hasValidArea = this.mapService.selectedFeatures.getLength() === 1
+        const hasValidArea = this.mapService.selectedOlFeatures.getLength() === 1
 
         if (this.currentSelectionMode !== 'Boundary') {
             return hasValidArea && this.areaLabelControl.valid
@@ -365,7 +365,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     removeSelectedRegion(region: Feature): void {
-        this.mapService.selectedFeatures.remove(region)
+        this.mapService.removeSelectedRegion(region)
         if (this.currentSelectionMode !== 'Boundary') {
             this.mapService.clearDrawnFeatures()
             this.mapService.stopDrawing()

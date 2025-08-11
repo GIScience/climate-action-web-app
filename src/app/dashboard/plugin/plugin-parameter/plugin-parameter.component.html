@@ -46,24 +46,24 @@
             class="area-selection-message"
             [ngClass]="{
                 'message--info': !areaSelected,
-                'message--blocked': areaSelected && this.mapService.selectedFeatures.getLength() > 1,
+                'message--blocked': areaSelected && this.mapService.selectedOlFeatures.getLength() > 1,
                 'message--warning':
                     areaSelected &&
-                    this.mapService.selectedFeatures.getLength() === 1 &&
-                    this.mapService.selectedFeatures.item(0).get('area') > 500
+                    this.mapService.selectedOlFeatures.getLength() === 1 &&
+                    this.mapService.selectedOlFeatures.item(0).get('area') > 500
             }"
             *ngIf="
                 !areaSelected ||
-                (areaSelected && this.mapService.selectedFeatures.getLength() > 1) ||
+                (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) ||
                 (areaSelected &&
-                    this.mapService.selectedFeatures.getLength() === 1 &&
-                    this.mapService.selectedFeatures.item(0).get('area') > 500)
+                    this.mapService.selectedOlFeatures.getLength() === 1 &&
+                    this.mapService.selectedOlFeatures.item(0).get('area') > 500)
             ">
             <i-lucide
                 [img]="
                     !areaSelected
                         ? Info
-                        : this.mapService.selectedFeatures.getLength() > 1
+                        : this.mapService.selectedOlFeatures.getLength() > 1
                           ? TriangleAlert
                           : CircleAlert
                 "
@@ -78,17 +78,16 @@
                     {{ currentSelectionMode === 'Box' ? 'rectangle' : 'circle' }}. Click again to finish.
                 </ng-container>
                 <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Polygon'">
-                    Click on multiple points to draw a polygon, or hold <em>Shift</em> and click and drag the pointer to
-                    draw freehand. Double-click anywhere to finish.
+                    Click on multiple points to draw a polygon. Double-click anywhere to finish.
                 </ng-container>
-                <ng-container *ngIf="areaSelected && this.mapService.selectedFeatures.getLength() > 1"
+                <ng-container *ngIf="areaSelected && this.mapService.selectedOlFeatures.getLength() > 1"
                     >Multiple areas selected. Please select only one.</ng-container
                 >
                 <ng-container
                     *ngIf="
                         areaSelected &&
-                        this.mapService.selectedFeatures.getLength() === 1 &&
-                        this.mapService.selectedFeatures.item(0).get('area') > 500
+                        this.mapService.selectedOlFeatures.getLength() === 1 &&
+                        this.mapService.selectedOlFeatures.item(0).get('area') > 500
                     "
                     >The selected region is large (> 500 km²).<br />Processing may take longer, or even
                     fail.</ng-container
@@ -97,7 +96,7 @@
         </div>
 
         <div *ngIf="areaSelected" class="selected-regions">
-            <div *ngFor="let region of this.mapService.selectedFeatures.getArray()" class="region-item">
+            <div *ngFor="let region of this.mapService.selectedOlFeatures.getArray()" class="region-item">
                 <span *ngIf="currentSelectionMode === 'Boundary'" class="region-name">{{ region.get('name') }}</span>
                 <input
                     *ngIf="currentSelectionMode !== 'Boundary'"

@@ -13,10 +13,21 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             configureVisualRegression(on)
             on('before:browser:launch', (browser, launchOptions) => {
-                if (browser.name === 'chrome' && browser.isHeadless) {
+                if (browser.name === 'chrome' || browser.name === 'chromium') {
+                    // Disable GPU and set consistent rendering
                     launchOptions.args.push(
-                        '--window-size=1500,850 --start-fullscreen --force-color-profile=srgb --font-render-hinting=none'
+                        '--disable-gpu',
+                        '--disable-dev-shm-usage',
+                        '--disable-blink-features=AutomationControlled',
+                        '--force-device-scale-factor=1',
+                        '--force-color-profile=srgb',
+                        '--font-render-hinting=none'
                     )
+
+                    if (browser.isHeadless) {
+                        // Use larger window size to ensure viewport fits
+                        launchOptions.args.push('--headless', '--window-size=1600,950')
+                    }
                 }
 
                 return launchOptions

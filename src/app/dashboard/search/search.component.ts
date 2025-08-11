@@ -4,11 +4,8 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
 import { NgScrollbar } from 'ngx-scrollbar'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { MapService } from '../map/map.service'
+import { AutocompleteFeature, MapService } from '../map/map.service'
 import { SearchTermHighlightPipe } from './search-highlight.pipe'
-import { AutocompleteProperties } from '@app/dashboard/search/search.interface'
-import { Feature } from 'ol'
-import Point from 'ol/geom/Point'
 
 @Component({
     selector: 'app-search',
@@ -25,7 +22,7 @@ import Point from 'ol/geom/Point'
 })
 export class SearchComponent implements OnInit {
     searchControl = new FormControl()
-    suggestions: Feature<Point>[] = []
+    suggestions: AutocompleteFeature[] = []
     firstSuggestionItem: HTMLElement | null = null
     searchInput: HTMLInputElement | null = null
     isFetchingSuggestions = false
@@ -57,7 +54,7 @@ export class SearchComponent implements OnInit {
                 })
             )
             .subscribe({
-                next: (results: Feature<Point>[]) => {
+                next: (results: AutocompleteFeature[]) => {
                     this.suggestions = results
                     this.isFetchingSuggestions = false
                     if (results.length > 0) {
@@ -73,7 +70,8 @@ export class SearchComponent implements OnInit {
             })
     }
 
-    formatLocation(properties: AutocompleteProperties): string {
+    formatLocation(suggestion: AutocompleteFeature): string {
+        const properties = suggestion.properties
         const { layer, locality, county, region, country } = properties
 
         const parts = [
@@ -88,18 +86,22 @@ export class SearchComponent implements OnInit {
         return parts.join(', ')
     }
 
-    selectSuggestion(suggestion: Feature<Point>) {
-        this.searchControl.setValue(suggestion.get('label'), { emitEvent: false })
+    selectSuggestion(suggestion: AutocompleteFeature) {
+        this.searchControl.setValue(suggestion.properties?.name, {
+            emitEvent: false
+        })
         this.suggestions = []
         this.isSearchActive = false
-        this.mapService.goToLocation(suggestion)
+        this.mapService.flyToExtent(suggestion)
     }
 
     clearSearch() {
         this.searchControl.setValue('')
         this.suggestions = []
         this.isSearchActive = false
-        this.mapService.markerFeatures.clear()
+        this.mapService.markerLayer.forEach(marker => marker.remove())
+        this.mapService.markerLayer = []
+        this.mapService.markerFeatures = []
     }
 
     onSuggestionKeydown(event: KeyboardEvent) {

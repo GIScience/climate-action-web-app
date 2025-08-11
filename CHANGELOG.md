@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/2.5.1...main)
 
+### Changed
+
+- Switched the map library to [MapLibre](https://maplibre.org/maplibre-gl-js/docs/), and we now have vector basemaps via [Versatiles](https://github.com/versatiles-org/versatiles-style) tiles and styles (using Shortbread schema) ([#180](https://gitlab.heigit.org/climate-action/web-app/-/issues/180))
+
 ### Added
 
 - Provide ability within Report Builder to export it to PDF ([#298](https://gitlab.heigit.org/climate-action/web-app/-/issues/298))

@@ -1,6 +1,8 @@
 .search-locations__wrapper {
+    position: relative;
     text-align: right;
     width: 250px;
+    z-index: 5;
 
     ng-scrollbar {
         max-height: 500px;
@@ -43,7 +45,7 @@
             border: none;
             position: absolute;
             right: 0;
-            top: 6.5px;
+            top: 7px;
             z-index: 2;
         }
     }

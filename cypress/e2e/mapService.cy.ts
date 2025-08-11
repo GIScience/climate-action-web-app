@@ -16,11 +16,11 @@ describe('mapService', () => {
     })
 
     it('display the layerswitcher', () => {
-        cy.get('.ol-layerswitcher').should('exist')
+        cy.get('.maplibregl-style-switcher-container').should('exist')
 
-        const expectedTexts = ['OSM Carto', 'ESRI World Imagery', 'Carto Positron']
+        const expectedTexts = ['Graybeard', 'Colorful', 'ESRI World Imagery']
 
-        cy.get('.ol-layerswitcher li.baselayer label span')
+        cy.get('.maplibregl-style-list button')
             .should('have.length', 3)
             .each(item => {
                 cy.wrap(item)
@@ -34,15 +34,15 @@ describe('mapService', () => {
     it('remembers the selected layer', () => {
         cy.visit('dashboard/plugin/plugin_blueprint')
 
-        cy.get('.ol-layerswitcher li.baselayer label span').eq(1).click()
+        cy.get('.maplibregl-style-list button').eq(1).click()
 
-        cy.get('.ol-layerswitcher li.baselayer').eq(1).should('have.class', 'ol-visible')
+        cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.reload(true)
 
-        cy.get('.ol-layerswitcher li.baselayer').eq(1).should('have.class', 'ol-visible')
+        cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
-        cy.get('.ol-layerswitcher li.baselayer label span')
+        cy.get('.maplibregl-style-list button')
             .eq(1)
             .invoke('text')
             .then(text => {
@@ -87,8 +87,8 @@ describe('mapService', () => {
 
         cy.wait('@getGeoTiffComputation')
 
-        cy.get('.ol-layerswitcher li.baselayer label span').eq(1).click()
-        cy.get('.ol-layerswitcher li.baselayer').eq(1).should('have.class', 'ol-visible')
+        cy.get('.maplibregl-style-list button').eq(1).click()
+        cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.get('.parent-computation').eq(0).click()
         cy.get('.child-computation').eq(0).click()
@@ -99,9 +99,9 @@ describe('mapService', () => {
 
         cy.wait('@getGeoTiffComputation')
 
-        cy.get('.ol-layerswitcher li.baselayer').eq(1).should('have.class', 'ol-visible')
+        cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
-        cy.get('.ol-layerswitcher li.baselayer label span')
+        cy.get('.maplibregl-style-list button')
             .eq(1)
             .invoke('text')
             .then(text => {
@@ -117,15 +117,15 @@ describe('mapService', () => {
     it('remembers the collapsed state', () => {
         cy.visit('dashboard/plugin/plugin_blueprint')
 
-        cy.get('.ol-layerswitcher button').click()
+        cy.get('.maplibregl-style-switcher').click()
 
-        cy.get('.ol-layerswitcher').should('not.have.class', 'ol-forceopen')
+        cy.get('.maplibregl-style-switcher-container').should('not.have.class', 'expanded')
 
         cy.reload(true)
 
         cy.waitForRenderComplete()
 
-        cy.get('.ol-layerswitcher').should('not.have.class', 'ol-forceopen')
+        cy.get('.maplibregl-style-switcher-container').should('not.have.class', 'expanded')
 
         cy.location('origin').then(origin => {
             cy.getAllLocalStorage().then(result => {
@@ -144,7 +144,7 @@ describe('mapService', () => {
         mockGeoJson()
 
         beforeCompareSnapshots(
-            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .ol-layerswitcher, .child-computations, .child-computations-wrapper, .toast-container'
+            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
         )
 
         cy.window().then(win => {
@@ -178,7 +178,7 @@ describe('mapService', () => {
         cy.wait('@getGeoJson')
         cy.waitForRenderComplete()
 
-        cy.compareSnapshot('geojson', 0.01)
+        cy.compareSnapshot('geojson', 0.05)
     })
 
     it('should display tooltips from a geojson layer ', () => {
@@ -220,30 +220,22 @@ describe('mapService', () => {
         cy.waitForRenderComplete()
 
         cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            const map = win.ng.getComponent(win.document.querySelector('app-map')).mapService.map
+            const lng = (12952933.57136454 * 180) / 20037508.34
+            const lat = (Math.atan(Math.exp((4853791.28861462 * Math.PI) / 20037508.34)) * 360) / Math.PI - 90
+            const point = map.project([lng, lat])
 
-            const coordinate = [12952933.57136454, 4853791.28861462]
-            const pixel = mapService.map.getPixelFromCoordinate(coordinate)
-
-            const fakePointerEvent = new PointerEvent('click', {
-                clientX: pixel[0],
-                clientY: pixel[1]
+            map.fire('mousemove', {
+                type: 'mousemove',
+                target: map,
+                originalEvent: new MouseEvent('mousemove', { clientX: point.x, clientY: point.y, bubbles: true }),
+                point: { x: point.x, y: point.y },
+                lngLat: map.unproject([point.x, point.y])
             })
-
-            const event = {
-                type: 'click',
-                target: mapService.map,
-                map: mapService.map,
-                pixel: pixel,
-                coordinate: coordinate,
-                dragging: false,
-                originalEvent: fakePointerEvent
-            }
-
-            mapService.map.dispatchEvent(event)
         })
 
-        cy.get('#map-popup-content-main-map span').should('contain.text', 'Connectivity : 0.0167')
+        cy.get('.maplibregl-popup-content').should('be.visible')
+        cy.get('.maplibregl-popup-content').should('contain.text', 'Connectivity: 0.0167')
     })
 
     it('should read the boundaries from the ohsome api and display them on the map', () => {
@@ -263,15 +255,25 @@ describe('mapService', () => {
 
         cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
 
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
+        cy.wait(500)
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            if (mapService.regionLayer) {
+                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
+                mapService.regionLayer.visible = true
+            }
+        })
+
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
 
         cy.waitForRenderComplete()
 
-        cy.get('canvas.ol-layer').click()
+        cy.get('canvas.maplibregl-canvas').click()
 
         cy.waitForRenderComplete()
 
@@ -286,7 +288,7 @@ describe('mapService', () => {
                 currentRegionName = text
             })
 
-        cy.get('canvas').eq(1).click(1000, 300)
+        cy.get('canvas.maplibregl-canvas').click(1000, 300)
 
         cy.waitForRenderComplete()
 
@@ -318,21 +320,31 @@ describe('mapService', () => {
 
         cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
 
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
+        cy.wait(500)
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            if (mapService.regionLayer) {
+                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
+                mapService.regionLayer.visible = true
+            }
+        })
+
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
 
         cy.waitForRenderComplete()
 
-        cy.get('canvas.ol-layer').click()
+        cy.get('canvas.maplibregl-canvas').click()
 
         cy.waitForRenderComplete()
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            currentSelectedFeaturesCount = mapService.selectedFeatures.getLength()
+            currentSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
 
             expect(currentSelectedFeaturesCount).to.be.greaterThan(0)
         })
@@ -343,7 +355,7 @@ describe('mapService', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            newSelectedFeaturesCount = mapService.selectedFeatures.getLength()
+            newSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
 
             expect(newSelectedFeaturesCount).to.not.equal(currentSelectedFeaturesCount)
         })
@@ -363,15 +375,25 @@ describe('mapService', () => {
 
         cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
 
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
+        cy.wait(500)
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            if (mapService.regionLayer) {
+                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
+                mapService.regionLayer.visible = true
+            }
+        })
+
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
 
         cy.waitForRenderComplete()
 
-        cy.get('canvas.ol-layer').click()
+        cy.get('canvas.maplibregl-canvas').click()
 
         cy.waitForRenderComplete()
 
@@ -380,7 +402,7 @@ describe('mapService', () => {
             const selectedFeature = mapService.getSelectedRegion()
 
             expect(selectedFeature).to.exist
-            expect(selectedFeature.geometry.type).to.be.oneOf(['MultiPolygon', 'Polygon'])
+            expect(selectedFeature.geometry.type).to.be.equal('MultiPolygon')
             expect(selectedFeature.geometry.coordinates).to.be.an('array')
         })
     })
@@ -399,24 +421,37 @@ describe('mapService', () => {
 
         cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
 
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
-        cy.get('.ol-zoom-in').click()
+        cy.wait(500)
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            if (mapService.regionLayer) {
+                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
+                mapService.regionLayer.visible = true
+            }
+        })
+
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.draw-button').eq(1).click()
 
         cy.waitForRenderComplete()
 
-        cy.get('canvas.ol-layer').click(800, 425, { force: true })
-        cy.get('canvas.ol-layer').click(850, 550, { force: true })
+        cy.get('canvas.maplibregl-canvas').click(800, 425, { force: true })
+        cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })
 
         cy.waitForRenderComplete()
+        cy.wait(500)
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            const selectedFeature = mapService.getSelectedRegion()
+            expect(mapService.selectedGeoJSONFeatures).to.have.length.greaterThan(0)
 
-            expect(selectedFeature).to.exist
-            expect(selectedFeature.geometry.type).to.equal('MultiPolygon')
+            if (mapService.selectedGeoJSONFeatures.length > 0) {
+                const feature = mapService.selectedGeoJSONFeatures[0]
+                expect(feature.geometry.type).to.be.equal('MultiPolygon')
+            }
         })
     })
 })

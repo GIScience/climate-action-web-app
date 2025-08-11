@@ -671,7 +671,8 @@ export const mockPostPluginRun = () => {
     cy.intercept('POST', `${cypressEnvironment.apiBasePath}/plugin/hiwalk`, {
         body: {
             correlation_uuid: '8d81bea0-7183-4083-aae0-b751f9813de5'
-        }
+        },
+        delay: 100
     }).as('postPluginRun')
 }
 
