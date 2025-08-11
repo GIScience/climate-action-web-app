@@ -1,6 +1,7 @@
 @use 'globals';
 
 .plugin-container {
+    pointer-events: all;
     position: relative;
     transition: transform 0.2s ease-in-out;
     width: 425px;

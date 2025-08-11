@@ -27,6 +27,7 @@ main.dashboard {
 
     .dashboard__left-column {
         display: flex;
+        pointer-events: none;
         position: relative;
         transition: transform 0.2s ease-in-out;
         z-index: 5;

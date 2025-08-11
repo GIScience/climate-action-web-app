@@ -4,6 +4,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import type { FeatureCollection } from 'geojson'
 import { Subscription } from 'rxjs'
 import { MapService } from '../../map/map.service'
+import { MapGeoJsonUtils } from '../../map/utils/map-geojson.utils'
 import { Artifact } from '../artifact.interface'
 
 @Component({
@@ -51,6 +52,8 @@ export class GeojsonComponent implements OnInit, OnDestroy {
         this.mapService.featureHoverOverlay?.remove()
 
         this.mapService.mapPopUp?.remove()
+
+        MapGeoJsonUtils.cleanupGeoJsonInteractions(this.mapService.map)
 
         this.mapService.layerSwitcherControl?.updateLayerControls()
     }
