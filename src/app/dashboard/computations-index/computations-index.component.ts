@@ -416,10 +416,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             if (computation && computation.geometry) {
                 const extent = this.mapService.highlightAoI(computation.geometry)
 
-                if (extent && this.mapService.map) {
-                    this.mapService.map.getView().fit(extent, {
-                        padding: this.mapService.calculateMapPadding()
-                    })
+                if (extent) {
+                    this.mapService.flyToExtent(extent)
                 }
             }
 

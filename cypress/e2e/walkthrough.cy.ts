@@ -32,9 +32,11 @@ describe('walkthrough', () => {
 
         cy.get('.driver-popover-next-btn').click().wait(1000)
 
-        cy.get('.driver-popover-next-btn').click().wait(1000)
+        cy.get('.driver-popover-next-btn').click()
 
-        cy.wait('@postPluginRun').wait(1000)
+        cy.wait(2000)
+
+        cy.wait('@postPluginRun', { timeout: 30000, requestTimeout: 30000 }).wait(1000)
 
         cy.wait('@getComputationState')
 

@@ -3,22 +3,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { MapService } from '@app/dashboard/map/map.service'
 import { Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { JSONSchema7 } from 'json-schema'
 import { ToastrService } from 'ngx-toastr'
-import { Feature } from 'ol'
-import { MultiPolygon } from 'ol/geom'
 import { MockToastrService } from '../../../../../jest.mocks'
 import { PluginParameterComponent } from './plugin-parameter.component'
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
     let fixture: ComponentFixture<PluginParameterComponent>
-    let mapService: MapService
     const test_plugin = { demo_config: { aoi: {}, params: {} } } as Plugin
 
     beforeEach(() => {
@@ -47,57 +43,7 @@ describe('PluginParameterComponent', () => {
         fixture = TestBed.createComponent(PluginParameterComponent)
         component = fixture.componentInstance
         component.plugin = test_plugin
-        mapService = TestBed.inject(MapService)
         fixture.detectChanges()
-    })
-
-    it('should return a GEOJSON feature object', () => {
-        const inputFeature = new Feature({
-            geometry: new MultiPolygon([
-                [
-                    [
-                        [0, 0],
-                        [111319.49079327357, 0],
-                        [111319.49079327357, 111325.1428663851],
-                        [0, 111325.1428663851],
-                        [0, 0]
-                    ]
-                ]
-            ]),
-            id: '1',
-            osm_id: -285864,
-            name: 'Heidelberg'
-        })
-
-        const expectedFeature = {
-            type: 'Feature',
-            geometry: {
-                type: 'MultiPolygon',
-                coordinates: [
-                    [
-                        [
-                            [0, 0],
-                            [1, 0],
-                            [1, 1],
-                            [0, 1],
-                            [0, 0]
-                        ]
-                    ]
-                ]
-            },
-            properties: {
-                id: '1',
-                osm_id: -285864,
-                name: 'Heidelberg'
-            }
-        }
-
-        mapService.selectedFeatures.clear()
-        mapService.selectedFeatures.push(inputFeature)
-
-        const aoi = mapService.getSelectedRegion()
-
-        expect(aoi).toEqual(expectedFeature)
     })
 
     it('should correctly parse required boolean field', () => {

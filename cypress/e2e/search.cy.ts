@@ -20,22 +20,14 @@ describe('Search', () => {
         cy.wait(500)
         cy.get('.location-suggestion__item').first().trigger('mouseover')
 
-        cy.get('.ol-viewport')
+        cy.get('.maplibregl-canvas')
             .should('be.visible')
             .then(() => {
                 cy.window().then(win => {
-                    expect(win.olMap).to.exist
+                    expect(win.map).to.exist
 
-                    const layers = win.olMap.getLayers().getArray()
-                    const markerLayer = layers.find(layer => {
-                        const style = layer.style_
-                        if (style && style.image_ && style.image_.iconImage_ && style.image_.iconImage_.src_) {
-                            return style.image_.iconImage_.src_.includes('map-pin.svg')
-                        }
-                        return false
-                    })
-
-                    expect(markerLayer).to.exist
+                    cy.get('.marker').should('exist')
+                    cy.get('.marker').should('have.css', 'background-image').and('include', 'map-pin.svg')
                 })
             })
     })
@@ -45,31 +37,24 @@ describe('Search', () => {
         cy.wait(500)
         let initialCenter
         cy.window().then(win => {
-            expect(win.olMap).to.exist
-            initialCenter = win.olMap.getView().getCenter()
+            expect(win.map).to.exist
+            initialCenter = win.map.getCenter()
         })
 
         cy.get('.location-suggestion__item').first().click()
 
-        cy.wait(500)
+        cy.wait(1500)
 
-        cy.get('.ol-viewport')
+        cy.get('.maplibregl-canvas')
             .should('be.visible')
             .then(() => {
                 cy.window().then(win => {
-                    const newCenter = win.olMap.getView().getCenter()
-                    expect(newCenter).to.not.deep.equal(initialCenter)
+                    const newCenter = win.map.getCenter()
+                    expect(newCenter.lng).to.not.equal(initialCenter.lng)
+                    expect(newCenter.lat).to.not.equal(initialCenter.lat)
 
-                    const layers = win.olMap.getLayers().getArray()
-                    const markerLayer = layers.find(layer => {
-                        const style = layer.style_
-                        if (style && style.image_ && style.image_.iconImage_ && style.image_.iconImage_.src_) {
-                            return style.image_.iconImage_.src_.includes('map-pin.svg')
-                        }
-                        return false
-                    })
-
-                    expect(markerLayer).to.exist
+                    cy.get('.marker').should('exist')
+                    cy.get('.marker').should('have.css', 'background-image').and('include', 'map-pin.svg')
                 })
             })
     })
@@ -84,7 +69,10 @@ describe('Search', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            focusedCoordinates = mapService.markerFeatures.item(0).getGeometry().getCoordinates()
+            if (mapService.markerFeatures.length > 0) {
+                const feature = mapService.markerFeatures[0]
+                focusedCoordinates = feature.geometry.coordinates
+            }
         })
 
         cy.get('.location-suggestion__item').first().click()
@@ -93,7 +81,10 @@ describe('Search', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            clickedCoordinates = mapService.markerFeatures.item(0).getGeometry().getCoordinates()
+            if (mapService.markerFeatures.length > 0) {
+                const feature = mapService.markerFeatures[0]
+                clickedCoordinates = feature.geometry.coordinates
+            }
 
             expect(focusedCoordinates).to.deep.equal(clickedCoordinates)
         })

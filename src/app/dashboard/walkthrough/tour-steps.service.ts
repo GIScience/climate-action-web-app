@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { fromLonLat } from 'ol/proj'
 import { MapService } from '../map/map.service'
 import { ExtendedDriveStep } from './tour.interfaces'
 
@@ -135,8 +134,9 @@ export class TourStepsService {
             },
             onNextClicked: () => {
                 if (this.mapService.map) {
-                    const ventoteneCoords = fromLonLat([13.42405, 40.79237])
-                    const pixel = this.mapService.map.getPixelFromCoordinate(ventoteneCoords)
+                    const ventoteneCoords: [number, number] = [13.42405, 40.79237]
+                    const point = this.mapService.map.project(ventoteneCoords)
+                    const pixel: [number, number] = [point.x, point.y]
                     this.mapService.selectRegions(pixel)
                 }
             }

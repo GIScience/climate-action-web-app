@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, Injector, Optional } from '@angular/core'
+import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
 import { StorageService } from '../../storage.service'
@@ -86,37 +87,49 @@ export class ReportService {
                 if (mapElement) {
                     mapService.initMap(mapId, true)
 
-                    if (computationBasicInfo.geometry) {
-                        const extent = mapService.highlightAoI(computationBasicInfo.geometry)
+                    // @ts-ignore: Store map instance globally for PDF export
+                    window[`maplibre_map_${artifactInstance.store_id}`] = mapService.map
 
-                        if (extent && mapService.map) {
-                            mapService.map.getView().fit(extent, {
-                                padding: [25, 25, 25, 25]
+                    const waitForMapLoad = () => {
+                        if (mapService.map) {
+                            mapService.map.once('idle', () => {
+                                if (computationBasicInfo.geometry) {
+                                    const extent = mapService.highlightAoI(computationBasicInfo.geometry)
+
+                                    if (extent && mapService.map) {
+                                        mapService.fitToExtent(extent, {
+                                            padding: { top: 25, right: 25, bottom: 25, left: 25 }
+                                        })
+                                        const minZoom = mapService.map.getZoom()
+                                        if (minZoom) {
+                                            mapService.map.setMinZoom(minZoom)
+                                        }
+                                    }
+                                }
+
+                                if (artifactInstance.modality === 'MAP_LAYER_GEOJSON') {
+                                    artifactService.getGeoJson(artifactInstance)
+                                    artifactService.geojson.subscribe(data => {
+                                        if (data) {
+                                            this.http.get<FeatureCollection>(data.url).subscribe(geoJsonData => {
+                                                mapService.addGeoJsonLayer(geoJsonData, artifactInstance.name)
+                                            })
+                                        }
+                                    })
+                                } else if (artifactInstance.modality === 'MAP_LAYER_GEOTIFF') {
+                                    artifactService.getGeoTiff(artifactInstance)
+                                    artifactService.geotiff.subscribe(data => {
+                                        if (data) {
+                                            mapService.addGeoTiffLayer(data.url, artifactInstance.name)
+                                        }
+                                    })
+                                }
                             })
-                            const minZoom = mapService.map.getView().getZoom()
-                            if (minZoom) {
-                                mapService.map.getView().setMinZoom(minZoom)
-                            }
+                        } else {
+                            setTimeout(waitForMapLoad, 50)
                         }
                     }
-
-                    if (artifactInstance.modality === 'MAP_LAYER_GEOJSON') {
-                        artifactService.getGeoJson(artifactInstance)
-                        artifactService.geojson.subscribe(data => {
-                            if (data) {
-                                this.http.get(data.url).subscribe(geoJsonData => {
-                                    mapService.addGeoJsonLayer(geoJsonData, artifactInstance.name)
-                                })
-                            }
-                        })
-                    } else if (artifactInstance.modality === 'MAP_LAYER_GEOTIFF') {
-                        artifactService.getGeoTiff(artifactInstance)
-                        artifactService.geotiff.subscribe(data => {
-                            if (data) {
-                                mapService.addGeoTiffLayer(data.url, artifactInstance.name)
-                            }
-                        })
-                    }
+                    waitForMapLoad()
                 }
             }, 100)
         }

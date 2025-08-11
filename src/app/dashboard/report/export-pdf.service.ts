@@ -32,7 +32,7 @@ export class ExportPDFService {
             })
 
             const imageCache: Record<string, string> = {}
-            await this.prepareArtifactImages(artifacts, artifactContainers, imageCache, html2canvas)
+            await this.prepareArtifactImages(artifacts, artifactContainers, imageCache)
 
             const pdf = new jsPDF({
                 orientation: 'landscape',
@@ -170,15 +170,12 @@ export class ExportPDFService {
     private async prepareArtifactImages(
         artifacts: ArtifactEntity[],
         artifactContainers: QueryList<ElementRef>,
-        imageCache: Record<string, string>,
-        html2canvas: Html2CanvasType
+        imageCache: Record<string, string>
     ): Promise<void> {
         const imageArtifacts = artifacts.filter(artifact => artifact.modality === 'IMAGE')
         const mapArtifacts = artifacts.filter(artifact => this.reportService.isMapArtifact(artifact))
 
-        const mapCapturePromises = mapArtifacts.map(artifact =>
-            this.captureMapFromDOM(artifact, imageCache, html2canvas)
-        )
+        const mapCapturePromises = mapArtifacts.map(artifact => this.captureMapFromDOM(artifact, imageCache))
 
         const imagePromises = imageArtifacts.map(async artifact => {
             const artifactElement = artifactContainers?.find(
@@ -200,45 +197,23 @@ export class ExportPDFService {
         await Promise.all([...mapCapturePromises, ...imagePromises])
     }
 
-    private async captureMapFromDOM(
-        artifact: ArtifactEntity,
-        mapImageCache: Record<string, string>,
-        html2canvas: Html2CanvasType
-    ): Promise<void> {
+    private async captureMapFromDOM(artifact: ArtifactEntity, mapImageCache: Record<string, string>): Promise<void> {
+        // @ts-ignore: Access global map instance for PDF export
+        const mapInstance = window[`maplibre_map_${artifact.store_id}`]
+        if (!mapInstance) return
+
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            const mapContainerElement = document.querySelector<HTMLElement>(
-                `[data-artifact-id="${artifact.store_id}"] .report-map-container`
+            await new Promise<void>(resolve =>
+                mapInstance.loaded() ? resolve() : (mapInstance.once('idle', resolve), setTimeout(resolve, 3000))
             )
 
-            if (!mapContainerElement) {
-                console.warn(`Map container not found for ${artifact.name}`)
-                return
-            }
-
-            const images = Array.from(mapContainerElement.querySelectorAll('img'))
-            await Promise.all(
-                images.map(img =>
-                    img.complete
-                        ? Promise.resolve()
-                        : new Promise(resolve => {
-                              img.onload = img.onerror = resolve
-                              setTimeout(resolve, 2000)
-                          })
-                )
-            )
-
-            const canvas = await html2canvas(mapContainerElement, {
-                useCORS: true,
-                allowTaint: false,
-                scale: 2,
-                logging: false,
-                ignoreElements: (element: Element) =>
-                    element.tagName === 'BUTTON' || element.classList.contains('ol-control')
+            const screenshot = await new Promise<string>(resolve => {
+                mapInstance.once('render', () => resolve(mapInstance.getCanvas().toDataURL('image/png')))
+                mapInstance.setBearing(mapInstance.getBearing() + 0.001)
+                setTimeout(() => resolve(''), 3000)
             })
 
-            mapImageCache[artifact.store_id] = canvas.toDataURL('image/png')
+            if (screenshot?.length > 5000) mapImageCache[artifact.store_id] = screenshot
         } catch (error) {
             console.warn(`Failed to capture map for ${artifact.name}:`, error)
         }

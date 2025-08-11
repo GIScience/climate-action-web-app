@@ -19,12 +19,8 @@ export class ArtifactViewerService {
     }
 
     closeArtifactViewer(): void {
-        this.resetArtifacts()
+        this.artifactService.resetAllSubjects()
         this.storageService.clearActiveArtifact()
         this.isViewerVisible = false
-    }
-
-    resetArtifacts(): void {
-        this.artifactService.resetAllSubjects()
     }
 }

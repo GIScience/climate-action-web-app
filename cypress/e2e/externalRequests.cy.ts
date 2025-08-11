@@ -1,10 +1,9 @@
 describe('External Requests', () => {
     const allowlist = [
         'http://localhost',
-        'https://tile.openstreetmap.org',
+        'https://tiles.versatiles.org',
         'https://api.openrouteservice.org',
         'https://*.heigit.org',
-        'https://a.basemaps.cartocdn.com',
         'https://server.arcgisonline.com'
     ]
 
@@ -12,7 +11,8 @@ describe('External Requests', () => {
         'https://content-autofill.googleapis.com',
         'https://safebrowsingohttpgateway.googleapis.com',
         'https://safebrowsing.googleapis.com',
-        'https://optimizationguide-pa.googleapis.com'
+        'https://optimizationguide-pa.googleapis.com',
+        'https://android.clients.google.com'
     ]
 
     it('should only make external calls to allowlisted URLs', () => {

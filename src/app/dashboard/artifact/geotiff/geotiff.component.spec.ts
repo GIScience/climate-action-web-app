@@ -1,8 +1,7 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { jest } from '@jest/globals'
-import TileLayer from 'ol/layer/WebGLTile.js'
-import { XYZ } from 'ol/source'
+import maplibregl from 'maplibre-gl'
 import { MapService } from '../../map/map.service'
 import { GeoTiffComponent } from './geotiff.component'
 
@@ -38,8 +37,13 @@ describe('GeoTiffComponent', () => {
 
     it('should initialize map with valid input data', async () => {
         const mockUrl = 'http://test_url'
-        const mockSource: XYZ = new XYZ()
-        const mockLayer = new TileLayer({ source: mockSource })
+        const mockLayer = {
+            id: 'geotiff-geotiff-123456789',
+            sourceId: 'source-geotiff-geotiff-123456789',
+            name: 'geotiff',
+            setOpacity: jest.fn().mockReturnValue(undefined) as (opacity: number) => maplibregl.Map | undefined,
+            setVisible: jest.fn().mockReturnValue(undefined) as (visible: boolean) => maplibregl.Map | undefined
+        }
 
         mapServiceSpy.addGeoTiffLayer.mockResolvedValue(mockLayer)
 

@@ -110,7 +110,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
         const waitForMapRender = (artifact: ArtifactEntity): Promise<void> => {
             return new Promise<void>(resolve => {
-                this.mapService.map?.once('rendercomplete', () => {
+                this.mapService.map?.once('idle', () => {
                     this.artifactService.getLegend(artifact)
                     artifact.isLoading = false
                     resolve()

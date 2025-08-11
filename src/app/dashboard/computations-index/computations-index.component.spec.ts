@@ -73,7 +73,8 @@ describe('ComputationsIndexComponent', () => {
         mockMapService = {
             initMap: jest.fn(),
             highlightAoI: jest.fn(),
-            removeFocusedLayer: jest.fn()
+            removeFocusedLayer: jest.fn(),
+            flyToExtent: jest.fn()
         }
 
         mockMapService.highlightAoI = jest.fn().mockReturnValue([0, 0, 1, 1])
