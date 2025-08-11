@@ -159,3 +159,30 @@
 .maplibregl-ctrl-attrib.maplibregl-compact {
     margin-right: 0;
 }
+
+.maplibregl-popup {
+    .maplibregl-popup-content {
+        border-radius: 10px;
+        overflow-wrap: break-word;
+        padding: 7.5px 10px;
+    }
+
+    &.smooth-popup {
+        .maplibregl-popup-content {
+            animation: popup-fade-in 0.2s ease;
+        }
+
+        .maplibregl-popup-tip {
+            animation: popup-fade-in 0.2s ease;
+        }
+    }
+}
+
+@keyframes popup-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
