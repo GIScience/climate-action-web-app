@@ -309,25 +309,15 @@
     }
 
     ::ng-deep {
-        .ol-zoom {
-            right: 0.5vw;
-            top: 0.5em;
-        }
-
-        .ol-scale-line {
-            right: calc(0.5vw + 65px);
-            top: 0.5em;
-        }
-
-        .ol-zoom-extent {
-            display: none;
+        .maplibregl-ctrl-top-right {
+            top: 0;
         }
 
         app-legend {
             max-width: 250px;
             position: absolute;
             right: 0.5vw;
-            top: 45px;
+            top: 47.5px;
         }
     }
 }
