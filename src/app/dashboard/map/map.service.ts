@@ -131,20 +131,22 @@ export class MapService {
             }
         })
 
-        this.mapDrawingService?.drawnFeatures$.subscribe(drawnFeatures => {
-            this.selectedOlFeatures.clear()
-            this.selectedGeoJSONFeatures = []
+        if (this.mapDrawingService?.drawnFeatures$) {
+            this.mapDrawingService.drawnFeatures$.subscribe(drawnFeatures => {
+                this.selectedOlFeatures.clear()
+                this.selectedGeoJSONFeatures = []
 
-            drawnFeatures.forEach(({ geoJsonFeature, olFeature }) => {
-                this.selectedOlFeatures.push(olFeature)
-                this.selectedGeoJSONFeatures.push(geoJsonFeature)
+                drawnFeatures.forEach(({ geoJsonFeature, olFeature }) => {
+                    this.selectedOlFeatures.push(olFeature)
+                    this.selectedGeoJSONFeatures.push(geoJsonFeature)
+                })
+
+                if (this.selectedRegionLayer && this.map) {
+                    const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+                    source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
+                }
             })
-
-            if (this.selectedRegionLayer && this.map) {
-                const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
-                source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
-            }
-        })
+        }
     }
 
     initMap(targetId: string, isReportMap: boolean = false) {
@@ -885,15 +887,21 @@ export class MapService {
     }
 
     startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
-        this.mapDrawingService?.startDrawing(type)
+        if (this.mapDrawingService?.startDrawing) {
+            this.mapDrawingService.startDrawing(type)
+        }
     }
 
     stopDrawing(): void {
-        this.mapDrawingService?.stopDrawing()
+        if (this.mapDrawingService?.stopDrawing) {
+            this.mapDrawingService.stopDrawing()
+        }
     }
 
     clearDrawnFeatures(): void {
-        this.mapDrawingService?.clearDrawnFeatures()
+        if (this.mapDrawingService?.clearDrawnFeatures) {
+            this.mapDrawingService.clearDrawnFeatures()
+        }
 
         this.selectedOlFeatures.clear()
         this.selectedGeoJSONFeatures = []
