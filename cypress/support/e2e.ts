@@ -35,3 +35,18 @@ Cypress.Commands.add('waitForRenderComplete', () => {
         })
     })
 })
+
+Cypress.Commands.add('clickFakeUserButtonUntilGone', () => {
+    cy.get('body').then($body => {
+        if ($body.find('button.fake-user-button').length > 0) {
+            cy.get('button.fake-user-button').click({ force: true })
+            cy.wait(1000)
+            cy.get('body').then($bodyAfter => {
+                if ($bodyAfter.find('button.fake-user-button').length > 0) {
+                    cy.wait(1000)
+                    cy.clickFakeUserButtonUntilGone()
+                }
+            })
+        }
+    })
+})

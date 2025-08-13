@@ -24,7 +24,15 @@
                         "polyfills": ["zone.js"],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
-                        "assets": ["src/favicon.ico", "src/assets"],
+                        "assets": [
+                            "src/favicon.ico",
+                            "src/assets",
+                            {
+                                "glob": "mapbox-gl-rtl-text.js",
+                                "input": "node_modules/@mapbox/mapbox-gl-rtl-text/dist/",
+                                "output": "/assets/rtl/"
+                            }
+                        ],
                         "styles": [
                             "node_modules/material-icons-font/material-icons-font.css",
                             "@angular/material/prebuilt-themes/deeppurple-amber.css",

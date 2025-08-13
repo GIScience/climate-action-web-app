@@ -1,9 +1,5 @@
 import { cypressEnvironment } from './cypress-environment'
 
-export const interceptOhsomeWMS = () => {
-    cy.intercept('GET', 'https://maps.heigit.org/ohsome/service/wms?*').as('getOhsomeBoundaries')
-}
-
 export const interceptORS = () => {
     cy.intercept('GET', 'https://api.openrouteservice.org/geocode/autocomplete?*').as('openRouteServiceRequest')
 }
