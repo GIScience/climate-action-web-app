@@ -20,12 +20,18 @@ Cypress.Commands.add('waitForRenderComplete', () => {
         return new Cypress.Promise(resolve => {
             const timeout = setTimeout(() => {
                 resolve()
-            }, 2500)
+            }, 4000)
 
-            ;(win as any).map?.once('idle', () => {
+            const map = (win as any).map
+            if (map && typeof map.once === 'function') {
+                map.once('idle', () => {
+                    clearTimeout(timeout)
+                    resolve()
+                })
+            } else {
                 clearTimeout(timeout)
                 resolve()
-            })
+            }
         })
     })
 })

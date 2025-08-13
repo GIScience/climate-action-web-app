@@ -1,11 +1,14 @@
+import { interceptORS } from '../support/interceptors'
+
 describe('Search', () => {
     beforeEach(() => {
+        interceptORS()
         cy.visit('dashboard/plugin/plugin_blueprint')
     })
 
     it('should list suggestions when given a location', () => {
         cy.get('.search-locations').type('Berlin')
-        cy.wait(500)
+        cy.wait('@openRouteServiceRequest', { timeout: 10000 })
         cy.get('.location-suggestion__item')
             .should('have.length.gte', 1)
             .each(item => {
@@ -17,7 +20,7 @@ describe('Search', () => {
 
     it('should add a marker when hovering over a suggestion', () => {
         cy.get('.search-locations').type('Berlin')
-        cy.wait(500)
+        cy.wait('@openRouteServiceRequest', { timeout: 10000 })
         cy.get('.location-suggestion__item').first().trigger('mouseover')
 
         cy.get('.maplibregl-canvas')
@@ -34,7 +37,7 @@ describe('Search', () => {
 
     it('should add a marker when clicking on a suggestion and change the map center', () => {
         cy.get('.search-locations').type('Berlin')
-        cy.wait(500)
+        cy.wait('@openRouteServiceRequest', { timeout: 10000 })
         let initialCenter
         cy.window().then(win => {
             expect(win.map).to.exist
@@ -61,7 +64,7 @@ describe('Search', () => {
 
     it('features of the focused suggestion and the clicked suggestion should be the same', () => {
         cy.get('.search-locations').type('Währing')
-        cy.wait(500)
+        cy.wait('@openRouteServiceRequest', { timeout: 10000 })
         cy.get('.location-suggestion__item').first().trigger('mouseover')
 
         let focusedCoordinates = null
