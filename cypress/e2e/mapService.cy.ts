@@ -1,4 +1,5 @@
 import {
+    interceptOhsomeWMS,
     mockGeoJson,
     mockGeoJsonComputation,
     mockGeoTiff,
@@ -241,6 +242,7 @@ describe('mapService', () => {
     it('should read the boundaries from the ohsome api and display them on the map', () => {
         mockPluginsList()
         mockPluginBlueprint()
+        interceptOhsomeWMS()
 
         let currentRegionName = ''
         let newRegionName = ''
@@ -275,7 +277,7 @@ describe('mapService', () => {
 
         cy.get('canvas.maplibregl-canvas').click()
 
-        cy.waitForRenderComplete()
+        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
 
         cy.get('.selected-regions').children().should('have.class', 'region-item')
 
@@ -290,7 +292,7 @@ describe('mapService', () => {
 
         cy.get('canvas.maplibregl-canvas').click(1000, 300)
 
-        cy.waitForRenderComplete()
+        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
 
         cy.get('.selected-regions')
             .children()
@@ -306,6 +308,7 @@ describe('mapService', () => {
     it('selected regions should be deselectable', () => {
         mockPluginsList()
         mockPluginBlueprint()
+        interceptOhsomeWMS()
 
         let currentSelectedFeaturesCount = 0
         let newSelectedFeaturesCount = 0
@@ -340,7 +343,7 @@ describe('mapService', () => {
 
         cy.get('canvas.maplibregl-canvas').click()
 
-        cy.waitForRenderComplete()
+        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
@@ -364,6 +367,7 @@ describe('mapService', () => {
     it('the boundaries from the ohsome api should be valid polygons or multipolygons', () => {
         mockPluginsList()
         mockPluginBlueprint()
+        interceptOhsomeWMS()
 
         cy.reload(true)
 
@@ -395,7 +399,7 @@ describe('mapService', () => {
 
         cy.get('canvas.maplibregl-canvas').click()
 
-        cy.waitForRenderComplete()
+        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService

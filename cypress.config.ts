@@ -4,6 +4,11 @@ import { configureVisualRegression } from 'cypress-visual-regression'
 export default defineConfig({
     viewportWidth: 1500,
     viewportHeight: 850,
+    experimentalMemoryManagement: true,
+    retries: {
+        runMode: 2,
+        openMode: 0
+    },
     e2e: {
         baseUrl: 'http://localhost:4200',
         env: {
