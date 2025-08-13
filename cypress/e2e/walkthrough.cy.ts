@@ -20,7 +20,7 @@ describe('walkthrough', () => {
 
         cy.wait(1000)
 
-        cy.get('button.fake-user-button').click({ force: true }).wait(1000)
+        cy.clickFakeUserButtonUntilGone()
 
         cy.get('.welcome-content .cta-section .btn-primary').click()
 

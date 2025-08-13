@@ -1,5 +1,4 @@
 import {
-    interceptOhsomeWMS,
     mockGeoJson,
     mockGeoJsonComputation,
     mockGeoTiff,
@@ -239,13 +238,14 @@ describe('mapService', () => {
         cy.get('.maplibregl-popup-content').should('contain.text', 'Connectivity: 0.0167')
     })
 
-    it('should read the boundaries from the ohsome api and display them on the map', () => {
+    it('should read boundaries from ohsome api, display them, validate geometry, and allow deselection', () => {
         mockPluginsList()
         mockPluginBlueprint()
-        interceptOhsomeWMS()
 
         let currentRegionName = ''
         let newRegionName = ''
+        let currentSelectedFeaturesCount = 0
+        let newSelectedFeaturesCount = 0
 
         cy.reload(true)
 
@@ -255,9 +255,30 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
+        cy.clickFakeUserButtonUntilGone()
+
+        cy.wait(1000)
+
+        cy.get('.new-compute').click()
 
         cy.wait(500)
+
+        cy.window()
+            .then(win => {
+                const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+                if (!mapService.regionLayer || !mapService.regionLayer.visible) {
+                    return false
+                }
+                return true
+            })
+            .then(isReady => {
+                if (!isReady) {
+                    cy.get('.new-compute').click()
+                    cy.wait(500)
+                    cy.get('.new-compute').click()
+                    cy.wait(500)
+                }
+            })
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
@@ -267,6 +288,8 @@ describe('mapService', () => {
             }
         })
 
+        cy.wait(2000)
+
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -275,9 +298,8 @@ describe('mapService', () => {
 
         cy.waitForRenderComplete()
 
+        // Should read boundaries and display them
         cy.get('canvas.maplibregl-canvas').click()
-
-        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
 
         cy.get('.selected-regions').children().should('have.class', 'region-item')
 
@@ -290,9 +312,22 @@ describe('mapService', () => {
                 currentRegionName = text
             })
 
+        // Validate geometry is correct for selected region
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            const selectedFeature = mapService.getSelectedRegion()
+            currentSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
+
+            expect(selectedFeature).to.exist
+            expect(selectedFeature.geometry.type).to.be.equal('MultiPolygon')
+            expect(selectedFeature.geometry.coordinates).to.be.an('array')
+            expect(currentSelectedFeaturesCount).to.be.greaterThan(0)
+        })
+
+        // Test selecting a different region
         cy.get('canvas.maplibregl-canvas').click(1000, 300)
 
-        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
+        cy.wait(1000)
 
         cy.get('.selected-regions')
             .children()
@@ -303,55 +338,8 @@ describe('mapService', () => {
                 newRegionName = text
                 expect(newRegionName).to.not.equal(currentRegionName)
             })
-    })
 
-    it('selected regions should be deselectable', () => {
-        mockPluginsList()
-        mockPluginBlueprint()
-        interceptOhsomeWMS()
-
-        let currentSelectedFeaturesCount = 0
-        let newSelectedFeaturesCount = 0
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
-
-        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
-
-        cy.wait(500)
-
-        cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            if (mapService.regionLayer) {
-                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
-                mapService.regionLayer.visible = true
-            }
-        })
-
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-
-        cy.waitForRenderComplete()
-
-        cy.get('canvas.maplibregl-canvas').click()
-
-        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
-
-        cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            currentSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
-
-            expect(currentSelectedFeaturesCount).to.be.greaterThan(0)
-        })
-
+        // Should be able to deselect regions
         cy.get('.selected-regions .deselect-region').first().click()
 
         cy.waitForRenderComplete()
@@ -361,53 +349,6 @@ describe('mapService', () => {
             newSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
 
             expect(newSelectedFeaturesCount).to.not.equal(currentSelectedFeaturesCount)
-        })
-    })
-
-    it('the boundaries from the ohsome api should be valid polygons or multipolygons', () => {
-        mockPluginsList()
-        mockPluginBlueprint()
-        interceptOhsomeWMS()
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
-
-        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
-
-        cy.wait(500)
-
-        cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            if (mapService.regionLayer) {
-                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
-                mapService.regionLayer.visible = true
-            }
-        })
-
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.maplibregl-ctrl-zoom-in').click()
-
-        cy.waitForRenderComplete()
-
-        cy.get('canvas.maplibregl-canvas').click()
-
-        cy.wait('@getOhsomeBoundaries', { timeout: 10000 })
-
-        cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            const selectedFeature = mapService.getSelectedRegion()
-
-            expect(selectedFeature).to.exist
-            expect(selectedFeature.geometry.type).to.be.equal('MultiPolygon')
-            expect(selectedFeature.geometry.coordinates).to.be.an('array')
         })
     })
 
@@ -423,7 +364,11 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.get('.new-compute').click({ force: true }) // forcing click since login cannot be validated in test env
+        cy.clickFakeUserButtonUntilGone()
+
+        cy.wait(1000)
+
+        cy.get('.new-compute').click()
 
         cy.wait(500)
 

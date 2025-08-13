@@ -166,6 +166,8 @@ export class MapService {
             renderWorldCopies: false
         })
 
+        maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
+
         const navigationControl = new maplibregl.NavigationControl({
             visualizePitch: true,
             visualizeRoll: true
