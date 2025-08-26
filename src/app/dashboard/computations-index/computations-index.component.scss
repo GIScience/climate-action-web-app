@@ -10,44 +10,114 @@
 }
 
 .computations-index {
-    .computations-index__header {
-        align-items: center;
-        display: flex;
-
-        button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            margin-left: auto;
-        }
-    }
-
     .computations-index-content {
         display: flex;
         transition: max-height 0.25s ease-in-out;
 
-        .empty-computations {
-            align-items: center;
-            display: flex;
-            flex-direction: column;
-            height: 20vh;
-            justify-content: center;
-            padding: 20px 0;
-            text-align: center;
+        .skeleton-container {
+            padding: 10px 5px;
             width: 100%;
 
-            .empty-computations__message {
-                font-variation-settings: 'wght' 500;
+            .skeleton-item {
+                align-items: center;
+                animation: fadeIn 0.3s ease-out;
+                display: grid;
+                grid-template-columns: 1fr 100px;
+                margin-left: 32.5px;
+                padding: 10px 5px;
+
+                &:after {
+                    border-bottom: 1px solid #ccc;
+                    content: '';
+                    display: block;
+                    grid-column: 1 / -1;
+                    margin: 10px auto 0;
+                    width: 80%;
+                }
+
+                .skeleton-header {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .skeleton-title,
+                .skeleton-subtitle,
+                .skeleton-status {
+                    animation: shimmer 1.5s infinite;
+                    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+                    background-size: 200% 100%;
+                    border-radius: 4px;
+                }
+
+                .skeleton-title {
+                    height: 20px;
+                    width: 200px;
+                }
+
+                .skeleton-subtitle {
+                    height: 14px;
+                    width: 150px;
+                }
+
+                .skeleton-status {
+                    border-radius: 12px;
+                    height: 24px;
+                    justify-self: center;
+                    width: 80px;
+                }
             }
         }
 
-        .computations-container {
+        .load-more-container {
+            background-color: #f0f0f0;
+            box-shadow: inset 0px 5px 10px -7.5px #666;
+            display: flex;
+            justify-content: center;
+            margin-left: -20px;
+            padding: 10px 0;
+            width: calc(100% + 40px);
+
+            .loading-indicator {
+                align-items: center;
+                color: #666;
+                display: flex;
+                font-size: 14px;
+                gap: 8px;
+                justify-content: center;
+
+                i-lucide {
+                    animation: spin 1s linear infinite;
+                }
+            }
+        }
+
+        .active-runs-container {
             width: 100%;
 
-            .ng-scrollbar {
-                max-height: 45vh;
-                min-height: 20vh;
+            .empty-computations {
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+                height: 20vh;
+                justify-content: center;
+                padding: 20px 0;
+                text-align: center;
+                width: 100%;
+
+                .empty-computations__message {
+                    font-variation-settings: 'wght' 500;
+                }
+            }
+
+            .computations-container {
+                animation: fadeIn 0.5s ease-out;
+                width: 100%;
+
+                .ng-scrollbar {
+                    max-height: 45vh;
+                    min-height: 20vh;
+                }
             }
         }
     }
@@ -63,6 +133,9 @@
     }
 
     .scheduled-computation {
+        animation: fadeInUp 0.3s ease-out;
+        animation-fill-mode: both;
+
         &:after {
             border-bottom: 1px solid #ccc;
             content: '';
@@ -84,6 +157,15 @@
     }
 
     .computation {
+        animation: fadeInUp 0.4s ease-out;
+        animation-fill-mode: both;
+
+        @for $i from 1 through 10 {
+            &:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.05}s;
+            }
+        }
+
         &:after {
             border-bottom: 1px solid #ccc;
             content: '';
@@ -243,6 +325,35 @@
 
         100% {
             box-shadow: 0px 0px 5px 1px rgba(0, 255, 135, 0.5);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
         }
     }
 

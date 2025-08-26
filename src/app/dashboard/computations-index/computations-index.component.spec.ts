@@ -34,11 +34,14 @@ describe('ComputationsIndexComponent', () => {
         mockStorageService = {
             getPluginRuns: jest.fn(),
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            getComputesByStatus: jest.fn(),
-            getArchivedRuns: jest.fn(),
+            getPluginRunsPaginated: jest.fn().mockResolvedValue({
+                documents: [],
+                total: 0,
+                hasMore: false
+            }),
+            getComputesByStatus: jest.fn().mockReturnValue([]),
             archiveComputation: jest.fn(),
             unarchiveComputation: jest.fn(),
-            savePluginRuns: jest.fn(),
             getNewRuns: jest.fn().mockReturnValue([]),
             getDemoRuns: jest.fn().mockReturnValue([]),
             getActiveArtifact: jest.fn(),
@@ -52,7 +55,7 @@ describe('ComputationsIndexComponent', () => {
             updateRunStatus: jest.fn(),
             getComputationMetadata: jest.fn(),
             setComputeState: jest.fn(),
-            getComputationState: jest.fn(),
+            getComputationRunState: jest.fn(),
             collapsePluginCatalog: jest.fn(),
             getPluginDetails: jest.fn().mockReturnValue(
                 of({
@@ -63,8 +66,7 @@ describe('ComputationsIndexComponent', () => {
             syncTasks$: new BehaviorSubject<void>(undefined),
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             computeDemo: jest.fn(),
-            storeNewComputes: jest.fn(),
-            refreshComputesInLS: jest.fn()
+            storeNewComputes: jest.fn()
         }
 
         mockArtifactService = {
@@ -106,7 +108,6 @@ describe('ComputationsIndexComponent', () => {
 
     beforeEach(fakeAsync(() => {
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([])
-        mockStorageService.getArchivedRuns = jest.fn().mockReturnValue([])
 
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
@@ -146,6 +147,11 @@ describe('ComputationsIndexComponent', () => {
         } as ComputationDisplayEntity
 
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getPluginRunsPaginated = jest.fn().mockResolvedValue({
+            documents: [testRun],
+            total: 1,
+            hasMore: false
+        })
 
         mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
@@ -197,9 +203,10 @@ describe('ComputationsIndexComponent', () => {
             return of()
         })
 
-        component.ngOnInit()
-        fixture.detectChanges()
+        component.currentRuns = [testRun]
+        component.initializeSuccessfulRuns()
         tick()
+        fixture.detectChanges()
 
         const parentComputation = fixture.debugElement.query(By.css('.parent-computation'))
         expect(parentComputation).toBeTruthy()
@@ -229,8 +236,6 @@ describe('ComputationsIndexComponent', () => {
         component.archiveComputation(initialRun.correlation_uuid)
 
         expect(mockStorageService.archiveComputation).toHaveBeenCalledWith(initialRun.correlation_uuid)
-        expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
-        expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
 
         discardPeriodicTasks()
     }))
@@ -246,6 +251,11 @@ describe('ComputationsIndexComponent', () => {
         } as ComputationDisplayEntity
 
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getPluginRunsPaginated = jest.fn().mockResolvedValue({
+            documents: [testRun],
+            total: 1,
+            hasMore: false
+        })
 
         mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
@@ -300,9 +310,10 @@ describe('ComputationsIndexComponent', () => {
             return of()
         })
 
-        component.ngOnInit()
-        fixture.detectChanges()
+        component.currentRuns = [testRun]
+        component.initializeSuccessfulRuns()
         tick()
+        fixture.detectChanges()
 
         const artifactErrorsIcon = fixture.debugElement.query(By.css('.artifact-errors'))
         expect(artifactErrorsIcon).toBeTruthy()
@@ -327,8 +338,6 @@ describe('ComputationsIndexComponent', () => {
         component.unarchiveComputation(archivedRun.correlation_uuid)
 
         expect(mockStorageService.unarchiveComputation).toHaveBeenCalledWith(archivedRun.correlation_uuid)
-        expect(mockStorageService.getComputesByStatus).toHaveBeenCalled()
-        expect(mockStorageService.getArchivedRuns).toHaveBeenCalled()
 
         discardPeriodicTasks()
     }))
@@ -337,12 +346,13 @@ describe('ComputationsIndexComponent', () => {
         component.demoConfig = true
         component.demoRuns = []
         component.pluginId = 'test_plugin'
+        component.currentRuns = []
 
         const demoResponse = { correlation_uuid: 'demo-uuid-123' }
         const stateResponse = { state: 'SUCCESS' }
 
         mockPluginService.computeDemo = jest.fn().mockReturnValue(of(demoResponse))
-        mockPluginService.getComputationState = jest.fn().mockReturnValue(of(stateResponse))
+        mockPluginService.getComputationRunState = jest.fn().mockReturnValue(of(stateResponse))
         mockPluginService.storeNewComputes = jest.fn()
 
         mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
@@ -383,13 +393,9 @@ describe('ComputationsIndexComponent', () => {
             return of({})
         })
 
-        const fetchDemoSpy = jest.spyOn(component, 'fetchDemoComputation')
+        component.fetchDemoComputation()
+        tick(100)
 
-        component.ngOnInit()
-        fixture.detectChanges()
-        tick()
-
-        expect(fetchDemoSpy).toHaveBeenCalled()
         expect(mockPluginService.computeDemo).toHaveBeenCalledWith('test_plugin')
 
         const expectedCompute = {
@@ -457,7 +463,7 @@ describe('ComputationsIndexComponent', () => {
         expect(component.currentRuns[0]).toEqual(expectedComputation)
 
         expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith('8a897536-c4b4-4e5a-9d70-50430183ac66')
-        expect(mockPluginService.refreshComputesInLS).toHaveBeenCalledWith(component.currentRuns)
+        expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expectedComputation)
         expect(fetchAndProcessSpy).toHaveBeenCalledWith(expectedComputation)
 
         discardPeriodicTasks()

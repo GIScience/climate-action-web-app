@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
 import { AppwriteService } from './auth/appwrite.service'
+import { ComputationItemState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
 
 export interface BasicKeyInfo extends Models.Document {
@@ -9,6 +10,20 @@ export interface BasicKeyInfo extends Models.Document {
     ors_policy: string
     policy_upgrade_requests: string[]
     key: string
+}
+
+export interface PaginationParams {
+    limit: number
+    cursor?: string
+    pluginId: string
+    state?: ComputationItemState
+}
+
+export interface PaginatedResult<T> {
+    documents: T[]
+    total: number
+    hasMore: boolean
+    nextCursor?: string
 }
 
 @Injectable({
@@ -36,29 +51,56 @@ export class DatabaseService {
         }
     }
 
-    async getPluginRuns(): Promise<ComputationDatabaseEntity[]> {
+    async fetchPluginRunsPaginated(params: PaginationParams): Promise<PaginatedResult<ComputationDatabaseEntity>> {
         try {
-            if (!this.user_id) return []
+            if (!this.user_id) {
+                return { documents: [], total: 0, hasMore: false }
+            }
 
-            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+            const queries = [
                 Query.equal('user_id', this.user_id),
-                Query.limit(1000)
-            ])
+                Query.equal('pluginId', params.pluginId),
+                Query.limit(params.limit),
+                Query.orderDesc('timestamp')
+            ]
 
-            return response.documents.map(
-                doc =>
+            const stateFilter = params.state || 'ACTIVE'
+            queries.push(Query.equal('state', stateFilter))
+
+            if (params.cursor) {
+                queries.push(Query.cursorAfter(params.cursor))
+            }
+
+            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, queries)
+
+            const documents = response.documents.map(
+                (doc: Models.Document) =>
                     ({
                         correlation_uuid: doc['correlation_uuid'],
                         flags: doc['flags'],
+                        state: doc['state'],
                         pluginId: doc['pluginId'],
                         timestamp: doc['timestamp'],
                         status: doc['status'],
                         aoiName: doc['aoiName']
                     }) as ComputationDatabaseEntity
             )
+
+            const hasMore = documents.length === params.limit
+            const nextCursor =
+                hasMore && response.documents.length > 0
+                    ? response.documents[response.documents.length - 1].$id
+                    : undefined
+
+            return {
+                documents,
+                total: response.total,
+                hasMore,
+                nextCursor
+            }
         } catch (error) {
-            this.logError('Error fetching plugin runs from Appwrite:', error)
-            return []
+            this.logError('Error fetching paginated plugin runs from Appwrite:', error)
+            return { documents: [], total: 0, hasMore: false }
         }
     }
 
@@ -93,7 +135,7 @@ export class DatabaseService {
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
                 Query.equal('correlation_uuid', correlationId),
                 Query.equal('user_id', this.user_id),
-                Query.limit(1000)
+                Query.limit(1)
             ])
 
             if (response.documents.length === 0) return false
@@ -112,30 +154,79 @@ export class DatabaseService {
         }
     }
 
-    async syncPluginRuns(runs: ComputationDatabaseEntity[]): Promise<boolean> {
+    getBasicKey(): Promise<BasicKeyInfo | null> {
+        if (!this.user_id) return Promise.resolve(null)
+        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
+    }
+
+    async hasDemoComputations(pluginId: string): Promise<boolean> {
         try {
             if (!this.user_id) return false
 
-            const existingRuns = await this.getPluginRuns()
-            const existingIds = new Set(existingRuns.map(run => run.correlation_uuid))
+            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+                Query.equal('user_id', this.user_id),
+                Query.equal('pluginId', pluginId),
+                Query.contains('flags', 'DEMO'),
+                Query.limit(1)
+            ])
 
-            for (const run of runs) {
-                if (existingIds.has(run.correlation_uuid)) {
-                    await this.updatePluginRun(run.correlation_uuid, run)
-                } else {
-                    await this.createPluginRun(run)
-                }
-            }
-
-            return true
+            return response.documents.length > 0
         } catch (error) {
-            this.logError('Error syncing plugin runs with Appwrite:', error)
+            this.logError('Error checking for demo computations:', error)
             return false
         }
     }
 
-    getBasicKey(): Promise<BasicKeyInfo | null> {
-        if (!this.user_id) return Promise.resolve(null)
-        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
+    // TODO: Temporary migration script, remove after all users run states have been migrated
+    async migrateComputationsToStateField(): Promise<void> {
+        try {
+            if (!this.user_id) {
+                console.log('No user logged in, skipping migration')
+                return
+            }
+
+            console.log('Starting migration of computations to state field...')
+
+            const allDocuments = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+                Query.equal('user_id', this.user_id),
+                Query.limit(1000)
+            ])
+
+            console.log(`Found ${allDocuments.documents.length} documents to migrate`)
+
+            let migratedCount = 0
+            let archivedCount = 0
+            let activeCount = 0
+
+            for (const doc of allDocuments.documents) {
+                const flags = (doc['flags'] as string[]) || []
+                const hasArchivedFlag = flags.includes('ARCHIVED')
+
+                const newState: ComputationItemState = hasArchivedFlag ? 'ARCHIVED' : 'ACTIVE'
+
+                if (!doc['state'] || doc['state'] !== newState) {
+                    const cleanedFlags = flags.filter(flag => flag !== 'ARCHIVED')
+
+                    await this.databases.updateDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, doc.$id, {
+                        state: newState,
+                        flags: cleanedFlags
+                    })
+
+                    migratedCount++
+                    if (newState === 'ARCHIVED') {
+                        archivedCount++
+                    } else {
+                        activeCount++
+                    }
+                }
+            }
+
+            console.log(`Migration complete: ${migratedCount} documents updated`)
+            console.log(`- Set to ACTIVE: ${activeCount}`)
+            console.log(`- Set to ARCHIVED: ${archivedCount}`)
+        } catch (error) {
+            this.logError('Error during migration:', error)
+            throw error
+        }
     }
 }

@@ -5,7 +5,7 @@ import { Feature } from 'ol'
 import { MultiPolygon } from 'ol/geom'
 import { of } from 'rxjs'
 import { StorageService } from '../../storage.service'
-import { ComputationDatabaseEntity, ComputationID } from '../computations-index/computation.interface'
+import { ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
 import { PluginService } from './plugin.service'
 
@@ -121,8 +121,7 @@ describe('PluginService', () => {
         const mockStorageService = {
             getComputesByStatus: jest.fn().mockReturnValue([test_plugin_run, test_plugin_run]),
             storeNewCompute: jest.fn(),
-            savePluginRuns: jest.fn(),
-            updateComputeStatus: jest.fn(),
+            updateComputation: jest.fn(() => Promise.resolve()),
             getPluginRuns: jest.fn().mockReturnValue([test_plugin_run])
         }
 
@@ -220,16 +219,10 @@ describe('PluginService', () => {
         expect(storageService.storeNewCompute).toHaveBeenCalled()
     })
 
-    it('should refresh compute', () => {
-        service.refreshComputesInLS([test_plugin_run] as ComputationDatabaseEntity[])
-        expect(storageService.savePluginRuns).toHaveBeenCalled()
-    })
-
-    it('should update run status', () => {
-        service.updateRunStatus('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
-        expect(storageService.updateComputeStatus).toHaveBeenCalledWith(
-            '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
-            'PENDING'
-        )
+    it('should update run status', async () => {
+        await service.updateRunStatus('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', 'PENDING')
+        expect(storageService.updateComputation).toHaveBeenCalledWith('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', {
+            status: 'PENDING'
+        })
     })
 })

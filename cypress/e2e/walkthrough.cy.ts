@@ -1,5 +1,5 @@
 import {
-    mockComputationState,
+    mockComputationRunState,
     mockPluginHiWalk,
     mockPluginHiWalkComputation,
     mockPluginsList,
@@ -10,7 +10,7 @@ describe('walkthrough', () => {
     it('should run the walkthrough', () => {
         mockPluginsList()
         mockPluginHiWalk()
-        mockComputationState()
+        mockComputationRunState()
         mockPostPluginRun()
         mockPluginHiWalkComputation()
 
@@ -50,7 +50,7 @@ describe('walkthrough', () => {
 
         cy.wait('@postPluginRun', { timeout: 30000, requestTimeout: 30000 }).wait(1000)
 
-        cy.wait('@getComputationState')
+        cy.wait('@getComputationRunState')
 
         cy.wait('@getPluginHiWalkComputation')
 

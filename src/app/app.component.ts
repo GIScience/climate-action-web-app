@@ -15,6 +15,7 @@ import { default as packageInfo } from '../../package.json'
 import { AccountComponent } from './account/account.component'
 import { DashboardService } from './dashboard/dashboard.service'
 import { TourEngine } from './dashboard/walkthrough/tour-engine.service'
+import { MigrationService } from './migration.service'
 import { MobileWarningComponent } from './mobile-warning/mobile-warning.component'
 
 @Component({
@@ -51,7 +52,8 @@ export class AppComponent implements AfterViewInit {
 
     constructor(
         private dashboardService: DashboardService,
-        private tourEngine: TourEngine
+        private tourEngine: TourEngine,
+        _migrationService: MigrationService
     ) {}
 
     ngAfterViewInit(): void {

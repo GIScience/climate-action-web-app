@@ -13,7 +13,7 @@ import {
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { AppwriteService } from '@app/auth/appwrite.service'
-import { ComputationState } from '@app/dashboard/common/status.types'
+import { ComputationRunState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
@@ -249,7 +249,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                     correlation_uuid: data.correlation_uuid,
                     pluginId: this.plugin.plugin_id,
                     aoiName: aoiName,
-                    status: 'PENDING' as ComputationState,
+                    status: 'PENDING' as ComputationRunState,
                     timestamp: new Date()
                 }
                 this.pluginService.storeNewComputes(compute)

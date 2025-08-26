@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Switched the map library to [MapLibre](https://maplibre.org/maplibre-gl-js/docs/), and we now have vector basemaps via [Versatiles](https://github.com/versatiles-org/versatiles-style) tiles and styles (using Shortbread schema) ([#180](https://gitlab.heigit.org/climate-action/web-app/-/issues/180))
+- Computations are now paginated during fetch from Appwrite, also switched storage to be Appwrite first (and switch to local for fallback) ([#337](https://gitlab.heigit.org/climate-action/web-app/-/issues/337))
 
 ### Added
 

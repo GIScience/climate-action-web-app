@@ -680,13 +680,13 @@ export const mockPostPluginRun = () => {
     }).as('postPluginRun')
 }
 
-export const mockComputationState = () => {
+export const mockComputationRunState = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/computation/8d81bea0-7183-4083-aae0-b751f9813de5/state`, {
         body: {
             state: 'SUCCESS',
             message: ''
         }
-    }).as('getComputationState')
+    }).as('getComputationRunState')
 }
 
 export const mockPluginHiWalkComputation = () => {
