@@ -1,6 +1,8 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { importProvidersFrom } from '@angular/core'
-import { provideMomentDateAdapter } from '@angular/material-moment-adapter'
+import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
+import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { enUS } from 'date-fns/locale'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy, Routes, provideRouter } from '@angular/router'
@@ -92,23 +94,18 @@ bootstrapApplication(AppComponent, {
             MarkdownModule.forRoot(),
             LucideAngularModule.pick({ CircleUserRound })
         ),
-        provideMomentDateAdapter(
-            {
-                parse: {
-                    dateInput: ['YYYY-MM-DD', 'll', 'LL', 'l', 'll']
-                },
-                display: {
-                    dateInput: 'LL',
-                    monthYearLabel: 'MMM YYYY',
-                    dateA11yLabel: 'LL',
-                    monthYearA11yLabel: 'MMMM YYYY'
-                }
+        provideDateFnsAdapter({
+            parse: {
+                dateInput: 'yyyy-MM-dd'
             },
-            {
-                useUtc: true,
-                strict: true
+            display: {
+                dateInput: 'PP',
+                monthYearLabel: 'LLL yyyy',
+                dateA11yLabel: 'PP',
+                monthYearA11yLabel: 'LLLL yyyy'
             }
-        ),
+        }),
+        { provide: MAT_DATE_LOCALE, useValue: enUS },
         {
             provide: RouteReuseStrategy,
             useClass: CustomRouteReuseStrategy

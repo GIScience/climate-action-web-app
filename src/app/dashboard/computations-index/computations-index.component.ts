@@ -27,7 +27,7 @@ import {
     Share2,
     Trash2
 } from 'lucide-angular'
-import moment from 'moment/moment'
+import { compareDesc, format } from 'date-fns'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
@@ -208,7 +208,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     formatTimestamp(timestamp: Date) {
-        return moment.utc(timestamp).local().locale(this.currentLocale).format('lll')
+        return format(timestamp, 'MMM d, yyyy h:mm a')
     }
 
     formatUUID(correlation_uuid: string): string {
@@ -471,7 +471,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.computations = this.computations.filter(x => x.correlation_uuid != correlation_uuid)
             this.computations.push(computation)
             this.computations.sort((a, b) => {
-                return moment(a.timestamp?.valueOf()) < moment(b.timestamp?.valueOf()) ? 1 : -1
+                return compareDesc(new Date(a.timestamp?.valueOf() || 0), new Date(b.timestamp?.valueOf() || 0))
             })
             this.dataChange.next(this.computations)
         }

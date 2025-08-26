@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
-import moment from 'moment/moment'
+import { formatISO } from 'date-fns'
 import { map, Observable } from 'rxjs'
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
 import { WSMessage } from './notification.interface'
@@ -43,7 +43,7 @@ export class NotificationService {
         return setInterval(() => {
             this.sendMessage({
                 type: 'heartbeat',
-                timestamp: moment(new Date()).format()
+                timestamp: formatISO(new Date())
             })
         }, 5000)
     }
