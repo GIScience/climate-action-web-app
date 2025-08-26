@@ -1,7 +1,7 @@
 import { NgOptimizedImage } from '@angular/common'
 import { AfterViewInit, Component } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { MatMomentDateModule } from '@angular/material-moment-adapter'
+import { MatDateFnsModule } from '@angular/material-date-fns-adapter'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
@@ -30,7 +30,7 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         RouterOutlet,
         RouterLink,
         FormlyMaterialModule,
-        MatMomentDateModule,
+        MatDateFnsModule,
         MatExpansionModule,
         MobileWarningComponent,
         MatDialogModule,

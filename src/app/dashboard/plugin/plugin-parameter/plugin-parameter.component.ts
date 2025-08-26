@@ -38,7 +38,7 @@ import {
     TriangleAlert,
     UserCheck
 } from 'lucide-angular'
-import moment from 'moment/moment'
+import { format, isValid } from 'date-fns'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
@@ -209,8 +209,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         if (schema.format == 'date') {
             field.type = 'datepicker'
-            field.parsers = [v => (moment.isMoment(v) ? v.format('YYYY-MM-DD') : v)]
-            field.validators = { date: (control: AbstractControl) => moment(control.value, true).isValid() }
+            field.parsers = [v => (v instanceof Date ? format(v, 'yyyy-MM-dd') : v)]
+            field.validators = { date: (control: AbstractControl) => isValid(new Date(control.value)) }
         }
 
         field = separateOptionalParameters(field, schema)
