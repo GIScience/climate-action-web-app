@@ -15,7 +15,7 @@
         transition: max-height 0.25s ease-in-out;
 
         .skeleton-container {
-            padding: 10px 5px;
+            padding: 10px 0;
             width: 100%;
 
             .skeleton-item {
@@ -23,8 +23,8 @@
                 animation: fadeIn 0.3s ease-out;
                 display: grid;
                 grid-template-columns: 1fr 100px;
-                margin-left: 32.5px;
-                padding: 10px 5px;
+                margin-left: 30px;
+                padding: 10px 0;
 
                 &:after {
                     border-bottom: 1px solid #ccc;
@@ -148,11 +148,11 @@
             align-items: center;
             display: grid;
             grid-template-columns: 1fr 100px;
-            padding: 10px 5px;
+            padding: 10px 0;
         }
 
         .card-header {
-            margin-left: 32.5px;
+            margin-left: 30px;
         }
     }
 
@@ -183,8 +183,8 @@
             border-radius: 10px;
             cursor: pointer;
             display: grid;
-            grid-template-columns: 32.5px 1fr 100px;
-            padding: 10px 5px;
+            grid-template-columns: 30px 1fr 135px;
+            padding: 10px 0;
             transition: background-color 0.15s ease-in-out;
             width: 100%;
 
@@ -195,7 +195,7 @@
             }
 
             &:hover {
-                background-color: #d3d3d3;
+                background-color: #def0ff;
 
                 .computation-actions {
                     visibility: visible;
@@ -238,9 +238,29 @@
 
             .computation-actions {
                 display: flex;
-                gap: 2.5px;
                 margin-left: auto;
+                margin-right: 5px;
                 visibility: hidden;
+
+                button {
+                    border-radius: 0;
+                    border-right-width: 0;
+
+                    &:first-of-type {
+                        border-bottom-left-radius: 10px;
+                        border-top-left-radius: 10px;
+                    }
+
+                    &:last-of-type {
+                        border-bottom-right-radius: 10px;
+                        border-right-width: 1.5px;
+                        border-top-right-radius: 10px;
+                    }
+
+                    &.delete-computation {
+                        color: rgba(156, 12, 5, 0.75);
+                    }
+                }
             }
         }
     }
@@ -261,10 +281,10 @@
         color: #666;
         display: flex;
         font-size: 12px;
-        gap: 2.5px;
+        gap: 1px;
 
         i-lucide:first-of-type {
-            margin-right: 2.5px;
+            margin-right: 1px;
         }
     }
 
