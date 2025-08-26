@@ -129,21 +129,28 @@
                                     aria-label="Share Computation"
                                     tp="Share Computation"
                                     class="btn-onlyicon btn-onlyicon--cta">
-                                    <i-lucide [img]="Share2" size="17"></i-lucide>
+                                    <i-lucide [img]="Share2" size="18"></i-lucide>
                                 </button>
                                 <button
                                     (click)="viewParameters(computation, $event)"
                                     aria-label="View Parameters"
                                     tp="View Parameters"
                                     class="btn-onlyicon btn-onlyicon--cta">
-                                    <i-lucide [img]="ListTodo" size="17"></i-lucide>
+                                    <i-lucide [img]="ListTodo" size="18"></i-lucide>
                                 </button>
                                 <button
                                     (click)="archiveComputation(computation.correlation_uuid, $event)"
                                     aria-label="Archive Computation"
                                     tp="Archive Computation"
                                     class="archive-computation btn-onlyicon btn-onlyicon--cta">
-                                    <i-lucide [img]="Archive" size="17"></i-lucide>
+                                    <i-lucide [img]="Archive" size="18"></i-lucide>
+                                </button>
+                                <button
+                                    (click)="deleteComputation(computation.correlation_uuid, $event)"
+                                    aria-label="Delete Computation"
+                                    tp="Delete Computation"
+                                    class="delete-computation btn-onlyicon btn-onlyicon--cta">
+                                    <i-lucide [img]="Trash2" size="18"></i-lucide>
                                 </button>
                             </div>
                             <div

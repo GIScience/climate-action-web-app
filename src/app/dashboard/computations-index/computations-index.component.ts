@@ -24,7 +24,8 @@ import {
     Loader,
     LoaderCircle,
     LucideAngularModule,
-    Share2
+    Share2,
+    Trash2
 } from 'lucide-angular'
 import moment from 'moment/moment'
 import { NgScrollbarModule } from 'ngx-scrollbar'
@@ -144,6 +145,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly LoaderCircle = LoaderCircle
     readonly FileWarning = FileWarning
     readonly Clipboard = Clipboard
+    readonly Trash2 = Trash2
 
     @Input() pluginId: string = ''
     @Input() demoConfig: boolean = true
@@ -586,10 +588,23 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     archiveComputation(correlation_uuid: string, event?: Event): void {
         event?.stopPropagation()
+        this.storageService.archiveComputation(correlation_uuid)
+        this.removeComputationFromView(correlation_uuid)
+    }
+
+    deleteComputation(correlation_uuid: string, event?: Event): void {
+        event?.stopPropagation()
+
+        const confirmed = confirm('Are you sure you want to delete this computation? This action cannot be undone.')
+        if (!confirmed) return
+
+        this.storageService.deleteComputation(correlation_uuid)
+        this.removeComputationFromView(correlation_uuid)
+    }
+
+    private removeComputationFromView(correlation_uuid: string): void {
         const isCurrentComputation =
             this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
-
-        this.storageService.archiveComputation(correlation_uuid)
 
         this.currentRuns = this.currentRuns.filter(run => run.correlation_uuid !== correlation_uuid)
         this.computations = this.computations.filter(comp => comp.correlation_uuid !== correlation_uuid)
@@ -597,6 +612,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (isCurrentComputation) {
             this.artifactViewerService.closeArtifactViewer()
+            this.mapService.removeFocusedLayer()
         }
 
         if (this.currentRuns.length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {

@@ -179,6 +179,12 @@ export class StorageService {
         await this.updateComputation(correlationId, { state: 'ACTIVE' })
     }
 
+    // Delete runs
+
+    async deleteComputation(correlationId: string): Promise<void> {
+        await this.updateComputation(correlationId, { state: 'DELETED' })
+    }
+
     // New runs tracking
 
     getNewRuns(): string[] {
