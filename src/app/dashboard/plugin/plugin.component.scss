@@ -158,6 +158,7 @@
         2px 2px 4px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     margin-top: -12.5px;
+    overflow: hidden;
     position: relative;
 
     &.is-loading {

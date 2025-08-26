@@ -7,7 +7,7 @@ import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, Observable, Subject, map, of, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
-import { ComputationState, ComputationStateInfo } from '../common/status.types'
+import { ComputationRunState, ComputationRunStateInfo } from '../common/status.types'
 import {
     ComputationDatabaseEntity,
     ComputationDisplayEntity,
@@ -58,8 +58,8 @@ export class PluginService {
         return this.http.get<ComputationID>(`${this.apiUrl}/plugin/${pluginId}/demo`)
     }
 
-    getComputationState(id: string): Observable<ComputationStateInfo> {
-        return this.http.get<ComputationStateInfo>(`${this.apiUrl}/computation/${id}/state`)
+    getComputationRunState(id: string): Observable<ComputationRunStateInfo> {
+        return this.http.get<ComputationRunStateInfo>(`${this.apiUrl}/computation/${id}/state`)
     }
 
     getComputationMetadata(id: string): Observable<ComputationMetadata> {
@@ -127,16 +127,12 @@ export class PluginService {
         this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])
     }
 
-    refreshComputesInLS(runs: ComputationDatabaseEntity[]) {
-        this.storageService.savePluginRuns(runs)
-    }
-
     getPluginRuns() {
         return this.storageService.getPluginRunsObservable()
     }
 
-    updateRunStatus(correlationId: string, newStatus: ComputationState) {
-        this.storageService.updateComputeStatus(correlationId, newStatus)
+    async updateRunStatus(correlationId: string, newStatus: ComputationRunState) {
+        await this.storageService.updateComputation(correlationId, { status: newStatus })
 
         const runs = this.storageService.getPluginRuns()
         this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])

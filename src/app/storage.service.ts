@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
+import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
 import { ActiveArtifactRef } from './dashboard/artifact/artifact.interface'
-import { ComputationFlags, ComputationState } from './dashboard/common/status.types'
+import { ComputationFlags, ComputationItemState, ComputationRunState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
-import { DatabaseService } from './database.service'
+import { DatabaseService, PaginatedResult } from './database.service'
 
 interface MapPreferences {
     selectedLayer?: string
@@ -29,52 +30,99 @@ export class StorageService {
     }
 
     private pluginRunsSubject = new BehaviorSubject<ComputationDatabaseEntity[]>([])
-    private syncInProgress = false
+
+    private paginationState: { [pluginId: string]: { cursor?: string; hasMore: boolean } } = {}
+    private readonly DEFAULT_PAGE_SIZE = 10
 
     constructor(
         private appwriteService: AppwriteService,
         private databaseService: DatabaseService
     ) {
-        this.loadInitialData()
-
-        this.appwriteService._user.subscribe(user => {
-            if (user) {
-                this.syncWithAppwrite()
-            }
-        })
-
         this.appwriteService.onLogout.subscribe(() => {
             this.savePluginRunsToLocal([])
             this.pluginRunsSubject.next([])
         })
     }
 
-    private async loadInitialData(): Promise<void> {
-        const pluginRuns = this.getPluginRunsFromLocal()
-        this.pluginRunsSubject.next(pluginRuns)
+    private getUserAuthStatus(): { user: Models.User<Models.Preferences> | null; isRealUser: boolean } {
+        const user = this.appwriteService._user.getValue()
+        const isRealUser = !!(user && user.$id !== 'fake-user-id')
+        return { user, isRealUser }
     }
 
-    private async syncWithAppwrite(): Promise<void> {
-        if (this.syncInProgress) return
+    // Pagination
 
-        this.syncInProgress = true
-        try {
-            const initialSyncStatus = sessionStorage.getItem('initialSyncCompleted')
+    async getPluginRunsPaginated(
+        pluginId: string,
+        isInitialLoad: boolean = true,
+        state: ComputationItemState = 'ACTIVE'
+    ): Promise<PaginatedResult<ComputationDatabaseEntity>> {
+        const { isRealUser } = this.getUserAuthStatus()
 
-            const appwriteRuns = await this.databaseService.getPluginRuns()
-
-            this.savePluginRunsToLocal(appwriteRuns)
-            this.pluginRunsSubject.next(appwriteRuns)
-
-            if (!initialSyncStatus) {
-                sessionStorage.setItem('initialSyncCompleted', 'true')
-                window.location.reload()
+        if (!isRealUser) {
+            // localStorage fallback for dev/fake users - filter by state locally
+            const pluginRuns = this.getPluginRunsFromLocal()
+            this.pluginRunsSubject.next(pluginRuns)
+            const localRuns = this.getPluginRuns().filter(
+                run => run.pluginId === pluginId && (run.state || 'ACTIVE') === state
+            )
+            return {
+                documents: localRuns,
+                total: localRuns.length,
+                hasMore: false
             }
-        } catch (error) {
-            console.error('Error syncing with Appwrite:', error)
-        } finally {
-            this.syncInProgress = false
         }
+
+        const currentState = this.paginationState[pluginId] || { hasMore: true }
+
+        if (!isInitialLoad && !currentState.hasMore) {
+            return { documents: [], total: 0, hasMore: false }
+        }
+
+        const cursor = isInitialLoad ? undefined : currentState.cursor
+
+        try {
+            const result = await this.databaseService.fetchPluginRunsPaginated({
+                limit: this.DEFAULT_PAGE_SIZE,
+                cursor,
+                pluginId,
+                state
+            })
+
+            this.paginationState[pluginId] = {
+                cursor: result.nextCursor,
+                hasMore: result.hasMore
+            }
+
+            if (isInitialLoad) {
+                // First page - replace all localStorage with this plugin's runs
+                this.savePluginRunsToLocal(result.documents)
+                this.pluginRunsSubject.next(result.documents)
+            } else {
+                // Load more - append to existing runs for this plugin
+                const currentRuns = this.getPluginRuns()
+                const updatedRuns = [...currentRuns, ...result.documents]
+                this.savePluginRunsToLocal(updatedRuns)
+                this.pluginRunsSubject.next(updatedRuns)
+            }
+
+            return result
+        } catch (error) {
+            console.error('Error loading paginated runs from Appwrite, falling back to localStorage:', error)
+            // On error, fallback to localStorage - filter by state
+            const localRuns = this.getPluginRuns().filter(
+                run => run.pluginId === pluginId && (run.state || 'ACTIVE') === state
+            )
+            return {
+                documents: localRuns,
+                total: localRuns.length,
+                hasMore: false
+            }
+        }
+    }
+
+    resetPagination(pluginId: string): void {
+        delete this.paginationState[pluginId]
     }
 
     // Storage utility methods
@@ -98,57 +146,37 @@ export class StorageService {
         return this.pluginRunsSubject.getValue()
     }
 
-    private getPluginRunsFromLocal(): ComputationDatabaseEntity[] {
-        return this.getItem(this.STORAGE_KEYS.PLUGIN_RUNS, [])
-    }
-
-    private savePluginRunsToLocal(runs: ComputationDatabaseEntity[]): void {
-        this.setItem(this.STORAGE_KEYS.PLUGIN_RUNS, runs)
-    }
-
-    async savePluginRuns(runs: ComputationDatabaseEntity[]): Promise<void> {
-        this.savePluginRunsToLocal(runs)
-        this.pluginRunsSubject.next(runs)
-
-        if (this.appwriteService._user.getValue()) {
-            await this.databaseService.syncPluginRuns(runs)
-        }
-    }
-
     async storeNewCompute(compute: ComputationDatabaseEntity): Promise<void> {
-        const runs = this.getPluginRuns()
-        runs.push(compute)
+        const { isRealUser } = this.getUserAuthStatus()
 
-        this.savePluginRunsToLocal(runs)
-        this.pluginRunsSubject.next(runs)
-
-        if (this.appwriteService._user.getValue()) {
-            await this.databaseService.createPluginRun(compute)
+        if (isRealUser) {
+            try {
+                const appwriteId = await this.databaseService.createPluginRun(compute)
+                if (appwriteId && compute.pluginId) {
+                    this.resetPagination(compute.pluginId)
+                }
+            } catch (error) {
+                console.warn('Failed to store to Appwrite, will store locally only:', error)
+            }
         }
+
+        this.addComputeToLocalStorage(compute)
     }
 
-    async updateComputeStatus(correlationId: string, newStatus: ComputationState): Promise<void> {
-        await this.updateComputation(correlationId, { status: newStatus })
-    }
-
-    getComputesByStatus(statuses: ComputationState[]): ComputationDatabaseEntity[] {
+    getComputesByStatus(statuses: ComputationRunState[]): ComputationDatabaseEntity[] {
         return this.getPluginRuns().filter(
-            run => statuses.includes(run.status as ComputationState) && !run.flags?.includes('ARCHIVED')
+            run => statuses.includes(run.status as ComputationRunState) && (run.state || 'ACTIVE') === 'ACTIVE'
         )
     }
 
     // Archived runs
 
-    getArchivedRuns(): ComputationDatabaseEntity[] {
-        return this.getPluginRuns().filter(run => run.flags?.includes('ARCHIVED'))
-    }
-
     async archiveComputation(correlationId: string): Promise<void> {
-        await this.addFlag(correlationId, 'ARCHIVED')
+        await this.updateComputation(correlationId, { state: 'ARCHIVED' })
     }
 
     async unarchiveComputation(correlationId: string): Promise<void> {
-        await this.removeFlag(correlationId, 'ARCHIVED')
+        await this.updateComputation(correlationId, { state: 'ACTIVE' })
     }
 
     // New runs tracking
@@ -176,22 +204,53 @@ export class StorageService {
     }
 
     // Helper method for updating computation properties
-    private async updateComputation(correlationId: string, updates: Partial<ComputationDatabaseEntity>): Promise<void> {
-        const runs = this.getPluginRuns()
-        const index = runs.findIndex(run => run.correlation_uuid === correlationId)
 
-        if (index !== -1) {
-            runs[index] = { ...runs[index], ...updates }
-            this.savePluginRunsToLocal(runs)
-            this.pluginRunsSubject.next(runs)
+    async updateComputation(correlationId: string, updates: Partial<ComputationDatabaseEntity>): Promise<void> {
+        const { isRealUser } = this.getUserAuthStatus()
+
+        if (isRealUser) {
+            try {
+                await this.databaseService.updatePluginRun(correlationId, updates)
+            } catch (error) {
+                console.warn('Failed to update in Appwrite, will update locally only:', error)
+            }
         }
 
-        if (this.appwriteService._user.getValue()) {
-            await this.databaseService.updatePluginRun(correlationId, updates)
+        this.updateLocalRun(correlationId, updates)
+    }
+
+    private updateLocalRun(correlationId: string, updates: Partial<ComputationDatabaseEntity>): void {
+        const runs = this.getPluginRuns()
+        const index = runs.findIndex(run => run.correlation_uuid === correlationId)
+        if (index !== -1) {
+            runs[index] = { ...runs[index], ...updates }
+            this.syncLocalStorage(runs)
         }
     }
 
+    // Helper methods to add and sync runs to localStorage
+
+    private addComputeToLocalStorage(compute: ComputationDatabaseEntity): void {
+        const runs = this.getPluginRuns()
+        runs.push(compute)
+        this.syncLocalStorage(runs)
+    }
+
+    private syncLocalStorage(runs: ComputationDatabaseEntity[]): void {
+        this.savePluginRunsToLocal(runs)
+        this.pluginRunsSubject.next(runs)
+    }
+
+    private getPluginRunsFromLocal(): ComputationDatabaseEntity[] {
+        return this.getItem(this.STORAGE_KEYS.PLUGIN_RUNS, [])
+    }
+
+    private savePluginRunsToLocal(runs: ComputationDatabaseEntity[]): void {
+        this.setItem(this.STORAGE_KEYS.PLUGIN_RUNS, runs)
+    }
+
     // Helper methods for flags
+
     private getCurrentFlags(run: ComputationDatabaseEntity): ComputationFlags {
         return run.flags || []
     }

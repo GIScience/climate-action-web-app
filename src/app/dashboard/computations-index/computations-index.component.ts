@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
+import { DatabaseService } from '@app/database.service'
 import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -120,6 +121,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     currentLocale = navigator.language
     isReportVisible = false
 
+    paginationInfo: { hasMore: boolean; loading: boolean; total?: number } = {
+        hasMore: true,
+        loading: false
+    }
+
+    archivedPaginationInfo: { hasMore: boolean; loading: boolean; total?: number } = {
+        hasMore: true,
+        loading: false
+    }
+
     readonly Archive = Archive
     readonly ArchiveRestore = ArchiveRestore
     readonly CircleArrowLeft = CircleArrowLeft
@@ -170,7 +181,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private storageService: StorageService,
         private appwriteService: AppwriteService,
-        private reportService: ReportService
+        private reportService: ReportService,
+        private databaseService: DatabaseService
     ) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
@@ -191,9 +203,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 }
             })
         }
-
-        this.newRuns = this.storageService.getNewRuns()
-        this.demoRuns = this.storageService.getDemoRuns(this.pluginId)
     }
 
     formatTimestamp(timestamp: Date) {
@@ -205,13 +214,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (this.demoRuns.length == 0 && this.demoConfig) {
-            this.fetchDemoComputation()
-        }
-
-        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-        this.archivedComputations = this.storageService.getArchivedRuns()
-        this.startPeriodicSync()
+        this.loadInitialPluginRuns()
 
         this.shareService.onComputationToImport().subscribe(computationId => {
             if (computationId) {
@@ -226,16 +229,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             }
         })
 
-        this.initializeSuccessfulRuns()
-
-        this.scheduledRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED'])
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-            this.scheduledRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED'])
+            this.refreshCurrentRuns()
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
-            this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+            this.refreshCurrentRuns()
             this.startPeriodicSync()
         })
 
@@ -244,11 +243,98 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
+    private async loadRuns(isInitialLoad: boolean = true, state: 'ACTIVE' | 'ARCHIVED' = 'ACTIVE'): Promise<void> {
+        const isActive = state === 'ACTIVE'
+        const paginationInfo = isActive ? this.paginationInfo : this.archivedPaginationInfo
+
+        if (!isInitialLoad && (!paginationInfo.hasMore || paginationInfo.loading)) return
+
+        try {
+            // Set loading state
+            if (isActive) this.paginationInfo = { hasMore: true, loading: true }
+            else this.archivedPaginationInfo = { hasMore: true, loading: true }
+
+            const result = await this.storageService.getPluginRunsPaginated(this.pluginId, isInitialLoad, state)
+
+            // Update pagination state
+            const newPaginationInfo = { hasMore: result.hasMore, loading: false, total: result.total }
+            if (isActive) this.paginationInfo = newPaginationInfo
+            else this.archivedPaginationInfo = newPaginationInfo
+
+            // Handle results based on state
+            if (isActive) {
+                this.handleActiveRunsResult(result.documents, isInitialLoad)
+            } else {
+                if (isInitialLoad) this.archivedComputations = result.documents
+                else this.archivedComputations = [...this.archivedComputations, ...result.documents]
+            }
+        } catch (error) {
+            console.error(`Error loading ${isInitialLoad ? 'initial' : 'more'} ${state.toLowerCase()} runs:`, error)
+        }
+    }
+
+    private handleActiveRunsResult(documents: ComputationDatabaseEntity[], isInitialLoad: boolean): void {
+        const filteredRuns = documents.filter(run => ['PENDING', 'STARTED', 'SUCCESS'].includes(run.status))
+
+        if (isInitialLoad) {
+            this.currentRuns = filteredRuns
+            this.scheduledRuns = documents.filter(run => ['PENDING', 'STARTED'].includes(run.status))
+
+            this.updateNewRuns(documents)
+
+            if (this.currentRuns.length === 0 && this.demoConfig) {
+                this.checkAndFetchDemoComputation()
+            }
+
+            this.initializeSuccessfulRuns()
+            this.startPeriodicSync()
+        } else {
+            this.currentRuns = [...this.currentRuns, ...filteredRuns]
+
+            this.updateNewRuns(documents)
+
+            this.initializeSuccessfulRuns(filteredRuns)
+        }
+    }
+
+    private updateNewRuns(documents: ComputationDatabaseEntity[]): void {
+        const newRunsFromData = documents.filter(run => run.flags?.includes('NEW')).map(run => run.correlation_uuid)
+        this.newRuns = [...new Set([...this.newRuns, ...newRunsFromData])]
+    }
+
+    private refreshCurrentRuns(): void {
+        this.currentRuns = this.storageService
+            .getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+            .filter(run => run.pluginId === this.pluginId)
+        this.scheduledRuns = this.storageService
+            .getComputesByStatus(['PENDING', 'STARTED'])
+            .filter(run => run.pluginId === this.pluginId)
+    }
+
+    private async loadInitialPluginRuns(): Promise<void> {
+        await this.loadRuns(true, 'ACTIVE')
+    }
+
+    async loadMoreRuns(): Promise<void> {
+        await this.loadRuns(false, 'ACTIVE')
+    }
+
     toggleArchivedView(): void {
         this.showArchived = !this.showArchived
         if (this.showArchived) {
-            this.archivedComputations = this.storageService.getArchivedRuns()
+            this.currentRuns = []
+            this.computations = []
+            this.scheduledRuns = []
+            this.loadRuns(true, 'ARCHIVED')
+        } else {
+            this.archivedComputations = []
+            this.archivedPaginationInfo = { hasMore: true, loading: false }
+            this.loadInitialPluginRuns()
         }
+    }
+
+    async loadMoreArchivedRuns(): Promise<void> {
+        await this.loadRuns(false, 'ARCHIVED')
     }
 
     ngOnDestroy() {
@@ -261,11 +347,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    initializeSuccessfulRuns() {
-        this.currentRuns
-            .filter(currentRun => currentRun.status === 'SUCCESS')
-            .forEach(currentRun => {
-                this.fetchAndProcessComputations(currentRun)
+    initializeSuccessfulRuns(runs?: ComputationDatabaseEntity[]) {
+        const runsToProcess = runs || this.currentRuns
+        runsToProcess
+            .filter(run => run.status === 'SUCCESS')
+            .forEach(run => {
+                this.fetchAndProcessComputations(run)
             })
     }
 
@@ -281,16 +368,18 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.currentRuns
             .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
             .forEach(run => {
-                this.pluginService.getComputationState(run.correlation_uuid).subscribe({
+                this.pluginService.getComputationRunState(run.correlation_uuid).subscribe({
                     next: stateInfo => {
                         if (stateInfo.state === 'STARTED') {
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'STARTED')
                         }
                         if (stateInfo.state === 'SUCCESS') {
-                            this.storageService.markAsNew(run.correlation_uuid)
-                            this.newRuns = this.storageService.getNewRuns()
                             this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
                             this.fetchAndProcessComputations(run)
+                            this.storageService.markAsNew(run.correlation_uuid)
+                            if (!this.newRuns.includes(run.correlation_uuid)) {
+                                this.newRuns.push(run.correlation_uuid)
+                            }
                             this.syncSubscription?.unsubscribe()
                             this.toastr.success(
                                 `<strong>${derivePluginNameFromId(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
@@ -388,7 +477,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     removeNewRunMark(correlation_uuid: string) {
         this.storageService.markAsViewed(correlation_uuid)
-        this.newRuns = this.storageService.getNewRuns()
+        this.newRuns = this.newRuns.filter(id => id !== correlation_uuid)
     }
 
     toggleComputation(computation: ComputationDisplayEntity) {
@@ -483,7 +572,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    viewParameters(computation: ComputationDisplayEntity) {
+    viewParameters(computation: ComputationDisplayEntity, event?: Event) {
+        event?.stopPropagation()
         this.dialog.open(this.parametersDialog, {
             data: { parameters: JSON.stringify(computation.params) },
             autoFocus: false
@@ -494,36 +584,38 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.dialog.closeAll()
     }
 
-    archiveComputation(correlation_uuid: string): void {
+    archiveComputation(correlation_uuid: string, event?: Event): void {
+        event?.stopPropagation()
         const isCurrentComputation =
             this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
 
         this.storageService.archiveComputation(correlation_uuid)
-        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-        this.archivedComputations = this.storageService.getArchivedRuns()
-        this.refreshDataSource()
+
+        this.currentRuns = this.currentRuns.filter(run => run.correlation_uuid !== correlation_uuid)
+        this.computations = this.computations.filter(comp => comp.correlation_uuid !== correlation_uuid)
+        this.dataChange.next(this.computations)
 
         if (isCurrentComputation) {
             this.artifactViewerService.closeArtifactViewer()
+        }
+
+        if (this.currentRuns.length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {
+            this.loadRuns(false, 'ACTIVE')
         }
     }
 
     unarchiveComputation(correlation_uuid: string): void {
         this.storageService.unarchiveComputation(correlation_uuid)
-        this.currentRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-        this.archivedComputations = this.storageService.getArchivedRuns()
 
-        const computationToFetch = this.currentRuns.find(run => run.correlation_uuid === correlation_uuid)
-        if (computationToFetch) {
-            this.fetchAndProcessComputations(computationToFetch)
+        this.archivedComputations = this.archivedComputations.filter(comp => comp.correlation_uuid !== correlation_uuid)
+
+        if (
+            this.archivedComputations.length === 0 &&
+            this.archivedPaginationInfo.hasMore &&
+            !this.archivedPaginationInfo.loading
+        ) {
+            this.loadRuns(false, 'ARCHIVED')
         }
-    }
-
-    private refreshDataSource() {
-        this.computations = this.computations.filter(computation =>
-            this.currentRuns.some(run => run.correlation_uuid === computation.correlation_uuid)
-        )
-        this.dataChange.next(this.computations)
     }
 
     private startPeriodicSync() {
@@ -573,8 +665,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     aoiName: response.aoi?.get('name')
                 }
 
+                this.pluginService.storeNewComputes(computation)
                 this.currentRuns.push(computation)
-                this.pluginService.refreshComputesInLS(this.currentRuns)
                 this.fetchAndProcessComputations(computation)
                 this.toastr.success('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', '', {
                     timeOut: 4000
@@ -589,10 +681,22 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
+    private async checkAndFetchDemoComputation(): Promise<void> {
+        try {
+            const hasExistingDemo = await this.databaseService.hasDemoComputations(this.pluginId)
+            if (!hasExistingDemo) {
+                this.fetchDemoComputation()
+                console.log('No existing demo computations found, fetching demo computation')
+            }
+        } catch (error) {
+            console.error('Error checking for existing demo computations:', error)
+        }
+    }
+
     fetchDemoComputation(): void {
         this.pluginService.computeDemo(this.pluginId).subscribe({
             next: data => {
-                this.pluginService.getComputationState(data.correlation_uuid).subscribe({
+                this.pluginService.getComputationRunState(data.correlation_uuid).subscribe({
                     next: stateInfo => {
                         if (stateInfo.state === 'SUCCESS') {
                             const compute: ComputationDatabaseEntity = {

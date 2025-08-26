@@ -1,8 +1,10 @@
-export type ComputationState = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | 'REVOKED'
+export type ComputationRunState = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | 'REVOKED'
 
-export type ComputationFlags = ('NEW' | 'ARCHIVED' | 'DEMO')[]
+export type ComputationItemState = 'ACTIVE' | 'ARCHIVED' | 'DELETED'
 
-export type ComputationStateInfo = {
-    state: ComputationState
+export type ComputationFlags = ('NEW' | 'DEMO')[]
+
+export type ComputationRunStateInfo = {
+    state: ComputationRunState
     message: string
 }

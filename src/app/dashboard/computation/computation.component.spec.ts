@@ -31,20 +31,24 @@ describe('ComputationComponent', () => {
         mockStorageService = {
             getPluginRuns: jest.fn(),
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
+            getPluginRunsPaginated: jest.fn().mockResolvedValue({
+                documents: [],
+                total: 0,
+                hasMore: false
+            }),
             getNewRuns: jest.fn().mockReturnValue([]),
             getDemoRuns: jest.fn().mockReturnValue([]),
             getComputesByStatus: jest.fn().mockReturnValue([]),
             getActiveArtifact: jest.fn(),
             saveActiveArtifact: jest.fn(),
-            clearActiveArtifact: jest.fn(),
-            getArchivedRuns: jest.fn().mockReturnValue([])
+            clearActiveArtifact: jest.fn()
         }
 
         mockPluginService = {
             updateRunStatus: jest.fn(),
             getComputationMetadata: jest.fn(),
             setComputeState: jest.fn(),
-            getComputationState: jest.fn(),
+            getComputationRunState: jest.fn(),
             collapsePluginCatalog: jest.fn(),
             getPluginDetails: jest.fn().mockReturnValue(
                 of({

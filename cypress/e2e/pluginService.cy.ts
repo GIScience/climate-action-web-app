@@ -1,11 +1,4 @@
-import {
-    mockPluginBluePrintIcon,
-    mockPluginBlueprint404,
-    mockPluginBlueprintComputation,
-    mockPluginWalkabilitytIcon,
-    mockPluginsList,
-    mockPluginsListWithoutBlueprint
-} from '../support/interceptors'
+import { mockPluginBluePrintIcon, mockPluginWalkabilitytIcon, mockPluginsList } from '../support/interceptors'
 
 describe('pluginService', () => {
     it('fetch and display the plugin icon', () => {
@@ -29,39 +22,41 @@ describe('pluginService', () => {
         )
     })
 
-    it('should still display the plugin component if the plugin is offline, but a computation exists under it', () => {
-        mockPluginsListWithoutBlueprint()
-        mockPluginBlueprint404()
-        mockPluginBlueprintComputation()
-        mockPluginWalkabilitytIcon()
+    // TODO: Restore once gateway is updated to report plugin status (https://gitlab.heigit.org/climate-action/api-gateway/-/issues/38)
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                        pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-12-17T08:55:23.807074Z',
-                        status: 'SUCCESS'
-                    }
-                ])
-            )
-        })
+    // it('should still display the plugin component if the plugin is offline, but a computation exists under it', () => {
+    //     mockPluginsListWithoutBlueprint()
+    //     mockPluginBlueprint404()
+    //     mockPluginBlueprintComputation()
+    //     mockPluginWalkabilitytIcon()
 
-        cy.reload(true)
+    //     cy.window().then(win => {
+    //         win.localStorage.setItem(
+    //             'plugin_runs',
+    //             JSON.stringify([
+    //                 {
+    //                     correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+    //                     pluginId: 'plugin_blueprint',
+    //                     pluginName: 'Plugin Blueprint',
+    //                     timestamp: '2024-12-17T08:55:23.807074Z',
+    //                     status: 'SUCCESS'
+    //                 }
+    //             ])
+    //         )
+    //     })
 
-        cy.visit('/')
+    //     cy.reload(true)
 
-        cy.wait('@getPluginsWithoutBlueprint')
-        cy.wait('@getPluginWalkabilityIcon')
+    //     cy.visit('/')
 
-        cy.get('.plugin-card').eq(1).click()
-        cy.wait('@getPluginBlueprint404')
-        cy.wait('@getPluginBlueprintComputation')
+    //     cy.wait('@getPluginsWithoutBlueprint')
+    //     cy.wait('@getPluginWalkabilityIcon')
 
-        cy.get('.plugin-header h1').should('exist').should('contain.text', 'Plugin Blueprint')
-        cy.get('.parent-computation').eq(0).should('contain.text', '8649e714')
-    })
+    //     cy.get('.plugin-card').eq(1).click()
+    //     cy.wait('@getPluginBlueprint404')
+    //     cy.wait('@getPluginBlueprintComputation')
+
+    //     cy.get('.plugin-header h1').should('exist').should('contain.text', 'Plugin Blueprint')
+    //     cy.get('.parent-computation').eq(0).should('contain.text', '8649e714')
+    // })
 })

@@ -70,53 +70,6 @@ describe('DatabaseService', () => {
         service = TestBed.inject(DatabaseService)
     })
 
-    describe('getPluginRuns', () => {
-        it('should return empty array if no user is logged in', async () => {
-            userSubject.next(null)
-            const result = await service.getPluginRuns()
-            expect(result).toEqual([])
-            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
-        })
-
-        it('should return plugin runs from Appwrite', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: [
-                    {
-                        correlation_uuid: 'test-uuid-1',
-                        flags: ['NEW'],
-                        pluginId: 'test-plugin-1',
-                        timestamp: new Date().toISOString(),
-                        status: 'SUCCESS',
-                        aoiName: 'Test Area'
-                    },
-                    {
-                        correlation_uuid: 'test-uuid-2',
-                        flags: [],
-                        pluginId: 'test-plugin-2',
-                        timestamp: new Date().toISOString(),
-                        status: 'PENDING',
-                        aoiName: 'Another Area'
-                    }
-                ]
-            })
-
-            const result = await service.getPluginRuns()
-
-            expect(mockDatabases.listDocuments).toHaveBeenCalled()
-            expect(result.length).toBe(2)
-            expect(result[0].correlation_uuid).toBe('test-uuid-1')
-            expect(result[1].correlation_uuid).toBe('test-uuid-2')
-        })
-
-        it('should handle errors and return empty array', async () => {
-            mockDatabases.listDocuments.mockRejectedValue(new Error('Test error'))
-
-            const result = await service.getPluginRuns()
-
-            expect(result).toEqual([])
-        })
-    })
-
     describe('createPluginRun', () => {
         it('should return null if no user is logged in', async () => {
             userSubject.next(null)
@@ -208,62 +161,190 @@ describe('DatabaseService', () => {
         })
     })
 
-    describe('syncPluginRuns', () => {
-        it('should return false if no user is logged in', async () => {
+    describe('fetchPluginRunsPaginated', () => {
+        it('should return empty result if no user is logged in', async () => {
             userSubject.next(null)
 
-            const result = await service.syncPluginRuns([])
+            const result = await service.fetchPluginRunsPaginated({
+                limit: 10,
+                pluginId: 'test-plugin'
+            })
 
-            expect(result).toBe(false)
+            expect(result).toEqual({
+                documents: [],
+                total: 0,
+                hasMore: false
+            })
+            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
         })
 
-        it('should sync plugin runs with Appwrite', async () => {
-            jest.spyOn(service, 'getPluginRuns').mockResolvedValue([
+        it('should return paginated results for first page', async () => {
+            const mockDocuments = [
                 {
-                    correlation_uuid: 'existing-uuid',
+                    $id: 'doc-id-1',
+                    correlation_uuid: 'test-uuid-1',
                     pluginId: 'test-plugin',
-                    status: 'PENDING',
-                    timestamp: new Date(),
-                    flags: [],
-                    aoiName: 'Test Area'
-                }
-            ])
-
-            jest.spyOn(service, 'updatePluginRun').mockResolvedValue(true)
-            jest.spyOn(service, 'createPluginRun').mockResolvedValue('new-doc-id')
-
-            const result = await service.syncPluginRuns([
-                {
-                    correlation_uuid: 'existing-uuid',
-                    pluginId: 'test-plugin',
+                    timestamp: new Date().toISOString(),
                     status: 'SUCCESS',
-                    timestamp: new Date(),
-                    flags: [],
-                    aoiName: 'Test Area'
+                    aoiName: 'Test Area 1'
                 },
                 {
-                    correlation_uuid: 'new-uuid',
-                    pluginId: 'test-plugin-2',
+                    $id: 'doc-id-2',
+                    correlation_uuid: 'test-uuid-2',
+                    pluginId: 'test-plugin',
+                    timestamp: new Date().toISOString(),
                     status: 'PENDING',
-                    timestamp: new Date(),
-                    flags: [],
-                    aoiName: 'Another Area'
+                    aoiName: 'Test Area 2'
+                }
+            ]
+
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: mockDocuments
+            })
+
+            const result = await service.fetchPluginRunsPaginated({
+                limit: 2,
+                pluginId: 'test-plugin'
+            })
+
+            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
+                'climate_action',
+                'dashboard_data',
+                expect.arrayContaining([
+                    expect.stringContaining('"method":"equal"'),
+                    expect.stringContaining('"method":"limit"'),
+                    expect.stringContaining('"method":"orderDesc"'),
+                    expect.stringContaining('"attribute":"pluginId"')
+                ])
+            )
+            expect(result.documents).toEqual([
+                {
+                    correlation_uuid: 'test-uuid-1',
+                    pluginId: 'test-plugin',
+                    timestamp: mockDocuments[0].timestamp,
+                    status: 'SUCCESS',
+                    aoiName: 'Test Area 1',
+                    flags: undefined
+                },
+                {
+                    correlation_uuid: 'test-uuid-2',
+                    pluginId: 'test-plugin',
+                    timestamp: mockDocuments[1].timestamp,
+                    status: 'PENDING',
+                    aoiName: 'Test Area 2',
+                    flags: undefined
                 }
             ])
-
-            expect(result).toBe(true)
-            expect(service.updatePluginRun).toHaveBeenCalledWith('existing-uuid', expect.anything())
-            expect(service.createPluginRun).toHaveBeenCalledWith(
-                expect.objectContaining({ correlation_uuid: 'new-uuid' })
-            )
+            expect(result.hasMore).toBe(true)
+            expect(result.nextCursor).toBe('doc-id-2')
         })
 
-        it('should handle errors and return false', async () => {
-            jest.spyOn(service, 'getPluginRuns').mockRejectedValue(new Error('Test error'))
+        it('should return paginated results with cursor for subsequent pages', async () => {
+            const mockDocuments = [
+                {
+                    $id: 'doc-id-3',
+                    correlation_uuid: 'test-uuid-3',
+                    pluginId: 'test-plugin',
+                    timestamp: new Date().toISOString(),
+                    status: 'SUCCESS',
+                    aoiName: 'Test Area 3'
+                }
+            ]
 
-            const result = await service.syncPluginRuns([])
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: mockDocuments
+            })
 
-            expect(result).toBe(false)
+            const result = await service.fetchPluginRunsPaginated({
+                limit: 1,
+                cursor: 'test-uuid-2',
+                pluginId: 'test-plugin'
+            })
+
+            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
+                'climate_action',
+                'dashboard_data',
+                expect.arrayContaining([
+                    expect.stringContaining('"method":"equal"'),
+                    expect.stringContaining('"method":"limit"'),
+                    expect.stringContaining('"method":"orderDesc"'),
+                    expect.stringContaining('"method":"cursorAfter"')
+                ])
+            )
+            expect(result.documents).toEqual([
+                {
+                    correlation_uuid: 'test-uuid-3',
+                    pluginId: 'test-plugin',
+                    timestamp: mockDocuments[0].timestamp,
+                    status: 'SUCCESS',
+                    aoiName: 'Test Area 3',
+                    flags: undefined
+                }
+            ])
+            expect(result.hasMore).toBe(true)
+            expect(result.nextCursor).toBe('doc-id-3')
+        })
+
+        it('should handle last page correctly', async () => {
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: []
+            })
+
+            const result = await service.fetchPluginRunsPaginated({
+                limit: 10,
+                cursor: 'last-uuid',
+                pluginId: 'test-plugin'
+            })
+
+            expect(result.documents).toEqual([])
+            expect(result.hasMore).toBe(false)
+            expect(result.nextCursor).toBeUndefined()
+        })
+
+        it('should filter by state when provided', async () => {
+            const mockDocuments = [
+                {
+                    $id: 'doc-id-1',
+                    correlation_uuid: 'test-uuid-1',
+                    pluginId: 'test-plugin',
+                    timestamp: new Date().toISOString(),
+                    status: 'SUCCESS',
+                    aoiName: 'Test Area 1',
+                    flags: [],
+                    state: 'ARCHIVED'
+                }
+            ]
+
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: mockDocuments
+            })
+
+            const result = await service.fetchPluginRunsPaginated({
+                limit: 10,
+                pluginId: 'test-plugin',
+                state: 'ARCHIVED'
+            })
+
+            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
+                'climate_action',
+                'dashboard_data',
+                expect.arrayContaining([
+                    expect.stringContaining('"method":"equal"'),
+                    expect.stringContaining('"method":"limit"'),
+                    expect.stringContaining('"method":"orderDesc"')
+                ])
+            )
+            expect(result.documents).toEqual([
+                {
+                    correlation_uuid: 'test-uuid-1',
+                    pluginId: 'test-plugin',
+                    timestamp: mockDocuments[0].timestamp,
+                    status: 'SUCCESS',
+                    aoiName: 'Test Area 1',
+                    flags: [],
+                    state: 'ARCHIVED'
+                }
+            ])
         })
     })
 })
