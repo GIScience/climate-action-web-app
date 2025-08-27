@@ -89,7 +89,7 @@
 
                 &::before,
                 &::after {
-                    border-top: 1px solid #333;
+                    border-top: 1px solid #999;
                     content: '';
                     display: inline-block;
                     margin: 0 10px;
@@ -112,38 +112,11 @@
             }
         }
 
-        .plugin-authors {
-            h3 {
-                margin: 10px 0;
-            }
-
-            ul.plugin-authors {
-                display: inline-flex;
-                flex-wrap: wrap;
-                list-style: none;
-                padding-left: 0;
-
-                li {
-                    background-color: #f3f3f3;
-                    border-radius: 5px;
-                    margin-bottom: 5px;
-                    margin-right: 5px;
-                    padding: 0 5px;
-                    transition: background-color 0.2s ease;
-
-                    a {
-                        color: #008080;
-                    }
-
-                    &:hover {
-                        background-color: #e0e0e0;
-                    }
-
-                    &:last-of-type {
-                        margin-right: 0;
-                    }
-                }
-            }
+        .plugin-links-container {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            padding: 15px 0 5px;
         }
     }
 }
@@ -234,6 +207,99 @@
     ::ng-deep {
         formly-field .object-field__label:not(.mat-expansion-panel-body *) {
             display: none;
+        }
+    }
+}
+
+.plugin-methodology-dialog {
+    padding: 20px;
+    position: relative;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .ng-scrollbar {
+        max-height: 50vh !important;
+        max-width: 650px !important;
+        position: relative;
+    }
+
+    button.close-dialog {
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: 5px;
+        top: 15px;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        padding: 5px;
+    }
+
+    ul.plugin-sources {
+        list-style: unset;
+        padding: 0 2em;
+
+        li {
+            margin-bottom: 0.5em;
+        }
+    }
+}
+
+.plugin-credits-dialog {
+    max-height: 50vh !important;
+    max-width: 650px !important;
+    padding: 20px;
+    position: relative;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    button.close-dialog {
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: 5px;
+        top: 15px;
+    }
+
+    ul.plugin-authors {
+        display: inline-flex;
+        flex-wrap: wrap;
+        list-style: none;
+        padding-left: 0;
+
+        li {
+            margin-bottom: 20px;
+            margin-right: 10px;
+
+            a {
+                background-color: #f3f3f3;
+                border-radius: 5px;
+                color: #008080;
+                padding: 5px 10px;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: #e0e0e0;
+                }
+            }
+
+            &:last-of-type {
+                margin-right: 0;
+            }
         }
     }
 }

@@ -189,17 +189,6 @@
         position: relative !important;
     }
 
-    .methodology-link__wrapper {
-        border-top: 1px solid #ccc;
-        display: flex;
-        justify-content: center;
-        padding: 15px 0 5px;
-
-        a {
-            color: #008080;
-        }
-    }
-
     .btn-container {
         display: flex;
         justify-content: center;
@@ -207,49 +196,6 @@
 
         button {
             margin: 0 5px;
-        }
-    }
-}
-
-.plugin-methodology-dialog {
-    padding: 20px;
-    position: relative;
-
-    h2 {
-        margin-top: 0;
-    }
-
-    .ng-scrollbar {
-        max-height: 50vh !important;
-        max-width: 650px !important;
-        position: relative;
-    }
-
-    button.close-dialog {
-        background: #fff;
-        border: none;
-        border-radius: 50%;
-        color: #666;
-        cursor: pointer;
-        position: absolute;
-        right: 5px;
-        top: 15px;
-    }
-
-    table,
-    th,
-    td {
-        border: 1px solid #ccc;
-        border-collapse: collapse;
-        padding: 5px;
-    }
-
-    ul.plugin-sources {
-        list-style: unset;
-        padding: 0 2em;
-
-        li {
-            margin-bottom: 0.5em;
         }
     }
 }

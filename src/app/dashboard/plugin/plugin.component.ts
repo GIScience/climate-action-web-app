@@ -1,8 +1,10 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, ChangeDetectorRef, Component } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
+import { Source } from '@app/types/sources/sources.type'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
@@ -52,6 +54,9 @@ import { PluginService } from './plugin.service'
     ]
 })
 export class PluginComponent implements AfterViewInit {
+    @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
+    @ViewChild('pluginCreditsDialog') pluginCreditsDialog!: TemplateRef<Plugin>
+
     pluginObs$: Observable<Plugin> | undefined
     computeState: ComputeState = 'inactive'
     loading = true
@@ -70,7 +75,8 @@ export class PluginComponent implements AfterViewInit {
         private pluginService: PluginService,
         private route: ActivatedRoute,
         private cdr: ChangeDetectorRef,
-        private appwriteService: AppwriteService
+        private appwriteService: AppwriteService,
+        private dialog: MatDialog
     ) {}
 
     ngAfterViewInit(): void {
@@ -130,6 +136,7 @@ export class PluginComponent implements AfterViewInit {
                                 plugin_id: pluginId,
                                 version: 'N/A',
                                 library_version: 'N/A',
+                                teaser: 'This plugin is currently offline. Previous computations are still available.',
                                 purpose: 'This plugin is currently offline. Previous computations are still available.',
                                 methodology: 'Plugin is offline',
                                 authors: [],
@@ -168,5 +175,39 @@ export class PluginComponent implements AfterViewInit {
 
     togglePurposeExpand(): void {
         this.isPurposeExpanded = !this.isPurposeExpanded
+    }
+
+    processSourceText(source: Source) {
+        const commonFields = [source.author, source.year]
+
+        switch (source.ENTRYTYPE) {
+            case 'article':
+                return [...commonFields, source.journal, source.volume, source.pages].filter(Boolean).join(', ')
+            case 'inbook':
+            case 'inproceedings':
+                return [...commonFields, source.pages].filter(Boolean).join(', ')
+            case 'misc':
+                return [...commonFields].filter(Boolean).join(', ')
+            default:
+                return ''
+        }
+    }
+
+    openDialog(plugin: Plugin): void {
+        this.dialog.open(this.pluginMethodologyDialog, {
+            data: plugin,
+            autoFocus: false
+        })
+    }
+
+    openCreditsDialog(plugin: Plugin): void {
+        this.dialog.open(this.pluginCreditsDialog, {
+            data: plugin,
+            autoFocus: false
+        })
+    }
+
+    closeDialog(): void {
+        this.dialog.closeAll()
     }
 }
