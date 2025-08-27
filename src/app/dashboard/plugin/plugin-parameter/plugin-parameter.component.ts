@@ -1,28 +1,17 @@
 import { CommonModule, NgIf } from '@angular/common'
-import {
-    ChangeDetectorRef,
-    Component,
-    Input,
-    OnChanges,
-    OnDestroy,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-    ViewEncapsulation
-} from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
-import { MatDialog } from '@angular/material/dialog'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationRunState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
-import { Source } from '@app/types/sources/sources.type'
 import { TippyDirective } from '@ngneat/helipopper'
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { Models } from 'appwrite'
+import { format, isValid } from 'date-fns'
 import { JSONSchema7 } from 'json-schema'
 import {
     CircleAlert,
@@ -38,8 +27,6 @@ import {
     TriangleAlert,
     UserCheck
 } from 'lucide-angular'
-import { format, isValid } from 'date-fns'
-import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import Feature from 'ol/Feature'
@@ -57,16 +44,13 @@ import { FormlyModel } from './plugin-parameter.interface'
         LucideAngularModule,
         CommonModule,
         NgScrollbarModule,
-        TippyDirective,
-        MarkdownModule
+        TippyDirective
     ],
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
-
-    @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
 
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
@@ -98,8 +82,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         public mapService: MapService,
         private cdr: ChangeDetectorRef,
         private formlyJsonschema: FormlyJsonschema,
-        private appwriteService: AppwriteService,
-        private dialog: MatDialog
+        private appwriteService: AppwriteService
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.selectedOlFeatures.on('change:length', handler)
@@ -306,33 +289,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 }
             }
         })
-    }
-
-    processSourceText(source: Source) {
-        const commonFields = [source.author, source.year]
-
-        switch (source.ENTRYTYPE) {
-            case 'article':
-                return [...commonFields, source.journal, source.volume, source.pages].filter(Boolean).join(', ')
-            case 'inbook':
-            case 'inproceedings':
-                return [...commonFields, source.pages].filter(Boolean).join(', ')
-            case 'misc':
-                return [...commonFields].filter(Boolean).join(', ')
-            default:
-                return ''
-        }
-    }
-
-    openDialog(plugin: Plugin): void {
-        this.dialog.open(this.pluginMethodologyDialog, {
-            data: plugin,
-            autoFocus: false
-        })
-    }
-
-    closeDialog(): void {
-        this.dialog.closeAll()
     }
 
     hasValidAreaSelection(): boolean {

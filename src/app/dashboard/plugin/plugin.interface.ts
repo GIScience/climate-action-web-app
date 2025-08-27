@@ -18,6 +18,7 @@ export interface Plugin {
     authors: Array<PluginAuthor>
     version: string
     concerns: Array<Concern>
+    teaser: string
     purpose: string
     methodology: string
     sources: Array<Source> | null

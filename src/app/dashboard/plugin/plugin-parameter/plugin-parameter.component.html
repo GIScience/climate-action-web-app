@@ -124,11 +124,6 @@
                 [form]="form"
                 class="plugin-params-form"></formly-form>
         </ng-scrollbar>
-        <div class="methodology-link__wrapper">
-            <a class="read-more" (click)="openDialog(plugin)" (keyup.enter)="openDialog(plugin)" tabindex="0"
-                >Read about the methodology »</a
-            >
-        </div>
         <div class="btn-container">
             <div tp="Please login to request a computation." [tpIsEnabled]="!user">
                 <button
@@ -143,28 +138,4 @@
             <button type="button" class="btn-light btn-withtext" (click)="resetForm()">Reset</button>
         </div>
     </form>
-
-    <ng-template #pluginMethodologyDialog let-data>
-        <div class="plugin-methodology-dialog">
-            <ng-scrollbar visibility="hover" orientation="vertical">
-                <h2>Methodology</h2>
-                <markdown [data]="plugin.methodology" ngPreserveWhitespaces class="markdown"></markdown>
-                <div *ngIf="plugin.sources">
-                    <h3>Sources</h3>
-                    <ul class="plugin-sources">
-                        <li *ngFor="let source of plugin.sources" class="plugin-sources">
-                            <strong *ngIf="source.title">{{ source.title }}</strong>
-                            {{ processSourceText(source) }}{{ source.url ? ',' : '' }}
-                            <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer" *ngIf="source.url">{{
-                                source.url
-                            }}</a>
-                        </li>
-                    </ul>
-                </div>
-            </ng-scrollbar>
-            <button (click)="closeDialog()" class="close-dialog">
-                <i-lucide [img]="CircleX" size="25"></i-lucide>
-            </button>
-        </div>
-    </ng-template>
 </div>

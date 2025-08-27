@@ -70,7 +70,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                         icon: this.pluginService.getIconUrl(plugin.plugin_id),
                         library_version: plugin.library_version,
                         version: plugin.version,
-                        purpose: plugin.purpose,
+                        teaser: plugin.teaser,
                         status: plugin.status || 'active'
                     } as PluginCard
 
@@ -92,7 +92,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                             icon: this.pluginService.getIconUrl(run.pluginId || ''),
                             library_version: 'N/A',
                             version: 'N/A',
-                            purpose: 'This plugin is currently offline',
+                            teaser: 'This plugin is currently offline',
                             status: 'unavailable'
                         } as PluginCard
 
