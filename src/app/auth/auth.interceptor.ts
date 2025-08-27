@@ -9,6 +9,8 @@ import { AppwriteService } from './appwrite.service'
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     private apiKey: string | null = null
+    private currentUserId: string | null = null
+    private keyLoadPromise: Promise<void> | null = null
     private apiBaseUrl = environment.climateActionApiUrl
     private authInitPromise: Promise<void> | null = null
     private readonly clientInfo = `${packageInfo.name}/${packageInfo.version}`
@@ -19,7 +21,21 @@ export class AuthInterceptor implements HttpInterceptor {
     ) {
         this.authInitPromise = this.initAuth()
 
-        this.appwriteService._user.subscribe(user => (user ? this.loadApiKey() : (this.apiKey = null)))
+        this.appwriteService._user.subscribe(user => {
+            if (user) {
+                // Only reload key if user changed
+                if (user.$id !== this.currentUserId) {
+                    this.currentUserId = user.$id
+                    this.loadApiKey()
+                }
+            } else {
+                // Clear on logout
+                this.apiKey = null
+                this.currentUserId = null
+                this.keyLoadPromise = null
+                sessionStorage.removeItem('api_key_cache')
+            }
+        })
     }
 
     private async initAuth(): Promise<void> {
@@ -34,12 +50,40 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     private async loadApiKey(): Promise<void> {
+        if (this.keyLoadPromise) return this.keyLoadPromise
+
+        // Try cache first
         try {
-            const keyInfo = await this.databaseService.getBasicKey()
-            this.apiKey = keyInfo?.key || null
-        } catch (_err) {
-            this.apiKey = null
+            const cached = JSON.parse(sessionStorage.getItem('api_key_cache') || '{}')
+            if (cached.userId === this.currentUserId && cached.key) {
+                this.apiKey = cached.key
+                return
+            }
+        } catch {
+            // Invalid cache data, continue to fetch
         }
+
+        // Fetch and cache
+        this.keyLoadPromise = (async () => {
+            try {
+                const keyInfo = await this.databaseService.getBasicKey()
+                this.apiKey = keyInfo?.key || null
+                if (this.apiKey && this.currentUserId) {
+                    sessionStorage.setItem(
+                        'api_key_cache',
+                        JSON.stringify({
+                            userId: this.currentUserId,
+                            key: this.apiKey
+                        })
+                    )
+                }
+            } catch (_err) {
+                this.apiKey = null
+            }
+        })()
+
+        await this.keyLoadPromise
+        this.keyLoadPromise = null
     }
 
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {

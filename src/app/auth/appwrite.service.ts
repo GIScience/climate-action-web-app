@@ -71,6 +71,7 @@ export class AppwriteService {
             await this.account.deleteSession('current')
             this.onLogout.emit()
             sessionStorage.removeItem('initialSyncCompleted')
+            sessionStorage.removeItem('api_key_cache')
         } catch (error) {
             console.error('Error deleting session:', error)
         } finally {
