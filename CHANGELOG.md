@@ -20,6 +20,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Users can now (soft)delete computations from the list
 - Simple in-memory cache for `/metadata` responses ([#155](https://gitlab.heigit.org/climate-action/web-app/-/issues/155))
 
+### Fixed
+
+- Landing page now displays last computation details only, since we do only paginated fetches when required
+
 ## [2.5.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.5.1) - 2025-07-21
 
 ### Fixed

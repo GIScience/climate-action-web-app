@@ -2,7 +2,6 @@ import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
-import { pickRandomGradient } from '@app/utils/style.utils'
 import { StorageService } from '../../storage.service'
 import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
 import { TourEngine } from '../walkthrough/tour-engine.service'
@@ -14,13 +13,9 @@ import { TourEngine } from '../walkthrough/tour-engine.service'
     styleUrl: './landing.component.scss'
 })
 export class LandingComponent implements OnInit {
-    customRuns: ComputationDatabaseEntity[] = []
-    pluginCounts: { pluginName: string; pluginId: string; count: number }[] = []
-    private gradientCache: { [key: string]: string } = {}
-
-    protected getGradient(index: number): string {
-        return this.gradientCache[index]
-    }
+    totalActiveComputations = 0
+    latestComputation: ComputationDatabaseEntity | null = null
+    loading = true
 
     constructor(
         private storageService: StorageService,
@@ -28,47 +23,25 @@ export class LandingComponent implements OnInit {
         private tourEngine: TourEngine
     ) {}
 
-    ngOnInit() {
-        this.customRuns = this.storageService
-            .getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-            .filter(run => !run.flags?.includes('DEMO'))
-        this.calculatePluginCounts()
+    async ngOnInit() {
+        try {
+            const [totalCount, latestComp] = await Promise.all([
+                this.storageService.getTotalActiveComputationsCount(),
+                this.storageService.getLatestActiveComputation()
+            ])
 
-        this.pluginCounts.forEach((_, index) => {
-            this.gradientCache[index] = pickRandomGradient(this.gradientCache)
-        })
-
-        this.cdr.detectChanges()
+            this.totalActiveComputations = totalCount
+            this.latestComputation = latestComp
+        } catch (error) {
+            console.error('Error loading landing page data:', error)
+        } finally {
+            this.loading = false
+            this.cdr.detectChanges()
+        }
     }
 
-    private calculatePluginCounts() {
-        const counts = this.customRuns.reduce(
-            (acc, run) => {
-                if (run.pluginId) {
-                    acc[run.pluginId] = {
-                        pluginName: derivePluginNameFromId(run.pluginId),
-                        pluginId: run.pluginId,
-                        count: (acc[run.pluginId]?.count || 0) + 1
-                    }
-                }
-                return acc
-            },
-            {} as Record<string, { pluginName: string; pluginId: string; count: number }>
-        )
-
-        this.pluginCounts = Object.values(counts).map(value => ({
-            pluginName: value.pluginName,
-            pluginId: value.pluginId,
-            count: value.count
-        }))
-    }
-
-    calculateBubbleSize(count: number): number {
-        const minSize = 100
-        const maxSize = 200
-        const maxCount = Math.max(...this.pluginCounts.map(p => p.count))
-        const scale = maxCount === 1 ? 0 : (count - 1) / (maxCount - 1)
-        return minSize + (maxSize - minSize) * scale
+    getPluginName(pluginId: string | undefined): string {
+        return pluginId ? derivePluginNameFromId(pluginId) : 'Unknown Plugin'
     }
 
     startTour() {

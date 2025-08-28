@@ -177,6 +177,52 @@ export class DatabaseService {
         }
     }
 
+    async getTotalActiveComputationsCount(): Promise<number> {
+        try {
+            if (!this.user_id) return 0
+
+            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+                Query.equal('user_id', this.user_id),
+                Query.equal('state', 'ACTIVE'),
+                Query.limit(1) // We only need the total count, not the documents
+            ])
+
+            return response.total
+        } catch (error) {
+            this.logError('Error fetching total active computations count:', error)
+            return 0
+        }
+    }
+
+    async getLatestActiveComputation(): Promise<ComputationDatabaseEntity | null> {
+        try {
+            if (!this.user_id) return null
+
+            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+                Query.equal('user_id', this.user_id),
+                Query.equal('state', 'ACTIVE'),
+                Query.orderDesc('timestamp'),
+                Query.limit(1)
+            ])
+
+            if (response.documents.length === 0) return null
+
+            const doc = response.documents[0]
+            return {
+                correlation_uuid: doc['correlation_uuid'],
+                flags: doc['flags'],
+                state: doc['state'],
+                pluginId: doc['pluginId'],
+                timestamp: doc['timestamp'],
+                status: doc['status'],
+                aoiName: doc['aoiName']
+            } as ComputationDatabaseEntity
+        } catch (error) {
+            this.logError('Error fetching latest active computation:', error)
+            return null
+        }
+    }
+
     // TODO: Temporary migration script, remove after all users run states have been migrated
     async migrateComputationsToStateField(): Promise<void> {
         try {

@@ -327,6 +327,46 @@ export class StorageService {
         this.saveMapPreferences(prefs)
     }
 
+    // Landing page data
+
+    async getTotalActiveComputationsCount(): Promise<number> {
+        await this.appwriteService.tryToLogin()
+
+        const { isRealUser } = this.getUserAuthStatus()
+
+        if (!isRealUser) {
+            return this.getPluginRuns().filter(run => (run.state || 'ACTIVE') === 'ACTIVE').length
+        }
+
+        try {
+            return await this.databaseService.getTotalActiveComputationsCount()
+        } catch (error) {
+            console.error('Error getting total active computations count from Appwrite.', error)
+            return 0
+        }
+    }
+
+    async getLatestActiveComputation(): Promise<ComputationDatabaseEntity | null> {
+        await this.appwriteService.tryToLogin()
+
+        const { isRealUser } = this.getUserAuthStatus()
+
+        if (!isRealUser) {
+            const activeComputations = this.getPluginRuns()
+                .filter(run => (run.state || 'ACTIVE') === 'ACTIVE')
+                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+
+            return activeComputations.length > 0 ? activeComputations[0] : null
+        }
+
+        try {
+            return await this.databaseService.getLatestActiveComputation()
+        } catch (error) {
+            console.error('Error getting latest active computation from Appwrite.', error)
+            return null
+        }
+    }
+
     // Tour preferences
 
     getPendingTourState(): boolean {

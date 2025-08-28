@@ -232,11 +232,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
 
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.refreshCurrentRuns()
+            this.refreshCurrentAndScheduledRuns()
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
-            this.refreshCurrentRuns()
+            this.refreshCurrentAndScheduledRuns()
             this.startPeriodicSync()
         })
 
@@ -304,7 +304,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.newRuns = [...new Set([...this.newRuns, ...newRunsFromData])]
     }
 
-    private refreshCurrentRuns(): void {
+    private refreshCurrentAndScheduledRuns(): void {
         this.currentRuns = this.storageService
             .getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
             .filter(run => run.pluginId === this.pluginId)
