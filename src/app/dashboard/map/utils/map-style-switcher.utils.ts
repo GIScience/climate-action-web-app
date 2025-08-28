@@ -11,11 +11,12 @@ export class MapStyleSwitcherControl implements IControl {
     private mapStyleContainer?: HTMLDivElement
     private layerControlsContainer?: HTMLDivElement
     private isExpanded: boolean = true
+    private isAutomaticChange: boolean = false
 
     constructor(
         private styles: MapStyle[],
         private defaultStyle: string,
-        private onStyleChange?: (styleName: string) => void,
+        private onStyleChange?: (styleName: string, automatic?: boolean) => void,
         private onStateChange?: (isExpanded: boolean) => void,
         initialExpanded: boolean = true
     ) {
@@ -127,7 +128,7 @@ export class MapStyleSwitcherControl implements IControl {
 
         this.mapStyleContainer!.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
         button.classList.add('active')
-        this.onStyleChange?.(button.dataset['title']!)
+        this.onStyleChange?.(button.dataset['title']!, this.isAutomaticChange)
     }
 
     private createLayerControlsContainer(): HTMLDivElement {
@@ -135,6 +136,15 @@ export class MapStyleSwitcherControl implements IControl {
             className: 'maplibregl-layer-controls',
             style: 'display:none;'
         })
+    }
+
+    switchToStyle(styleName: string, automatic: boolean = false): void {
+        const button = this.mapStyleContainer?.querySelector(`button[data-title="${styleName}"]`) as HTMLButtonElement
+        if (button && !button.classList.contains('active')) {
+            this.isAutomaticChange = automatic
+            this.handleStyleChange(button)
+            this.isAutomaticChange = false
+        }
     }
 
     updateLayerControls(): void {

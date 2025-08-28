@@ -10,15 +10,32 @@
 }
 
 .welcome-content {
-    backdrop-filter: blur(5px);
-    background-color: rgba(255, 255, 255, 0.85);
-    border-radius: 15px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
     height: auto;
-    margin-left: -130px;
     overflow: hidden;
-    position: relative;
     pointer-events: all;
+    position: relative;
+
+    .bg {
+        border-radius: 15px;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+
+    .bg1 {
+        backdrop-filter: blur(7.5px);
+        filter: url(#glass-distortion);
+    }
+
+    .bg2 {
+        background-color: rgba(255, 255, 255, 0.65);
+        box-shadow:
+            inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+            inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+    }
 }
 
 .welcome-content__revisit {
@@ -225,31 +242,6 @@
         }
     }
 
-    .bg {
-        animation: slide 25s ease-in-out infinite alternate;
-        background-image: linear-gradient(-60deg, rgba(102, 187, 161, 0.7) 50%, rgba(42, 109, 109, 0.7) 50%);
-        bottom: 0;
-        filter: blur(7.5px);
-        left: -50%;
-        margin: -10px;
-        opacity: 0.2;
-        position: absolute;
-        right: -50%;
-        top: 0;
-        z-index: -1;
-    }
-
-    .bg2 {
-        animation-direction: alternate-reverse;
-        animation-duration: 20s;
-        background-image: linear-gradient(-60deg, rgba(102, 187, 161, 0.4) 50%, rgba(70, 130, 180, 0.4) 50%);
-    }
-
-    .bg3 {
-        animation-duration: 30s;
-        background-image: linear-gradient(-60deg, rgba(42, 109, 109, 0.3) 50%, rgba(66, 148, 118, 0.3) 50%);
-    }
-
     @keyframes slide {
         0% {
             transform: translateX(-15%);
@@ -273,7 +265,7 @@
             letter-spacing: -0.5px;
             margin: 0 0 15px;
             text-align: center;
-            text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
 
         p {

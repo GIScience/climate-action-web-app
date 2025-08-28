@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, Injector, Optional } from '@angular/core'
+import { Injectable, Injector } from '@angular/core'
 import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
@@ -8,7 +8,7 @@ import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.servic
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
-import { MAP_ID, MapService } from '../map/map.service'
+import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 @Injectable({
     providedIn: 'root'
@@ -73,10 +73,16 @@ export class ReportService {
 
                 const injector = Injector.create({
                     providers: [
-                        { provide: MAP_ID, useValue: mapId },
                         {
                             provide: MapService,
-                            deps: [PluginService, HttpClient, StorageService, [new Optional(), MAP_ID]]
+                            useFactory: (
+                                pluginService: PluginService,
+                                http: HttpClient,
+                                storageService: StorageService
+                            ) => {
+                                return new MapService(pluginService, http, storageService)
+                            },
+                            deps: [PluginService, HttpClient, StorageService]
                         }
                     ],
                     parent: this.injector

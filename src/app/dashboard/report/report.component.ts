@@ -2,6 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
+import { Router } from '@angular/router'
 import { MatIconModule } from '@angular/material/icon'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
@@ -57,7 +58,8 @@ export class ReportComponent implements OnInit {
         private pluginService: PluginService,
         private http: HttpClient,
         private storageService: StorageService,
-        private ExportPDFService: ExportPDFService
+        private ExportPDFService: ExportPDFService,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -72,7 +74,7 @@ export class ReportComponent implements OnInit {
 
             addedArtifacts.forEach(artifact => {
                 if (this.reportService.isMapArtifact(artifact) && !this.mapServices.has(artifact.store_id)) {
-                    const mapService = new MapService(this.pluginService, this.http, this.storageService)
+                    const mapService = new MapService(this.pluginService, this.http, this.storageService, this.router)
                     this.mapServices.set(artifact.store_id, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)

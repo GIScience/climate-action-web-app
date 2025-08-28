@@ -251,7 +251,11 @@ describe('mapService', () => {
 
         cy.wait('@getPlugins')
 
-        cy.visit('dashboard/plugin/plugin_blueprint')
+        cy.visit('dashboard/plugin/plugin_blueprint', {
+            onBeforeLoad(win: Cypress.AUTWindow) {
+                Object.defineProperty(win.navigator, 'language', { value: 'de-DE' })
+            }
+        })
 
         cy.wait('@getPluginBlueprint')
 
@@ -383,9 +387,12 @@ describe('mapService', () => {
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
-        cy.get('.draw-button').eq(1).click()
 
         cy.waitForRenderComplete()
+
+        cy.get('.draw-button').eq(1).click()
+
+        cy.wait(1000)
 
         cy.get('canvas.maplibregl-canvas').click(800, 425, { force: true })
         cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })

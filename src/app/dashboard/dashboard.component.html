@@ -1,4 +1,5 @@
 <main class="dashboard">
+    <div class="map-background" [attr.data-style]="mapService.styleChange$ | async"></div>
     <app-map></app-map>
 
     <div

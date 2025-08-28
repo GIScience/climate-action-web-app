@@ -1,4 +1,5 @@
 main.dashboard {
+    background-color: #111;
     border: 1px solid #aaa;
     border-radius: 10px;
     box-shadow: 0 0 15px 0 rgb(0 0 0 / 25%);
@@ -16,8 +17,34 @@ main.dashboard {
         grid-template-columns: auto 1fr 12.5%;
     }
 
+    .map-background {
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        transition: opacity 0.3s ease;
+        width: 100%;
+
+        &[data-style='ESRI World Imagery'] {
+            background-image: url('../../assets/images/stars-bg.jpg');
+            background-position: center;
+            background-size: cover;
+            mix-blend-mode: exclusion;
+            opacity: 0.35;
+        }
+
+        &[data-style='Colorful'] {
+            background: linear-gradient(40deg, #fdfdfd9e 0%, #00000057 100%), url('../../assets/images/dot-grid.png');
+            opacity: 1;
+        }
+
+        &[data-style='Graybeard'] {
+            background: linear-gradient(40deg, #4444449e 0%, #0000007d 100%), url('../../assets/images/dot-grid.png');
+            opacity: 1;
+        }
+    }
+
     app-map {
-        background: linear-gradient(40deg, #fdfdfd9e 0%, #00000057 100%), url('../../assets/images/dot-grid.png');
         height: 100%;
         left: 0;
         position: absolute;
@@ -36,9 +63,9 @@ main.dashboard {
             app-landing {
                 align-items: center;
                 display: flex;
-                height: calc(100% - 1vw);
+                height: 100%;
                 justify-content: center;
-                width: calc(100vw - (120px + 1.5vw));
+                width: calc(100vw - (270px + 1.5vw));
             }
         }
 
