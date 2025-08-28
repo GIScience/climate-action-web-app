@@ -33,14 +33,6 @@ export class MapDrawingService {
     private measureTooltipElement: HTMLElement | undefined
     private measureTooltip: Popup | undefined
 
-    get currentDrawMode$(): Observable<DrawMode> {
-        return this.currentDrawMode.asObservable()
-    }
-
-    get isDrawingMode$(): Observable<boolean> {
-        return this.isDrawingMode.asObservable()
-    }
-
     get drawnFeatures$(): Observable<DrawingFeature[]> {
         return this.drawnFeatures.asObservable()
     }
@@ -53,41 +45,103 @@ export class MapDrawingService {
         return this.isDrawingMode.value
     }
 
-    get drawnFeaturesValue(): DrawingFeature[] {
-        return this.drawnFeatures.value
-    }
+    private initializeTerraDrawControl(): MaplibreTerradrawControl | undefined {
+        if (this.terraDrawControl || !this.map) {
+            return this.terraDrawControl
+        }
 
-    initializeTerraDraw(map: Map): MaplibreTerradrawControl {
-        this.map = map
         this.terraDrawControl = new MaplibreTerradrawControl({
             modes: ['polygon', 'circle', 'rectangle', 'select', 'render'],
             open: false
         })
 
-        map.addControl(this.terraDrawControl as IControl, 'top-left')
+        this.map.addControl(this.terraDrawControl as IControl, 'top-left')
 
-        setTimeout(() => {
+        const setupTerraDrawing = () => {
             const terraDraw = this.terraDrawControl?.getTerraDrawInstance()
             if (!terraDraw) return
+
+            if (!this.map?.loaded() || !this.map?.isStyleLoaded()) {
+                setTimeout(() => {
+                    if (this.map?.loaded() && this.map?.isStyleLoaded()) {
+                        setupTerraDrawing()
+                    }
+                }, 300)
+                return
+            }
+
+            if (!terraDraw.enabled) {
+                try {
+                    terraDraw.start()
+                } catch (_e) {
+                    return
+                }
+            }
 
             terraDraw.setMode('static')
             terraDraw.on('finish', (featureId: string | number) => this.handleDrawFinish(featureId))
             terraDraw.on('change', () => this.updateMeasurements())
-        }, 100)
+        }
+
+        this.map.once('idle', () => {
+            setTimeout(setupTerraDrawing, 500)
+        })
 
         return this.terraDrawControl
     }
 
-    startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
+    clearTerraDrawAfterStyleChange(): void {
+        if (this.terraDrawControl) {
+            const terraDraw = this.terraDrawControl.getTerraDrawInstance()
+            if (terraDraw && terraDraw.enabled) {
+                try {
+                    terraDraw.stop()
+                } catch (_error) {
+                    // Ignore setData errors during cleanup
+                }
+            }
+        }
+
+        if (this.terraDrawControl && this.map) {
+            this.map.removeControl(this.terraDrawControl as IControl)
+        }
+
+        if (this.map) this.map.getCanvas().style.cursor = ''
+
+        this.terraDrawControl = undefined
+        this.currentDrawMode.next(null)
+        this.isDrawingMode.next(false)
+    }
+
+    startDrawing(type: 'Polygon' | 'Circle' | 'Box', map?: Map): void {
+        if (map) this.map = map
         this.clearDrawnFeatures()
 
-        const terraDraw = this.terraDrawControl?.getTerraDrawInstance()
-        if (!terraDraw) return
+        if (this.map) this.map.getCanvas().style.cursor = 'wait'
 
-        const mode = this.DRAW_MODES[type]
-        terraDraw.setMode(mode)
-        this.currentDrawMode.next(mode)
         this.isDrawingMode.next(true)
+
+        if (!this.terraDrawControl) {
+            this.initializeTerraDrawControl()
+        }
+
+        const tryStartDrawing = (attempts: number = 0) => {
+            const terraDraw = this.terraDrawControl?.getTerraDrawInstance()
+            if (!terraDraw || !terraDraw.enabled) {
+                if (attempts < 10) {
+                    setTimeout(() => tryStartDrawing(attempts + 1), 300)
+                }
+                return
+            }
+
+            const mode = this.DRAW_MODES[type]
+            terraDraw.setMode(mode)
+            this.currentDrawMode.next(mode)
+
+            if (this.map) this.map.getCanvas().style.cursor = 'crosshair'
+        }
+
+        setTimeout(() => tryStartDrawing(), 500)
     }
 
     stopDrawing(): void {
@@ -96,6 +150,8 @@ export class MapDrawingService {
         this.measureTooltip?.remove()
         this.measureTooltip = undefined
         this.measureTooltipElement = undefined
+
+        if (this.map) this.map.getCanvas().style.cursor = ''
 
         this.currentDrawMode.next(null)
         this.isDrawingMode.next(false)

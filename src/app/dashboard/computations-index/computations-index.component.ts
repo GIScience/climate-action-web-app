@@ -10,6 +10,7 @@ import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
+import { compareDesc, format } from 'date-fns'
 import {
     Archive,
     ArchiveRestore,
@@ -27,7 +28,6 @@ import {
     Share2,
     Trash2
 } from 'lucide-angular'
-import { compareDesc, format } from 'date-fns'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
@@ -702,7 +702,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             const hasExistingDemo = await this.databaseService.hasDemoComputations(this.pluginId)
             if (!hasExistingDemo) {
                 this.fetchDemoComputation()
-                console.log('No existing demo computations found, fetching demo computation')
             }
         } catch (error) {
             console.error('Error checking for existing demo computations:', error)

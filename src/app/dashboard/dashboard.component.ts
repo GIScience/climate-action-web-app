@@ -10,6 +10,7 @@ import { ArtifactService } from './artifact/artifact.service'
 import { LegendComponent } from './artifact/legend/legend.component'
 import { ComputationsIndexComponent } from './computations-index/computations-index.component'
 import { MapComponent } from './map/map.component'
+import { MapService } from './map/map.service'
 import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
 import { ReportComponent } from './report/report.component'
 import { ReportService } from './report/report.service'
@@ -46,6 +47,7 @@ export class DashboardComponent implements OnInit {
         public artifactService: ArtifactService,
         public artifactViewerService: ArtifactViewerService,
         public reportService: ReportService,
+        public mapService: MapService,
         private elementRef: ElementRef
     ) {}
 

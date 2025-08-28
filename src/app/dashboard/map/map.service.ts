@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
-import { Inject, Injectable, InjectionToken, Optional } from '@angular/core'
+import { Injectable, Optional } from '@angular/core'
+import { NavigationEnd, Router } from '@angular/router'
 import { StorageService } from '@app/storage.service'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
@@ -27,8 +28,8 @@ import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
 import Feature from 'ol/Feature'
 import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
 import { MapDrawingService } from './map-drawing.service'
@@ -36,9 +37,8 @@ import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
 import { MapGeoTiffUtils } from './utils/map-geotiff.utils'
+import { MapGlobeUtils } from './utils/map-globe.utils'
 import { MapStyle, MapStyleSwitcherControl } from './utils/map-style-switcher.utils'
-
-export const MAP_ID = new InjectionToken<string>('MAP_ID')
 
 export interface AutocompleteFeature extends GeoJSONFeature<GeoJSONPoint> {
     properties: {
@@ -82,13 +82,16 @@ export class MapService {
     // Core Map Instance
     map: Map | undefined
     mapId: string = 'main-map'
+    isOnLanding: boolean = true
 
     // UI Controls & Overlays
     mapPopUp: Popup | undefined
     featureHoverOverlay: Popup | undefined
     layerSwitcherControl: MapStyleSwitcherControl | undefined
     layerSwitcherCollapsed: boolean = false
-    currentBasemapStyle: string = 'Graybeard'
+    currentBasemapStyle: string = 'ESRI World Imagery'
+    private styleChangeSubject = new BehaviorSubject<string>('ESRI World Imagery')
+    public styleChange$ = this.styleChangeSubject.asObservable()
 
     // Window & Display Properties
     windowWidth?: number
@@ -118,10 +121,19 @@ export class MapService {
         private pluginService: PluginService,
         private http: HttpClient,
         public storageService: StorageService,
-        @Optional() private mapDrawingService?: MapDrawingService,
-        @Optional() @Inject(MAP_ID) mapId?: string
+        @Optional() private router?: Router,
+        @Optional() private mapDrawingService?: MapDrawingService
     ) {
-        if (mapId) this.mapId = mapId
+        const isReportMap = this.mapId?.startsWith('report-map-')
+        this.isOnLanding = !isReportMap && this.router?.url === '/dashboard'
+
+        if (this.router) {
+            this.router.events
+                .pipe(filter(event => event instanceof NavigationEnd))
+                .subscribe((event: NavigationEnd) => {
+                    this.handleRouteChange(event.urlAfterRedirects)
+                })
+        }
 
         this.pluginService.computeState$.subscribe(value => {
             if (value === 'compute-ready') {
@@ -152,21 +164,28 @@ export class MapService {
     initMap(targetId: string, isReportMap: boolean = false) {
         this.mapId = targetId
 
-        const availableStyles = ['Graybeard', 'Colorful', 'ESRI World Imagery']
-        const storedStyle = this.storageService.getSelectedMapLayer('')
-
-        this.currentBasemapStyle = availableStyles.includes(storedStyle) ? storedStyle : 'Graybeard'
+        // For report maps, start with user's preferred style; for dashboard, start with ESRI for globe view
+        if (isReportMap) {
+            const storedStyle = this.storageService.getSelectedMapLayer('')
+            const availableStyles = ['Graybeard', 'Colorful', 'ESRI World Imagery']
+            this.currentBasemapStyle = availableStyles.includes(storedStyle) ? storedStyle : 'Graybeard'
+        } else {
+            this.currentBasemapStyle = 'ESRI World Imagery'
+        }
 
         this.map = new Map({
             container: targetId,
             style: this.getInitialMapStyle(),
-            center: [8.6759928, 49.4187355],
             zoom: 3,
+            minZoom: 2,
             maxZoom: 20,
-            renderWorldCopies: false
+            renderWorldCopies: false,
+            maxPitch: 85
         })
 
-        maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
+        if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
+            maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
+        }
 
         const navigationControl = new maplibregl.NavigationControl({
             visualizePitch: true,
@@ -189,10 +208,16 @@ export class MapService {
         this.mapPopUp = new Popup({ closeButton: false, closeOnClick: false })
         this.setupEventHandlers()
 
-        this.map!.on('load', () => {
+        this.map!.on('style.load', () => {
+            const isReportMap = this.mapId?.startsWith('report-map-')
+            if (!isReportMap) {
+                MapGlobeUtils.setupGlobeProjection(this.map!)
+            }
+
             this.setupLayers()
-            if (this.mapDrawingService) {
-                this.terraDrawControl = this.mapDrawingService.initializeTerraDraw(this.map!)
+
+            if (this.isOnLanding) {
+                MapGlobeUtils.startSpinning(this.map!, this.isOnLanding)
             }
         })
 
@@ -286,7 +311,8 @@ export class MapService {
         if (!this.map) return
 
         this.map.on('mousemove', e => {
-            if (!this.map) return
+            if (!this.map || this.mapDrawingService?.isDrawingModeValue) return
+
             let showPointer = false
 
             if (this.regionLayer?.visible) {
@@ -305,6 +331,8 @@ export class MapService {
         this.map.on('click', e => {
             this.selectRegions([e.point.x, e.point.y])
         })
+
+        MapGlobeUtils.setupInteractionHandlers(this.map)
     }
 
     private setupReportMapZoomNote() {
@@ -890,7 +918,7 @@ export class MapService {
 
     startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
         if (this.mapDrawingService?.startDrawing) {
-            this.mapDrawingService.startDrawing(type)
+            this.mapDrawingService.startDrawing(type, this.map)
         }
     }
 
@@ -935,9 +963,7 @@ export class MapService {
 
     private getInitialMapStyle(): string | StyleSpecification {
         const isVectorStyle = ['Graybeard', 'Colorful'].includes(this.currentBasemapStyle)
-        if (isVectorStyle) {
-            return `assets/map-schema/${this.currentBasemapStyle.toLowerCase()}/style.json`
-        }
+        if (isVectorStyle) return `assets/map-schema/${this.currentBasemapStyle.toLowerCase()}/style.json`
 
         return this.createRasterStyle()
     }
@@ -983,14 +1009,18 @@ export class MapService {
         this.layerSwitcherControl = MapControlsUtils.createLayerSwitcherControl(
             styles,
             this.currentBasemapStyle,
-            (styleName: string) => {
+            (styleName: string, automatic?: boolean) => {
+                if (this.mapDrawingService?.clearTerraDrawAfterStyleChange) {
+                    this.mapDrawingService.clearTerraDrawAfterStyleChange()
+                }
+
                 this.currentBasemapStyle = styleName
-                this.storageService.saveSelectedMapLayer(styleName)
+                this.styleChangeSubject.next(styleName)
+                if (!automatic) this.storageService.saveSelectedMapLayer(styleName)
 
                 this.map!.once('style.load', () => {
-                    if (this.mapDrawingService) {
-                        this.terraDrawControl = this.mapDrawingService.initializeTerraDraw(this.map!)
-                    }
+                    const isReportMap = this.mapId?.startsWith('report-map-')
+                    if (!isReportMap) MapGlobeUtils.setupGlobeProjection(this.map!)
 
                     if (this.mapDrawingService?.isDrawingModeValue && this.mapDrawingService.currentDrawModeValue) {
                         let mode: 'Box' | 'Circle' | 'Polygon'
@@ -1005,9 +1035,10 @@ export class MapService {
                                 mode = 'Polygon'
                                 break
                             default:
-                                throw new Error(`Unknown draw mode: ${this.mapDrawingService.currentDrawModeValue}`)
+                                console.error(`Unknown draw mode: ${this.mapDrawingService.currentDrawModeValue}`)
+                                return
                         }
-                        this.startDrawing(mode)
+                        setTimeout(() => this.startDrawing(mode), 100)
                     }
                 })
             },
@@ -1018,5 +1049,72 @@ export class MapService {
         )
 
         this.map.addControl(this.layerSwitcherControl as IControl, 'bottom-right')
+
+        this.handleInitialRouteState()
+    }
+
+    private async zoomToUserLocale(): Promise<void> {
+        if (!this.map) return
+
+        await MapGlobeUtils.zoomToUserLocale(this.map, this.http)
+
+        setTimeout(() => {
+            const storedStyle = this.storageService.getSelectedMapLayer('')
+            const availableStyles = ['Graybeard', 'Colorful', 'ESRI World Imagery']
+            const preferredStyle = availableStyles.includes(storedStyle) ? storedStyle : 'Graybeard'
+            this.switchMapStyle(preferredStyle, true)
+        }, 2100)
+    }
+
+    private resetToGlobalView(): void {
+        if (!this.map) return
+
+        this.switchMapStyle('ESRI World Imagery', true)
+        MapGlobeUtils.resetToGlobalView(this.map)
+    }
+
+    private switchMapStyle(styleName: string, automatic: boolean = false): void {
+        if (!this.map || this.currentBasemapStyle === styleName) return
+
+        if (this.layerSwitcherControl) {
+            this.layerSwitcherControl.switchToStyle(styleName, automatic)
+        } else {
+            console.warn('Layer switcher control not found, cannot switch style')
+        }
+    }
+
+    private handleRouteChange(url: string): void {
+        const isReportMap = this.mapId?.startsWith('report-map-')
+
+        const wasOnLanding = this.isOnLanding
+        this.isOnLanding = !isReportMap && url === '/dashboard'
+
+        if (!this.map) return
+
+        if (wasOnLanding && !this.isOnLanding) {
+            // Dashboard → Plugin: zoom to locale with user's preferred style
+            MapGlobeUtils.stopSpinning()
+            this.zoomToUserLocale().catch(error => console.warn('Failed to zoom to user locale:', error))
+        } else if (!wasOnLanding && this.isOnLanding) {
+            // Plugin → Dashboard: reset to global view and start spinning
+            this.resetToGlobalView()
+            setTimeout(() => {
+                if (this.isOnLanding) {
+                    MapGlobeUtils.startSpinning(this.map!, this.isOnLanding)
+                }
+            }, 2050)
+        }
+    }
+
+    private handleInitialRouteState(): void {
+        const isReportMap = this.mapId?.startsWith('report-map-')
+
+        if (isReportMap) return
+
+        if (!this.isOnLanding) {
+            this.zoomToUserLocale().catch(error => console.warn('Failed to zoom to user locale on init:', error))
+        } else {
+            this.switchMapStyle('ESRI World Imagery', true)
+        }
     }
 }
