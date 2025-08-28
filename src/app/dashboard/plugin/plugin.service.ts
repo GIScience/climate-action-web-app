@@ -10,7 +10,6 @@ import { StorageService } from '../../storage.service'
 import { ComputationRunState, ComputationRunStateInfo } from '../common/status.types'
 import {
     ComputationDatabaseEntity,
-    ComputationDisplayEntity,
     ComputationID,
     ComputationMetadata
 } from '../computations-index/computation.interface'
@@ -21,9 +20,6 @@ import { ComputeState, Plugin } from './plugin.interface'
 })
 export class PluginService {
     private apiUrl = environment.climateActionApiUrl
-
-    private pluginRuns: ComputationDisplayEntity[] = []
-    private pluginRunsSubject = new BehaviorSubject<ComputationDisplayEntity[]>(this.pluginRuns)
 
     private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
     private syncTasksSubject = new Subject<void>()
@@ -133,9 +129,6 @@ export class PluginService {
 
     storeNewComputes(compute: ComputationDatabaseEntity) {
         this.storageService.storeNewCompute(compute)
-
-        const runs = this.storageService.getPluginRuns()
-        this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])
     }
 
     getPluginRuns() {
@@ -144,9 +137,6 @@ export class PluginService {
 
     async updateRunStatus(correlationId: string, newStatus: ComputationRunState) {
         await this.storageService.updateComputation(correlationId, { status: newStatus })
-
-        const runs = this.storageService.getPluginRuns()
-        this.pluginRunsSubject.next([...runs] as ComputationDisplayEntity[])
     }
 
     triggerSyncTasks() {

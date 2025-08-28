@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
-import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
@@ -28,7 +26,6 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         private router: Router,
         private pluginService: PluginService,
         private artifactViewerService: ArtifactViewerService,
-        private storageService: StorageService,
         private mapService: MapService
     ) {}
 
@@ -82,23 +79,25 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
                     }
                 })
 
-                const storedRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-                storedRuns.forEach(run => {
-                    const existingCard = this.cards.find(x => x.plugin_id === run.pluginId)
-                    if (!existingCard) {
-                        const offlineCard = {
-                            plugin_id: run.pluginId,
-                            name: derivePluginNameFromId(run.pluginId || ''),
-                            icon: this.pluginService.getIconUrl(run.pluginId || ''),
-                            library_version: 'N/A',
-                            version: 'N/A',
-                            teaser: 'This plugin is currently offline',
-                            status: 'unavailable'
-                        } as PluginCard
+                // TODO: Refactor once gateway is updated to report plugin status (https://gitlab.heigit.org/climate-action/api-gateway/-/issues/38)
 
-                        this.cards.push(offlineCard)
-                    }
-                })
+                // const storedRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
+                // storedRuns.forEach(run => {
+                //     const existingCard = this.cards.find(x => x.plugin_id === run.pluginId)
+                //     if (!existingCard) {
+                //         const offlineCard = {
+                //             plugin_id: run.pluginId,
+                //             name: derivePluginNameFromId(run.pluginId || ''),
+                //             icon: this.pluginService.getIconUrl(run.pluginId || ''),
+                //             library_version: 'N/A',
+                //             version: 'N/A',
+                //             teaser: 'This plugin is currently offline',
+                //             status: 'unavailable'
+                //         } as PluginCard
+
+                //         this.cards.push(offlineCard)
+                //     }
+                // })
 
                 this.sortCards()
                 this.syncActiveCardWithRoute()

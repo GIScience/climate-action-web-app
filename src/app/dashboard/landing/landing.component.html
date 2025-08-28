@@ -2,29 +2,31 @@
     <div class="bg bg1"></div>
     <div class="bg bg2"></div>
 
-    <div *ngIf="customRuns.length > 0" class="welcome-content__revisit">
-        <div class="plugin-bubbles-container">
-            <h2>You have run a total of {{ customRuns.length }} computations so far.</h2>
+    <div *ngIf="!loading && totalActiveComputations > 0" class="welcome-content__revisit">
+        <h2>You have run a total of {{ totalActiveComputations }} computations so far.</h2>
 
-            <ul class="plugin-bubbles">
-                <a
-                    *ngFor="let plugin of pluginCounts; let i = index"
-                    [routerLink]="'/dashboard/plugin/' + plugin.pluginId">
-                    <li
-                        class="bubble"
-                        [style.--bubble-size]="calculateBubbleSize(plugin.count) + 'px'"
-                        [style.--bubble-gradient]="getGradient(i)">
-                        <div class="bubble-content">
-                            <span class="count">{{ plugin.count }}</span>
-                            <span class="plugin-name">{{ plugin.pluginName }}</span>
-                        </div>
-                    </li>
-                </a>
-            </ul>
+        <div *ngIf="latestComputation" class="latest-computation">
+            <h3>Browse your latest computation:</h3>
+            <a [routerLink]="'/dashboard/plugin/' + latestComputation.pluginId" class="latest-computation-card">
+                <div class="card-header">
+                    <span class="plugin-name">{{ getPluginName(latestComputation.pluginId) }}</span>
+                    <span class="status status-{{ latestComputation.status.toLowerCase() }}">{{
+                        latestComputation.status
+                    }}</span>
+                </div>
+                <div class="card-body">
+                    <span *ngIf="latestComputation.aoiName" class="aoi-name">{{ latestComputation.aoiName }}</span>
+                    <span class="timestamp">{{ latestComputation.timestamp | date: 'medium' }}</span>
+                </div>
+            </a>
         </div>
     </div>
 
-    <div *ngIf="customRuns.length === 0" class="welcome-content__new">
+    <div *ngIf="loading" class="welcome-content__loading">
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <div *ngIf="!loading && totalActiveComputations === 0" class="welcome-content__new">
         <div class="intro-section">
             <h1>Welcome to the Climate Action Navigator (CAN)</h1>
             <p>
