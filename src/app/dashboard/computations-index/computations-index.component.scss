@@ -133,9 +133,6 @@
     }
 
     .scheduled-computation {
-        animation: fadeInUp 0.3s ease-out;
-        animation-fill-mode: both;
-
         &:after {
             border-bottom: 1px solid #ccc;
             content: '';

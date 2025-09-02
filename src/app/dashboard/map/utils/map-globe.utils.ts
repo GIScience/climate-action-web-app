@@ -102,6 +102,17 @@ export class MapGlobeUtils {
         })
     }
 
+    static async fitToUserLocale(map: Map, http: HttpClient): Promise<void> {
+        if (!map) return
+
+        const [lng, lat] = await this.getLocaleBasedCenter(http)
+
+        map.jumpTo({
+            center: [lng, lat],
+            zoom: 4.5
+        })
+    }
+
     static resetToGlobalView(map: Map): void {
         if (!map) return
 
