@@ -23,6 +23,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Landing page now displays last computation details only, since we do only paginated fetches when required
+- Scheduled computations are more stable, and periodic sync isn't broken by switching between browser tabs ([#378](https://gitlab.heigit.org/climate-action/web-app/-/issues/378))
 
 ## [2.5.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.5.1) - 2025-07-21
 
