@@ -185,6 +185,11 @@
             transition: background-color 0.15s ease-in-out;
             width: 100%;
 
+            &.is-imported {
+                background-color: #e6fffa;
+                box-shadow: inset 0 0 0 2px rgba(0, 128, 128, 0.2);
+            }
+
             &.is-new {
                 .computation-actions {
                     display: none;

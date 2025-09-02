@@ -21,6 +21,7 @@ import {
     Clock,
     FileWarning,
     Hash,
+    Import,
     ListTodo,
     Loader,
     LoaderCircle,
@@ -119,6 +120,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     showArchived = false
     newRuns: string[] = []
     demoRuns: string[] = []
+    importedRuns: string[] = []
     currentLocale = navigator.language
     isReportVisible = false
 
@@ -146,6 +148,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly FileWarning = FileWarning
     readonly Clipboard = Clipboard
     readonly Trash2 = Trash2
+    readonly Import = Import
 
     @Input() pluginId: string = ''
     @Input() demoConfig: boolean = true
@@ -453,7 +456,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.plugin_id,
                     params: response.params,
-                    artifact_errors: response.artifact_errors
+                    artifact_errors: response.artifact_errors,
+                    flags: run.flags
                 }
 
                 if (Array.isArray(artifacts) && artifacts.length > 0) {
@@ -510,6 +514,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.newRuns = this.newRuns.filter(id => id !== correlation_uuid)
     }
 
+    removeImportedRunMark(correlation_uuid: string) {
+        this.importedRuns = this.importedRuns.filter(id => id !== correlation_uuid)
+    }
+
     toggleComputation(computation: ComputationDisplayEntity) {
         if (this.pluginService.computeState$) {
             this.pluginService.setComputeState('inactive')
@@ -542,6 +550,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
             if (this.newRuns.includes(computation.correlation_uuid)) {
                 this.removeNewRunMark(computation.correlation_uuid)
+            }
+
+            if (this.importedRuns.includes(computation.correlation_uuid)) {
+                this.removeImportedRunMark(computation.correlation_uuid)
             }
         }
     }
@@ -742,12 +754,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     pluginId: response.plugin_info?.plugin_id,
                     timestamp: response.timestamp,
                     status: 'SUCCESS',
-                    aoiName: response.aoi?.get('name')
+                    aoiName: response.aoi?.get('name'),
+                    flags: ['IMPORTED']
                 }
 
                 this.pluginService.storeNewComputes(computation)
                 this.currentRuns.push(computation)
                 this.fetchAndProcessComputations(computation)
+                this.importedRuns = [...this.importedRuns, correlationUuid]
                 this.toastr.success('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', '', {
                     timeOut: 4000
                 })
