@@ -58,7 +58,10 @@
                 class="computations-container">
                 <ng-scrollbar visibility="hover" orientation="vertical">
                     <div
-                        *ngFor="let scheduledRun of scheduledRuns | filterByCriteria: pluginId; trackBy: trackByScheduled"
+                        *ngFor="
+                            let scheduledRun of scheduledRuns | filterByCriteria: pluginId;
+                            trackBy: trackByScheduled
+                        "
                         class="scheduled-computation">
                         <div class="scheduled-parent-computation">
                             <div class="card-header">
@@ -84,7 +87,12 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngFor="let computation of computations | filterByCriteria: pluginId; trackBy: trackByComputation" class="computation">
+                    <div
+                        *ngFor="
+                            let computation of computations | filterByCriteria: pluginId;
+                            trackBy: trackByComputation
+                        "
+                        class="computation">
                         <div
                             [ngClass]="{
                                 'parent-computation': true,
@@ -92,6 +100,7 @@
                                 'computation-collapsed': !computation.isExpanded,
                                 'is-new': newRuns.includes(computation.correlation_uuid),
                                 'is-demo': demoRuns.includes(computation.correlation_uuid),
+                                'is-imported': importedRuns.includes(computation.correlation_uuid),
                                 'not-expandable': computation.artifacts.length === 0
                             }"
                             (click)="toggleComputation(computation)"
@@ -114,6 +123,14 @@
                                         class="artifact-errors"
                                         [tp]="artifactErrorsTooltip"
                                         [tpData]="computation.artifact_errors"
+                                        tpPlacement="right"></i-lucide>
+                                    <i-lucide
+                                        *ngIf="computation.flags?.includes('IMPORTED')"
+                                        [img]="Import"
+                                        size="20"
+                                        color="#aaaaaa"
+                                        class="imported-computation"
+                                        tp="Imported Computation"
                                         tpPlacement="right"></i-lucide>
                                 </div>
                                 <p class="card-subtitle m-0">
@@ -208,7 +225,11 @@
                 <ng-scrollbar visibility="hover" orientation="vertical">
                     <ul class="archive-list">
                         <li
-                            *ngFor="let archivedComputation of archivedComputations; let i = index; trackBy: trackByArchived"
+                            *ngFor="
+                                let archivedComputation of archivedComputations;
+                                let i = index;
+                                trackBy: trackByArchived
+                            "
                             class="archived-computation">
                             <div class="archived-item">
                                 <div>

@@ -456,7 +456,8 @@ describe('ComputationsIndexComponent', () => {
             pluginId: 'test_plugin',
             timestamp: mockMetadata.timestamp,
             status: 'SUCCESS',
-            aoiName: 'Imported AOI'
+            aoiName: 'Imported AOI',
+            flags: ['IMPORTED']
         }
 
         expect(component.currentRuns).toHaveLength(1)

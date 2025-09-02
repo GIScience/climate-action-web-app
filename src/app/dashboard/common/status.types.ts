@@ -2,7 +2,7 @@ export type ComputationRunState = 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' 
 
 export type ComputationItemState = 'ACTIVE' | 'ARCHIVED' | 'DELETED'
 
-export type ComputationFlags = ('NEW' | 'DEMO')[]
+export type ComputationFlags = ('NEW' | 'DEMO' | 'IMPORTED')[]
 
 export type ComputationRunStateInfo = {
     state: ComputationRunState
