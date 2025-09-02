@@ -169,8 +169,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     userSubscription: Subscription
     private syncSubscription?: Subscription
     private reportVisibilitySubscription: Subscription = new Subscription()
+    private visibilityChangeHandler?: () => void
 
-    private readonly INITIAL_INTERVAL = 2500
+    private readonly POLL_INTERVAL = 5000
     private readonly MAX_INTERVAL = 1800000
 
     constructor(
@@ -347,6 +348,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (this.reportVisibilitySubscription) {
             this.reportVisibilitySubscription.unsubscribe()
         }
+        if (this.visibilityChangeHandler) {
+            document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
+        }
     }
 
     initializeSuccessfulRuns(runs?: ComputationDatabaseEntity[]) {
@@ -372,36 +376,19 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .forEach(run => {
                 this.pluginService.getComputationRunState(run.correlation_uuid).subscribe({
                     next: stateInfo => {
-                        if (stateInfo.state === 'STARTED') {
-                            this.pluginService.updateRunStatus(run.correlation_uuid, 'STARTED')
-                        }
-                        if (stateInfo.state === 'SUCCESS') {
-                            this.pluginService.updateRunStatus(run.correlation_uuid, 'SUCCESS')
-                            this.fetchAndProcessComputations(run)
-                            this.storageService.markAsNew(run.correlation_uuid)
-                            if (!this.newRuns.includes(run.correlation_uuid)) {
-                                this.newRuns.push(run.correlation_uuid)
-                            }
-                            this.syncSubscription?.unsubscribe()
-                            this.toastr.success(
-                                `<strong>${derivePluginNameFromId(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
-                                '',
-                                {
-                                    timeOut: 7000,
-                                    enableHtml: true
-                                }
-                            )
-                        } else if (stateInfo.state === 'FAILURE') {
-                            this.pluginService.updateRunStatus(run.correlation_uuid, 'FAILURE')
-                            this.syncSubscription?.unsubscribe()
-                            this.toastr.error(
-                                `Error while computing <strong>${derivePluginNameFromId(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${stateInfo.message ? ' — ' + stateInfo.message : ''}.`,
-                                '',
-                                {
-                                    disableTimeOut: true,
-                                    enableHtml: true
-                                }
-                            )
+                        switch (stateInfo.state) {
+                            case 'STARTED':
+                                this.transitionRunStatus(run, 'STARTED')
+                                break
+                            case 'SUCCESS':
+                                this.transitionRunStatus(run, 'SUCCESS')
+                                break
+                            case 'FAILURE':
+                                this.transitionRunStatus(run, 'FAILURE', stateInfo.message)
+                                break
+                            case 'PENDING':
+                            default:
+                                break
                         }
                     },
                     error: error => {
@@ -409,6 +396,47 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     }
                 })
             })
+    }
+
+    private transitionRunStatus(
+        run: ComputationDatabaseEntity,
+        newStatus: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE',
+        message?: string
+    ) {
+        this.pluginService.updateRunStatus(run.correlation_uuid, newStatus)
+
+        run.status = newStatus
+        const idx = this.currentRuns.findIndex(r => r.correlation_uuid === run.correlation_uuid)
+        if (idx > -1) this.currentRuns[idx].status = newStatus
+
+        if (newStatus === 'SUCCESS' || newStatus === 'FAILURE') {
+            this.scheduledRuns = this.scheduledRuns.filter(r => r.correlation_uuid !== run.correlation_uuid)
+        }
+
+        if (newStatus === 'SUCCESS') {
+            this.fetchAndProcessComputations(run)
+            this.storageService.markAsNew(run.correlation_uuid)
+            if (!this.newRuns.includes(run.correlation_uuid)) {
+                this.newRuns.push(run.correlation_uuid)
+            }
+            this.toastr.success(
+                `<strong>${derivePluginNameFromId(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
+                '',
+                {
+                    timeOut: 7000,
+                    enableHtml: true
+                }
+            )
+        } else if (newStatus === 'FAILURE') {
+            this.toastr.error(
+                `Error while computing <strong>${derivePluginNameFromId(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${message ? ' - ' + message : ''}.`,
+                '',
+                {
+                    disableTimeOut: true,
+                    enableHtml: true
+                }
+            )
+        }
     }
 
     fetchAndProcessComputations(run: ComputationDatabaseEntity) {
@@ -635,17 +663,53 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private startPeriodicSync() {
-        let retryCount = 0
+        if (this.syncSubscription && !this.syncSubscription.closed) {
+            return
+        }
+
+        const POLL_INTERVAL_MS = this.POLL_INTERVAL
 
         const checkAndScheduleNext = () => {
-            const hasPendingRuns = this.currentRuns.some(run => run.status === 'PENDING' || run.status === 'STARTED')
-            const nextInterval = Math.min(this.INITIAL_INTERVAL * Math.pow(2, retryCount), this.MAX_INTERVAL)
+            const pendingRuns = this.currentRuns.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
 
-            if (hasPendingRuns) {
+            const hasPendingRuns = pendingRuns.length > 0
+
+            const now = Date.now()
+            const allExceededMaxInterval =
+                hasPendingRuns &&
+                pendingRuns.every(run => {
+                    const runTs = new Date(run.timestamp).getTime()
+                    return now - runTs >= this.MAX_INTERVAL
+                })
+
+            if (hasPendingRuns && !allExceededMaxInterval) {
                 this.syncRuns()
-                retryCount++
-                this.syncSubscription = timer(nextInterval).subscribe(() => checkAndScheduleNext())
+                this.syncSubscription = timer(POLL_INTERVAL_MS).subscribe(() => checkAndScheduleNext())
+            } else {
+                if (allExceededMaxInterval) {
+                    this.syncRuns()
+                }
+                if (this.syncSubscription) {
+                    this.syncSubscription.unsubscribe()
+                    this.syncSubscription = undefined
+                }
             }
+        }
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                const hasPendingRuns = this.currentRuns.some(
+                    run => run.status === 'PENDING' || run.status === 'STARTED'
+                )
+                if (hasPendingRuns && (!this.syncSubscription || this.syncSubscription.closed)) {
+                    checkAndScheduleNext()
+                }
+            }
+        }
+
+        if (!this.visibilityChangeHandler) {
+            document.addEventListener('visibilitychange', handleVisibilityChange)
+            this.visibilityChangeHandler = handleVisibilityChange
         }
 
         checkAndScheduleNext()
@@ -763,5 +827,18 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             return []
         }
         return Object.entries(artifactErrors)
+    }
+
+    // trackBy helpers to reduce DOM churn in lists
+    trackByScheduled(_index: number, run: ComputationDatabaseEntity): string {
+        return run.correlation_uuid
+    }
+
+    trackByComputation(_index: number, comp: ComputationDisplayEntity): string {
+        return comp.correlation_uuid
+    }
+
+    trackByArchived(_index: number, run: ComputationDatabaseEntity): string {
+        return run.correlation_uuid
     }
 }
