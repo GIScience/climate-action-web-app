@@ -135,10 +135,11 @@
     }
 
     button {
-        border-radius: 5px;
+        border-radius: 5px !important;
         height: auto;
         min-width: 170px;
         padding: 8px;
+        position: relative;
         width: 100%;
 
         &.active {
@@ -151,7 +152,24 @@
         }
 
         + button {
-            border-top: 1px solid #ddd;
+            border: none;
+        }
+
+        &:after {
+            border-bottom: 1px solid #ccc;
+            bottom: 0;
+            content: '';
+            display: block;
+            left: 5%;
+            margin: 0 auto;
+            position: absolute;
+            width: 90%;
+        }
+
+        &:last-child {
+            &:after {
+                display: none;
+            }
         }
     }
 }

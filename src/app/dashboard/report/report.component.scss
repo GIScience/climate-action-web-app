@@ -311,6 +311,14 @@
     ::ng-deep {
         .maplibregl-ctrl-top-right {
             top: 0;
+
+            .navigation-controls {
+                margin-right: 0;
+            }
+
+            .zoom-to-zero-control {
+                display: none;
+            }
         }
 
         app-legend {

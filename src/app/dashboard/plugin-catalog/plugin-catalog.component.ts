@@ -116,7 +116,9 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     showPlugin(card: PluginCard) {
         this.artifactViewerService.closeArtifactViewer()
+        this.pluginService.setComputeState('inactive')
         this.mapService.removeFocusedLayer()
+        this.mapService.removeComputeLayers()
         this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
             this.activeCard = card
         })
