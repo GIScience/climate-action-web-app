@@ -45,8 +45,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       '@ngneat/helipopper':
-        specifier: ^10.2.0-alpha.0
-        version: 10.2.1(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))
+        specifier: ^11.0.0
+        version: 11.1.4(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))
       '@ngx-formly/core':
         specifier: ^6.3.12
         version: 6.3.12(@angular/forms@19.2.14(@angular/common@19.2.14(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.14(@angular/animations@19.2.14(@angular/common@19.2.14(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.14(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(rxjs@7.8.2)
@@ -2162,8 +2162,8 @@ packages:
     resolution: {integrity: sha512-Sqih1YARrmMoHlXGgI9JrrgkzxcaaEso0AH+Y7j8NHonUs+xe4iDsgC3IBIDNdzEewbNpccNN6hip+b5vmyRLw==}
     engines: {node: '>= 10'}
 
-  '@ngneat/helipopper@10.2.1':
-    resolution: {integrity: sha512-0L3/8dhK01kD+AuwfkmSOestm+UVssiXz9OHBXw6zaeek0fcG78m3BYw2/SC0lE6sxpWw9n2bCAF7Chp6JvgZQ==}
+  '@ngneat/helipopper@11.1.4':
+    resolution: {integrity: sha512-2Um3KRwWJBYZ9GMvTDvQoLEqhK6uAk8qbg6NwtS/RUyKATLbtK7waPO6+J3QvvOy4ESU+FQBp4Iu3sLpZ/Mx6g==}
     peerDependencies:
       '@angular/core': '>=17.0.0'
 
@@ -9721,7 +9721,7 @@ snapshots:
       '@napi-rs/nice-win32-x64-msvc': 1.0.4
     optional: true
 
-  '@ngneat/helipopper@10.2.1(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))':
+  '@ngneat/helipopper@11.1.4(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))':
     dependencies:
       '@angular/core': 19.2.14(rxjs@7.8.2)(zone.js@0.15.1)
       '@ngneat/overview': 6.1.2(@angular/core@19.2.14(rxjs@7.8.2)(zone.js@0.15.1))
