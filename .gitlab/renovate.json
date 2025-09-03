@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "dependency patches"
+    },
+    {
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": "dependency feature release updates"
+    },
+    {
+      "matchDepNames": [
+        "@ngx-formly/*"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "ngx-formly"
+    },
+    {
+      "matchDepNames": [
+        "@angular/*",
+        "@angular-builders/*",
+        "@angular-eslint/*"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    }
+  ]
+}
