@@ -12,6 +12,10 @@ export interface BasicKeyInfo extends Models.Document {
     key: string
 }
 
+export interface ComputationDocument extends Models.Document, ComputationDatabaseEntity {
+    user_id: string
+}
+
 export interface PaginationParams {
     limit: number
     cursor?: string
@@ -71,18 +75,22 @@ export class DatabaseService {
                 queries.push(Query.cursorAfter(params.cursor))
             }
 
-            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, queries)
+            const response = await this.databases.listDocuments<ComputationDocument>(
+                this.DATABASE_ID,
+                this.RUNS_COLLECTION_ID,
+                queries
+            )
 
             const documents = response.documents.map(
-                (doc: Models.Document) =>
+                doc =>
                     ({
-                        correlation_uuid: doc['correlation_uuid'],
-                        flags: doc['flags'],
-                        state: doc['state'],
-                        pluginId: doc['pluginId'],
-                        timestamp: doc['timestamp'],
-                        status: doc['status'],
-                        aoiName: doc['aoiName']
+                        correlation_uuid: doc.correlation_uuid,
+                        flags: doc.flags,
+                        state: doc.state,
+                        pluginId: doc.pluginId,
+                        timestamp: doc.timestamp,
+                        status: doc.status,
+                        aoiName: doc.aoiName
                     }) as ComputationDatabaseEntity
             )
 
@@ -198,24 +206,28 @@ export class DatabaseService {
         try {
             if (!this.user_id) return null
 
-            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('user_id', this.user_id),
-                Query.equal('state', 'ACTIVE'),
-                Query.orderDesc('timestamp'),
-                Query.limit(1)
-            ])
+            const response = await this.databases.listDocuments<ComputationDocument>(
+                this.DATABASE_ID,
+                this.RUNS_COLLECTION_ID,
+                [
+                    Query.equal('user_id', this.user_id),
+                    Query.equal('state', 'ACTIVE'),
+                    Query.orderDesc('timestamp'),
+                    Query.limit(1)
+                ]
+            )
 
             if (response.documents.length === 0) return null
 
             const doc = response.documents[0]
             return {
-                correlation_uuid: doc['correlation_uuid'],
-                flags: doc['flags'],
-                state: doc['state'],
-                pluginId: doc['pluginId'],
-                timestamp: doc['timestamp'],
-                status: doc['status'],
-                aoiName: doc['aoiName']
+                correlation_uuid: doc.correlation_uuid,
+                flags: doc.flags,
+                state: doc.state,
+                pluginId: doc.pluginId,
+                timestamp: doc.timestamp,
+                status: doc.status,
+                aoiName: doc.aoiName
             } as ComputationDatabaseEntity
         } catch (error) {
             this.logError('Error fetching latest active computation:', error)
@@ -233,10 +245,11 @@ export class DatabaseService {
 
             console.log('Starting migration of computations to state field...')
 
-            const allDocuments = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('user_id', this.user_id),
-                Query.limit(1000)
-            ])
+            const allDocuments = await this.databases.listDocuments<ComputationDocument>(
+                this.DATABASE_ID,
+                this.RUNS_COLLECTION_ID,
+                [Query.equal('user_id', this.user_id), Query.limit(1000)]
+            )
 
             console.log(`Found ${allDocuments.documents.length} documents to migrate`)
 
@@ -245,12 +258,12 @@ export class DatabaseService {
             let activeCount = 0
 
             for (const doc of allDocuments.documents) {
-                const flags = (doc['flags'] as string[]) || []
+                const flags = doc.flags || []
                 const hasArchivedFlag = flags.includes('ARCHIVED')
 
                 const newState: ComputationItemState = hasArchivedFlag ? 'ARCHIVED' : 'ACTIVE'
 
-                if (!doc['state'] || doc['state'] !== newState) {
+                if (!doc.state || doc.state !== newState) {
                     const cleanedFlags = flags.filter(flag => flag !== 'ARCHIVED')
 
                     await this.databases.updateDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, doc.$id, {

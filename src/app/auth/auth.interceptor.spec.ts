@@ -32,6 +32,7 @@ describe('AuthInterceptor', () => {
         $permissions: [],
         $collectionId: 'basic_keys',
         $databaseId: 'tyk_integration',
+        $sequence: 0,
         hash: 'test-hash',
         tyk_user_id: 'test-tyk-user-id',
         ors_policy: 'test-policy',
