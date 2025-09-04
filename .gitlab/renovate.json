@@ -5,6 +5,12 @@
   ],
   "packageRules": [
     {
+      "matchDatasources": [
+        "npm"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
       "matchUpdateTypes": [
         "patch"
       ],
@@ -34,7 +40,8 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "enabled": false
+      "minimumReleaseAge": "6 months",
+      "groupName": "angular"
     }
   ]
 }
