@@ -1,6 +1,6 @@
 import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -14,6 +14,12 @@ import { ComputationBasicInfo, ComputationDisplayEntity } from '../computations-
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
+
+enum DefaultTag {
+    ALL = 'all',
+    MAIN = 'main',
+    UNTAGGED = 'untagged'
+}
 
 @Component({
     selector: 'app-computation',
@@ -44,7 +50,7 @@ import { ReportService } from '../report/report.service'
     templateUrl: './computation.component.html',
     styleUrls: ['./computation.component.scss']
 })
-export class ComputationComponent implements OnInit, OnDestroy {
+export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
     @Input() computation!: ComputationDisplayEntity
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
@@ -53,7 +59,14 @@ export class ComputationComponent implements OnInit, OnDestroy {
     private reportVisibilitySubscription: Subscription | undefined
     isReportVisible = false
 
+    selectedTag: string = ''
+    availableTags: string[] = []
+    filteredArtifacts: ArtifactEntity[] = []
+    tagCounts: Map<string, number> = new Map()
+    shouldShowFilters: boolean = false
+
     readonly ClipboardPlus = ClipboardPlus
+    readonly DefaultTag = DefaultTag
 
     constructor(
         private artifactService: ArtifactService,
@@ -68,6 +81,11 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.reportVisibilitySubscription = this.reportService.isVisible$.subscribe(isVisible => {
             this.isReportVisible = isVisible
         })
+        this.initializeTagsAndFiltering()
+    }
+
+    ngOnChanges(): void {
+        this.initializeTagsAndFiltering()
     }
 
     ngOnDestroy(): void {
@@ -83,18 +101,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
         if (event.toState === 'collapsed') {
             computation.keepInDOM = false
         }
-    }
-
-    showMore(computation: ComputationDisplayEntity) {
-        computation.showSecondaryArtifacts = true
-    }
-
-    showLess(computation: ComputationDisplayEntity) {
-        computation.showSecondaryArtifacts = false
-    }
-
-    hasSecondaryArtifacts(computation: ComputationDisplayEntity): boolean {
-        return computation.artifacts.some(artifact => !artifact.primary)
     }
 
     renderArtifact(artifact: ArtifactEntity) {
@@ -186,5 +192,113 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         this.reportService.addArtifact(artifact, computationBasicInfo)
+    }
+
+    private initializeTagsAndFiltering(): void {
+        if (!this.computation?.artifacts) {
+            this.filteredArtifacts = []
+            this.availableTags = []
+            this.shouldShowFilters = false
+            return
+        }
+
+        const tagsSet = new Set<string>()
+        this.tagCounts.clear()
+
+        const previousSelectedTag = this.selectedTag
+
+        let untaggedCount = 0
+        let mainCount = 0
+
+        this.computation.artifacts.forEach(artifact => {
+            if (artifact.primary) {
+                mainCount++
+            }
+
+            if (artifact.tags?.length) {
+                artifact.tags.forEach(tag => {
+                    tagsSet.add(tag)
+                    this.tagCounts.set(tag, (this.tagCounts.get(tag) || 0) + 1)
+                })
+            } else {
+                untaggedCount++
+            }
+        })
+
+        const hasRegularTags = tagsSet.size > 0
+        const hasMixedPrimarySecondary = mainCount > 0 && mainCount < this.computation.artifacts.length
+
+        this.shouldShowFilters = hasRegularTags || hasMixedPrimarySecondary
+
+        const regularTags = Array.from(tagsSet).sort()
+        this.availableTags = []
+
+        if (hasMixedPrimarySecondary) {
+            this.availableTags.push(DefaultTag.MAIN)
+            this.tagCounts.set(DefaultTag.MAIN, mainCount)
+        }
+
+        this.availableTags.push(...regularTags)
+
+        this.availableTags.push(DefaultTag.ALL)
+        this.tagCounts.set(DefaultTag.ALL, this.computation.artifacts.length)
+
+        if (untaggedCount > 0) {
+            this.availableTags.push(DefaultTag.UNTAGGED)
+            this.tagCounts.set(DefaultTag.UNTAGGED, untaggedCount)
+        }
+
+        if (!previousSelectedTag || !this.availableTags.includes(previousSelectedTag)) {
+            if (this.availableTags.length > 0) {
+                this.selectedTag = this.availableTags[0]
+            }
+        } else {
+            this.selectedTag = previousSelectedTag
+        }
+
+        this.filterArtifacts()
+    }
+
+    selectTag(tag: string): void {
+        this.selectedTag = tag
+        this.filterArtifacts()
+    }
+
+    getTagDisplayName(tag: string): string {
+        switch (tag) {
+            case DefaultTag.UNTAGGED:
+                return 'untagged'
+            case DefaultTag.ALL:
+                return 'all'
+            case DefaultTag.MAIN:
+                return 'main'
+            default:
+                return tag
+        }
+    }
+
+    private filterArtifacts(): void {
+        if (!this.computation?.artifacts) {
+            this.filteredArtifacts = []
+            return
+        }
+
+        switch (this.selectedTag) {
+            case DefaultTag.ALL:
+                this.filteredArtifacts = this.computation.artifacts.slice()
+                break
+            case DefaultTag.MAIN:
+                this.filteredArtifacts = this.computation.artifacts.filter(artifact => artifact.primary === true)
+                break
+            case DefaultTag.UNTAGGED:
+                this.filteredArtifacts = this.computation.artifacts.filter(
+                    artifact => !artifact.tags || artifact.tags.length === 0
+                )
+                break
+            default:
+                this.filteredArtifacts = this.computation.artifacts.filter(artifact =>
+                    artifact.tags?.includes(this.selectedTag)
+                )
+        }
     }
 }

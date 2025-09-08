@@ -53,6 +53,7 @@ describe('GeoTiffComponent', () => {
                 primary: true,
                 name: 'geotiff',
                 modality: 'MAP_LAYER_GEOTIFF',
+                tags: [],
                 file_path: './',
                 summary: 'test summary',
                 description: 'test description',

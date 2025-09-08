@@ -91,6 +91,7 @@ describe('ReportComponent', () => {
         name: 'Test Artifact',
         modality: 'MARKDOWN',
         primary: true,
+        tags: [],
         file_path: '/path/to/test/artifact',
         correlation_uuid: '12345678-1234-1234-1234-123456789012',
         attachments: {}
@@ -101,6 +102,7 @@ describe('ReportComponent', () => {
         name: 'Test Map',
         modality: 'MAP_LAYER_GEOJSON',
         primary: true,
+        tags: [],
         file_path: '/path/to/map/artifact',
         correlation_uuid: '12345678-1234-1234-1234-123456789012',
         attachments: {}
