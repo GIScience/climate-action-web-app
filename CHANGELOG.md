@@ -13,12 +13,14 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computations are now paginated during fetch from Appwrite, also switched storage to be Appwrite first (and switch to local for fallback) ([#337](https://gitlab.heigit.org/climate-action/web-app/-/issues/337))
 - Switched to Globe Projection on load, which spins while in Landing view ([#174](https://gitlab.heigit.org/climate-action/web-app/-/issues/174))
 - When accessing a plugin, the map zooms into the general area of the user based on their browser locale ([#380](https://gitlab.heigit.org/climate-action/web-app/-/issues/380))
+- Primary/Secondary artifacts are not folded under a 'Show More' view anymore; rather primary artifacts are grouped and displayed under a 'main' tag ([#258](https://gitlab.heigit.org/climate-action/web-app/-/issues/258))
 
 ### Added
 
 - Provide ability within Report Builder to export it to PDF ([#298](https://gitlab.heigit.org/climate-action/web-app/-/issues/298))
 - Users can now (soft)delete computations from the list
 - Simple in-memory cache for `/metadata` responses ([#155](https://gitlab.heigit.org/climate-action/web-app/-/issues/155))
+- Artifacts are now grouped and filterable under each computation ([#260](https://gitlab.heigit.org/climate-action/web-app/-/issues/260))
 
 ### Fixed
 

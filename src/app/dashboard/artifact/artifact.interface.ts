@@ -29,6 +29,7 @@ export interface Artifact {
     name: string
     modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'CHART_PLOTLY' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
     primary: boolean
+    tags: string[]
     file_path: string
     summary?: string
     description?: string

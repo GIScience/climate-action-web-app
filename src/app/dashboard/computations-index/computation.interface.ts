@@ -28,7 +28,6 @@ export interface ComputationDisplayEntity
     geometry?: ComputationMetadata['aoi']
     pluginName?: Plugin['name']
     pluginId?: ComputationMetadata['plugin_info']['plugin_id']
-    showSecondaryArtifacts?: boolean
     isExpanded?: boolean
     keepInDOM?: boolean
     flags?: ComputationFlags

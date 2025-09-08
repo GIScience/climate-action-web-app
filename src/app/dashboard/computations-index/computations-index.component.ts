@@ -467,6 +467,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 name: x.name,
                                 modality: x.modality,
                                 primary: x.primary,
+                                tags: x.tags,
                                 file_path: x.file_path,
                                 summary: x.summary,
                                 description: x.description,
