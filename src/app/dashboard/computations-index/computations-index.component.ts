@@ -211,8 +211,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    formatTimestamp(timestamp: Date) {
-        return format(timestamp, 'MMM d, yyyy h:mm a')
+    formatTimestamp(timestamp: Date | string) {
+        return format(
+            typeof timestamp === 'string'
+                ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z')
+                : timestamp,
+            'MMM d, yyyy h:mm a'
+        )
     }
 
     formatUUID(correlation_uuid: string): string {
