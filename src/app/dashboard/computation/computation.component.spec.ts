@@ -268,13 +268,23 @@ describe('ComputationComponent', () => {
                         attachments: {}
                     },
                     {
+                        name: 'Primary No Tags',
+                        primary: true,
+                        tags: [],
+                        modality: 'IMAGE',
+                        correlation_uuid: 'test-uuid',
+                        file_path: 'test_image2.png',
+                        store_id: 'image2',
+                        attachments: {}
+                    },
+                    {
                         name: 'Visualization',
                         primary: false,
                         tags: ['visualization'],
                         modality: 'CHART',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image2.png',
-                        store_id: 'image2',
+                        file_path: 'test_image3.png',
+                        store_id: 'image3',
                         attachments: {}
                     },
                     {
@@ -283,8 +293,8 @@ describe('ComputationComponent', () => {
                         tags: [],
                         modality: 'TABLE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image3.png',
-                        store_id: 'image3',
+                        file_path: 'test_image4.png',
+                        store_id: 'image4',
                         attachments: {}
                     }
                 ],
@@ -303,7 +313,14 @@ describe('ComputationComponent', () => {
         expect(computationComponent.shouldShowFilters).toBe(true)
         expect(computationComponent.availableTags).toContain('analysis')
         expect(computationComponent.availableTags).toContain('visualization')
-        expect(computationComponent.tagCounts.get('all')).toBe(3)
+        expect(computationComponent.tagCounts.get('all')).toBe(4)
+        expect(computationComponent.tagCounts.get('main')).toBe(2)
+        expect(computationComponent.tagCounts.get('untagged')).toBe(1)
+
+        computationComponent.selectTag('untagged')
+        expect(computationComponent.filteredArtifacts.length).toBe(1)
+        expect(computationComponent.filteredArtifacts[0].name).toBe('Raw Data')
+        expect(computationComponent.filteredArtifacts[0].primary).toBe(false)
 
         discardPeriodicTasks()
     }))

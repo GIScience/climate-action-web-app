@@ -220,7 +220,7 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
                     tagsSet.add(tag)
                     this.tagCounts.set(tag, (this.tagCounts.get(tag) || 0) + 1)
                 })
-            } else {
+            } else if (!artifact.primary) {
                 untaggedCount++
             }
         })
@@ -292,7 +292,7 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
                 break
             case DefaultTag.UNTAGGED:
                 this.filteredArtifacts = this.computation.artifacts.filter(
-                    artifact => !artifact.tags || artifact.tags.length === 0
+                    artifact => (!artifact.tags || artifact.tags.length === 0) && !artifact.primary
                 )
                 break
             default:
