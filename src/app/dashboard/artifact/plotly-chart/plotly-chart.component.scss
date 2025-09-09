@@ -3,3 +3,26 @@
     margin: 0 auto;
     max-width: 50rem;
 }
+
+.in-app-full {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 5px 5px 20px 25px rgba(0, 0, 0, 0.35);
+    height: calc(100vh - 85px) !important;
+    overflow: hidden;
+    padding: 20px 0;
+    position: fixed;
+    width: 99vw !important;
+    z-index: 9999;
+
+    ::ng-deep {
+        .plot-container.plotly {
+            overflow: hidden;
+
+            .modebar {
+                margin-right: 15px;
+            }
+        }
+    }
+}

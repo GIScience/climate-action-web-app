@@ -15,6 +15,9 @@ declare module 'plotly.js-strict-dist' {
     interface PlotlyStatic {
         newPlot(element: HTMLElement, data: Data[], layout: Layout, config?: any): Promise<PlotlyInstance>
         purge(element: HTMLElement): void
+        Plots: {
+            resize(element: HTMLElement): void
+        }
     }
 
     export interface Data {
