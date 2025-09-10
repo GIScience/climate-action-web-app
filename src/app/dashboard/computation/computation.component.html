@@ -8,7 +8,6 @@
             *ngFor="let tag of availableTags"
             class="tag-pill"
             [class.active]="selectedTag === tag"
-            [class.untagged]="tag === DefaultTag.UNTAGGED"
             (click)="selectTag(tag)">
             <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
             <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>

@@ -1,6 +1,6 @@
 import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -50,7 +50,7 @@ enum DefaultTag {
     templateUrl: './computation.component.html',
     styleUrls: ['./computation.component.scss']
 })
-export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
+export class ComputationComponent implements OnInit, OnDestroy {
     @Input() computation!: ComputationDisplayEntity
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
@@ -81,10 +81,6 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
         this.reportVisibilitySubscription = this.reportService.isVisible$.subscribe(isVisible => {
             this.isReportVisible = isVisible
         })
-        this.initializeTagsAndFiltering()
-    }
-
-    ngOnChanges(): void {
         this.initializeTagsAndFiltering()
     }
 
@@ -205,8 +201,6 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
         const tagsSet = new Set<string>()
         this.tagCounts.clear()
 
-        const previousSelectedTag = this.selectedTag
-
         let untaggedCount = 0
         let mainCount = 0
 
@@ -240,20 +234,16 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
 
         this.availableTags.push(...regularTags)
 
-        this.availableTags.push(DefaultTag.ALL)
-        this.tagCounts.set(DefaultTag.ALL, this.computation.artifacts.length)
-
         if (untaggedCount > 0) {
             this.availableTags.push(DefaultTag.UNTAGGED)
             this.tagCounts.set(DefaultTag.UNTAGGED, untaggedCount)
         }
 
-        if (!previousSelectedTag || !this.availableTags.includes(previousSelectedTag)) {
-            if (this.availableTags.length > 0) {
-                this.selectedTag = this.availableTags[0]
-            }
-        } else {
-            this.selectedTag = previousSelectedTag
+        this.availableTags.push(DefaultTag.ALL)
+        this.tagCounts.set(DefaultTag.ALL, this.computation.artifacts.length)
+
+        if (this.availableTags.length > 0) {
+            this.selectedTag = this.availableTags[0]
         }
 
         this.filterArtifacts()

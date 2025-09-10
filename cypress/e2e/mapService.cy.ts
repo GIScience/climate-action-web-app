@@ -388,7 +388,7 @@ describe('mapService', () => {
 
         cy.get('.draw-button').eq(1).click()
 
-        cy.wait(1000)
+        cy.wait(2500)
 
         cy.get('canvas.maplibregl-canvas').click(800, 425, { force: true })
         cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })
