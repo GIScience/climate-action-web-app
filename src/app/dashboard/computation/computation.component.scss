@@ -8,8 +8,8 @@
 
     .tag-pill {
         align-items: center;
-        background-color: #f5f5f5;
-        border: 1px solid #e0e0e0;
+        background-color: #f0f0f0;
+        border: 2px solid #ddd;
         border-radius: 15px;
         color: #111;
         display: inline-flex;
@@ -18,42 +18,19 @@
         padding: 5px 12.5px;
         transition: all 0.2s ease;
 
-        $colors: #10b981, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #14b8a6, #f97316, #ef4444, #84cc16, #06b6d4;
-
         &:hover {
-            background-color: #ebebeb;
-            border-color: #d0d0d0;
+            border-color: rgba(0 128 128 / 25%);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         &.active {
-            color: #fff;
-        }
-
-        &.untagged {
-            background-color: rgba(107, 114, 128, 10%);
-            border-color: rgb(107, 114, 128);
-
-            &.active {
-                background-color: rgba(107, 114, 128, 100%);
-            }
-        }
-
-        @for $i from 1 through 10 {
-            &:nth-child(10n + #{$i}):not(.untagged) {
-                $color: list.nth($colors, $i);
-                background-color: rgba($color, 0.1);
-                border-color: $color;
-
-                &.active {
-                    background-color: $color;
-                }
-            }
+            background-color: rgba(0 128 128 / 10%);
+            border-color: #008080;
         }
 
         .tag-count {
+            color: #777;
             font-size: 12px;
-            opacity: 0.5;
         }
     }
 }
