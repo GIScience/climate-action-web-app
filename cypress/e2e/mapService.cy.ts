@@ -251,11 +251,7 @@ describe('mapService', () => {
 
         cy.wait('@getPlugins')
 
-        cy.visit('dashboard/plugin/plugin_blueprint', {
-            onBeforeLoad(win: Cypress.AUTWindow) {
-                Object.defineProperty(win.navigator, 'language', { value: 'de-DE' })
-            }
-        })
+        cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.wait('@getPluginBlueprint')
 

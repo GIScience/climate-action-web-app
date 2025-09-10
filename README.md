@@ -91,4 +91,3 @@ Run `pnpm test:all` to execute the unit & integration tests on [Jest](https://je
 ## Attribution
 
 - Stars background image: Photo by [Olena Bohovyk](https://unsplash.com/@olenkasergienko) on [Unsplash](https://unsplash.com)
-- Country Codes Lat Long List by [Sundar Singh](https://github.com/eesur/country-codes-lat-long)
