@@ -41,14 +41,14 @@ import { MapGlobeUtils } from './utils/map-globe.utils'
 import { MapStyle, MapStyleSwitcherControl } from './utils/map-style-switcher.utils'
 
 export enum BasemapStyleName {
-    Graybeard = 'Graybeard',
     Colorful = 'Colorful',
+    Graybeard = 'Graybeard',
     EsriWorldImagery = 'ESRI World Imagery'
 }
 
 const ALL_BASEMAPS: readonly BasemapStyleName[] = [
-    BasemapStyleName.Graybeard,
     BasemapStyleName.Colorful,
+    BasemapStyleName.Graybeard,
     BasemapStyleName.EsriWorldImagery
 ] as const
 
@@ -105,8 +105,8 @@ export class MapService {
     featureHoverOverlay: Popup | undefined
     layerSwitcherControl: MapStyleSwitcherControl | undefined
     layerSwitcherCollapsed: boolean = false
-    currentBasemapStyle: BasemapStyleName = BasemapStyleName.Graybeard
-    private styleChangeSubject = new BehaviorSubject<BasemapStyleName>(BasemapStyleName.Graybeard)
+    currentBasemapStyle: BasemapStyleName = BasemapStyleName.Colorful
+    private styleChangeSubject = new BehaviorSubject<BasemapStyleName>(BasemapStyleName.Colorful)
     public styleChange$ = this.styleChangeSubject.asObservable()
 
     // Window & Display Properties
@@ -132,6 +132,7 @@ export class MapService {
 
     private readonly orsAPIKey = environment.orsAPIKey
     static readonly sqmToSqkmFactor = 1 / 1000000
+    private static readonly HEIDELBERG_COORDS: [number, number] = [8.6759928, 49.4187355]
 
     constructor(
         private pluginService: PluginService,
@@ -179,13 +180,9 @@ export class MapService {
     initMap(targetId: string, isReportMap: boolean = false) {
         this.mapId = targetId
 
-        if (!this.isOnLanding) {
-            const storedStyle = this.storageService.getSelectedMapLayer('')
-            this.currentBasemapStyle = isBasemapStyleName(storedStyle) ? storedStyle : BasemapStyleName.Graybeard
-        } else {
-            this.currentBasemapStyle = BasemapStyleName.EsriWorldImagery
-            this.styleChangeSubject.next(this.currentBasemapStyle)
-        }
+        const storedStyle = this.storageService.getSelectedMapLayer('')
+        this.currentBasemapStyle = isBasemapStyleName(storedStyle) ? storedStyle : BasemapStyleName.Colorful
+        this.styleChangeSubject.next(this.currentBasemapStyle)
 
         this.map = new Map({
             container: targetId,
@@ -1006,10 +1003,10 @@ export class MapService {
 
     private getStyleFor(style: BasemapStyleName): string | StyleSpecification {
         switch (style) {
-            case BasemapStyleName.Graybeard:
-                return 'assets/map-schema/graybeard/style.json'
             case BasemapStyleName.Colorful:
                 return 'assets/map-schema/colorful/style.json'
+            case BasemapStyleName.Graybeard:
+                return 'assets/map-schema/graybeard/style.json'
             case BasemapStyleName.EsriWorldImagery:
                 return this.createRasterStyle()
         }
@@ -1029,7 +1026,7 @@ export class MapService {
         this.layerSwitcherControl = MapControlsUtils.createLayerSwitcherControl(
             styles,
             this.currentBasemapStyle,
-            (styleName: string, automatic?: boolean) => {
+            (styleName: string) => {
                 if (this.mapDrawingService?.clearTerraDrawAfterStyleChange) {
                     this.mapDrawingService.clearTerraDrawAfterStyleChange()
                 }
@@ -1037,8 +1034,8 @@ export class MapService {
                 if (isBasemapStyleName(styleName)) {
                     this.currentBasemapStyle = styleName
                     this.styleChangeSubject.next(styleName)
+                    this.storageService.saveSelectedMapLayer(styleName)
                 }
-                if (!automatic) this.storageService.saveSelectedMapLayer(styleName)
             },
             (isExpanded: boolean) => {
                 this.storageService.saveLayerSwitcherCollapsed(!isExpanded)
@@ -1052,38 +1049,27 @@ export class MapService {
     private async zoomToUserLocale(): Promise<void> {
         if (!this.map) return
 
-        await MapGlobeUtils.zoomToUserLocale(this.map, this.http)
-
-        setTimeout(() => {
-            const storedStyle = this.storageService.getSelectedMapLayer('')
-            const preferredStyle: BasemapStyleName = isBasemapStyleName(storedStyle)
-                ? storedStyle
-                : BasemapStyleName.Graybeard
-            this.switchMapStyle(preferredStyle, true)
-        }, 2100)
+        this.map.flyTo({
+            center: MapService.HEIDELBERG_COORDS,
+            zoom: 4.5,
+            duration: 2000,
+            essential: true
+        })
     }
 
     private async fitToUserLocale(): Promise<void> {
         if (!this.map) return
 
-        await MapGlobeUtils.fitToUserLocale(this.map, this.http)
+        this.map.jumpTo({
+            center: MapService.HEIDELBERG_COORDS,
+            zoom: 4.5
+        })
     }
 
     private resetToGlobalView(): void {
         if (!this.map) return
 
-        this.switchMapStyle(BasemapStyleName.EsriWorldImagery, true)
         MapGlobeUtils.resetToGlobalView(this.map)
-    }
-
-    private switchMapStyle(styleName: BasemapStyleName, automatic: boolean = false): void {
-        if (!this.map || this.currentBasemapStyle === styleName) return
-
-        if (this.layerSwitcherControl) {
-            this.layerSwitcherControl.switchToStyle(styleName, automatic)
-        } else {
-            console.warn('Layer switcher control not found, cannot switch style')
-        }
     }
 
     private handleRouteChange(url: string): void {

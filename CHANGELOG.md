@@ -12,7 +12,6 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Switched the map library to [MapLibre](https://maplibre.org/maplibre-gl-js/docs/), and we now have vector basemaps via [Versatiles](https://github.com/versatiles-org/versatiles-style) tiles and styles (using Shortbread schema) ([#180](https://gitlab.heigit.org/climate-action/web-app/-/issues/180))
 - Computations are now paginated during fetch from Appwrite, also switched storage to be Appwrite first (and switch to local for fallback) ([#337](https://gitlab.heigit.org/climate-action/web-app/-/issues/337))
 - Switched to Globe Projection on load, which spins while in Landing view ([#174](https://gitlab.heigit.org/climate-action/web-app/-/issues/174))
-- When accessing a plugin, the map zooms into the general area of the user based on their browser locale ([#380](https://gitlab.heigit.org/climate-action/web-app/-/issues/380))
 - Primary/Secondary artifacts are not folded under a 'Show More' view anymore; rather primary artifacts are grouped and displayed under a 'main' tag ([#258](https://gitlab.heigit.org/climate-action/web-app/-/issues/258))
 
 ### Added

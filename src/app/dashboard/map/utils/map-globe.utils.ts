@@ -1,6 +1,4 @@
-import { HttpClient } from '@angular/common/http'
 import { Map } from 'maplibre-gl'
-import { firstValueFrom } from 'rxjs'
 
 export interface CountryCoordinate {
     country: string
@@ -18,7 +16,6 @@ export interface CountryCoordinatesResponse {
 export class MapGlobeUtils {
     private static readonly SECONDS_PER_REVOLUTION = 240
     private static readonly MAX_SPIN_ZOOM = 5
-    private static readonly HEIDELBERG_COORDS: [number, number] = [8.6759928, 49.4187355]
 
     private static spinAnimation: number | undefined
     private static lastTime = 0
@@ -64,53 +61,6 @@ export class MapGlobeUtils {
 
     static isSpinning(): boolean {
         return this.spinAnimation !== undefined
-    }
-
-    static async getLocaleBasedCenter(http: HttpClient): Promise<[number, number]> {
-        const locale = navigator.language
-        const country = locale.split('-')[1]
-
-        try {
-            const response = await firstValueFrom(
-                http.get<CountryCoordinatesResponse>('assets/scripts/country-codes-lat-long-alpha3.json')
-            )
-
-            if (response?.ref_country_codes) {
-                const countryData = response.ref_country_codes.find(c => c.alpha2 === country)
-
-                if (countryData) {
-                    return [countryData.longitude, countryData.latitude]
-                }
-            }
-        } catch (error) {
-            console.warn('Failed to load country coordinates, using default:', error)
-        }
-
-        return this.HEIDELBERG_COORDS
-    }
-
-    static async zoomToUserLocale(map: Map, http: HttpClient): Promise<void> {
-        if (!map) return
-
-        const [lng, lat] = await this.getLocaleBasedCenter(http)
-
-        map.flyTo({
-            center: [lng, lat],
-            zoom: 4.5,
-            duration: 2000,
-            essential: true
-        })
-    }
-
-    static async fitToUserLocale(map: Map, http: HttpClient): Promise<void> {
-        if (!map) return
-
-        const [lng, lat] = await this.getLocaleBasedCenter(http)
-
-        map.jumpTo({
-            center: [lng, lat],
-            zoom: 4.5
-        })
     }
 
     static resetToGlobalView(map: Map): void {
