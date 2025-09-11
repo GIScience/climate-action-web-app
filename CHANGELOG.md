@@ -21,6 +21,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Simple in-memory cache for `/metadata` responses ([#155](https://gitlab.heigit.org/climate-action/web-app/-/issues/155))
 - Artifacts are now grouped and filterable under each computation ([#260](https://gitlab.heigit.org/climate-action/web-app/-/issues/260))
 - Plotly control added to view plots in fullscreen, especially useful for dense treemaps
+- App will now check for upcoming maintenance entries and display a toast on launch ([#357](https://gitlab.heigit.org/climate-action/web-app/-/issues/357))
 
 ### Fixed
 

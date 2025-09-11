@@ -98,7 +98,6 @@ i-lucide {
 .toast-container {
     &.toast-bottom-center {
         margin-bottom: calc(25px + 0.5vw);
-        margin-top: 0;
 
         .ngx-toastr {
             margin-bottom: 0;
@@ -108,12 +107,11 @@ i-lucide {
     }
 
     &.toast-top-center {
-        margin-bottom: 0;
-        margin-top: 0.5vw;
+        margin-top: calc(60px + 0.5vw);
 
         .ngx-toastr {
-            margin-bottom: 0;
-            margin-top: -5px;
+            margin-bottom: 10px;
+            margin-top: 0;
             width: 450px;
         }
     }
@@ -145,6 +143,32 @@ i-lucide {
 
         &.toast-warning {
             background-color: rgba(192, 112, 0, 0.75);
+        }
+
+        &.ngx-toastr--inverted {
+            background-blend-mode: exclusion;
+            background-color: rgba(255, 255, 255, 0.75);
+            color: #111;
+
+            & .toast-close-button {
+                color: #666;
+            }
+
+            &.toast-success {
+                border: 5px solid rgba(41, 124, 41, 0.75);
+            }
+
+            &.toast-error {
+                border: 5px solid rgba(156, 12, 5, 0.75);
+            }
+
+            &.toast-info {
+                border: 5px solid rgba(71, 115, 163, 0.75);
+            }
+
+            &.toast-warning {
+                border: 5px solid rgba(192, 112, 0, 0.75);
+            }
         }
     }
 
