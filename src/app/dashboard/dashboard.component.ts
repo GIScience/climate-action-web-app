@@ -86,7 +86,7 @@ export class DashboardComponent implements OnInit {
     }
 
     private fetchMaintenanceAnn(): void {
-        this.http.get<MaintenanceAnnouncement[]>('maintenance-log.json').subscribe({
+        this.http.get<MaintenanceAnnouncement[]>('/maintenance-log.json').subscribe({
             next: (announcements: MaintenanceAnnouncement[]) => {
                 this.processMaintenanceAnn(announcements)
             },
