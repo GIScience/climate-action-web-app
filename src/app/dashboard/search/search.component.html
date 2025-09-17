@@ -1,25 +1,27 @@
 <div class="search-locations__wrapper">
-    <form>
+    <form (ngSubmit)="onInputEnter(); $event.preventDefault()">
         <input
             class="search-locations"
             name="search-locations"
             type="search"
             placeholder="Search..."
             [formControl]="searchControl"
+            (focus)="onInputFocus()"
+            (blur)="onInputBlur()"
+            (keydown.enter)="onInputEnter(); $event.preventDefault()"
             spellcheck="false" />
         <button class="clear-search" (click)="clearSearch()">
             <i-lucide [img]="CircleX" size="20" title="Clear Search"></i-lucide>
         </button>
     </form>
 
-    <div class="location-suggestions" *ngIf="suggestions.length > 0">
+    <div class="location-suggestions" *ngIf="suggestions.length > 0 && isInputFocused">
         <ng-scrollbar orientation="vertical">
             <div
                 class="location-suggestion__item"
                 *ngFor="let suggestion of suggestions"
                 (click)="selectSuggestion(suggestion)"
                 (keyup.enter)="selectSuggestion(suggestion)"
-                (keydown)="onSuggestionKeydown($event)"
                 (mouseover)="this.mapService.addMarker(suggestion)"
                 (focus)="this.mapService.addMarker(suggestion)"
                 tabindex="0">
@@ -33,7 +35,7 @@
     </div>
     <div
         class="location-suggestions location-suggestions--empty"
-        *ngIf="suggestions.length === 0 && isSearchActive && !isFetchingSuggestions">
+        *ngIf="suggestions.length === 0 && !isSearchInputEmpty && !isFetchingSuggestions && isInputFocused">
         <p>No suggestions found</p>
     </div>
 </div>

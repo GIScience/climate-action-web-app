@@ -95,9 +95,16 @@ export class TourStepsService {
 
     private getSearchAreaStep(): ExtendedDriveStep {
         return {
-            element: () =>
-                this.fetchElementWithText('.location-suggestion__item', 'Ventotene') ||
-                document.querySelector('.location-suggestion__item:first-child'),
+            element: () => {
+                const searchInput = document.querySelector('input.search-locations') as HTMLInputElement
+                if (searchInput && document.activeElement !== searchInput) {
+                    searchInput.focus()
+                }
+                return (
+                    this.fetchElementWithText('.location-suggestion__item', 'Ventotene') ||
+                    document.querySelector('.location-suggestion__item:first-child')
+                )
+            },
             popover: {
                 title: 'Search for an Area of Interest',
                 description:
@@ -105,6 +112,17 @@ export class TourStepsService {
                 side: 'left',
                 align: 'start',
                 onPopoverRender: () => {
+                    const maintainFocus = () => {
+                        const searchInput = document.querySelector('input.search-locations') as HTMLInputElement
+                        if (searchInput && document.activeElement !== searchInput) {
+                            searchInput.focus()
+                        }
+                    }
+
+                    maintainFocus()
+                    const focusInterval = setInterval(maintainFocus, 100)
+                    this.activeEventHandlers.push(() => clearInterval(focusInterval))
+
                     this.waitForClickAndElement('.location-suggestion__item:first-child')
                 }
             },
@@ -317,6 +335,7 @@ export class TourStepsService {
             if (element) {
                 const searchInput = document.querySelector('input.search-locations') as HTMLInputElement
                 if (searchInput) {
+                    searchInput.focus()
                     searchInput.value = 'Ventotene'
                     searchInput.dispatchEvent(new Event('input'))
                 }
