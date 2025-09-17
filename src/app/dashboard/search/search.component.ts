@@ -23,10 +23,11 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
 export class SearchComponent implements OnInit {
     searchControl = new FormControl()
     suggestions: AutocompleteFeature[] = []
-    firstSuggestionItem: HTMLElement | null = null
     searchInput: HTMLInputElement | null = null
     isFetchingSuggestions = false
-    isSearchActive = false
+    isSearchInputEmpty = true
+    isInputFocused = false
+    private blurTimeout: ReturnType<typeof setTimeout> | null = null
 
     readonly CircleX = CircleX
 
@@ -44,11 +45,11 @@ export class SearchComponent implements OnInit {
                 switchMap(query => {
                     if (query) {
                         this.isFetchingSuggestions = true
-                        this.isSearchActive = true
+                        this.isSearchInputEmpty = false
                         return this.mapService.getAutoCompleteSuggestions(query)
                     } else {
                         this.suggestions = []
-                        this.isSearchActive = false
+                        this.isSearchInputEmpty = true
                         return []
                     }
                 })
@@ -57,15 +58,10 @@ export class SearchComponent implements OnInit {
                 next: (results: AutocompleteFeature[]) => {
                     this.suggestions = results
                     this.isFetchingSuggestions = false
-                    if (results.length > 0) {
-                        setTimeout(() => {
-                            this.firstSuggestionItem = document.querySelector('.location-suggestion__item')
-                            this.firstSuggestionItem?.focus()
-                        })
-                    }
                 },
-                error: () => {
+                error: error => {
                     this.isFetchingSuggestions = false
+                    console.warn('Search suggestions could not be fetched:', error)
                 }
             })
     }
@@ -90,41 +86,49 @@ export class SearchComponent implements OnInit {
         this.searchControl.setValue(suggestion.properties?.name, {
             emitEvent: false
         })
-        this.suggestions = []
-        this.isSearchActive = false
+        this.isInputFocused = false
         this.mapService.flyToExtent(suggestion)
     }
 
     clearSearch() {
         this.searchControl.setValue('')
         this.suggestions = []
-        this.isSearchActive = false
+        this.isSearchInputEmpty = true
         this.mapService.markerLayer.forEach(marker => marker.remove())
         this.mapService.markerLayer = []
         this.mapService.markerFeatures = []
     }
 
-    onSuggestionKeydown(event: KeyboardEvent) {
-        if (event.key.length === 1 || event.key === 'Backspace' || event.key === 'Delete') {
-            this.searchInput?.focus()
-            return
+    onInputEnter() {
+        if (this.searchControl.value) {
+            this.isFetchingSuggestions = true
+            this.isSearchInputEmpty = false
+            this.mapService.getAutoCompleteSuggestions(this.searchControl.value).subscribe({
+                next: (results: AutocompleteFeature[]) => {
+                    this.suggestions = results
+                    this.isFetchingSuggestions = false
+                },
+                error: error => {
+                    this.isFetchingSuggestions = false
+                    console.warn('Search suggestions could not be fetched:', error)
+                }
+            })
         }
+    }
 
-        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-            event.preventDefault()
+    // Delay hiding suggestions so click handlers can finish before the DOM disappears
 
-            const currentElement = event.target as HTMLElement
-            const items = Array.from(document.querySelectorAll('.location-suggestion__item'))
-            const currentIndex = items.indexOf(currentElement)
+    onInputBlur() {
+        this.blurTimeout = setTimeout(() => {
+            this.isInputFocused = false
+        }, 150)
+    }
 
-            let nextIndex
-            if (event.key === 'ArrowDown') {
-                nextIndex = currentIndex + 1 >= items.length ? 0 : currentIndex + 1
-            } else {
-                nextIndex = currentIndex - 1 < 0 ? items.length - 1 : currentIndex - 1
-            }
-
-            ;(items[nextIndex] as HTMLElement).focus()
+    onInputFocus() {
+        this.isInputFocused = true
+        if (this.blurTimeout) {
+            clearTimeout(this.blurTimeout)
+            this.blurTimeout = null
         }
     }
 }
