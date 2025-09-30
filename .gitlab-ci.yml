@@ -1,139 +1,128 @@
 stages:
-    - test
-    - deploy
+  - test
+  - build
+  - deploy
 
 cache:
-    key:
-        files:
-            - pnpm-lock.yaml
-        prefix: $CI_COMMIT_REF_NAME
-    paths:
-        - node_modules
-        - /root/.cache/Cypress
+  key:
+    files:
+      - pnpm-lock.yaml
+    prefix: $CI_COMMIT_REF_NAME
+  paths:
+    - node_modules
+    - /root/.cache/Cypress
 
 test_jest_and_lint:
-    stage: test
-    tags: [climate-action]
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    image:
-        name: trion/ng-cli-karma:19.2.13
-    variables:
-        NODE_OPTIONS: '--no-warnings'
-    before_script:
-        - |
-            cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
-            export const ORS_API_KEY = '${ORS_API_KEY}'
-            export const APPWRITE_PROJECT_ID = '${APPWRITE_PROJECT_ID_STAGING}'
-            export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_STAGING}'
-            export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
-            EOF
-        - pnpm install
-    script:
-        - pnpm lint
-        - pnpm test
-    artifacts:
-        reports:
-            coverage_report:
-                coverage_format: cobertura
-                path: coverage/cobertura-coverage.xml
+  stage: test
+  tags: [ climate-action ]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  image:
+    name: trion/ng-cli-karma:19.2.13
+  variables:
+    NODE_OPTIONS: '--no-warnings'
+  before_script:
+    - |
+      cat > "./src/assets/env.js" << EOF
+      ;(function (window) {
+          window.env = window.env || {}
+          window['env']['ENVIRONMENT_TYPE'] = 'testing'
+      })(this)
+      EOF
+    - pnpm install
+  script:
+    - pnpm lint
+    - pnpm test
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
 
 test_cypress:
-    stage: test
-    tags: [climate-action]
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    variables:
-        NODE_ENV: 'test'
-        NODE_OPTIONS: '--no-warnings'
-    needs: ['test_jest_and_lint']
-    image:
-        name: cypress/included:cypress-14.5.4-node-22.18.0-chrome-139.0.7258.66-1-ff-141.0.3-edge-138.0.3351.121-1
-        entrypoint: ['']
-    before_script:
-        - |
-            cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
-            export const ORS_API_KEY = '${ORS_API_KEY}'
-            export const APPWRITE_PROJECT_ID = '${APPWRITE_PROJECT_ID_STAGING}'
-            export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_STAGING}'
-            export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
-            EOF
-        - npm install -g pnpm
-        - pnpm install
-        - pnpm exec cypress install
-    script:
-        - pnpm start & pnpm exec wait-on http://localhost:4200
-        - pnpm cy:run
-    artifacts:
-        when: on_failure
-        paths:
-            - cypress/screenshots/**/*.png
-            - cypress/snapshots/actual/**/*.png
-            - cypress/snapshots/diff/**/*.png
-        expire_in: 30 day
+  stage: test
+  tags: [ climate-action ]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  variables:
+    NODE_ENV: 'test'
+    NODE_OPTIONS: '--no-warnings'
+  needs: [ 'test_jest_and_lint' ]
+  image:
+    name: cypress/included:cypress-14.5.4-node-22.18.0-chrome-139.0.7258.66-1-ff-141.0.3-edge-138.0.3351.121-1
+    entrypoint: [ '' ]
+  before_script:
+    - |
+      cat > "./src/assets/env.js" << EOF
+      ;(function (window) {
+          window.env = window.env || {}
+          window['env']['ENVIRONMENT_TYPE'] = 'testing'
+          window['env']['ORS_API_KEY'] = '${ORS_API_KEY}'
+      })(this)
+      EOF
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm exec cypress install
+  script:
+    - pnpm start & pnpm exec wait-on http://localhost:4200
+    - pnpm cy:run
+  artifacts:
+    when: on_failure
+    paths:
+      - cypress/screenshots/**/*.png
+      - cypress/snapshots/actual/**/*.png
+      - cypress/snapshots/diff/**/*.png
+    expire_in: 30 day
 
-docker_build_deploy_development:
-    stage: deploy
-    tags: [k8s]
-    cache: []
-    rules:
-        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
-    image: docker.io/docker:cli
-    before_script:
-        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
-        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
-        - |
-            cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
-            export const ORS_API_KEY = '${ORS_API_KEY}'
-            export const APPWRITE_PROJECT_ID = '${APPWRITE_PROJECT_ID_STAGING}'
-            export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_STAGING}'
-            export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_STAGING}'
-            EOF
-    script:
-        - |
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
-                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
-                --build-arg BUILD_TARGET=dev \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
-                --push \
-                .
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
-                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
-                --build-arg BUILD_TARGET=staging \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
-                --push \
-                .
+build_staging:
+  stage: build
+  tags: [ k8s ]
+  cache: [ ]
+  rules:
+     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+  image: docker.io/docker:cli
+  before_script:
+    - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+    - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+  script:
+    - |
+      docker --config ~/ca_config \
+          buildx build \
+          --builder=kube \
+          --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
+          --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
+          --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
+          --push \
+          .
 
-docker_build_deploy_release:
-    stage: deploy
-    tags: [k8s]
-    cache: []
-    rules:
-        - if: $CI_COMMIT_TAG
-    image: docker.io/docker:cli
-    before_script:
-        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
-        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
-        - |
-            cat > "./src/environments/keys-and-ids/keys-and-ids.ts" << EOF
-            export const ORS_API_KEY = '${ORS_API_KEY}'
-            export const APPWRITE_PROJECT_ID = '${APPWRITE_PROJECT_ID_PROD}'
-            export const APPWRITE_ENDPOINT = '${APPWRITE_ENDPOINT_PROD}'
-            export const APPWRITE_WEBSITE_URL = '${APPWRITE_WEBSITE_URL_PROD}'
-            EOF
-    script:
-        - |
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --platform=linux/amd64 \
-                --build-arg BUILD_TARGET=prod \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
-                --push \
-                .
+build_release:
+  stage: build
+  tags: [ k8s ]
+  cache: [ ]
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: docker.io/docker:cli
+  before_script:
+    - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+    - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+  script:
+    - |
+      docker --config ~/ca_config \
+          buildx build \
+          --builder=kube \
+          --platform=linux/amd64 \
+          --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
+          --push \
+          .
+
+deploy_staging:
+  stage: deploy
+  tags: [ k8s ]
+  needs:
+    - build_staging
+  rules:
+    - !reference [ build_staging, rules ]
+  image: repo.heigit.org/heigit/argocd-cli:latest
+  script:
+    - argocd app actions run argocd/${ARGOCD_STAGING_APPLICATION_NAME} restart --kind Deployment --server ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --resource-name can-${CI_PROJECT_NAME}
+

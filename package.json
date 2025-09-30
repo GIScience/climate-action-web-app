@@ -5,11 +5,8 @@
         "ng": "ng",
         "start": "ng serve --no-hmr --host=127.0.0.1",
         "dev": "ng serve --proxy-config proxy.conf.json",
-        "build": "ng build",
-        "build:prod": "ng build --configuration production --base-href /webapp/",
-        "build:staging": "ng build --configuration staging --base-href /webapp/",
-        "build:dev": "ng build --configuration development --base-href /webapp/",
-        "build:int": "ng build --configuration integration",
+        "build:prod": "ng build --configuration production --base-href /",
+        "build:dev": "ng build --configuration development --base-href /",
         "build:stats": "ng build --stats-json",
         "analyze": "pnpm dlx esbuild-visualizer --metadata ./dist/browser/stats.json",
         "watch": "ng build --watch --configuration development",
@@ -21,8 +18,7 @@
         "cy:run": "cypress run --headless --browser chrome",
         "test:all": "pnpm run test && pnpm run cy:run",
         "lint": "ng lint --max-warnings 0",
-        "lint:fix": "ng lint --fix",
-        "serve:dist": "node serve-dist.js"
+        "lint:fix": "ng lint --fix"
     },
     "private": true,
     "dependencies": {
