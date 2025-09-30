@@ -23,13 +23,13 @@
     </li>
     <li><a href="#build">Build</a></li>
     <li><a href="#docker">Docker</a></li>
-    <li><a href="#unit-tests">Unit Tests</a></li>
+    <li><a href="#tests">Tests</a></li>
   </ol>
 </details>
 
 ## About the Project
 
-This is the repository of the frontend website of HeiGIT's [Climate Action](https://heigit.org/climate-action/) project. Visit the [Demo Website](https://staging.climate-action.heigit.org/webapp/dashboard) to view the current status of the dashboard, and access the available plugins.
+This is the repository of the frontend website of HeiGIT's [Climate Action](https://heigit.org/climate-action/) project. Visit the [Demo Website](https://staging.climate-action.heigit.org/dashboard) to view the current status of the dashboard, and access the available plugins.
 
 ## Getting Started
 
@@ -41,12 +41,21 @@ This is the repository of the frontend website of HeiGIT's [Climate Action](http
 
 ### Installation
 
-Clone the repository locally, and run `pnpm install` to install the dependencies.
+1. Clone the repository locally
+2. Run `pnpm install` to install the dependencies
+3. Create the configuration file:
+    - Copy `src/assets/env.template.js` to `src/assets/env.js`
+    - Edit `env.js` with your settings:
+        - `ENVIRONMENT_TYPE`: Set to `'development'` for local development
+        - `ORS_API_KEY`: Get an API key from [OpenRouteService (ORS)](https://openrouteservice.org/) for the Search function
+        - `CLIMATE_ACTION_API_URL`: Set to `'http://localhost/api/v1/gateway'` for local development with the backend
+        - Other values can typically use the defaults provided
+4. Run `pnpm dev` or `ng serve` to start the dev server
+5. Navigate to `http://localhost:4200/`
 
-Run `pnpm dev` or `ng serve` for a dev server and navigate to `http://localhost:4200/`.
 The application will automatically reload if you change any of the source files.
 
-For the Search function to work, you'll need to acquire an API key from our search results provider, [OpenRouteService (ORS)](https://openrouteservice.org/). Once you have the key, create a copy of `src/environments/keys-and-ids/keys-and-ids.ts.example`, rename it to `keys-and-ids.ts` and fill it against `ORS_API_KEY`.
+**Note**: The `src/assets/env.js` file contains configuration for local development. For production deployments, these values are injected at runtime via environment variables (see Docker section below).
 
 ### Backend Server
 
@@ -56,29 +65,40 @@ Make sure to start at least one plugin along with the API Gateway, for example `
 
 ## Build
 
-Run `pnpm build:{build_target}` to build the project.
-Currently available `build_target`s are
-
-- dev
-- staging
-- prod
+Run `pnpm build` to build the project. The application is built as a single, environment-agnostic bundle that can be configured at runtime via environment variables.
 
 ## Docker
 
-The web app itself is also [Dockerised](Dockerfile). To start it, run the following commands
+The web app is [Dockerised](Dockerfile) with runtime configuration support.
+
+### Building the Docker image
 
 ```shell
-docker build --build-arg BUILD_TARGET={build_target} . --tag repo.heigit.org/climate-action/web-app:{build_target}
-docker run --publish 8080:80 repo.heigit.org/climate-action/web-app:{build_target}
+docker build . --tag repo.heigit.org/climate-action/web-app:{image_tag}
+```
+
+### Running with environment variables
+
+```shell
+docker run --publish 8080:80 \
+  -e ENVIRONMENT_TYPE="development" \
+  -e CLIMATE_ACTION_API_URL="http://localhost/api/v1/gateway" \
+  -e ORS_API_KEY="your-ors-api-key" \
+  -e APPWRITE_PROJECT_ID="your-project-id" \
+  -e APPWRITE_ENDPOINT="appwrite-api-endpoint" \
+  -e APPWRITE_WEBSITE_URL="appwrite-frontend" \
+  repo.heigit.org/climate-action/web-app:{image_tag}
 ```
 
 Then head to [localhost:8080](http://localhost:8080).
 
-To push a new version to [Docker Hub](https://repo.heigit.org/climate-action) run
+### Pushing to [Docker Hub](https://repo.heigit.org/climate-action)
 
 ```shell
-docker image push repo.heigit.org/climate-action/web-app:{build_target}
+docker image push repo.heigit.org/climate-action/web-app:{image_tag}
 ```
+
+**Note**: The same Docker image can be used for all environments (development, staging, production - if compatible) by simply changing the environment variables at runtime.
 
 ## Tests
 

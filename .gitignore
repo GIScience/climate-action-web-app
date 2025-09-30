@@ -48,5 +48,5 @@ cypress/downloads/*
 .DS_Store
 Thumbs.db
 
-# API Keys
-/src/environments/keys-and-ids/*.ts
+# Environment Variables
+/src/assets/env.js
