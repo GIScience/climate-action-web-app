@@ -45,8 +45,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       '@ngneat/helipopper':
-        specifier: ^11.0.0
-        version: 11.1.4(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
+        specifier: ^12.0.0
+        version: 12.0.0(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
       '@ngx-formly/core':
         specifier: ^6.3.12
         version: 6.3.12(@angular/forms@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))(rxjs@7.8.2)
@@ -2410,10 +2410,10 @@ packages:
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
-  '@ngneat/helipopper@11.1.4':
-    resolution: {integrity: sha512-2Um3KRwWJBYZ9GMvTDvQoLEqhK6uAk8qbg6NwtS/RUyKATLbtK7waPO6+J3QvvOy4ESU+FQBp4Iu3sLpZ/Mx6g==}
+  '@ngneat/helipopper@12.0.0':
+    resolution: {integrity: sha512-4gGixwoNVYYn8wvsEfBgua97DlCHpO+7ruNwo8xdiRyrK3hpGqJXYFN7fRH2KGzca6tWTujQ54zNHRd9sBNl2Q==}
     peerDependencies:
-      '@angular/core': '>=17.0.0'
+      '@angular/core': '>=20.0.0'
 
   '@ngneat/overview@6.1.2':
     resolution: {integrity: sha512-oqwbOqE6s7k0WocDwqhQ9NTjqgG/6fkfmzRSjba0/vsne4pKxTD5RxTdcYZA/o7Dvp1/DceX45G/ZRlyJeoqaA==}
@@ -10333,7 +10333,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.0
     optional: true
 
-  '@ngneat/helipopper@11.1.4(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))':
+  '@ngneat/helipopper@12.0.0(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))':
     dependencies:
       '@angular/core': 19.2.15(rxjs@7.8.2)(zone.js@0.15.1)
       '@ngneat/overview': 6.1.2(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
@@ -12131,7 +12131,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.6)
       postcss-modules-values: 4.0.0(postcss@8.5.6)
       postcss-value-parser: 4.2.0
-      semver: 7.7.1
+      semver: 7.7.2
     optionalDependencies:
       webpack: 5.98.0(esbuild@0.25.4)
 
@@ -12698,7 +12698,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.10
       '@esbuild/win32-ia32': 0.25.10
       '@esbuild/win32-x64': 0.25.10
-    optional: true
 
   esbuild@0.25.4:
     optionalDependencies:
@@ -15152,7 +15151,7 @@ snapshots:
       cosmiconfig: 9.0.0(typescript@5.8.3)
       jiti: 1.21.7
       postcss: 8.5.2
-      semver: 7.7.1
+      semver: 7.7.2
     optionalDependencies:
       webpack: 5.98.0(esbuild@0.25.4)
     transitivePeerDependencies:
@@ -16294,9 +16293,9 @@ snapshots:
 
   vite@6.2.7(@types/node@24.3.0)(jiti@1.21.7)(less@4.2.2)(sass@1.85.0)(terser@5.39.0):
     dependencies:
-      esbuild: 0.25.4
+      esbuild: 0.25.10
       postcss: 8.5.6
-      rollup: 4.34.8
+      rollup: 4.52.3
     optionalDependencies:
       '@types/node': 24.3.0
       fsevents: 2.3.3

@@ -34,7 +34,7 @@
         "@angular/platform-browser-dynamic": "^19.2.14",
         "@angular/router": "^19.2.14",
         "@mapbox/mapbox-gl-rtl-text": "^0.3.0",
-        "@ngneat/helipopper": "^11.0.0",
+        "@ngneat/helipopper": "^12.0.0",
         "@ngx-formly/core": "^6.3.12",
         "@ngx-formly/material": "^6.3.12",
         "@turf/area": "^7.2.0",
