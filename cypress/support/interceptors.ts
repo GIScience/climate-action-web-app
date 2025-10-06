@@ -386,7 +386,6 @@ export const mockPluginBlueprint = () => {
                     Mapping: {
                         properties: {
                             good: {
-                                default: 'John Doe',
                                 description: 'A good string.',
                                 examples: ['John Doe'],
                                 title: 'String for Good',
@@ -396,26 +395,20 @@ export const mockPluginBlueprint = () => {
                                 default: 2.1,
                                 description: 'A mediocre float.',
                                 examples: [2.1],
-                                maximum: 4.0,
+                                maximum: 4,
                                 minimum: 0.5,
                                 title: 'Mediocre Float',
                                 type: 'number'
                             },
                             bad: {
-                                anyOf: [
-                                    {
-                                        $ref: '#/$defs/Option'
-                                    },
-                                    {
-                                        type: 'null'
-                                    }
-                                ],
+                                $ref: '#/$defs/Option',
                                 default: 'Option 2',
                                 description: 'A bad selection.',
-                                examples: ['Option 2'],
+                                examples: ['Option 1'],
                                 title: 'Bad Selection'
                             }
                         },
+                        required: ['good'],
                         title: 'Mapping',
                         type: 'object'
                     },
@@ -426,124 +419,74 @@ export const mockPluginBlueprint = () => {
                     }
                 },
                 properties: {
-                    bool_blueprint: {
+                    bool_showcase: {
                         description: 'A required boolean parameter.',
                         examples: [true],
                         title: 'Boolean Input',
                         type: 'boolean'
                     },
-                    int_blueprint: {
-                        anyOf: [
-                            {
-                                exclusiveMaximum: 100,
-                                exclusiveMinimum: 0,
-                                type: 'integer'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    int_showcase: {
                         default: 3,
                         description: 'An optional integer parameter.',
                         examples: [3],
-                        title: 'Integer Input'
+                        exclusiveMaximum: 100,
+                        exclusiveMinimum: 0,
+                        title: 'Integer Input',
+                        type: 'integer'
                     },
-                    float_blueprint: {
-                        anyOf: [
-                            {
-                                maximum: 4.0,
-                                minimum: 0.5,
-                                type: 'number'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    float_showcase: {
                         default: 2.1,
                         description: 'An optional floating point parameter.',
                         examples: [2.1],
-                        title: 'Float Input'
+                        maximum: 4,
+                        minimum: 0.5,
+                        title: 'Float Input',
+                        type: 'number'
                     },
-                    string_blueprint: {
-                        anyOf: [
-                            {
-                                type: 'string'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    string_showcase: {
                         default: 'John Doe',
                         description: 'An optional string parameter.',
                         examples: ['John Doe'],
-                        title: 'String Input'
+                        title: 'String Input',
+                        type: 'string'
                     },
-                    date_blueprint: {
-                        anyOf: [
-                            {
-                                format: 'date',
-                                maximum: '2024-11-25',
-                                minimum: '2005-01-01',
-                                type: 'string'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    date_showcase: {
                         default: '2020-01-01',
                         description: 'An optional date parameter.',
                         examples: ['2020-01-01'],
-                        title: 'Date Input'
+                        format: 'date',
+                        title: 'Date Input',
+                        type: 'string'
                     },
-                    select_blueprint: {
-                        anyOf: [
-                            {
-                                $ref: '#/$defs/Option'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    select_showcase: {
+                        $ref: '#/$defs/Option',
                         default: 'Option 2',
                         description:
                             'An optional selection parameter. The user can choose one of the available options.',
                         examples: ['Option 2'],
                         title: 'Selection Input'
                     },
-                    select_multi_blueprint: {
-                        anyOf: [
-                            {
-                                items: {
-                                    $ref: '#/$defs/Option'
-                                },
-                                type: 'array'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    select_multi_showcase: {
                         default: ['Option 2'],
                         description:
                             'An optional selection parameter. The user can choose multiple of the available options.',
                         examples: [['Option 2']],
-                        title: 'Multi-Selection Input'
+                        items: {
+                            $ref: '#/$defs/Option'
+                        },
+                        title: 'Multi-Selection Input',
+                        type: 'array',
+                        uniqueItems: true
                     },
-                    mapping_blueprint: {
-                        anyOf: [
-                            {
-                                $ref: '#/$defs/Mapping'
-                            },
-                            {
-                                type: 'null'
-                            }
-                        ],
+                    mapping_showcase: {
+                        $ref: '#/$defs/Mapping',
                         default: {
                             good: 'John Doe',
                             mediocre: 2.1,
                             bad: 'Option 2'
                         },
                         description:
-                            'An optional mapping parameter. The user can define key->value pairs representing choices/options that values/results are mapped to.',
+                            'This input represents a custom grouping of input values. They will be shown together in the front-end and will get a dedicated title and description. You can use it e.g. to group input variables that correspond to the same aspect of your indicator.Alternatively it can be used as a mapping input where the user can define key->value pairs representing choices/options that values/results are mapped to. E.g. the user could be asked to provide a tier list for bikeable path categories.',
                         examples: [
                             {
                                 bad: 'Option 2',
@@ -551,42 +494,10 @@ export const mockPluginBlueprint = () => {
                                 mediocre: 2.1
                             }
                         ],
-                        title: 'Mapping Input'
-                    },
-                    aoi: {
-                        allOf: [
-                            {
-                                $ref: '#/$defs/Feature_MultiPolygon_AoiProperties_'
-                            }
-                        ],
-                        description: "The geographic area of interest for this plugin's indicator computation.",
-                        examples: [
-                            {
-                                geometry: {
-                                    coordinates: [
-                                        [
-                                            [
-                                                [12.3, 48.22],
-                                                [12.3, 48.34],
-                                                [12.48, 48.34],
-                                                [12.48, 48.22],
-                                                [12.3, 48.22]
-                                            ]
-                                        ]
-                                    ],
-                                    type: 'MultiPolygon'
-                                },
-                                properties: {
-                                    name: 'Heidelberg',
-                                    id: 'Q12345'
-                                },
-                                type: 'Feature'
-                            }
-                        ],
-                        title: 'Area of Interest'
+                        title: 'Grouping or Mapping Input'
                     }
                 },
-                required: ['bool_blueprint', 'aoi'],
+                required: ['bool_showcase'],
                 title: 'ComputeInput',
                 type: 'object'
             },

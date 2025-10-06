@@ -1,4 +1,9 @@
-import { mockPluginBluePrintIcon, mockPluginWalkabilitytIcon, mockPluginsList } from '../support/interceptors'
+import {
+    mockPluginBluePrintIcon,
+    mockPluginBlueprint,
+    mockPluginWalkabilitytIcon,
+    mockPluginsList
+} from '../support/interceptors'
 
 describe('pluginService', () => {
     it('fetch and display the plugin icon', () => {
@@ -20,6 +25,33 @@ describe('pluginService', () => {
                 .should('have.attr', 'src')
                 .and('not.include', 'fallback.jpg')
         )
+    })
+
+    it('read and render the operator schema correctly', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        cy.visit('/')
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.clickFakeUserButtonUntilGone()
+
+        cy.wait(500)
+
+        cy.get('button.new-compute').click()
+
+        cy.get('canvas.maplibregl-canvas').click(1000, 300)
+
+        cy.get('formly-form label.mdc-label').should('contain.text', 'Boolean Input')
+
+        cy.get('button.optional-attributes-button').click()
+
+        cy.get('.dialog-window input[type="number"]').should('exist')
     })
 
     // TODO: Restore once gateway is updated to report plugin status (https://gitlab.heigit.org/climate-action/api-gateway/-/issues/38)
