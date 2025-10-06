@@ -3,6 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ArtifactComponent } from './artifact.component'
 import { ArtifactService } from './artifact.service'
@@ -14,7 +15,13 @@ describe('ArtifactComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, ArtifactComponent, BrowserAnimationsModule, MarkdownComponent],
+            imports: [
+                HttpClientModule,
+                ArtifactComponent,
+                BrowserAnimationsModule,
+                MarkdownComponent,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ],
             providers: [
                 ArtifactService,
                 provideTippyLoader(() => import('tippy.js')),

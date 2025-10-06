@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { Source } from '@app/types/sources/sources.type'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
+import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { ChevronsDown, ChevronsUp, CircleX, CloudOff, DiamondPlus, LucideAngularModule } from 'lucide-angular'
@@ -28,7 +29,8 @@ import { PluginService } from './plugin.service'
         PluginParameterComponent,
         TippyDirective,
         NgScrollbarModule,
-        LucideAngularModule
+        LucideAngularModule,
+        TranslocoModule
     ],
     animations: [
         trigger('accordion', [

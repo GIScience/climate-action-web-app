@@ -1,10 +1,9 @@
 <div *ngIf="isMobile" class="mobile-warning">
     <div class="mobile-warning__content">
-        <h2>Mobile Device Detected</h2>
-        <p>
-            This website is currently not optimized for mobile devices. For the best experience, please visit from a
-            desktop computer.
-        </p>
-        <button type="button" class="btn-alt btn-withtext" (click)="dismissWarning()">I understand</button>
+        <h2>{{ 'mobileWarning.title' | transloco }}</h2>
+        <p>{{ 'mobileWarning.description' | transloco }}</p>
+        <button type="button" class="btn-alt btn-withtext" (click)="dismissWarning()">
+            {{ 'mobileWarning.understand' | transloco }}
+        </button>
     </div>
 </div>

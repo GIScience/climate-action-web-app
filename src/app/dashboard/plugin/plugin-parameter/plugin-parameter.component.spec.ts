@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { Plugin } from '@app/dashboard/plugin/plugin.interface'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
@@ -26,7 +27,24 @@ describe('PluginParameterComponent', () => {
                 MatExpansionModule,
                 PluginParameterComponent,
                 ReactiveFormsModule,
-                HttpClientModule
+                HttpClientModule,
+                TranslocoTestingModule.forRoot({
+                    langs: {
+                        en: {
+                            pluginParameter: {
+                                optionalAttributes: 'Optional Attributes',
+                                editAdditionalParameters: 'Edit additional parameters.'
+                            }
+                        },
+                        de: {
+                            pluginParameter: {
+                                optionalAttributes: 'Optional Attributes',
+                                editAdditionalParameters: 'Edit additional parameters.'
+                            }
+                        }
+                    },
+                    translocoConfig: { defaultLang: 'en', availableLangs: ['en', 'de'] }
+                })
             ],
             providers: [
                 { provide: ToastrService, useClass: MockToastrService },
@@ -137,8 +155,8 @@ describe('PluginParameterComponent', () => {
                         fieldGroup: [
                             {
                                 props: {
-                                    label: 'Optional Attributes',
-                                    description: 'Edit additional parameters.'
+                                    label: 'pluginParameter.optionalAttributes',
+                                    description: 'pluginParameter.editAdditionalParameters'
                                 },
                                 fieldGroup: [
                                     {
@@ -676,8 +694,8 @@ describe('PluginParameterComponent', () => {
                                 fieldGroup: [
                                     {
                                         props: {
-                                            label: 'Optional Attributes',
-                                            description: 'Edit additional parameters.'
+                                            label: 'pluginParameter.optionalAttributes',
+                                            description: 'pluginParameter.editAdditionalParameters'
                                         },
                                         fieldGroup: [
                                             {

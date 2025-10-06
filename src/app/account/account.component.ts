@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
+import { TranslocoModule } from '@jsverse/transloco'
 import { Models } from 'appwrite'
 import {
+    CircleUserRound,
     Footprints,
     LifeBuoy,
     LogIn,
     LogOut,
     LucideAngularModule,
     Percent,
-    SquareUserRound,
     TestTubeDiagonal,
     User
 } from 'lucide-angular'
@@ -20,7 +21,7 @@ import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-account',
-    imports: [CommonModule, LucideAngularModule],
+    imports: [CommonModule, LucideAngularModule, TranslocoModule],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
 })
@@ -31,7 +32,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     private closeTimeout: ReturnType<typeof setTimeout> | null = null
     readonly environment = environment
 
-    readonly SquareUserRound = SquareUserRound
+    readonly CircleUserRound = CircleUserRound
     readonly User = User
     readonly LogIn = LogIn
     readonly Percent = Percent

@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { MockToastrService } from '../../../jest.mocks'
@@ -29,7 +30,8 @@ describe('DashboardComponent', () => {
                 HttpClientModule,
                 ArtifactComponent,
                 PluginCatalogComponent,
-                RouterModule.forRoot([])
+                RouterModule.forRoot([]),
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
             ],
             providers: [
                 { provide: MapService, useValue: mockMapService },

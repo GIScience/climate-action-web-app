@@ -48,7 +48,7 @@ This is the repository of the frontend website of HeiGIT's [Climate Action](http
     - Edit `env.js` with your settings:
         - `ENVIRONMENT_TYPE`: Set to `'development'` for local development
         - `ORS_API_KEY`: Get an API key from [OpenRouteService (ORS)](https://openrouteservice.org/) for the Search function
-        - `CLIMATE_ACTION_API_URL`: Set to `'http://localhost/api/v1/gateway'` for local development with the backend
+        - `CLIMATE_ACTION_API_URL`: Set to `'api/v1/gateway'` for local development with the backend
         - Other values can typically use the defaults provided
 4. Run `pnpm dev` or `ng serve` to start the dev server
 5. Navigate to `http://localhost:4200/`

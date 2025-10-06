@@ -2,14 +2,23 @@ import { CommonModule } from '@angular/common'
 import { Component, Inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog'
-import { FormlyFieldConfig, FormlyField } from '@ngx-formly/core'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 
 @Component({
     selector: 'app-dialog-window',
-    imports: [CommonModule, FormlyField, MatDialogModule, MatButtonModule, LucideAngularModule, NgScrollbarModule],
+    imports: [
+        CommonModule,
+        FormlyField,
+        MatDialogModule,
+        MatButtonModule,
+        LucideAngularModule,
+        NgScrollbarModule,
+        TranslocoModule
+    ],
     templateUrl: './dialog-window.component.html',
     styleUrls: ['./dialog-window.component.scss']
 })
@@ -17,13 +26,14 @@ export class DialogWindowComponent {
     constructor(
         public dialogRef: MatDialogRef<DialogWindowComponent>,
         private toastr: ToastrService,
+        private translocoService: TranslocoService,
         @Inject(MAT_DIALOG_DATA) public data: FormlyFieldConfig
     ) {}
 
     readonly CircleX = CircleX
 
     closeDialog(): void {
-        if (confirm('Are you sure you want to close without saving? Values will be reset to their defaults.')) {
+        if (confirm(this.translocoService.translate('dialog.confirmClose'))) {
             this.resetDialog()
             this.dialogRef.close()
         }
@@ -31,14 +41,16 @@ export class DialogWindowComponent {
 
     saveDialog(): void {
         this.dialogRef.close()
-        this.toastr.success(`${this.data.props?.label} values have been saved.`, '', {
+        const translatedLabel = this.translocoService.translate(this.data.props?.label || '')
+        this.toastr.success(this.translocoService.translate('dialog.valuesSaved', { label: translatedLabel }), '', {
             timeOut: 4000
         })
     }
 
     resetDialog(): void {
         this.resetFieldGroup(this.data.fieldGroup || [])
-        this.toastr.info(`${this.data.props?.label} values have been reset to their defaults.`, '', {
+        const translatedLabel = this.translocoService.translate(this.data.props?.label || '')
+        this.toastr.info(this.translocoService.translate('dialog.valuesReset', { label: translatedLabel }), '', {
             timeOut: 4000
         })
     }

@@ -3,6 +3,7 @@ import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { Feature } from 'ol'
@@ -86,7 +87,8 @@ describe('ComputationsIndexComponent', () => {
                 ComputationsIndexComponent,
                 HttpClientTestingModule,
                 NoopAnimationsModule,
-                RouterModule.forRoot([])
+                RouterModule.forRoot([]),
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
             ],
             providers: [
                 { provide: PluginService, useValue: mockPluginService },

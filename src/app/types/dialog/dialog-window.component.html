@@ -1,16 +1,16 @@
 <div class="dialog-window">
-    <h2>{{ data.props?.label }}</h2>
+    <h2>{{ data.props?.label | transloco }}</h2>
     <button (click)="closeDialog()" class="close-dialog">
         <i-lucide [img]="CircleX" size="25"></i-lucide>
     </button>
     <ng-scrollbar orientation="vertical">
         <div class="optional-attributes">
-            <p *ngIf="data.props?.description">{{ data.props?.description }}</p>
+            <p *ngIf="data.props?.description">{{ data.props?.description | transloco }}</p>
             <formly-field [field]="data"></formly-field>
         </div>
     </ng-scrollbar>
     <div class="dialog-window-buttons">
-        <button (click)="saveDialog()" class="btn-alt btn-withtext">Save</button>
-        <button (click)="resetDialog()" class="btn-light btn-withtext">Reset</button>
+        <button (click)="saveDialog()" class="btn-alt btn-withtext">{{ 'dialog.save' | transloco }}</button>
+        <button (click)="resetDialog()" class="btn-light btn-withtext">{{ 'dialog.reset' | transloco }}</button>
     </div>
 </div>

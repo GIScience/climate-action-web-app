@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
+import { TranslocoService } from '@jsverse/transloco'
 import { Driver, driver } from 'driver.js'
+import { firstValueFrom, take } from 'rxjs'
 import { AppwriteService } from '../../auth/appwrite.service'
 import { StorageService } from '../../storage.service'
 import { DashboardService } from '../dashboard.service'
@@ -12,60 +14,22 @@ import { ExtendedDriveStep } from './tour.interfaces'
     providedIn: 'root'
 })
 export class TourEngine {
-    private driverObj: Driver
+    private driverObj: Driver | null = null
     private currentSteps: ExtendedDriveStep[] = []
+    private driverInitPromise: Promise<void>
 
     constructor(
         private dashboardService: DashboardService,
         private appwriteService: AppwriteService,
         private dialog: MatDialog,
         private tourStepsService: TourStepsService,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private translocoService: TranslocoService
     ) {
-        this.driverObj = driver({
-            showProgress: true,
-            animate: true,
-            showButtons: ['next', 'previous', 'close'],
-            prevBtnText: '↺ Restart',
-            doneBtnText: 'Close',
-            steps: [],
-            overlayOpacity: 0.3,
-            onDestroyStarted: () => {
-                if (
-                    !this.driverObj.hasNextStep() ||
-                    confirm(
-                        'Are you sure you want to exit the walkthrough? You can always restart it from the Account menu.'
-                    )
-                ) {
-                    this.driverObj.destroy()
-                }
-            },
-            onDestroyed: () => {
-                this.tourStepsService.cleanupEventHandlers()
-            },
-            onPrevClick: () => {
-                this.tourStepsService.cleanupEventHandlers()
-                this.dashboardService.clearDashboardState()
-                this.driverObj.drive(0)
-            },
-            onNextClick: () => {
-                if (!this.driverObj.hasNextStep()) {
-                    this.driverObj.destroy()
-                } else {
-                    const currentStepIndex = this.driverObj.getActiveIndex()
-                    if (currentStepIndex !== undefined && currentStepIndex < this.currentSteps.length) {
-                        this.currentSteps[currentStepIndex]?.onNextClicked?.()
-                    }
-                }
-            }
+        this.driverInitPromise = this.loadDriver()
+        this.translocoService.langChanges$.subscribe(lang => {
+            this.driverInitPromise = this.loadDriver(lang)
         })
-    }
-
-    startTour(steps: ExtendedDriveStep[]) {
-        this.currentSteps = steps
-        this.driverObj.setSteps(steps)
-        this.tourStepsService.setNextStepCallback(() => this.driverObj.moveNext())
-        this.driverObj.drive()
     }
 
     async initializeTour() {
@@ -77,7 +41,7 @@ export class TourEngine {
             if (this.storageService.getPendingTourState()) {
                 this.storageService.clearTourAfterLoginFlag()
             }
-            this.startFullTour()
+            await this.startFullTour()
         }
     }
 
@@ -88,7 +52,7 @@ export class TourEngine {
 
             if (getPendingTourState && isAuthenticated) {
                 this.storageService.clearTourAfterLoginFlag()
-                this.startFullTour()
+                await this.startFullTour()
             }
         }, 1000)
     }
@@ -114,7 +78,7 @@ export class TourEngine {
                     this.storageService.setTourAfterLoginFlag(true)
                     break
                 case TourChoice.GUEST_TOUR:
-                    this.startGuestTour()
+                    void this.startGuestTour()
                     break
                 case TourChoice.CANCEL:
                 default:
@@ -123,13 +87,107 @@ export class TourEngine {
         })
     }
 
-    private startFullTour() {
+    private async startFullTour() {
         const mainTourSteps = this.tourStepsService.getFullTourSteps()
-        this.startTour(mainTourSteps)
+        await this.startTour(mainTourSteps)
     }
 
-    private startGuestTour() {
+    private async startGuestTour() {
         const guestTourSteps = this.tourStepsService.getGuestTourSteps()
-        this.startTour(guestTourSteps)
+        await this.startTour(guestTourSteps)
+    }
+
+    private async startTour(steps: ExtendedDriveStep[]) {
+        await this.ensureDriverReady()
+        if (!this.driverObj) {
+            console.error('Tour driver failed to initialise')
+            return
+        }
+
+        this.currentSteps = steps
+        this.driverObj.setSteps(steps)
+        this.tourStepsService.setNextStepCallback(() => this.driverObj?.moveNext())
+        this.driverObj.drive()
+    }
+
+    private async ensureDriverReady(): Promise<void> {
+        if (!this.driverInitPromise) {
+            this.driverInitPromise = this.loadDriver()
+        }
+
+        await this.driverInitPromise
+    }
+
+    private async loadDriver(lang = this.translocoService.getActiveLang()): Promise<void> {
+        try {
+            const translations = await firstValueFrom(
+                this.translocoService
+                    .selectTranslateObject<{
+                        prevButton: string
+                        closeButton: string
+                        exitConfirmation: string
+                    }>('walkthrough.tourEngine', {}, lang)
+                    .pipe(take(1))
+            )
+            this.configureDriver(translations)
+        } catch (error) {
+            console.warn(`Failed to load tour translations for lang ${lang}`, error)
+            this.configureDriver({
+                prevButton: this.translocoService.translate('walkthrough.tourEngine.prevButton', {}, lang),
+                closeButton: this.translocoService.translate('walkthrough.tourEngine.closeButton', {}, lang),
+                exitConfirmation: this.translocoService.translate('walkthrough.tourEngine.exitConfirmation', {}, lang)
+            })
+        }
+    }
+
+    private configureDriver(translations: { prevButton: string; closeButton: string; exitConfirmation: string }) {
+        const exitConfirmation = translations.exitConfirmation
+
+        this.driverObj = driver({
+            showProgress: true,
+            animate: true,
+            showButtons: ['next', 'previous', 'close'],
+            prevBtnText: translations.prevButton,
+            doneBtnText: translations.closeButton,
+            steps: [],
+            overlayOpacity: 0.3,
+            onDestroyStarted: () => {
+                const instance = this.driverObj
+                if (!instance) {
+                    return
+                }
+
+                if (!instance.hasNextStep() || confirm(exitConfirmation)) {
+                    instance.destroy()
+                }
+            },
+            onDestroyed: () => {
+                this.tourStepsService.cleanupEventHandlers()
+            },
+            onPrevClick: () => {
+                this.tourStepsService.cleanupEventHandlers()
+                this.dashboardService.clearDashboardState()
+                this.driverObj?.drive(0)
+            },
+            onNextClick: () => {
+                const instance = this.driverObj
+                if (!instance) {
+                    return
+                }
+
+                if (!instance.hasNextStep()) {
+                    instance.destroy()
+                } else {
+                    const currentStepIndex = instance.getActiveIndex()
+                    if (currentStepIndex !== undefined && currentStepIndex < this.currentSteps.length) {
+                        this.currentSteps[currentStepIndex]?.onNextClicked?.()
+                    }
+                }
+            }
+        })
+
+        if (this.currentSteps.length) {
+            this.driverObj.setSteps(this.currentSteps)
+        }
     }
 }

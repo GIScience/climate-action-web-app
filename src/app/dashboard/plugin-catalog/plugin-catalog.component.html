@@ -1,7 +1,7 @@
 <div class="plugin-catalog" [ngClass]="{ 'is-loading': loading }">
     <input id="catalog-toggle" type="checkbox" #catalogToggle checked="checked" />
     <div id="catalog-header">
-        <h3 class="plugin-title">Assessment Tools</h3>
+        <h3 class="plugin-title">{{ 'pluginCatalog.title' | transloco }}</h3>
         <label for="catalog-toggle">
             <span id="catalog-toggle-burger"></span>
         </label>
@@ -14,7 +14,7 @@
                         <img src="assets/images/plugin-icons/loading.png" alt="Loading..." />
                     </div>
                     <div class="plugin-card__text">
-                        <h3>Loading...</h3>
+                        <h3>{{ 'pluginCatalog.loading' | transloco }}</h3>
                         <span>N/A</span>
                     </div>
                 </li>

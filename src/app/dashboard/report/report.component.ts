@@ -2,8 +2,9 @@ import { animate, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
-import { Router } from '@angular/router'
 import { MatIconModule } from '@angular/material/icon'
+import { Router } from '@angular/router'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
@@ -19,7 +20,15 @@ import { ReportService } from './report.service'
 
 @Component({
     selector: 'app-report',
-    imports: [CommonModule, ArtifactComponent, MatIconModule, LucideAngularModule, NgScrollbarModule, TippyDirective],
+    imports: [
+        CommonModule,
+        ArtifactComponent,
+        MatIconModule,
+        LucideAngularModule,
+        NgScrollbarModule,
+        TippyDirective,
+        TranslocoModule
+    ],
     templateUrl: './report.component.html',
     styleUrls: ['./report.component.scss'],
     animations: [
@@ -59,7 +68,8 @@ export class ReportComponent implements OnInit {
         private http: HttpClient,
         private storageService: StorageService,
         private ExportPDFService: ExportPDFService,
-        private router: Router
+        private router: Router,
+        private translocoService: TranslocoService
     ) {}
 
     ngOnInit(): void {
@@ -74,7 +84,13 @@ export class ReportComponent implements OnInit {
 
             addedArtifacts.forEach(artifact => {
                 if (this.reportService.isMapArtifact(artifact) && !this.mapServices.has(artifact.store_id)) {
-                    const mapService = new MapService(this.pluginService, this.http, this.storageService, this.router)
+                    const mapService = new MapService(
+                        this.pluginService,
+                        this.http,
+                        this.storageService,
+                        this.translocoService,
+                        this.router
+                    )
                     this.mapServices.set(artifact.store_id, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)

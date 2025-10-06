@@ -7,6 +7,7 @@ import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/com
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { FormlyFieldConfig, FormlyForm, FormlyFormOptions } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
@@ -44,7 +45,8 @@ import { FormlyModel } from './plugin-parameter.interface'
         LucideAngularModule,
         CommonModule,
         NgScrollbarModule,
-        TippyDirective
+        TippyDirective,
+        TranslocoModule
     ],
     encapsulation: ViewEncapsulation.None
 })
@@ -82,7 +84,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         public mapService: MapService,
         private cdr: ChangeDetectorRef,
         private formlyJsonschema: FormlyJsonschema,
-        private appwriteService: AppwriteService
+        private appwriteService: AppwriteService,
+        private translocoService: TranslocoService
     ) {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.selectedOlFeatures.on('change:length', handler)
@@ -130,7 +133,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         if (this.currentSelectionMode !== 'Boundary') {
             this.mapService.startDrawing(this.currentSelectionMode)
         }
-        this.toastr.info('All selections have been cleared.', '', {
+        this.toastr.info(this.translocoService.translate('pluginParameter.allSelectionsCleared'), '', {
             timeOut: 4000
         })
     }
@@ -172,8 +175,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                     fieldGroup: [
                         {
                             props: {
-                                label: 'Optional Attributes',
-                                description: 'Edit additional parameters.'
+                                label: 'pluginParameter.optionalAttributes',
+                                description: 'pluginParameter.editAdditionalParameters'
                             },
                             fieldGroup: optionalSubgroup
                         }
@@ -204,12 +207,13 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
         if (this.currentSelectionMode !== 'Boundary' && aoi?.properties) {
-            aoi.properties['name'] = this.areaLabelControl.value || 'Custom Area'
+            aoi.properties['name'] =
+                this.areaLabelControl.value || this.translocoService.translate('pluginParameter.customArea')
         }
         const aoiName = aoi?.properties?.['name']
 
         if (!aoi) {
-            this.toastr.warning('Please select an area on the map first.', '', {
+            this.toastr.warning(this.translocoService.translate('pluginParameter.pleaseSelectArea'), '', {
                 timeOut: 4000
             })
             return
@@ -239,24 +243,20 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 this.pluginService.triggerSyncTasks()
                 this.pluginService.setComputeState('inactive')
 
-                this.toastr.info(
-                    'This may take up to 60 minutes to complete, depending on the area size and complexity. Feel free to navigate away and check back later.',
-                    'Compute request sent!',
-                    {
-                        timeOut: 7000
-                    }
-                )
+                this.toastr.info(this.translocoService.translate('pluginParameter.computeRequestSent'), '', {
+                    timeOut: 7000
+                })
             },
             error: error => {
                 switch (error.status) {
                     case 401:
-                        this.toastr.error('Please ensure that you are logged in and have verified your email.', '', {
+                        this.toastr.error(this.translocoService.translate('pluginParameter.pleaseEnsureLoggedIn'), '', {
                             timeOut: 7000
                         })
                         break
                     case 403:
                         this.toastr.error(
-                            'There is an issue with your account. Please contact support via the Account menu.',
+                            this.translocoService.translate('pluginParameter.thereIsAnIssueWithYourAccount'),
                             '',
                             {
                                 timeOut: 7000
@@ -265,7 +265,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                         break
                     case 422:
                         this.toastr.error(
-                            'There is an issue with your selected area. Please try another area or contact support via the Account menu.',
+                            this.translocoService.translate('pluginParameter.thereIsAnIssueWithYourSelectedArea'),
                             '',
                             {
                                 timeOut: 7000
@@ -274,7 +274,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                         break
                     case 429:
                         this.toastr.error(
-                            'You have reached the maximum number of requests. Please try after a few minutes.',
+                            this.translocoService.translate('pluginParameter.youHaveReachedTheMaximumNumberOfRequests'),
                             '',
                             {
                                 timeOut: 7000
@@ -282,9 +282,13 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                         )
                         break
                     default:
-                        this.toastr.error('Error while submitting your request. Please try again.', '', {
-                            timeOut: 7000
-                        })
+                        this.toastr.error(
+                            this.translocoService.translate('pluginParameter.errorWhileSubmittingYourRequest'),
+                            '',
+                            {
+                                timeOut: 7000
+                            }
+                        )
                         break
                 }
             }

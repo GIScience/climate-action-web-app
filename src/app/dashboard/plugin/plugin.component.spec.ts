@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
 import { HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
 import { PluginComponent } from './plugin.component'
 import { Plugin } from './plugin.interface'
@@ -57,7 +57,13 @@ describe('PluginComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, PluginComponent, PluginCatalogComponent, RouterModule.forRoot([])]
+            imports: [
+                HttpClientModule,
+                PluginComponent,
+                PluginCatalogComponent,
+                RouterModule.forRoot([]),
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ]
         })
         fixture = TestBed.createComponent(PluginComponent)
         component = fixture.componentInstance

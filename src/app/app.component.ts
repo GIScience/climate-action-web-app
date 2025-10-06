@@ -6,6 +6,7 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
 import { RouterLink, RouterOutlet } from '@angular/router'
+import { TranslocoModule } from '@jsverse/transloco'
 import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
@@ -15,6 +16,7 @@ import { default as packageInfo } from '../../package.json'
 import { AccountComponent } from './account/account.component'
 import { DashboardService } from './dashboard/dashboard.service'
 import { TourEngine } from './dashboard/walkthrough/tour-engine.service'
+import { LanguageComponent } from './language/language.component'
 import { MigrationService } from './migration.service'
 import { MobileWarningComponent } from './mobile-warning/mobile-warning.component'
 
@@ -35,10 +37,12 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         MobileWarningComponent,
         MatDialogModule,
         AccountComponent,
+        LanguageComponent,
         FormlyModule,
         FormlyMatDatepickerModule,
         MarkdownModule,
-        LucideAngularModule
+        LucideAngularModule,
+        TranslocoModule
     ]
 })
 export class AppComponent implements AfterViewInit {

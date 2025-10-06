@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
 import { AppwriteService } from '../auth/appwrite.service'
@@ -45,7 +46,10 @@ describe('AccountComponent', () => {
         }
 
         await TestBed.configureTestingModule({
-            imports: [AccountComponent],
+            imports: [
+                AccountComponent,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ],
             providers: [
                 { provide: AppwriteService, useValue: appwriteService },
                 { provide: DashboardService, useValue: dashboardService },

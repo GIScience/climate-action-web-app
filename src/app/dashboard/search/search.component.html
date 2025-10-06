@@ -4,14 +4,14 @@
             class="search-locations"
             name="search-locations"
             type="search"
-            placeholder="Search..."
+            [placeholder]="'search.placeholder' | transloco"
             [formControl]="searchControl"
             (focus)="onInputFocus()"
             (blur)="onInputBlur()"
             (keydown.enter)="onInputEnter(); $event.preventDefault()"
             spellcheck="false" />
         <button class="clear-search" (click)="clearSearch()">
-            <i-lucide [img]="CircleX" size="20" title="Clear Search"></i-lucide>
+            <i-lucide [img]="CircleX" size="20" [title]="'search.clearSearch' | transloco"></i-lucide>
         </button>
     </form>
 
@@ -26,7 +26,10 @@
                 (focus)="this.mapService.addMarker(suggestion)"
                 tabindex="0">
                 <span
-                    [innerHTML]="suggestion.properties.name || 'Unknown location' | highlight: searchControl.value"
+                    [innerHTML]="
+                        suggestion.properties.name || ('search.unknownLocation' | transloco)
+                            | highlight: searchControl.value
+                    "
                     class="suggestion__title"></span
                 ><br />
                 <span class="suggestion__subtitle">{{ formatLocation(suggestion) }}</span>
@@ -36,6 +39,6 @@
     <div
         class="location-suggestions location-suggestions--empty"
         *ngIf="suggestions.length === 0 && !isSearchInputEmpty && !isFetchingSuggestions && isInputFocused">
-        <p>No suggestions found</p>
+        <p>{{ 'search.noSuggestions' | transloco }}</p>
     </div>
 </div>

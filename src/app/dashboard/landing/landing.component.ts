@@ -2,13 +2,14 @@ import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
+import { TranslocoModule } from '@jsverse/transloco'
 import { StorageService } from '../../storage.service'
 import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
 import { TourEngine } from '../walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-landing',
-    imports: [CommonModule, RouterModule, NgOptimizedImage],
+    imports: [CommonModule, RouterModule, NgOptimizedImage, TranslocoModule],
     templateUrl: './landing.component.html',
     styleUrl: './landing.component.scss'
 })

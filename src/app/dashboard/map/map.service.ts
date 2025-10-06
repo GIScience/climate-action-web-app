@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable, Optional } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
 import { StorageService } from '@app/storage.service'
+import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type {
@@ -138,6 +139,7 @@ export class MapService {
         private pluginService: PluginService,
         private http: HttpClient,
         public storageService: StorageService,
+        private translocoService: TranslocoService,
         @Optional() private router?: Router,
         @Optional() private mapDrawingService?: MapDrawingService
     ) {
@@ -1026,6 +1028,7 @@ export class MapService {
         this.layerSwitcherControl = MapControlsUtils.createLayerSwitcherControl(
             styles,
             this.currentBasemapStyle,
+            this.translocoService,
             (styleName: string) => {
                 if (this.mapDrawingService?.clearTerraDrawAfterStyleChange) {
                     this.mapDrawingService.clearTerraDrawAfterStyleChange()

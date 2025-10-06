@@ -1,0 +1,26 @@
+<div class="language-container">
+    <div class="language-dropdown">
+        <button class="language-button" (click)="toggleLanguageMenu()">
+            <i-lucide [img]="Languages" size="17.5" color="#008080"></i-lucide>
+            <span class="current-lang">{{ currentLang.toUpperCase() }}</span>
+        </button>
+        <div
+            class="language-menu"
+            [class.show]="languageMenuOpen"
+            (mouseleave)="closeLanguageMenu()"
+            (mouseenter)="cancelLanguageMenuClose()">
+            <button
+                class="language-menu__item"
+                [class.active]="currentLang === supportedLanguages.EN"
+                (click)="selectLanguage(supportedLanguages.EN)">
+                EN - {{ 'app.language.english' | transloco }}
+            </button>
+            <button
+                class="language-menu__item"
+                [class.active]="currentLang === supportedLanguages.DE"
+                (click)="selectLanguage(supportedLanguages.DE)">
+                DE - {{ 'app.language.german' | transloco }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -40,10 +40,10 @@
                         'btn-small btn-alt btn-withtext': isReportVisible
                     }"
                     (click)="addToReport(artifact)"
-                    tp="Add to Report"
+                    [tp]="'computation.addToReport' | transloco"
                     tpPlacement="left">
                     <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
-                    <span *ngIf="isReportVisible">Add »</span>
+                    <span *ngIf="isReportVisible">{{ 'computation.add' | transloco }}</span>
                 </button>
                 <div *ngIf="artifact.isLoading" class="loading-circle"></div>
             </li>
@@ -51,6 +51,6 @@
     </ul>
 
     <div *ngIf="computation.artifacts.length === 0" class="no-results-message">
-        This run created no results. If you think that is an error, please contact the plugin developers.
+        {{ 'computation.noResults' | transloco }}
     </div>
 </div>

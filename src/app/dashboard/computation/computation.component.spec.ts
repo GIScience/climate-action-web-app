@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, flush, tick
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
@@ -69,7 +70,12 @@ describe('ComputationComponent', () => {
         }
 
         await TestBed.configureTestingModule({
-            imports: [ComputationsIndexComponent, NoopAnimationsModule, HttpClientModule],
+            imports: [
+                ComputationsIndexComponent,
+                NoopAnimationsModule,
+                HttpClientModule,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ],
             providers: [
                 { provide: PluginService, useValue: mockPluginService },
                 { provide: StorageService, useValue: mockStorageService },

@@ -1,8 +1,8 @@
-@use "sass:color";
-@use "../settings/baseColors";
-@use "../settings/breakpoints";
-@use "../tools/mixins/mediaQueriesRanges";
-@use "../tools/mixins/placeholder";
+@use 'sass:color';
+@use '../settings/baseColors';
+@use '../settings/breakpoints';
+@use '../tools/mixins/mediaQueriesRanges';
+@use '../tools/mixins/placeholder';
 
 header {
     width: 100vw;
@@ -30,9 +30,12 @@ header {
             margin-bottom: 2.5px;
         }
 
-        app-account {
+        .header-right {
+            align-items: center;
+            display: flex;
             flex-basis: 0;
             flex-grow: 1;
+            justify-content: flex-end;
         }
     }
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
@@ -26,6 +27,7 @@ export class StorageService {
         PLUGIN_RUNS: 'plugin_runs',
         ACTIVE_ARTIFACT: 'active_artifact',
         MAP_PREFERENCES: 'map_prefs',
+        LANGUAGE_PREFERENCE: 'language_pref',
         TOUR_AFTER_LOGIN: 'start_tour_after_login'
     }
 
@@ -379,5 +381,16 @@ export class StorageService {
 
     clearTourAfterLoginFlag(): void {
         this.setItem(this.STORAGE_KEYS.TOUR_AFTER_LOGIN, false)
+    }
+
+    // Language preferences
+
+    getLanguagePreference(): SupportedLanguage | null {
+        const savedLang = this.getItem<string | null>(this.STORAGE_KEYS.LANGUAGE_PREFERENCE, null)
+        return savedLang && isValidLanguage(savedLang) ? savedLang : null
+    }
+
+    saveLanguagePreference(language: SupportedLanguage): void {
+        this.setItem(this.STORAGE_KEYS.LANGUAGE_PREFERENCE, language)
     }
 }

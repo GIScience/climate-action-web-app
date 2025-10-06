@@ -19,7 +19,10 @@
                 tabindex="0"
                 (click)="clearDashboardState()"
                 (keyup.enter)="clearDashboardState()" />
-            <app-account></app-account>
+            <div class="header-right">
+                <app-account></app-account>
+                <app-language></app-language>
+            </div>
         </div>
     </header>
 
@@ -29,16 +32,29 @@
 
     <footer class="footer ta-c fsz-sm c-grey-600">
         <span class="about-info">
-            <span>© {{ currentYear() }} HeiGIT gGmbH</span> |
-            <strong><a href="https://heigit.org/climate-action/" target="_blank">About Climate Action</a></strong> |
-            <a href="mailto:climateactionnavigator@heigit.org" target="_blank">Partner with us</a> |
-            <a href="https://heigit.org/imprint" target="_blank">Imprint</a> |
-            <a href="https://heigit.org/privacy-policy" target="_blank">Privacy Policy</a> |
-            <a href="https://heigit.org/climate-action-navigator-faq/" target="_blank">FAQs</a>
+            <span>{{ 'app.footer.copyright' | transloco: { year: currentYear() } }}</span> |
+            <strong
+                ><a href="https://heigit.org/climate-action/" target="_blank">{{
+                    'app.footer.aboutClimateAction' | transloco
+                }}</a></strong
+            >
+            |
+            <a href="mailto:climateactionnavigator@heigit.org" target="_blank">{{
+                'app.footer.partnerWithUs' | transloco
+            }}</a>
+            | <a href="https://heigit.org/imprint" target="_blank">{{ 'app.footer.imprint' | transloco }}</a> |
+            <a href="https://heigit.org/privacy-policy" target="_blank">{{ 'app.footer.privacyPolicy' | transloco }}</a>
+            |
+            <a href="https://heigit.org/climate-action-navigator-faq/" target="_blank">{{
+                'app.footer.faqs' | transloco
+            }}</a>
         </span>
         <span class="contact-info">
-            <span>Version: {{ version }}</span> | <a href="https://icons8.com/" target="_blank">Icons by Icons8</a> |
-            <a href="https://www.openstreetmap.org/fixthemap" target="_blank">Report a problem with the map</a>
+            <span>{{ 'app.footer.version' | transloco: { version: version } }}</span> |
+            <a href="https://icons8.com/" target="_blank">{{ 'app.footer.iconsByIcons8' | transloco }}</a> |
+            <a href="https://www.openstreetmap.org/fixthemap" target="_blank">{{
+                'app.footer.reportMapProblem' | transloco
+            }}</a>
         </span>
     </footer>
     <app-mobile-warning></app-mobile-warning>
