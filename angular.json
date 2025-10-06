@@ -40,7 +40,7 @@
                             "node_modules/ngx-toastr/toastr.css",
                             "src/styles.scss"
                         ],
-                        "scripts": ["node_modules/marked/marked.min.js", "src/assets/scripts/js-colormaps.js"],
+                        "scripts": ["node_modules/marked/lib/marked.umd.js", "src/assets/scripts/js-colormaps.js"],
                         "stylePreprocessorOptions": {
                             "includePaths": ["src/assets/styles"]
                         },

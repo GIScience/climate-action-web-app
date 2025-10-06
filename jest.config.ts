@@ -13,7 +13,7 @@ const config: Config = {
         '^src/environments/environment$': '<rootDir>/src/environments/environment.ts'
     },
     transformIgnorePatterns: [
-        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|rxjs|@babel|@kurkle|chart.js|@types/jest|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|@angular/material|ngx-markdown|ngx-toastr))'
+        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|rxjs|@babel|@kurkle|chart.js|@types/jest|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|@angular/material|ngx-markdown|ngx-toastr|marked))'
     ],
     transform: {
         '^.+\\.(ts|js|html)$': [
