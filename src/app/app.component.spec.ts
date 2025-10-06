@@ -2,6 +2,9 @@ import { HttpClientModule } from '@angular/common/http'
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
+import { TranslocoTestingModule } from '@jsverse/transloco'
+import { ToastrService } from 'ngx-toastr'
+import { MockToastrService } from '../../jest.mocks'
 import { AppComponent } from './app.component'
 import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
 import { MapService } from './dashboard/map/map.service'
@@ -53,12 +56,18 @@ describe('AppComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule, AppComponent],
+            imports: [
+                HttpClientModule,
+                RouterTestingModule,
+                AppComponent,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 { provide: ArtifactViewerService, useValue: mockArtifactViewerService },
                 { provide: MapService, useValue: mockMapService },
-                { provide: ReportService, useValue: mockReportService }
+                { provide: ReportService, useValue: mockReportService },
+                { provide: ToastrService, useClass: MockToastrService }
             ]
         }).compileComponents()
 

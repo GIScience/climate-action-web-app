@@ -1,0 +1,260 @@
+{
+    "landing": {
+        "revisit": {
+            "totalComputations": "Du hast {count, plural, =0 {leider noch keine Ergebnisse} one {bereits 1 Ergebnis} other {bereits # Ergebnisse}}.",
+            "latestComputation": "Sieh dir deine neuste Berechnung an:"
+        },
+        "loading": "Lade...",
+        "welcome": {
+            "title": "Willkommen beim Klimaschutznavigator (CAN)",
+            "description": "Der CAN ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen. Er stellt hochaufgelöste Daten und Analysen für wichtige Klimaschutzindikatoren, wie beispielsweise Heizungsemissionen oder zur Fußläufigkeit, bereit, die dir helfen die Stärken, aber auch die Verbesserungspotentiale deiner Stadt oder Region zu identifizieren."
+        },
+        "notes": {
+            "title": "Bevor du beginnst ein paar Hinweise:",
+            "onDemand": "Die CAN Berechnungen werden <strong>auf Anfrage</strong> erstellt. Dies reduziert den Energieverbrauch, heißt aber auch, dass Analysen in manchen Fällen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben.",
+            "urbanAreas": "Unsere Module sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von Nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
+            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Module <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb könnte es Vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
+            "worksInProgress": "Alle Module und Analysen im CAN sind in <strong>aktiver Entwicklung</strong> und werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
+        },
+        "cta": {
+            "startExploring": "Analysiere jetzt deine Region und Entdecke neues zum Thema Klimaschutz.",
+            "selectTool": "Starte, indem du ein Analysemodul aus der Seitenleiste links auswählst.",
+            "or": "ODER",
+            "guidedWalkthrough": "Starte das Tutorial"
+        }
+    },
+    "pluginCatalog": {
+        "title": "Module",
+        "loading": "Lade..."
+    },
+    "plugin": {
+        "loading": "Lade...",
+        "readMore": "Weitere Informationen",
+        "showLess": "Einklappen",
+        "methodology": "Methoden »",
+        "credits": "Autoren »",
+        "computations": "Ergebnisse",
+        "newComputation": "Neue Berechnung",
+        "loginToCompute": "Bitte melde dich an, um eine Berechnung zu starten.",
+        "computePanel": "Berechnung konfigurieren",
+        "computeStart": "Berechnung starten",
+        "cancel": "Abbrechen",
+        "dialog": {
+            "methodology": "Methoden",
+            "sources": "Quellen",
+            "credits": "Autoren"
+        }
+    },
+    "computationsIndex": {
+        "reportBuilder": "Bericht erstellen",
+        "exitReportBuilder": "Bericht schließen",
+        "archive": "Archiv",
+        "backToAll": "Zurück zu deinen Ergebnissen",
+        "createReport": "Erstelle eine PDF-Zusammenfassung, indem du verschiedene Ergebnisse kombinierst.",
+        "viewArchived": "Archivierte Ergebnisse anzeigen",
+        "noComputations": "Du hast noch keine Ergebnisse.",
+        "loadMore": "Weitere Ergebnisse laden",
+        "loadingMore": "Lade weitere Ergebnisse ...",
+        "archived": "Archiv",
+        "noArchived": "Du hast noch keine archivierten Ergebnisse.",
+        "loadingMoreArchived": "Lade weitere archivierte Ergebnisse.",
+        "status": {
+            "queued": "In der Warteschlange",
+            "running": "Berechne",
+            "done": "Fertig"
+        },
+        "actions": {
+            "share": "Ergebnis teilen",
+            "viewParameters": "Einstellungen anzeigen",
+            "archive": "Ergebnis archivieren",
+            "unarchive": "Ergebnis wiederherstellen",
+            "delete": "Ergebnis löschen"
+        },
+        "login": {
+            "prompt": "Möchtest du lieber deine eigenen Ergebnisse erstellen?",
+            "action": "Anmelden",
+            "suffix": "um fortzufahren."
+        },
+        "imported": "Ergebnis importiert",
+        "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
+        "parameters": {
+            "title": "Einstellungen",
+            "noParams": "Es wurden keine Einstellungsparameter angegeben."
+        },
+        "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen. Dies kann nicht rückgängig gemacht werden.",
+        "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden",
+        "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert",
+        "errorImportingComputation": "Es gab einen Fehler beim importieren des Ergebnisses"
+    },
+    "computation": {
+        "addToReport": "Zum Bericht hinzufügen",
+        "add": "Hinzufügen »",
+        "noResults": "Bei dieser Berechnung wurden keine Resultate produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Modulautoren",
+        "pleaseExitReportBuilder": "Bitte schließe zuerst den Bericht-Modus, oder füge das Ergebnis zum Bericht hinzu."
+    },
+    "artifactViewer": {
+        "download": "Ergebnis herunterladen",
+        "maximize": "Vergrößern",
+        "minimize": "Verkleinern",
+        "close": "Schließen"
+    },
+    "artifact": {
+        "abstract": "Zusammenfassung",
+        "detailedDescription": "Detaillierte Beschreibung"
+    },
+    "report": {
+        "title": "Bericht",
+        "exportToPDF": "Als PDF exportieren",
+        "removeAll": "Alle entfernen",
+        "exitBuilder": "Bericht schließen",
+        "itemsCounter": "{{ count }}/{{ max }} Ergebnisse",
+        "emptyMessage": "Wähle \"Hinzufügen »\" an einem beliebigen Ergebnis einer Analyse, um es dem Bericht beizufügen.",
+        "mapZoomNote": "Verwende + / - um die Kartenansicht zu vergrößern oder zu verkleinern",
+        "artifactAlreadyInReport": "Dieses Ergebnis ist bereits im Bericht enthalten.",
+        "maximumArtifactsAllowed": "Es sind nur vier Ergebnisse pro Bericht erlaubt. Bitte entferne zuerst ein Ergebnis aus dem Bericht, bevor du ein neues hinzufügst.",
+        "exportingPdf": "Der PDF-Bericht wird vorbereitet, bitte habe einen Moment Geduld...",
+        "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Berichts. Bitte versuche es noch einmal."
+    },
+    "search": {
+        "placeholder": "Suche...",
+        "clearSearch": "Suche zurücksetzen",
+        "unknownLocation": "Unbekannter Ort",
+        "noSuggestions": "Die Suche ergab keine Treffer"
+    },
+    "mobileWarning": {
+        "title": "Mobiles Endgerät erkannt",
+        "description": "Diese Website ist momentan nicht für mobile Endgeräte und kleine Bildschirmgrößen optimiert. Bitte verwende ein anderes Gerät für eine angenehmere Nutzungserfahrung.",
+        "understand": "Trotzdem fortfahren"
+    },
+    "app": {
+        "footer": {
+            "copyright": "© {{ year }} HeiGIT gGmbH",
+            "aboutClimateAction": "Über das Climate Action Projekt",
+            "partnerWithUs": "Werde unser Partner",
+            "imprint": "Impressum",
+            "privacyPolicy": "Datenschutz",
+            "faqs": "FAQs",
+            "version": "Version: {{ version }}",
+            "iconsByIcons8": "Icons von Icons8",
+            "reportMapProblem": "Ein Problem auf der Karte melden"
+        },
+        "language": {
+            "english": "English",
+            "german": "Deutsch",
+            "otherLangComputationWarning": "Die Berechnungen sind momentan noch nicht auf Deutsch sondern nur auf Englisch verfügbar."
+        }
+    },
+    "walkthrough": {
+        "tourChoiceDialog": {
+            "title": "Los geht's!",
+            "description": "Dieses Tutorial funktioniert am besten, wenn du angemeldet bist. Alternativ kannst du die kürzere Gästeinführung machen, um zu sehen was der Navigator bietet.",
+            "loginButton": "Anmelden, um das komplette Tutorial zu starten",
+            "guestTourButton": "Die Gästeeinführung starten",
+            "guestNote": "Die Gästeeinführung gibt dir einen Vorgeschmack von der Funktionalität des Navigators, verwendet aber Demo-Daten."
+        },
+        "tourSteps": {
+            "choosePlugin": {
+                "title": "Wähle ein Modul",
+                "description": "Um zu beginnen, wählen wir eines der verfügbaren Module aus. In diesem Beispiel wählen wir <strong>hiWalk</strong> aus."
+            },
+            "newComputation": {
+                "title": "Konfiguriere eine Berechnung",
+                "description": "Als nächstes starten wir über die Schaltfläche <strong>Neue Berechnung</strong> eine neue Indikatoranfrage."
+            },
+            "searchArea": {
+                "title": "Suche deine Zielregion",
+                "description": "Jetzt müssen wir unsere Zielregion spezifizieren. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus um die Karte dort zu zentrieren."
+            },
+            "selectBoundary": {
+                "title": "Wähle den Umriss aus",
+                "description": "Wähle nun den Umriss der gewünschten Zielregion aus, indem du auf die Karte klickst. Zoome mit dem Mausrad um die Ansicht anzupassen."
+            },
+            "requestCompute": {
+                "title": "Starte eine Berechnung",
+                "description": "Zuletzt startest du die Berechnung über den Knopf <strong>Berechnung starten</strong>."
+            },
+            "openComputation": {
+                "titleFull": "Eine Berechnung öffnen",
+                "titleGuest": "Eine Berechnung öffnen",
+                "descriptionFull": "Die Berechnung ist abgeschlossen! Klick sie an, um die einzelnen Ergebnisse zu begutachten.",
+                "descriptionGuest": "Im nächsten Schritt kannst du dir die Demoberechnung ansehen."
+            },
+            "viewFirstResult": {
+                "title": "Ergebnisse ansehen",
+                "description": "Öffne das erste Ergebnis um dir dessen Inhalt anzeigen zu lassen."
+            },
+            "exploreResult": {
+                "title": "Details zum Ergebnis",
+                "description": "Du kannst dir weitere Details zum Ergebnis anzeigen lassen oder die Rohdaten herunterladen."
+            },
+            "viewChartResult": {
+                "title": "Ein anderes Ergebnis öffnen",
+                "description": "Nicht alle Ergebnisse werden auf der Karte angezeigt. Wenn du beispielsweise das Diagramm öffnest, wird es dir in einem separaten Fenster angezeigt."
+            },
+            "completion": {
+                "title": "Geschafft!",
+                "descriptionGuest": "Geschafft! Wenn du dir nun ein Profil anlegst und dich anmeldest, kannst du Berechnungen in jeder beliebigen Region anfragen. Du kannst dieses Tutorial über das <strong>Profil</strong>-Menü immer wieder neu starten.",
+                "descriptionFull": "Geschafft! Nun kannst du deine eigenen Berechnungen in jeder beliebigen Region starten. Sieh dir auch an, was die anderen Module zu bieten haben. Du kannst dieses Tutorial über das <strong>Profil</strong>-Menü immer wieder neu starten.",
+                "exitButton": "Tutorial abschließen"
+            }
+        },
+        "tourEngine": {
+            "prevButton": "↺ Tutorial von vorne beginnen",
+            "closeButton": "Tutorial abbrechen",
+            "exitConfirmation": "Möchtest du das Tutorial wirklich abbrechen? Du kannst es über das <strong>Profil</strong>-Menü immer wieder neu starten."
+        }
+    },
+    "account": {
+        "loginFakeUser": "Anmelden (als Demonutzer)",
+        "login": "Anmelden",
+        "account": "Profil",
+        "editProfile": "Profil bearbeiten",
+        "viewUsage": "Nutzung",
+        "startWalkthrough": "Tutorial starten",
+        "support": "Hilfe",
+        "logout": "Abmelden"
+    },
+    "dialog": {
+        "confirmClose": "Möchtest du diesen Dialog wirklich schließen ohne zu speichern? Alle Werte werden auf ihre Standardwerte zurückgesetzt.",
+        "valuesSaved": "{{ label }}-Werte wurden gespeichert.",
+        "valuesReset": "{{ label }}-Werte wurden auf ihre Standardwerte zurückgesetzt.",
+        "save": "Speichern",
+        "reset": "Zurücksetzen"
+    },
+    "pluginParameter": {
+        "areaSelection": "Regionsauswahl",
+        "searchOrZoomInstruction": "Fokussiere einen Ort auf der Karte. Nutze dazu das Mausrad oder suche einen Ort in der Suchleiste. Du kannst dann eine der folgenden Methoden nutzen um das Berechnungsgebiet einzugrenzen.",
+        "boundary": "Administrative Grenze",
+        "circle": "Umkreis",
+        "rectangle": "Rechteck",
+        "polygon": "Polygon",
+        "selectFromBoundaries": "Wähle eine administrative Grenze",
+        "drawCircle": "Zeichne einen Umkreis",
+        "drawRectangle": "Zeichne ein Rechteck",
+        "drawPolygon": "Zeichne ein beliebiges Polygon",
+        "clickInsideBoundary": "Durch einen Klick auf die Karte kannst du eine Administrative Grenze auswählen. Die administrative Ebene passt sich dem Zoom an.",
+        "clickAndMovePointer": "Klicke auf die Karte und bewege danach den Mauszeiger um {shape, select, Umkreis {einen Kreis} Rechteck {ein Rechteck} other {ein Objekt}} zu zeichnen. Klicke zum abschließen ein weiteres Mal.",
+        "clickMultiplePoints": "Klicke auf die Karte um die Stützpunkte des Polygons zu zeichnen. Mit einem Doppelklick schließt du das Zeichnen ab.",
+        "multipleAreasSelected": "Es wurde mehr als eine Region ausgewählt. Bitte wähle nur eine Region aus.",
+        "selectedRegionLarge": "Die ausgewählte Region ist sehr groß (> 500 km²).",
+        "processingMayTakeLonger": "Die Berechnung könnte länger dauern oder möglicherweise auch fehlschlagen.",
+        "customAreaName": "Name der Region",
+        "customArea": "Benutzerdefinierte Region",
+        "areaNameRequired": "Bitte benenne die ausgewählte Region",
+        "reset": "Zurücksetzen",
+        "optionalAttributes": "Optionale Einstellungen",
+        "editAdditionalParameters": "Weitere Einstellungen ändern.",
+        "allSelectionsCleared": "Alle Einstellungen wurden zurückgesetzt.",
+        "pleaseSelectArea": "Bitte wähle zuerst eine Region auf der Karte aus.",
+        "computeRequestSent": "Je nach dem wie groß und komplex die Anfrage ist, kann dieser Vorgang bis zu 60 Minuten dauern. Sieh dich ruhig weiter um, wir sagen dir Bescheid, wenn das Ergebnis da ist.",
+        "pleaseEnsureLoggedIn": "Stelle bitte sicher, dass du angemeldet bist und deine E-Mailadresse verifiziert hast.",
+        "thereIsAnIssueWithYourAccount": "Es gibt ein Problem mit deinem Profil. Bitte kontaktiere den Support über das Profil-Menü.",
+        "thereIsAnIssueWithYourSelectedArea": "Die ausgewählte Region hat ein Problem verursacht. Bitte versuche es mit einer anderen Region erneut oder kontaktiere den Support über das Profil-Menü.",
+        "youHaveReachedTheMaximumNumberOfRequests": "Du hast im Moment die Maximale Anzahl an Anfragen erreicht, bitte versuche es in ein paar Minuten noch einmal.",
+        "errorWhileSubmittingYourRequest": "Beim Absenden der Anfrage ist ein Fehler aufgetreten, bitte versuche es erneut."
+    },
+    "map": {
+        "baseMaps": "Hintergrundkarte",
+        "layers": "Kartenebenen"
+    }
+}

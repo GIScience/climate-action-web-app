@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { ElementRef, Injectable, QueryList } from '@angular/core'
+import { TranslocoService } from '@jsverse/transloco'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { ToastrService } from 'ngx-toastr'
@@ -17,7 +18,8 @@ export class ExportPDFService {
     constructor(
         private http: HttpClient,
         private toastr: ToastrService,
-        private reportService: ReportService
+        private reportService: ReportService,
+        private translocoService: TranslocoService
     ) {}
 
     async exportToPDF(
@@ -26,7 +28,7 @@ export class ExportPDFService {
         getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined
     ) {
         try {
-            this.toastr.info('Preparing PDF export, please wait...', '', {
+            this.toastr.info(this.translocoService.translate('report.exportingPdf'), '', {
                 timeOut: 30000,
                 positionClass: 'toast-top-center'
             })
@@ -46,7 +48,7 @@ export class ExportPDFService {
             this.toastr.clear()
         } catch (error) {
             console.error('Error exporting PDF:', error)
-            this.toastr.error('Error exporting PDF. Please try again.')
+            this.toastr.error(this.translocoService.translate('report.errorExportingPdf'))
         }
     }
 

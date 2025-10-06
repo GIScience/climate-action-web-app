@@ -1,7 +1,7 @@
 <div class="plugin-parameter-container">
     <div class="area-selection">
-        <h4>Area Selection</h4>
-        <p>Search or zoom in on a location. Then use any of the tools below to select an area.</p>
+        <h4>{{ 'pluginParameter.areaSelection' | transloco }}</h4>
+        <p>{{ 'pluginParameter.searchOrZoomInstruction' | transloco }}</p>
         <hr />
         <div class="area-selection-buttons">
             <button
@@ -9,36 +9,36 @@
                 class="draw-button"
                 [class.active]="currentSelectionMode === 'Boundary'"
                 (click)="setSelectionMode('Boundary')"
-                title="Select from Boundaries">
+                [title]="'pluginParameter.selectFromBoundaries' | transloco">
                 <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
-                Boundary
+                {{ 'pluginParameter.boundary' | transloco }}
             </button>
             <button
                 type="button"
                 class="draw-button"
                 [class.active]="currentSelectionMode === 'Circle'"
                 (click)="setSelectionMode('Circle')"
-                title="Draw Circle">
+                [title]="'pluginParameter.drawCircle' | transloco">
                 <i-lucide [img]="CircleDot" size="16"></i-lucide>
-                Circle
+                {{ 'pluginParameter.circle' | transloco }}
             </button>
             <button
                 type="button"
                 class="draw-button"
                 [class.active]="currentSelectionMode === 'Box'"
                 (click)="setSelectionMode('Box')"
-                title="Draw Rectangle">
+                [title]="'pluginParameter.drawRectangle' | transloco">
                 <i-lucide [img]="Square" size="16"></i-lucide>
-                Rectangle
+                {{ 'pluginParameter.rectangle' | transloco }}
             </button>
             <button
                 type="button"
                 class="draw-button"
                 [class.active]="currentSelectionMode === 'Polygon'"
                 (click)="setSelectionMode('Polygon')"
-                title="Draw Polygon">
+                [title]="'pluginParameter.drawPolygon' | transloco">
                 <i-lucide [img]="Pentagon" size="16"></i-lucide>
-                Polygon
+                {{ 'pluginParameter.polygon' | transloco }}
             </button>
         </div>
 
@@ -70,27 +70,37 @@
                 size="20"></i-lucide>
             <span>
                 <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Boundary'">
-                    Click inside an area boundary to select an area.
+                    {{ 'pluginParameter.clickInsideBoundary' | transloco }}
                 </ng-container>
                 <ng-container
                     *ngIf="!areaSelected && (currentSelectionMode === 'Circle' || currentSelectionMode === 'Box')">
-                    Click once and move the pointer to draw a
-                    {{ currentSelectionMode === 'Box' ? 'rectangle' : 'circle' }}. Click again to finish.
+                    {{
+                        'pluginParameter.clickAndMovePointer'
+                            | transloco
+                                : {
+                                      shape:
+                                          (currentSelectionMode === 'Box'
+                                              ? 'pluginParameter.rectangle'
+                                              : 'pluginParameter.circle'
+                                          ) | transloco
+                                  }
+                    }}
                 </ng-container>
                 <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Polygon'">
-                    Click on multiple points to draw a polygon. Double-click anywhere to finish.
+                    {{ 'pluginParameter.clickMultiplePoints' | transloco }}
                 </ng-container>
-                <ng-container *ngIf="areaSelected && this.mapService.selectedOlFeatures.getLength() > 1"
-                    >Multiple areas selected. Please select only one.</ng-container
-                >
+                <ng-container *ngIf="areaSelected && this.mapService.selectedOlFeatures.getLength() > 1">{{
+                    'pluginParameter.multipleAreasSelected' | transloco
+                }}</ng-container>
                 <ng-container
                     *ngIf="
                         areaSelected &&
                         this.mapService.selectedOlFeatures.getLength() === 1 &&
                         this.mapService.selectedOlFeatures.item(0).get('area') > 500
-                    "
-                    >The selected region is large (> 500 km²).<br />Processing may take longer, or even
-                    fail.</ng-container
+                    ">
+                    {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
+                        'pluginParameter.processingMayTakeLonger' | transloco
+                    }}</ng-container
                 >
             </span>
         </div>
@@ -103,14 +113,14 @@
                     type="text"
                     id="custom-area-label"
                     class="region-name"
-                    placeholder="Custom Area Name"
+                    [placeholder]="'pluginParameter.customAreaName' | transloco"
                     [formControl]="areaLabelControl"
                     [value]="areaLabelControl.value" />
                 <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
                 <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
             </div>
             <div *ngIf="areaLabelControl.invalid && currentSelectionMode !== 'Boundary'" class="error-message">
-                Area name is required
+                {{ 'pluginParameter.areaNameRequired' | transloco }}
             </div>
         </div>
     </div>
@@ -125,17 +135,19 @@
                 class="plugin-params-form"></formly-form>
         </ng-scrollbar>
         <div class="btn-container">
-            <div tp="Please login to request a computation." [tpIsEnabled]="!user">
+            <div [tp]="'plugin.loginToCompute' | transloco" [tpIsEnabled]="!user">
                 <button
                     type="submit"
                     appearance="primary"
                     class="btn-primary btn-withtext"
                     [disabled]="!user || !form.valid || !hasValidAreaSelection()">
                     <i-lucide [img]="CirclePlay" size="20"></i-lucide>
-                    Compute
+                    {{ 'plugin.computeStart' | transloco }}
                 </button>
             </div>
-            <button type="button" class="btn-light btn-withtext" (click)="resetForm()">Reset</button>
+            <button type="button" class="btn-light btn-withtext" (click)="resetForm()">
+                {{ 'pluginParameter.reset' | transloco }}
+            </button>
         </div>
     </form>
 </div>

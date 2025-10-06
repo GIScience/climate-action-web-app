@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, Injector } from '@angular/core'
+import { TranslocoService } from '@jsverse/transloco'
 import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
@@ -34,7 +35,8 @@ export class ReportService {
         private http: HttpClient,
         private injector: Injector,
         private toastr: ToastrService,
-        private artifactViewerService: ArtifactViewerService
+        private artifactViewerService: ArtifactViewerService,
+        private translocoService: TranslocoService
     ) {}
 
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
@@ -42,18 +44,14 @@ export class ReportService {
         const existingIndex = this.artifacts.findIndex(a => a.artifact.store_id === artifact.store_id)
 
         if (existingIndex >= 0) {
-            this.toastr.warning('This artifact is already in the report.', '', {
+            this.toastr.warning(this.translocoService.translate('report.artifactAlreadyInReport'), '', {
                 timeOut: 4000
             })
             return
         } else if (this.artifacts.length >= this.MAX_ARTIFACTS) {
-            this.toastr.warning(
-                'Maximum of 4 artifacts allowed in the report. Please remove an existing artifact first.',
-                '',
-                {
-                    timeOut: 4000
-                }
-            )
+            this.toastr.warning(this.translocoService.translate('report.maximumArtifactsAllowed'), '', {
+                timeOut: 4000
+            })
             return
         }
 
@@ -78,11 +76,12 @@ export class ReportService {
                             useFactory: (
                                 pluginService: PluginService,
                                 http: HttpClient,
-                                storageService: StorageService
+                                storageService: StorageService,
+                                translocoService: TranslocoService
                             ) => {
-                                return new MapService(pluginService, http, storageService)
+                                return new MapService(pluginService, http, storageService, translocoService)
                             },
-                            deps: [PluginService, HttpClient, StorageService]
+                            deps: [PluginService, HttpClient, StorageService, TranslocoService]
                         }
                     ],
                     parent: this.injector

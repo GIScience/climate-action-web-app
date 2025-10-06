@@ -2,7 +2,7 @@
     <ng-scrollbar>
         <div *ngIf="showAccordion && modality === 'MARKDOWN'" class="artifact-meta">
             <mat-expansion-panel *ngIf="summary" class="artifact-abstract">
-                <mat-expansion-panel-header> Abstract </mat-expansion-panel-header>
+                <mat-expansion-panel-header>{{ 'artifact.abstract' | transloco }}</mat-expansion-panel-header>
                 {{ summary }}
             </mat-expansion-panel>
         </div>
@@ -21,7 +21,9 @@
             </p>
             <div *ngIf="showAccordion">
                 <mat-expansion-panel *ngIf="description" class="artifact-description">
-                    <mat-expansion-panel-header> Detailed Description </mat-expansion-panel-header>
+                    <mat-expansion-panel-header>{{
+                        'artifact.detailedDescription' | transloco
+                    }}</mat-expansion-panel-header>
                     <app-markdown [rawMarkdown]="description"></app-markdown>
                 </mat-expansion-panel>
             </div>

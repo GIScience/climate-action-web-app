@@ -2,6 +2,7 @@ import { HttpClientModule } from '@angular/common/http'
 import { ElementRef, QueryList } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { SafeUrl } from '@angular/platform-browser'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
@@ -143,7 +144,11 @@ describe('ReportComponent', () => {
         pluginService = {} as jest.Mocked<MockPluginService>
 
         await TestBed.configureTestingModule({
-            imports: [ReportComponent, HttpClientModule],
+            imports: [
+                ReportComponent,
+                HttpClientModule,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ],
             providers: [
                 { provide: ToastrService, useClass: MockToastrService },
                 { provide: ReportService, useValue: reportService },

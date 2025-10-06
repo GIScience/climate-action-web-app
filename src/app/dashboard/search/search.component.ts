@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { TranslocoModule } from '@jsverse/transloco'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
 import { NgScrollbar } from 'ngx-scrollbar'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
@@ -15,7 +16,8 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
         ReactiveFormsModule,
         SearchTermHighlightPipe,
         LucideAngularModule,
-        NgScrollbar
+        NgScrollbar,
+        TranslocoModule
     ],
     templateUrl: './search.component.html',
     styleUrl: './search.component.scss'

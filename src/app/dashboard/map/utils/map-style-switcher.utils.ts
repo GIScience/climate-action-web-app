@@ -1,4 +1,6 @@
+import { TranslocoService } from '@jsverse/transloco'
 import { IControl, Map, StyleSpecification } from 'maplibre-gl'
+import { Subscription } from 'rxjs'
 
 export interface MapStyle {
     title: string
@@ -11,10 +13,15 @@ export class MapStyleSwitcherControl implements IControl {
     private mapStyleContainer?: HTMLDivElement
     private layerControlsContainer?: HTMLDivElement
     private isExpanded: boolean = true
+    private readonly styleDataListener = () => this.updateMapLabelsLanguage()
+    private baseMapsHeading?: HTMLHeadingElement
+    private layersHeading?: HTMLHeadingElement
+    private subscriptions: Subscription[] = []
 
     constructor(
         private styles: MapStyle[],
         private defaultStyle: string,
+        private translocoService: TranslocoService,
         private onStyleChange?: (styleName: string) => void,
         private onStateChange?: (isExpanded: boolean) => void,
         initialExpanded: boolean = true
@@ -24,12 +31,45 @@ export class MapStyleSwitcherControl implements IControl {
 
     onAdd(map: Map): HTMLElement {
         this.map = map
-        return (this.controlContainer = this.createContainer())
+        const container = this.createContainer()
+        this.setupTranslations()
+        this.map?.on('styledata', this.styleDataListener)
+        this.updateMapLabelsLanguage()
+        return (this.controlContainer = container)
     }
 
     onRemove(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe())
+        this.subscriptions = []
+        if (this.map) {
+            this.map.off('styledata', this.styleDataListener)
+        }
         this.controlContainer?.remove()
         this.map = undefined
+    }
+
+    private setupTranslations(): void {
+        this.subscriptions.push(
+            this.translocoService.selectTranslate('map.baseMaps').subscribe(translation => {
+                if (this.baseMapsHeading) {
+                    this.baseMapsHeading.textContent = translation
+                }
+            })
+        )
+
+        this.subscriptions.push(
+            this.translocoService.selectTranslate('map.layers').subscribe(translation => {
+                if (this.layersHeading) {
+                    this.layersHeading.textContent = translation
+                }
+            })
+        )
+
+        this.subscriptions.push(
+            this.translocoService.langChanges$.subscribe(() => {
+                this.updateMapLabelsLanguage()
+            })
+        )
     }
 
     private createContainer(): HTMLDivElement {
@@ -68,10 +108,8 @@ export class MapStyleSwitcherControl implements IControl {
             className: 'maplibregl-style-list'
         })
 
-        const heading = Object.assign(document.createElement('h3'), {
-            textContent: 'Base Maps'
-        })
-        container.appendChild(heading)
+        this.baseMapsHeading = document.createElement('h3')
+        container.appendChild(this.baseMapsHeading)
         this.styles.forEach(style => {
             const button = Object.assign(document.createElement('button'), {
                 type: 'button',
@@ -137,6 +175,43 @@ export class MapStyleSwitcherControl implements IControl {
         })
     }
 
+    private updateMapLabelsLanguage(): void {
+        if (!this.map) return
+
+        const currentLang = this.translocoService.getActiveLang()
+        const langSuffix = currentLang === 'en' ? '_en' : currentLang === 'de' ? '_de' : '_en'
+        const currentStyle = this.map.getStyle()
+
+        if (!currentStyle || !currentStyle.layers) return
+
+        const isVectorStyle = this.isVectorStyleActive()
+        if (!isVectorStyle) return
+
+        currentStyle.layers.forEach(layer => {
+            if ('layout' in layer && layer.layout && 'text-field' in layer.layout) {
+                const textField = layer.layout['text-field']
+                if (typeof textField === 'string') {
+                    if (textField === '{name}') {
+                        this.map!.setLayoutProperty(layer.id, 'text-field', `{name${langSuffix}}`)
+                    } else if (textField.match(/^{name_(en|de)}$/)) {
+                        this.map!.setLayoutProperty(layer.id, 'text-field', `{name${langSuffix}}`)
+                    }
+                }
+            }
+        })
+    }
+
+    private isVectorStyleActive(): boolean {
+        if (!this.mapStyleContainer) return false
+        const activeButton = this.mapStyleContainer.querySelector('.active') as HTMLButtonElement
+        if (!activeButton) return false
+        const styleUri = activeButton.dataset['uri']
+        return (
+            styleUri !== undefined &&
+            (styleUri.includes('colorful/style.json') || styleUri.includes('graybeard/style.json'))
+        )
+    }
+
     updateLayerControls(): void {
         if (!this.map || !this.layerControlsContainer) return
         const groups: { [key: string]: string[] } = {}
@@ -150,8 +225,9 @@ export class MapStyleSwitcherControl implements IControl {
         const keys = Object.keys(groups)
         this.layerControlsContainer.style.display = keys.length ? 'block' : 'none'
         this.layerControlsContainer.innerHTML = ''
-        const heading = Object.assign(document.createElement('h3'), { textContent: 'Layers' })
-        this.layerControlsContainer.appendChild(heading)
+        this.layersHeading = document.createElement('h3')
+        this.layersHeading.textContent = this.translocoService.translate('map.layers')
+        this.layerControlsContainer.appendChild(this.layersHeading)
 
         keys.forEach(base => {
             const div = Object.assign(document.createElement('div'), { className: 'map-layer' })

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
+import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -13,7 +14,7 @@ import { PluginCard } from './plugin-catalog.interface'
     selector: 'app-plugin-catalog',
     templateUrl: './plugin-catalog.component.html',
     styleUrls: ['./plugin-catalog.component.scss'],
-    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule]
+    imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule, TranslocoModule]
 })
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
     @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>

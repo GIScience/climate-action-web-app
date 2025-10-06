@@ -12,6 +12,7 @@ import {
 } from '@angular/core'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { DomSanitizer } from '@angular/platform-browser'
+import { TranslocoModule } from '@jsverse/transloco'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { Artifact } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
@@ -27,7 +28,7 @@ import { TableComponent } from './table/table.component'
     selector: 'app-artifact',
     templateUrl: './artifact.component.html',
     styleUrls: ['./artifact.component.scss'],
-    imports: [CommonModule, MatExpansionModule, NgScrollbarModule, MarkdownComponent],
+    imports: [CommonModule, MatExpansionModule, NgScrollbarModule, MarkdownComponent, TranslocoModule],
     encapsulation: ViewEncapsulation.None
 })
 export class ArtifactComponent implements OnInit, AfterViewInit {

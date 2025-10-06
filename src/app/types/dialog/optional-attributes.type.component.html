@@ -5,6 +5,6 @@
         [disabled]="isDisabled"
         (click)="openDialog()">
         <i-lucide [img]="ListTodo" size="20"></i-lucide>
-        {{ field.fieldGroup?.[0]?.props?.label || 'Optional Attributes' }}
+        {{ field.fieldGroup?.[0]?.props?.label || 'pluginParameter.optionalAttributes' | transloco }}
     </button>
 </div>

@@ -11,14 +11,18 @@
             *ngIf="artifactService.currentUrl || artifactService.downloadJsonHref"
             (click)="downloadContent()"
             class="download-btn btn-onlyicon"
-            tp="Download Artifact">
+            [tp]="'artifactViewer.download' | transloco">
             <i-lucide [img]="Download" size="15"></i-lucide>
         </button>
         <div class="artifact-window-controls">
             <button
                 (click)="toggleMinimise()"
                 class="minimise-btn btn-onlyicon"
-                [tp]="artifactViewerService.minimised ? 'Maximise Artifact' : 'Minimise Artifact'">
+                [tp]="
+                    artifactViewerService.minimised
+                        ? ('artifactViewer.maximize' | transloco)
+                        : ('artifactViewer.minimize' | transloco)
+                ">
                 <i-lucide
                     *ngIf="artifactViewerService.minimised; else minimizeIcon"
                     [img]="Maximize2"
@@ -27,7 +31,10 @@
                     <i-lucide [img]="Minimize2" size="15"></i-lucide>
                 </ng-template>
             </button>
-            <button (click)="closeArtifactViewer()" class="close-btn btn-onlyicon" tp="Close Artifact">
+            <button
+                (click)="closeArtifactViewer()"
+                class="close-btn btn-onlyicon"
+                [tp]="'artifactViewer.close' | transloco">
                 <i-lucide [img]="X" size="15"></i-lucide>
             </button>
         </div>

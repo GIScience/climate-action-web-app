@@ -1,0 +1,260 @@
+{
+    "landing": {
+        "revisit": {
+            "totalComputations": "You have run a total of {{ count }} computations so far.",
+            "latestComputation": "Browse your latest computation:"
+        },
+        "loading": "Loading...",
+        "welcome": {
+            "title": "Welcome to the Climate Action Navigator (CAN)",
+            "description": "CAN is your entry point to exploring climate solutions at the local level. CAN offers high-resolution data and insights on key climate indicators, from heating emissions to walkability, helping you identify both strengths and areas for improvement in your city or region."
+        },
+        "notes": {
+            "title": "A few notes before you begin…",
+            "onDemand": "CAN results are <strong>calculated on-demand</strong>. This reduces our energy consumption, but means that assessments may take up to 60 minutes during high traffic.",
+            "urbanAreas": "Our tools are <strong>adapted to urban areas</strong>, where free and open source data quality is better. Results in rural areas may be less accurate.",
+            "experts": "While CAN is open to everyone, our assessment tools are <strong>tailored to experts</strong>. As such, they may include technical terms.",
+            "worksInProgress": "All tools and assessments within CAN are <strong>works in progress</strong> and will be continuously improved as new methods and datasets become available."
+        },
+        "cta": {
+            "startExploring": "Start exploring your region now and see where climate action can take you.",
+            "selectTool": "Begin by selecting an Assessment Tool from the sidebar on the left.",
+            "or": "OR",
+            "guidedWalkthrough": "Take our guided walkthrough"
+        }
+    },
+    "pluginCatalog": {
+        "title": "Assessment Tools",
+        "loading": "Loading..."
+    },
+    "plugin": {
+        "loading": "Loading...",
+        "readMore": "Read more",
+        "showLess": "Show less",
+        "methodology": "Read about the methodology »",
+        "credits": "View credits »",
+        "computations": "Computations",
+        "newComputation": "New computation",
+        "loginToCompute": "Please login to request a computation.",
+        "computePanel": "New Computation",
+        "computeStart": "Compute",
+        "cancel": "Cancel",
+        "dialog": {
+            "methodology": "Methodology",
+            "sources": "Sources",
+            "credits": "Credits"
+        }
+    },
+    "computationsIndex": {
+        "reportBuilder": "Report Builder",
+        "exitReportBuilder": "Exit Report Builder",
+        "archive": "Archive",
+        "backToAll": "Back to all computations",
+        "createReport": "Create a PDF report by collating multiple results",
+        "viewArchived": "View archived computations",
+        "noComputations": "No computations to show yet.",
+        "loadMore": "Load More",
+        "loadingMore": "Loading more computations...",
+        "archived": "Archived",
+        "noArchived": "No archived computations to display.",
+        "loadingMoreArchived": "Loading more archived computations...",
+        "status": {
+            "queued": "Queued",
+            "running": "Running",
+            "done": "Done"
+        },
+        "actions": {
+            "share": "Share Computation",
+            "viewParameters": "View Parameters",
+            "archive": "Archive Computation",
+            "unarchive": "Un-archive Computation",
+            "delete": "Delete Computation"
+        },
+        "login": {
+            "prompt": "Prefer to request your own computation?",
+            "action": "Login",
+            "suffix": "to proceed."
+        },
+        "imported": "Imported Computation",
+        "artifactErrors": "Some results could not be computed.",
+        "parameters": {
+            "title": "Computation Parameters",
+            "noParams": "This computation used no parameters."
+        },
+        "deleteConfirmation": "Are you sure you want to delete this computation? This action cannot be undone.",
+        "computationAlreadyPresent": "Computation ID #{{ id }} is already present",
+        "computationImported": "Computation ID #{{ id }} imported",
+        "errorImportingComputation": "Error importing computation"
+    },
+    "computation": {
+        "addToReport": "Add to Report",
+        "add": "Add »",
+        "noResults": "This run created no results. If you think that is an error, please contact the plugin developers",
+        "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this artifact to the report."
+    },
+    "artifactViewer": {
+        "download": "Download Artifact",
+        "maximize": "Maximise Artifact",
+        "minimize": "Minimise Artifact",
+        "close": "Close Artifact"
+    },
+    "artifact": {
+        "abstract": "Abstract",
+        "detailedDescription": "Detailed Description"
+    },
+    "report": {
+        "title": "Report Builder",
+        "exportToPDF": "Export to PDF",
+        "removeAll": "Remove all items",
+        "exitBuilder": "Exit Report Builder",
+        "itemsCounter": "{{ count }}/{{ max }} results",
+        "emptyMessage": "Click \"Add »\" next to any result under a computation to build your report.",
+        "mapZoomNote": "Use the + / - buttons to zoom the map",
+        "artifactAlreadyInReport": "This artifact is already in the report.",
+        "maximumArtifactsAllowed": "Maximum of 4 artifacts allowed in the report. Please remove an existing artifact first.",
+        "exportingPdf": "Preparing PDF export, please wait...",
+        "errorExportingPdf": "Error exporting PDF. Please try again."
+    },
+    "search": {
+        "placeholder": "Search...",
+        "clearSearch": "Clear Search",
+        "unknownLocation": "Unknown location",
+        "noSuggestions": "No suggestions found"
+    },
+    "mobileWarning": {
+        "title": "Mobile Device Detected",
+        "description": "This website is currently not optimized for mobile devices. For the best experience, please visit from a desktop computer.",
+        "understand": "I understand"
+    },
+    "app": {
+        "footer": {
+            "copyright": "© {{ year }} HeiGIT gGmbH",
+            "aboutClimateAction": "About Climate Action",
+            "partnerWithUs": "Partner with us",
+            "imprint": "Imprint",
+            "privacyPolicy": "Privacy Policy",
+            "faqs": "FAQs",
+            "version": "Version: {{ version }}",
+            "iconsByIcons8": "Icons by Icons8",
+            "reportMapProblem": "Report a problem with the map"
+        },
+        "language": {
+            "english": "English",
+            "german": "Deutsch",
+            "otherLangComputationWarning": "Computations are available only in English at the moment."
+        }
+    },
+    "walkthrough": {
+        "tourChoiceDialog": {
+            "title": "Let's get started!",
+            "description": "To get the most out of this walkthrough, we recommend logging in first. However, you can also try a shorter guest walkthrough to see what the platform offers.",
+            "loginButton": "Login for Full Walkthrough",
+            "guestTourButton": "Try Guest Walkthrough",
+            "guestNote": "The guest walkthrough provides a preview of what the platform offers, utilising demo data."
+        },
+        "tourSteps": {
+            "choosePlugin": {
+                "title": "Choose an Assessment Tool",
+                "description": "Let's start by picking from one of the many assessment tools. We'll use <strong>hiWalk</strong> for this example."
+            },
+            "newComputation": {
+                "title": "Request a New Computation",
+                "description": "Next we'll click on the <strong>New Computation</strong> button to initiate a new request."
+            },
+            "searchArea": {
+                "title": "Search for an Area of Interest",
+                "description": "Now we'll have to go to the area of interest. We've prefilled the search with an example for you. Click on the suggestion that appears to go there on the map."
+            },
+            "selectBoundary": {
+                "title": "Select the area boundary",
+                "description": "Now select the area boundaries by clicking on the map. You can also zoom in and out to see the area boundaries better."
+            },
+            "requestCompute": {
+                "title": "Request the computation",
+                "description": "Finally, click on the <strong>Compute</strong> button to start the computation."
+            },
+            "openComputation": {
+                "titleFull": "Open the computation",
+                "titleGuest": "Open the computation",
+                "descriptionFull": "The computation is now ready! Let's expand it to see what results are available.",
+                "descriptionGuest": "Next, let's open the Demo computation that has been pre-loaded for you."
+            },
+            "viewFirstResult": {
+                "title": "View a result",
+                "description": "Let's open the first result to see what it contains."
+            },
+            "exploreResult": {
+                "title": "Read more about the results",
+                "description": "You can read more about the results, or even download the raw data from here."
+            },
+            "viewChartResult": {
+                "title": "View a different result",
+                "description": "Not all results are displayed on the map. Let's look at a chart in this result."
+            },
+            "completion": {
+                "title": "Done!",
+                "descriptionGuest": "This concludes the guest tour. You may request your own custom computations for any area of interest after logging in. You can restart this walkthrough anytime from the <strong>Account</strong> menu.",
+                "descriptionFull": "The walkthrough is now complete. Feel free to explore the other Assessment Tools and see what they can offer. You can always restart this walkthrough via the <strong>Account</strong> menu.",
+                "exitButton": "Exit"
+            }
+        },
+        "tourEngine": {
+            "prevButton": "↺ Restart",
+            "closeButton": "Close",
+            "exitConfirmation": "Are you sure you want to exit the walkthrough? You can always restart it from the Account menu."
+        }
+    },
+    "account": {
+        "loginFakeUser": "Login (as Fake User)",
+        "login": "Login",
+        "account": "Account",
+        "editProfile": "Edit Profile",
+        "viewUsage": "View Usage",
+        "startWalkthrough": "Start Walkthrough",
+        "support": "Support",
+        "logout": "Logout"
+    },
+    "dialog": {
+        "confirmClose": "Are you sure you want to close without saving? Values will be reset to their defaults.",
+        "valuesSaved": "{{ label }} values have been saved.",
+        "valuesReset": "{{ label }} values have been reset to their defaults.",
+        "save": "Save",
+        "reset": "Reset"
+    },
+    "pluginParameter": {
+        "areaSelection": "Area Selection",
+        "searchOrZoomInstruction": "Search or zoom in on a location. Then use any of the tools below to select an area.",
+        "boundary": "Boundary",
+        "circle": "Circle",
+        "rectangle": "Rectangle",
+        "polygon": "Polygon",
+        "selectFromBoundaries": "Select from Boundaries",
+        "drawCircle": "Draw Circle",
+        "drawRectangle": "Draw Rectangle",
+        "drawPolygon": "Draw Polygon",
+        "clickInsideBoundary": "Click inside an area boundary to select an area.",
+        "clickAndMovePointer": "Click once and move the pointer to draw a {{ shape }}. Click again to finish.",
+        "clickMultiplePoints": "Click on multiple points to draw a polygon. Double-click anywhere to finish.",
+        "multipleAreasSelected": "Multiple areas selected. Please select only one.",
+        "selectedRegionLarge": "The selected region is large (> 500 km²).",
+        "processingMayTakeLonger": "Processing may take longer, or even fail.",
+        "customAreaName": "Custom Area Name",
+        "customArea": "Custom Area",
+        "areaNameRequired": "Area name is required",
+        "reset": "Reset",
+        "optionalAttributes": "Optional Attributes",
+        "editAdditionalParameters": "Edit additional parameters.",
+        "allSelectionsCleared": "All selections have been cleared.",
+        "pleaseSelectArea": "Please select an area on the map first.",
+        "computeRequestSent": "This may take up to 60 minutes to complete, depending on the area size and complexity. Feel free to navigate away and check back later.",
+        "pleaseEnsureLoggedIn": "Please ensure that you are logged in and have verified your email.",
+        "thereIsAnIssueWithYourAccount": "There is an issue with your account. Please contact support via the Account menu.",
+        "thereIsAnIssueWithYourSelectedArea": "There is an issue with your selected area. Please try another area or contact support via the Account menu.",
+        "youHaveReachedTheMaximumNumberOfRequests": "You have reached the maximum number of requests. Please try after a few minutes.",
+        "errorWhileSubmittingYourRequest": "Error while submitting your request. Please try again."
+    },
+    "map": {
+        "baseMaps": "Base Maps",
+        "layers": "Layers"
+    }
+}

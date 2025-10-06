@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
+import { TranslocoModule } from '@jsverse/transloco'
 import { CircleX, LogIn, LucideAngularModule, Play } from 'lucide-angular'
 import { AppwriteService } from '../../auth/appwrite.service'
 
@@ -13,7 +14,7 @@ export enum TourChoice {
 
 @Component({
     selector: 'app-tour-choice-dialog',
-    imports: [CommonModule, MatDialogModule, MatButtonModule, LucideAngularModule],
+    imports: [CommonModule, MatDialogModule, MatButtonModule, LucideAngularModule, TranslocoModule],
     templateUrl: './tour-choice-dialog.component.html',
     styleUrls: ['./tour-choice-dialog.component.scss']
 })

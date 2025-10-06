@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { Component, DoCheck } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
+import { TranslocoModule } from '@jsverse/transloco'
 import { FieldType } from '@ngx-formly/core'
 import { ListTodo, LucideAngularModule } from 'lucide-angular'
 import { DialogWindowComponent } from './dialog-window.component'
@@ -9,7 +10,7 @@ import { DialogWindowComponent } from './dialog-window.component'
     selector: 'app-optional-attributes-type',
     templateUrl: './optional-attributes.type.component.html',
     styleUrls: ['./optional-attributes.type.component.scss'],
-    imports: [LucideAngularModule, CommonModule]
+    imports: [LucideAngularModule, CommonModule, TranslocoModule]
 })
 export class OptionalAttributesTypeComponent extends FieldType implements DoCheck {
     isDisabled = false

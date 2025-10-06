@@ -1,16 +1,16 @@
 <div class="report-window" *ngIf="isVisible" [@reportAnimation]>
     <div class="report-header">
-        <h2>Report Builder</h2>
+        <h2>{{ 'report.title' | transloco }}</h2>
         <div class="report-controls">
             <button (click)="exportToPDF()" class="export-btn btn-withtext" [disabled]="artifacts.length === 0">
                 <i-lucide [img]="FileDown" size="20"></i-lucide>
-                Export to PDF
+                {{ 'report.exportToPDF' | transloco }}
             </button>
             <div class="report-controls__clear-exit">
                 <button
                     class="remove-all-btn btn-onlyicon"
                     (click)="removeAllReportItems()"
-                    tp="Remove all items"
+                    [tp]="'report.removeAll' | transloco"
                     tpPlacement="bottom"
                     [disabled]="artifacts.length === 0">
                     <i-lucide [img]="ListX" size="20"></i-lucide>
@@ -18,21 +18,20 @@
                 <button
                     class="close-btn btn-onlyicon"
                     (click)="closeReport()"
-                    tp="Exit Report Builder"
+                    [tp]="'report.exitBuilder' | transloco"
                     tpPlacement="bottom">
                     <i-lucide [img]="X" size="20"></i-lucide>
                 </button>
             </div>
         </div>
-        <span class="artifact-counter">{{ artifacts.length }}/{{ maxArtifacts }} items</span>
+        <span class="artifact-counter">{{
+            'report.itemsCounter' | transloco: { count: artifacts.length, max: maxArtifacts }
+        }}</span>
     </div>
 
     <div class="report-body">
         <div *ngIf="artifacts.length === 0" class="empty-report-message">
-            <p>
-                Click <span>"Add to Report" <i-lucide [img]="ClipboardPlus" size="20"></i-lucide></span> next to any
-                result under a computation to build your report.
-            </p>
+            <p [innerHTML]="'report.emptyMessage' | transloco"></p>
         </div>
 
         <ng-scrollbar>
@@ -61,7 +60,7 @@
                         <div [id]="'report-map-' + artifact.store_id" class="report-map"></div>
                         <div #legendContainer [id]="'report-map-legend-' + artifact.store_id"></div>
                         <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.store_id">
-                            Use the + / - buttons to zoom the map
+                            {{ 'report.mapZoomNote' | transloco }}
                         </div>
                     </div>
 

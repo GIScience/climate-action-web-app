@@ -1,6 +1,7 @@
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
+import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Download, GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
 import { ArtifactComponent } from '../artifact/artifact.component'
@@ -9,7 +10,15 @@ import { ArtifactViewerService } from './artifact-viewer.service'
 
 @Component({
     selector: 'app-artifact-viewer',
-    imports: [CommonModule, CdkDrag, CdkDragHandle, LucideAngularModule, TippyDirective, ArtifactComponent],
+    imports: [
+        CommonModule,
+        CdkDrag,
+        CdkDragHandle,
+        LucideAngularModule,
+        TippyDirective,
+        ArtifactComponent,
+        TranslocoModule
+    ],
     templateUrl: './artifact-viewer.component.html',
     styleUrl: './artifact-viewer.component.scss'
 })

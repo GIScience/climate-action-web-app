@@ -22,6 +22,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Artifacts are now grouped and filterable under each computation ([#260](https://gitlab.heigit.org/climate-action/web-app/-/issues/260))
 - Plotly control added to view plots in fullscreen, especially useful for dense treemaps
 - App will now check for upcoming maintenance entries and display a toast on launch ([#357](https://gitlab.heigit.org/climate-action/web-app/-/issues/357))
+- Interface has been made multi-lingual, with German|Deutsch offered as an option for now ([#54](https://gitlab.heigit.org/climate-action/web-app/-/issues/54))
 
 ### Fixed
 

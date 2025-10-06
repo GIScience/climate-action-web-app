@@ -3,27 +3,27 @@
         *ngIf="!showArchived && !isReportVisible"
         (click)="openReport()"
         class="toggle-archive btn-small btn-alt btn-withtext"
-        tp="Create a PDF report by collating multiple results"
+        [tp]="'computationsIndex.createReport' | transloco"
         tpPlacement="bottom">
         <i-lucide [img]="Clipboard" size="20" color="#008080"></i-lucide>
-        Report Builder
+        {{ 'computationsIndex.reportBuilder' | transloco }}
     </button>
     <button *ngIf="isReportVisible" class="toggle-archive btn-small btn-alt btn-withtext" (click)="closeReport()">
         <i-lucide [img]="CircleX" size="20" color="#008080"></i-lucide>
-        Exit Report Builder
+        {{ 'computationsIndex.exitReportBuilder' | transloco }}
     </button>
     <button
         *ngIf="!showArchived"
         (click)="toggleArchivedView()"
         class="toggle-archive btn-small btn-alt btn-withtext"
-        tp="View archived computations"
+        [tp]="'computationsIndex.viewArchived' | transloco"
         tpPlacement="bottom">
         <i-lucide [img]="Archive" size="20" color="#008080"></i-lucide>
-        Archive
+        {{ 'computationsIndex.archive' | transloco }}
     </button>
     <button (click)="toggleArchivedView()" *ngIf="showArchived" class="toggle-archive btn-small btn-alt btn-withtext">
-        <i-lucide [img]="CircleArrowLeft" size="20" tp="Back to all computations"></i-lucide>
-        <span> Back to all computations</span>
+        <i-lucide [img]="CircleArrowLeft" size="20" [tp]="'computationsIndex.backToAll' | transloco"></i-lucide>
+        <span>{{ 'computationsIndex.backToAll' | transloco }}</span>
     </button>
 </div>
 
@@ -37,7 +37,7 @@
                     !paginationInfo.loading
                 "
                 class="empty-computations">
-                <span class="empty-computations__message">No computations to show yet.</span>
+                <span class="empty-computations__message">{{ 'computationsIndex.noComputations' | transloco }}</span>
             </div>
 
             <div *ngIf="paginationInfo.loading && currentRuns.length === 0" class="skeleton-container">
@@ -78,11 +78,11 @@
                             <div class="computation-status" [ngClass]="scheduledRun.status">
                                 <ng-container *ngIf="scheduledRun.status === 'PENDING'">
                                     <i-lucide [img]="Loader" size="15"></i-lucide>
-                                    Queued
+                                    {{ 'computationsIndex.status.queued' | transloco }}
                                 </ng-container>
                                 <ng-container *ngIf="scheduledRun.status === 'STARTED'">
                                     <i-lucide [img]="LoaderCircle" size="15"></i-lucide>
-                                    Running
+                                    {{ 'computationsIndex.status.running' | transloco }}
                                 </ng-container>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                                         size="20"
                                         color="#aaaaaa"
                                         class="imported-computation"
-                                        tp="Imported Computation"
+                                        [tp]="'computationsIndex.imported' | transloco"
                                         tpPlacement="right"></i-lucide>
                                 </div>
                                 <p class="card-subtitle m-0">
@@ -143,29 +143,29 @@
                             <div class="computation-actions" *ngIf="!isReportVisible">
                                 <button
                                     (click)="shareComputation(computation.correlation_uuid, $event)"
-                                    aria-label="Share Computation"
-                                    tp="Share Computation"
+                                    [attr.aria-label]="'computationsIndex.actions.share' | transloco"
+                                    [tp]="'computationsIndex.actions.share' | transloco"
                                     class="btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="Share2" size="18"></i-lucide>
                                 </button>
                                 <button
                                     (click)="viewParameters(computation, $event)"
-                                    aria-label="View Parameters"
-                                    tp="View Parameters"
+                                    [attr.aria-label]="'computationsIndex.actions.viewParameters' | transloco"
+                                    [tp]="'computationsIndex.actions.viewParameters' | transloco"
                                     class="btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="ListTodo" size="18"></i-lucide>
                                 </button>
                                 <button
                                     (click)="archiveComputation(computation.correlation_uuid, $event)"
-                                    aria-label="Archive Computation"
-                                    tp="Archive Computation"
+                                    [attr.aria-label]="'computationsIndex.actions.archive' | transloco"
+                                    [tp]="'computationsIndex.actions.archive' | transloco"
                                     class="archive-computation btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="Archive" size="18"></i-lucide>
                                 </button>
                                 <button
                                     (click)="deleteComputation(computation.correlation_uuid, $event)"
-                                    aria-label="Delete Computation"
-                                    tp="Delete Computation"
+                                    [attr.aria-label]="'computationsIndex.actions.delete' | transloco"
+                                    [tp]="'computationsIndex.actions.delete' | transloco"
                                     class="delete-computation btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="Trash2" size="18"></i-lucide>
                                 </button>
@@ -175,7 +175,7 @@
                                 class="computation-status"
                                 [ngClass]="computation.status">
                                 <i-lucide [img]="Check" size="15"></i-lucide>
-                                Done
+                                {{ 'computationsIndex.status.done' | transloco }}
                             </div>
                         </div>
                         <app-computation
@@ -192,19 +192,19 @@
                     *ngIf="paginationInfo.hasMore && !paginationInfo.loading"
                     (click)="loadMoreRuns()"
                     class="btn-alt btn-small btn-withtext load-more-btn">
-                    Load More
+                    {{ 'computationsIndex.loadMore' | transloco }}
                 </button>
 
                 <div class="loading-indicator" *ngIf="paginationInfo.hasMore && paginationInfo.loading">
                     <i-lucide [img]="LoaderCircle" size="20"></i-lucide>
-                    <span>Loading more computations...</span>
+                    <span>{{ 'computationsIndex.loadingMore' | transloco }}</span>
                 </div>
             </div>
         </div>
 
         <div *ngIf="showArchived" class="archive-container">
             <div class="empty-archive" *ngIf="!archivedPaginationInfo.loading && archivedComputations.length === 0">
-                <p>No archived computations to display.</p>
+                <p>{{ 'computationsIndex.noArchived' | transloco }}</p>
             </div>
 
             <div *ngIf="archivedPaginationInfo.loading && archivedComputations.length === 0" class="skeleton-container">
@@ -219,7 +219,7 @@
 
             <div *ngIf="archivedComputations.length > 0" class="archived-container">
                 <div class="archived-header">
-                    <h3>Archived</h3>
+                    <h3>{{ 'computationsIndex.archived' | transloco }}</h3>
                 </div>
 
                 <ng-scrollbar visibility="hover" orientation="vertical">
@@ -243,8 +243,8 @@
                                 </div>
                                 <button
                                     (click)="unarchiveComputation(archivedComputation.correlation_uuid)"
-                                    aria-label="Un-archive Computation"
-                                    tp="Un-archive Computation"
+                                    [attr.aria-label]="'computationsIndex.actions.unarchive' | transloco"
+                                    [tp]="'computationsIndex.actions.unarchive' | transloco"
                                     class="pX-5 pY-3 btn-onlyicon btn-onlyicon--cta">
                                     <i-lucide [img]="ArchiveRestore" size="17"></i-lucide>
                                 </button>
@@ -259,23 +259,24 @@
                     *ngIf="archivedPaginationInfo.hasMore && !archivedPaginationInfo.loading"
                     (click)="loadMoreArchivedRuns()"
                     class="btn-alt btn-small btn-withtext load-more-btn">
-                    Load More
+                    {{ 'computationsIndex.loadMore' | transloco }}
                 </button>
 
                 <div class="loading-indicator" *ngIf="archivedPaginationInfo.hasMore && archivedPaginationInfo.loading">
                     <i-lucide [img]="LoaderCircle" size="20"></i-lucide>
-                    <span>Loading more archived computations...</span>
+                    <span>{{ 'computationsIndex.loadingMoreArchived' | transloco }}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="prompt-container" *ngIf="!user">
-        <span>Prefer to request your own computation?</span><br />
+        <span>{{ 'computationsIndex.login.prompt' | transloco }}</span
+        ><br />
         <a [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())" class="btn-alt btn-small btn-withtext"
-            ><strong>Login</strong></a
+            ><strong>{{ 'computationsIndex.login.action' | transloco }}</strong></a
         >
-        to proceed.
+        {{ 'computationsIndex.login.suffix' | transloco }}
     </div>
 </div>
 
@@ -283,7 +284,7 @@
     <div class="parameters-dialog">
         <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
             <div class="parameters-dialog__content" scrollViewport>
-                <h3>Computation Parameters</h3>
+                <h3>{{ 'computationsIndex.parameters.title' | transloco }}</h3>
                 <ng-container *ngIf="getParameterEntries(data.parameters).length > 0; else noParams">
                     <table class="parameters-table">
                         <tbody>
@@ -295,7 +296,7 @@
                     </table>
                 </ng-container>
                 <ng-template #noParams>
-                    <p class="no-params-message">This computation used no parameters.</p>
+                    <p class="no-params-message">{{ 'computationsIndex.parameters.noParams' | transloco }}</p>
                 </ng-template>
             </div>
         </ng-scrollbar>
@@ -307,7 +308,7 @@
 
 <ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
     <div class="artifact-errors-tooltip">
-        <h3 class="tooltip-title">Some results could not be computed.</h3>
+        <h3 class="tooltip-title">{{ 'computationsIndex.artifactErrors' | transloco }}</h3>
         <p *ngFor="let error of getArtifactErrorEntries(artifactErrors)" class="error-item">
             <strong>{{ error[0] }}:</strong> {{ error[1] }}
         </p>

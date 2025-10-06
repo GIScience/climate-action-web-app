@@ -3,10 +3,10 @@
     <div class="bg bg2"></div>
 
     <div *ngIf="!loading && totalActiveComputations > 0" class="welcome-content__revisit">
-        <h2>You have run a total of {{ totalActiveComputations }} computations so far.</h2>
+        <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalActiveComputations } }}</h2>
 
         <div *ngIf="latestComputation" class="latest-computation">
-            <h3>Browse your latest computation:</h3>
+            <h3>{{ 'landing.revisit.latestComputation' | transloco }}</h3>
             <a [routerLink]="'/dashboard/plugin/' + latestComputation.pluginId" class="latest-computation-card">
                 <div class="card-header">
                     <span class="plugin-name">{{ getPluginName(latestComputation.pluginId) }}</span>
@@ -23,69 +23,55 @@
     </div>
 
     <div *ngIf="loading" class="welcome-content__loading">
-        <div class="loading-text">Loading...</div>
+        <div class="loading-text">{{ 'landing.loading' | transloco }}</div>
     </div>
 
     <div *ngIf="!loading && totalActiveComputations === 0" class="welcome-content__new">
         <div class="intro-section">
-            <h1>Welcome to the Climate Action Navigator (CAN)</h1>
-            <p>
-                CAN is your entry point to exploring climate solutions at the local level. CAN offers high-resolution
-                data and insights on key climate indicators, from heating emissions to walkability, helping you identify
-                both strengths and areas for improvement in your city or region.
-            </p>
+            <h1>{{ 'landing.welcome.title' | transloco }}</h1>
+            <p [innerHTML]="'landing.welcome.description' | transloco"></p>
         </div>
 
         <div class="notes-section">
-            <h3>A few notes before you begin…</h3>
+            <h3>{{ 'landing.notes.title' | transloco }}</h3>
 
             <div class="note-cards">
                 <div class="note-card" style="animation-delay: 0s">
                     <div class="icon-wrapper">
                         <img ngSrc="assets/images/landing/hourglass.png" alt="Lazy computing" height="50" width="50" />
                     </div>
-                    <p>
-                        CAN results are <strong>calculated on-demand</strong>. This reduces our energy consumption, but
-                        means that assessments may take up to 60 minutes during high traffic.
-                    </p>
+                    <p [innerHTML]="'landing.notes.onDemand' | transloco"></p>
                 </div>
                 <div class="note-card" style="animation-delay: 0.15s">
                     <div class="icon-wrapper">
                         <img ngSrc="assets/images/landing/urban.png" alt="Lazy computing" height="50" width="50" />
                     </div>
-                    <p>
-                        Our tools are <strong>adapted to urban areas</strong>, where free and open source data quality
-                        is better. Results in rural areas may be less accurate.
-                    </p>
+                    <p [innerHTML]="'landing.notes.urbanAreas' | transloco"></p>
                 </div>
                 <div class="note-card" style="animation-delay: 0.3s">
                     <div class="icon-wrapper">
                         <img ngSrc="assets/images/landing/expert.png" alt="Lazy computing" height="50" width="50" />
                     </div>
-                    <p>
-                        While CAN is open to everyone, our assessment tools are <strong>tailored to experts</strong>. As
-                        such, they may include technical terms.
-                    </p>
+                    <p [innerHTML]="'landing.notes.experts' | transloco"></p>
                 </div>
                 <div class="note-card" style="animation-delay: 0.45s">
                     <div class="icon-wrapper">
                         <img ngSrc="assets/images/landing/tools.png" alt="Lazy computing" height="50" width="50" />
                     </div>
-                    <p>
-                        All tools and assessments within CAN are <strong>works in progress</strong> and will be
-                        continuously improved as new methods and datasets become available.
-                    </p>
+                    <p [innerHTML]="'landing.notes.worksInProgress' | transloco"></p>
                 </div>
             </div>
         </div>
 
         <div class="cta-section">
-            <p>Start exploring your region now and see where climate action can take you.</p>
+            <p>{{ 'landing.cta.startExploring' | transloco }}</p>
             <p>
-                <strong><span></span>Begin by selecting an Assessment Tool from the sidebar on the left.</strong>
+                <strong><span></span>{{ 'landing.cta.selectTool' | transloco }}</strong>
             </p>
-            <p class="or-text">OR</p>
-            <button class="btn-primary btn-withtext" (click)="startTour()">Take our guided walkthrough</button>
+            <p class="or-text">{{ 'landing.cta.or' | transloco }}</p>
+            <button class="btn-primary btn-withtext" (click)="startTour()">
+                {{ 'landing.cta.guidedWalkthrough' | transloco }}
+            </button>
         </div>
     </div>
 </div>

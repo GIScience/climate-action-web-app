@@ -1,10 +1,10 @@
 <div class="plugin-container">
     <div *ngIf="loading">
         <div class="plugin-header is-loading">
-            <h1>Loading...</h1>
+            <h1>{{ 'plugin.loading' | transloco }}</h1>
         </div>
         <div class="plugin-content-wrapper is-loading">
-            <h2>Loading...</h2>
+            <h2>{{ 'plugin.loading' | transloco }}</h2>
         </div>
     </div>
 
@@ -42,7 +42,11 @@
                                 (click)="togglePurposeExpand()"
                                 (keyup.enter)="togglePurposeExpand()"
                                 tabindex="0"
-                                >{{ isPurposeExpanded ? 'Show less' : 'Read more' }}
+                                >{{
+                                    isPurposeExpanded
+                                        ? ('plugin.showLess' | transloco)
+                                        : ('plugin.readMore' | transloco)
+                                }}
                                 <i-lucide [img]="isPurposeExpanded ? ChevronsUp : ChevronsDown" size="15"></i-lucide>
                             </a>
                         </div>
@@ -54,7 +58,7 @@
                                 (click)="openDialog(plugin)"
                                 (keyup.enter)="openDialog(plugin)"
                                 tabindex="0">
-                                Read about the methodology »
+                                {{ 'plugin.methodology' | transloco }}
                             </button>
                         </div>
                         <div class="credits-link__wrapper" *ngIf="plugin.authors.length > 0">
@@ -63,7 +67,7 @@
                                 (click)="openCreditsDialog(plugin)"
                                 (keyup.enter)="openCreditsDialog(plugin)"
                                 tabindex="0">
-                                View credits »
+                                {{ 'plugin.credits' | transloco }}
                             </button>
                         </div>
                     </div>
@@ -73,18 +77,18 @@
             <div class="plugin-content-wrapper">
                 <div class="computations-list" *ngIf="plugin.status === 'unavailable' || computeState === 'inactive'">
                     <div class="computations-list__header">
-                        <h2>Computations</h2>
+                        <h2>{{ 'plugin.computations' | transloco }}</h2>
                         <div
                             class="new-compute__wrapper"
                             *ngIf="plugin.status !== 'unavailable'"
-                            tp="Please login to request a computation."
+                            [tp]="'plugin.loginToCompute' | transloco"
                             [tpIsEnabled]="!user">
                             <button
                                 class="new-compute btn-primary btn-small btn-withtext"
                                 (click)="enterComputeState()"
                                 [disabled]="!user">
                                 <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
-                                New computation
+                                {{ 'plugin.newComputation' | transloco }}
                             </button>
                         </div>
                     </div>
@@ -93,13 +97,13 @@
 
                 <div class="plugin-compute" *ngIf="plugin.status !== 'unavailable' && computeState === 'compute-ready'">
                     <div class="plugin-compute__header">
-                        <h2>Compute</h2>
+                        <h2>{{ 'plugin.computePanel' | transloco }}</h2>
                         <button
                             class="new-compute btn-light btn-small btn-withtext"
                             (click)="exitComputeState()"
                             [disabled]="!user">
                             <i-lucide [img]="CircleX" size="20"></i-lucide>
-                            Cancel
+                            {{ 'plugin.cancel' | transloco }}
                         </button>
                     </div>
                     <div class="plugin-compute-wrapper">
@@ -118,10 +122,10 @@
 <ng-template #pluginMethodologyDialog let-data>
     <div class="plugin-methodology-dialog">
         <ng-scrollbar visibility="hover" orientation="vertical">
-            <h2>Methodology</h2>
+            <h2>{{ 'plugin.dialog.methodology' | transloco }}</h2>
             <markdown [data]="data.methodology" ngPreserveWhitespaces class="markdown"></markdown>
             <div *ngIf="data.sources">
-                <h3>Sources</h3>
+                <h3>{{ 'plugin.dialog.sources' | transloco }}</h3>
                 <ul class="plugin-sources">
                     <li *ngFor="let source of data.sources" class="plugin-sources">
                         <strong *ngIf="source.title">{{ source.title }}</strong>
@@ -142,7 +146,7 @@
 <ng-template #pluginCreditsDialog let-data>
     <div class="plugin-credits-dialog">
         <ng-scrollbar visibility="hover" orientation="vertical">
-            <h2>Credits</h2>
+            <h2>{{ 'plugin.dialog.credits' | transloco }}</h2>
             <ul class="plugin-authors">
                 <li *ngFor="let author of data.authors">
                     <a

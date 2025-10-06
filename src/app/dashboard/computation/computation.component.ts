@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
@@ -23,7 +24,7 @@ enum DefaultTag {
 
 @Component({
     selector: 'app-computation',
-    imports: [CommonModule, LucideAngularModule, MatIconModule, TippyDirective],
+    imports: [CommonModule, LucideAngularModule, MatIconModule, TippyDirective, TranslocoModule],
     animations: [
         trigger('expandCollapse', [
             state(
@@ -74,7 +75,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
         private mapService: MapService,
         private reportService: ReportService,
         private artifactViewerService: ArtifactViewerService,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private translocoService: TranslocoService
     ) {}
 
     ngOnInit(): void {
@@ -101,7 +103,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
     renderArtifact(artifact: ArtifactEntity) {
         if (this.isReportVisible) {
-            this.toastr.warning('Please exit the Report Builder first, or add this artifact to the report.', '', {
+            this.toastr.warning(this.translocoService.translate('computation.pleaseExitReportBuilder'), '', {
                 timeOut: 4000
             })
             return

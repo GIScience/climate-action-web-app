@@ -8,6 +8,7 @@ import { AppwriteService } from '@app/auth/appwrite.service'
 import { DatabaseService } from '@app/database.service'
 import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { compareDesc, format } from 'date-fns'
@@ -78,7 +79,8 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
         NgScrollbarModule,
         FilterByCriteriaPipe,
         LucideAngularModule,
-        ComputationComponent
+        ComputationComponent,
+        TranslocoModule
     ],
     animations: [
         trigger('expandCollapse', [
@@ -188,7 +190,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private storageService: StorageService,
         private appwriteService: AppwriteService,
         private reportService: ReportService,
-        private databaseService: DatabaseService
+        private databaseService: DatabaseService,
+        private translocoService: TranslocoService
     ) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
@@ -641,7 +644,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     deleteComputation(correlation_uuid: string, event?: Event): void {
         event?.stopPropagation()
 
-        const confirmed = confirm('Are you sure you want to delete this computation? This action cannot be undone.')
+        const confirmed = confirm(this.translocoService.translate('computationsIndex.deleteConfirmation'))
         if (!confirmed) return
 
         this.storageService.deleteComputation(correlation_uuid)
@@ -747,9 +750,15 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     importComputation(correlationUuid: string): void {
         if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
-            this.toastr.warning('Computation ID #' + this.formatUUID(correlationUuid) + ' is already present', '', {
-                timeOut: 4000
-            })
+            this.toastr.warning(
+                this.translocoService.translate('computationsIndex.computationAlreadyPresent', {
+                    id: this.formatUUID(correlationUuid)
+                }),
+                '',
+                {
+                    timeOut: 4000
+                }
+            )
             return
         }
 
@@ -768,13 +777,19 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.currentRuns.push(computation)
                 this.fetchAndProcessComputations(computation)
                 this.importedRuns = [...this.importedRuns, correlationUuid]
-                this.toastr.success('Computation ID #' + this.formatUUID(correlationUuid) + ' imported', '', {
-                    timeOut: 4000
-                })
+                this.toastr.success(
+                    this.translocoService.translate('computationsIndex.computationImported', {
+                        id: this.formatUUID(correlationUuid)
+                    }),
+                    '',
+                    {
+                        timeOut: 4000
+                    }
+                )
             },
             error: error => {
                 console.error('Error importing computation:', error)
-                this.toastr.error('Error importing computation', '', {
+                this.toastr.error(this.translocoService.translate('computationsIndex.errorImportingComputation'), '', {
                     disableTimeOut: true
                 })
             }

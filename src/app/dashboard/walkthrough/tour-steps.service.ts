@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { TranslocoService } from '@jsverse/transloco'
 import { MapService } from '../map/map.service'
 import { ExtendedDriveStep } from './tour.interfaces'
 
@@ -9,7 +10,10 @@ export class TourStepsService {
     private activeEventHandlers: (() => void)[] = []
     private nextStepCallback: () => void = () => {}
 
-    constructor(private mapService: MapService) {}
+    constructor(
+        private mapService: MapService,
+        private translocoService: TranslocoService
+    ) {}
 
     cleanupEventHandlers() {
         this.activeEventHandlers.forEach(cleanup => cleanup())
@@ -48,9 +52,8 @@ export class TourStepsService {
                 this.fetchElementWithText('.plugin-card', 'hiWalk') ||
                 document.querySelector('.plugin-card:nth-child(3)'),
             popover: {
-                title: 'Choose an Assessment Tool',
-                description:
-                    'Let’s start by picking from one of the many assessment tools. We’ll use <strong>hiWalk</strong> for this example.',
+                title: this.translocoService.translate('walkthrough.tourSteps.choosePlugin.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.choosePlugin.description'),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
@@ -72,9 +75,8 @@ export class TourStepsService {
         return {
             element: 'button.new-compute',
             popover: {
-                title: 'Request a New Computation',
-                description:
-                    'Next we’ll click on the <strong>New Computation</strong> button to initiate a new request.',
+                title: this.translocoService.translate('walkthrough.tourSteps.newComputation.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.newComputation.description'),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
@@ -106,9 +108,8 @@ export class TourStepsService {
                 )
             },
             popover: {
-                title: 'Search for an Area of Interest',
-                description:
-                    'Now we’ll have to go to the area of interest. We’ve prefilled the search with an example for you. Click on the suggestion that appears to go there on the map.',
+                title: this.translocoService.translate('walkthrough.tourSteps.searchArea.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.searchArea.description'),
                 side: 'left',
                 align: 'start',
                 onPopoverRender: () => {
@@ -141,9 +142,8 @@ export class TourStepsService {
         return {
             element: 'app-map',
             popover: {
-                title: 'Select the area boundary',
-                description:
-                    'Now select the area boundaries by clicking on the map. You can also zoom in and out to see the area boundaries better.',
+                title: this.translocoService.translate('walkthrough.tourSteps.selectBoundary.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.selectBoundary.description'),
                 side: 'bottom',
                 align: 'center',
                 onPopoverRender: () => {
@@ -165,8 +165,8 @@ export class TourStepsService {
         return {
             element: '.plugin-parameter-container button.btn-primary',
             popover: {
-                title: 'Request the computation',
-                description: 'Finally, click on the <strong>Compute</strong> button to start the computation.',
+                title: this.translocoService.translate('walkthrough.tourSteps.requestCompute.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.requestCompute.description'),
                 side: 'right',
                 align: 'start',
                 onPopoverRender: () => {
@@ -193,11 +193,16 @@ export class TourStepsService {
                 this.fetchElementWithText('.parent-computation', tourType === 'guest' ? 'Demo' : 'Ventotene') ||
                 document.querySelector('.computations-container .parent-computation'),
             popover: {
-                title: 'Open the computation',
-                description:
+                title: this.translocoService.translate(
                     tourType === 'guest'
-                        ? 'Next, let’s open the Demo computation that has been pre-loaded for you.'
-                        : 'The computation is now ready! Let’s expand it to see what results are available.',
+                        ? 'walkthrough.tourSteps.openComputation.titleGuest'
+                        : 'walkthrough.tourSteps.openComputation.titleFull'
+                ),
+                description: this.translocoService.translate(
+                    tourType === 'guest'
+                        ? 'walkthrough.tourSteps.openComputation.descriptionGuest'
+                        : 'walkthrough.tourSteps.openComputation.descriptionFull'
+                ),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
@@ -221,8 +226,8 @@ export class TourStepsService {
                 this.fetchElementWithText('li.child-computation', 'Path Category') ||
                 document.querySelector('li.child-computation'),
             popover: {
-                title: 'View a result',
-                description: 'Let’s open the first result to see what it contains.',
+                title: this.translocoService.translate('walkthrough.tourSteps.viewFirstResult.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.viewFirstResult.description'),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
@@ -244,8 +249,8 @@ export class TourStepsService {
         return {
             element: '.artifact-container .artifact-window-controls',
             popover: {
-                title: 'Read more about the results',
-                description: 'You can read more about the results, or even download the raw data from here.',
+                title: this.translocoService.translate('walkthrough.tourSteps.exploreResult.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.exploreResult.description'),
                 side: 'top',
                 align: 'end',
                 onPopoverRender: () => {
@@ -269,8 +274,8 @@ export class TourStepsService {
                 this.fetchElementWithText('li.child-computation', 'Distribution of Path Categories') ||
                 document.querySelector('li.child-computation:nth-child(3)'),
             popover: {
-                title: 'View a different result',
-                description: 'Not all results are displayed on the map. Let’s look at a chart in this result.',
+                title: this.translocoService.translate('walkthrough.tourSteps.viewChartResult.title'),
+                description: this.translocoService.translate('walkthrough.tourSteps.viewChartResult.description'),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
@@ -292,14 +297,14 @@ export class TourStepsService {
 
     private getCompletionStep(isGuestTour: boolean = false): ExtendedDriveStep {
         const description = isGuestTour
-            ? 'This concludes the guest tour. You may request your own custom computations for any area of interest after logging in. You can restart this walkthrough anytime from the <strong>Account</strong> menu.'
-            : 'The walkthrough is now complete. Feel free to explore the other Assessment Tools and see what they can offer. You can always restart this walkthrough via the <strong>Account</strong> menu.'
+            ? this.translocoService.translate('walkthrough.tourSteps.completion.descriptionGuest')
+            : this.translocoService.translate('walkthrough.tourSteps.completion.descriptionFull')
 
         return {
             popover: {
-                title: 'Done!',
+                title: this.translocoService.translate('walkthrough.tourSteps.completion.title'),
                 description,
-                doneBtnText: 'Exit'
+                doneBtnText: this.translocoService.translate('walkthrough.tourSteps.completion.exitButton')
             }
         }
     }

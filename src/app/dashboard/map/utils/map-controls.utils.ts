@@ -1,4 +1,5 @@
 import { IControl } from 'maplibre-gl'
+import { TranslocoService } from '@jsverse/transloco'
 import { MapStyle, MapStyleSwitcherControl } from './map-style-switcher.utils'
 
 export class MapControlsUtils {
@@ -42,10 +43,18 @@ export class MapControlsUtils {
     static createLayerSwitcherControl(
         styles: MapStyle[],
         currentBasemapStyle: string,
+        translocoService: TranslocoService,
         onStyleChange: (styleName: string) => void,
         onStateChange?: (isExpanded: boolean) => void,
         initialExpanded?: boolean
     ): MapStyleSwitcherControl {
-        return new MapStyleSwitcherControl(styles, currentBasemapStyle, onStyleChange, onStateChange, initialExpanded)
+        return new MapStyleSwitcherControl(
+            styles,
+            currentBasemapStyle,
+            translocoService,
+            onStyleChange,
+            onStateChange,
+            initialExpanded
+        )
     }
 }

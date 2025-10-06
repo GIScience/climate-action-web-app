@@ -33,6 +33,8 @@
         "@angular/platform-browser": "^19.2.14",
         "@angular/platform-browser-dynamic": "^19.2.14",
         "@angular/router": "^19.2.14",
+        "@jsverse/transloco": "8.0.0",
+        "@jsverse/transloco-messageformat": "^8.0.2",
         "@mapbox/mapbox-gl-rtl-text": "^0.3.0",
         "@ngneat/helipopper": "^12.0.0",
         "@ngx-formly/core": "^7.0.0",
