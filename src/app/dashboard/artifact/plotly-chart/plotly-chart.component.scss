@@ -2,6 +2,12 @@
     aspect-ratio: 3 / 2;
     margin: 0 auto;
     max-width: 50rem;
+
+    ::ng-deep {
+        .modebar-group {
+            display: flex;
+        }
+    }
 }
 
 .in-app-full {
@@ -19,6 +25,10 @@
     ::ng-deep {
         .plot-container.plotly {
             overflow: hidden;
+
+            .modebar-group {
+                display: flex;
+            }
 
             .modebar {
                 margin-right: 15px;

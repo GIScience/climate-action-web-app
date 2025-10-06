@@ -23,7 +23,8 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
     private fullscreenIcon = {
         width: 512,
         height: 512,
-        path: 'M512 512v-208l-80 80-96-96-48 48 96 96-80 80z M512 0h-208l80 80-96 96 48 48 96-96 80 80z M0 512h208l-80-80 96-96-48-48-96 96-80-80z M0 0v208l80-80 96 96 48-48-96-96 80-80z'
+        path: 'M512 512v-208l-80 80-96-96-48 48 96 96-80 80z M512 0h-208l80 80-96 96 48 48 96-96 80 80z M0 512h208l-80-80 96-96-48-48-96 96-80-80z M0 0v208l80-80 96 96 48-48-96-96 80-80z',
+        transform: 'matrix(0.8, 0, 0, 0.8, 51.2, 51.2)'
     }
 
     ngOnInit(): void {
@@ -56,7 +57,7 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
                         width: 1500,
                         scale: 1.5
                     },
-                    modeBarButtonsToRemove: ['zoom', 'pan', 'select', 'lasso2d', 'resetScale2d'],
+                    modeBarButtonsToRemove: ['zoom', 'pan', 'select', 'lasso2d', 'autoscale'],
                     modeBarButtonsToAdd: [
                         {
                             name: 'Fullscreen',
