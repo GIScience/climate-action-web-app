@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common'
 import { Component, Inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog'
-import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core'
+import { FormlyFieldConfig, FormlyField } from '@ngx-formly/core'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 
 @Component({
     selector: 'app-dialog-window',
-    imports: [CommonModule, FormlyModule, MatDialogModule, MatButtonModule, LucideAngularModule, NgScrollbarModule],
+    imports: [CommonModule, FormlyField, MatDialogModule, MatButtonModule, LucideAngularModule, NgScrollbarModule],
     templateUrl: './dialog-window.component.html',
     styleUrls: ['./dialog-window.component.scss']
 })

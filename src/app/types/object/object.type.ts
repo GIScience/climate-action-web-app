@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
-import { FieldType, FormlyModule } from '@ngx-formly/core'
+import { FieldType, FormlyField, FormlyValidationMessage } from '@ngx-formly/core'
 
 @Component({
     selector: 'app-formly-object-type',
     templateUrl: 'object.type.component.html',
     styleUrls: ['object.type.component.scss'],
-    imports: [CommonModule, FormlyModule]
+    imports: [CommonModule, FormlyField, FormlyValidationMessage]
 })
 export class ObjectTypeComponent extends FieldType {}
 

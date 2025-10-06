@@ -8,7 +8,7 @@ import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { TippyDirective } from '@ngneat/helipopper'
-import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core'
+import { FormlyFieldConfig, FormlyForm, FormlyFormOptions } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
@@ -37,7 +37,7 @@ import { FormlyModel } from './plugin-parameter.interface'
     templateUrl: './plugin-parameter.component.html',
     styleUrls: ['./plugin-parameter.component.scss'],
     imports: [
-        FormlyModule,
+        FormlyForm,
         FormsModule,
         ReactiveFormsModule,
         NgIf,

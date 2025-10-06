@@ -32,6 +32,8 @@ import { ObjectTypeComponent } from '@app/types/object/object.type'
 import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
 import { popperVariation, provideTippyConfig, provideTippyLoader } from '@ngneat/helipopper/config'
 import { FormlyModule } from '@ngx-formly/core'
+import { FormlyMaterialModule } from '@ngx-formly/material'
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
 import { provideToastr } from 'ngx-toastr'
@@ -91,6 +93,8 @@ bootstrapApplication(AppComponent, {
                     { name: 'dialog', component: OptionalAttributesTypeComponent, wrappers: [] }
                 ]
             }),
+            FormlyMaterialModule,
+            FormlyMatDatepickerModule,
             MarkdownModule.forRoot(),
             LucideAngularModule.pick({ CircleUserRound })
         ),
