@@ -56,7 +56,7 @@
         "ngx-papaparse": "^8.0.0",
         "ngx-scrollbar": "^18.0.0",
         "ngx-toastr": "^19.0.0",
-        "ol": "^9.2.4",
+        "ol": "^10.0.0",
         "plotly.js-strict-dist": "^3.0.1",
         "remarkable": "^2.0.1",
         "rxjs": "~7.8.0",
