@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule, NgClass, NgIf } from '@angular/common'
-import { Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
@@ -191,7 +191,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         private appwriteService: AppwriteService,
         private reportService: ReportService,
         private databaseService: DatabaseService,
-        private translocoService: TranslocoService
+        private translocoService: TranslocoService,
+        private cdr: ChangeDetectorRef
     ) {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
@@ -323,6 +324,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.scheduledRuns = this.storageService
             .getComputesByStatus(['PENDING', 'STARTED'])
             .filter(run => run.pluginId === this.pluginId)
+
+        this.cdr.markForCheck()
     }
 
     private async loadInitialPluginRuns(): Promise<void> {
@@ -422,6 +425,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (newStatus === 'SUCCESS' || newStatus === 'FAILURE') {
             this.scheduledRuns = this.scheduledRuns.filter(r => r.correlation_uuid !== run.correlation_uuid)
+            this.cdr.markForCheck()
         }
 
         if (newStatus === 'SUCCESS') {
@@ -773,19 +777,32 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     flags: ['IMPORTED']
                 }
 
-                this.pluginService.storeNewComputes(computation)
-                this.currentRuns.push(computation)
-                this.fetchAndProcessComputations(computation)
-                this.importedRuns = [...this.importedRuns, correlationUuid]
-                this.toastr.success(
-                    this.translocoService.translate('computationsIndex.computationImported', {
-                        id: this.formatUUID(correlationUuid)
-                    }),
-                    '',
-                    {
-                        timeOut: 4000
-                    }
-                )
+                this.pluginService
+                    .storeNewComputes(computation)
+                    .then(() => {
+                        this.currentRuns.push(computation)
+                        this.fetchAndProcessComputations(computation)
+                        this.importedRuns = [...this.importedRuns, correlationUuid]
+                        this.toastr.success(
+                            this.translocoService.translate('computationsIndex.computationImported', {
+                                id: this.formatUUID(correlationUuid)
+                            }),
+                            '',
+                            {
+                                timeOut: 4000
+                            }
+                        )
+                    })
+                    .catch(error => {
+                        console.error('Failed to store imported computation:', error)
+                        this.toastr.error(
+                            this.translocoService.translate('computationsIndex.errorImportingComputation'),
+                            '',
+                            {
+                                disableTimeOut: true
+                            }
+                        )
+                    })
             },
             error: error => {
                 console.error('Error importing computation:', error)
@@ -821,9 +838,15 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 status: stateInfo.state,
                                 flags: ['DEMO']
                             }
-                            this.pluginService.storeNewComputes(compute)
-                            this.demoRuns.push(data.correlation_uuid)
-                            this.fetchAndProcessComputations(compute)
+                            this.pluginService
+                                .storeNewComputes(compute)
+                                .then(() => {
+                                    this.demoRuns.push(data.correlation_uuid)
+                                    this.fetchAndProcessComputations(compute)
+                                })
+                                .catch(error => {
+                                    console.error('Failed to store demo computation:', error)
+                                })
                         } else {
                             const compute: ComputationDatabaseEntity = {
                                 correlation_uuid: data.correlation_uuid,
@@ -833,8 +856,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 status: stateInfo.state,
                                 flags: ['DEMO']
                             }
-                            this.pluginService.storeNewComputes(compute)
-                            this.pluginService.triggerSyncTasks()
+                            this.pluginService
+                                .storeNewComputes(compute)
+                                .then(() => {
+                                    this.pluginService.triggerSyncTasks()
+                                })
+                                .catch(error => {
+                                    console.error('Failed to store demo computation:', error)
+                                })
                         }
                     }
                 })
