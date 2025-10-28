@@ -127,8 +127,8 @@ export class PluginService {
         return this.computeState$
     }
 
-    storeNewComputes(compute: ComputationDatabaseEntity) {
-        this.storageService.storeNewCompute(compute)
+    storeNewComputes(compute: ComputationDatabaseEntity): Promise<void> {
+        return this.storageService.storeNewCompute(compute)
     }
 
     getPluginRuns() {

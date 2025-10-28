@@ -120,7 +120,7 @@ describe('PluginService', () => {
 
         const mockStorageService = {
             getComputesByStatus: jest.fn().mockReturnValue([test_plugin_run, test_plugin_run]),
-            storeNewCompute: jest.fn(),
+            storeNewCompute: jest.fn(() => Promise.resolve()),
             updateComputation: jest.fn(() => Promise.resolve()),
             getPluginRuns: jest.fn().mockReturnValue([test_plugin_run])
         }
@@ -208,8 +208,8 @@ describe('PluginService', () => {
         expect(storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])).toHaveLength(2)
     })
 
-    it('should store computes', () => {
-        service.storeNewComputes({
+    it('should store computes', async () => {
+        await service.storeNewComputes({
             correlation_uuid: '1fbeed00-e9b7-4f54-bae7-18f64bd33ea6',
             pluginId: 'test_plugin',
             aoiName: 'Test Area',

@@ -67,7 +67,7 @@ describe('ComputationsIndexComponent', () => {
             syncTasks$: new BehaviorSubject<void>(undefined),
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             computeDemo: jest.fn(),
-            storeNewComputes: jest.fn()
+            storeNewComputes: jest.fn(() => Promise.resolve())
         }
 
         mockArtifactService = {
@@ -355,7 +355,7 @@ describe('ComputationsIndexComponent', () => {
 
         mockPluginService.computeDemo = jest.fn().mockReturnValue(of(demoResponse))
         mockPluginService.getComputationRunState = jest.fn().mockReturnValue(of(stateResponse))
-        mockPluginService.storeNewComputes = jest.fn()
+        mockPluginService.storeNewComputes = jest.fn(() => Promise.resolve())
 
         mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
             if (id === 'demo-uuid-123') {

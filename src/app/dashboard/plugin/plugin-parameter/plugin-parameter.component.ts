@@ -231,7 +231,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         })
 
         this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
-            next: data => {
+            next: async data => {
                 const compute: ComputationDatabaseEntity = {
                     correlation_uuid: data.correlation_uuid,
                     pluginId: this.plugin.plugin_id,
@@ -239,13 +239,26 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                     status: 'PENDING' as ComputationRunState,
                     timestamp: new Date()
                 }
-                this.pluginService.storeNewComputes(compute)
-                this.pluginService.triggerSyncTasks()
-                this.pluginService.setComputeState('inactive')
 
-                this.toastr.info(this.translocoService.translate('pluginParameter.computeRequestSent'), '', {
-                    timeOut: 7000
-                })
+                try {
+                    await this.pluginService.storeNewComputes(compute)
+
+                    this.pluginService.triggerSyncTasks()
+                    this.pluginService.setComputeState('inactive')
+
+                    this.toastr.info(this.translocoService.translate('pluginParameter.computeRequestSent'), '', {
+                        timeOut: 7000
+                    })
+                } catch (error) {
+                    console.error('Failed to store computation:', error)
+                    this.toastr.error(
+                        this.translocoService.translate('pluginParameter.errorWhileSubmittingYourRequest'),
+                        '',
+                        {
+                            timeOut: 7000
+                        }
+                    )
+                }
             },
             error: error => {
                 switch (error.status) {
