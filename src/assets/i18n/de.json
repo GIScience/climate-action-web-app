@@ -259,6 +259,13 @@
     },
     "map": {
         "baseMaps": "Hintergrundkarte",
-        "layers": "Kartenebenen"
+        "layers": "Kartenebenen",
+        "drawing": {
+            "radius": "Radius",
+            "area": "Fläche",
+            "width": "Breite",
+            "height": "Höhe",
+            "measuring": "Messen..."
+        }
     }
 }

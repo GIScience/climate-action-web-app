@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import { Feature as GeoJSONFeature } from 'geojson'
@@ -22,6 +23,9 @@ export class MapDrawingService {
     private readonly SQM_TO_SQKM_FACTOR = 1e-6
     private readonly DRAW_MODES = { Polygon: 'polygon', Circle: 'circle', Box: 'rectangle' } as const
     private readonly TYPE_MAP = { circle: 'Circle', rectangle: 'Box', polygon: 'Polygon' } as const
+    private readonly TOOLTIP_OFFSET: [number, number] = [0, -15]
+    private readonly TOOLTIP_STYLES =
+        'padding:4px 8px;background:rgba(0,0,0,0.8);color:white;font-size:12px;border-radius:3px;white-space:pre-line;'
 
     private terraDrawControl: MaplibreTerradrawControl | undefined
     private map: Map | undefined
@@ -32,6 +36,8 @@ export class MapDrawingService {
 
     private measureTooltipElement: HTMLElement | undefined
     private measureTooltip: Popup | undefined
+
+    constructor(private translocoService: TranslocoService) {}
 
     get drawnFeatures$(): Observable<DrawingFeature[]> {
         return this.drawnFeatures.asObservable()
@@ -226,14 +232,22 @@ export class MapDrawingService {
     private updateMeasurements(): void {
         if (!this.map) return
 
-        const feature = this.terraDrawControl?.getTerraDrawInstance()?.getSnapshot().at(-1)
+        const mode = this.currentDrawMode.value
+        const feature = this.terraDrawControl?.getTerraDrawInstance()?.getSnapshot().at(-1) as
+            | GeoJSONFeature
+            | undefined
         const coords = feature?.geometry.type === 'Polygon' ? feature.geometry.coordinates[0] : undefined
+
+        const hasValidCoords =
+            Array.isArray(coords) &&
+            coords.length >= (mode === 'rectangle' ? 4 : 2) &&
+            coords.every(([lng, lat]) => typeof lng === 'number' && typeof lat === 'number')
 
         if (
             !this.isDrawingMode.value ||
-            this.currentDrawMode.value !== 'circle' ||
-            !coords?.length ||
-            coords.length < 2
+            (mode !== 'circle' && mode !== 'rectangle') ||
+            !hasValidCoords ||
+            (mode === 'rectangle' && (!coords[1] || !coords[3]))
         ) {
             this.measureTooltip?.remove()
             this.measureTooltip = undefined
@@ -241,6 +255,16 @@ export class MapDrawingService {
             return
         }
 
+        const measurement =
+            mode === 'circle'
+                ? this.calculateCircleMeasurements(coords)
+                : this.calculateRectangleMeasurements(coords, feature)
+
+        if (!measurement) return
+        this.createOrUpdateTooltip(measurement.position, measurement.text)
+    }
+
+    private calculateCircleMeasurements(coords: number[][]): { text: string; position: [number, number] } {
         const bounds = coords.reduce(
             (acc, [lng, lat]) => [
                 Math.min(acc[0], lng),
@@ -252,22 +276,66 @@ export class MapDrawingService {
         )
         const center: [number, number] = [(bounds[0] + bounds[1]) / 2, (bounds[2] + bounds[3]) / 2]
         const radius = MapConvertMeasureUtils.calculateDistance(center, coords[0])
-        const radiusText = `Radius: ${MapConvertMeasureUtils.formatRadius(radius)}`
+        const areaInSqMeters = Math.PI * Math.pow(radius, 2)
+        const areaInSqKm = areaInSqMeters * this.SQM_TO_SQKM_FACTOR
+        const radiusLabel = this.translocoService.translate('map.drawing.radius')
+        const areaLabel = this.translocoService.translate('map.drawing.area')
+        const radiusText = `${radiusLabel}: ${MapConvertMeasureUtils.formatRadius(radius)}`
+        const areaText = `${areaLabel}: ${areaInSqKm.toFixed(2)} km²`
+        const tooltipText = `${radiusText}\n${areaText}`
+
+        return {
+            text: tooltipText,
+            position: [coords[0][0], coords[0][1]] as [number, number]
+        }
+    }
+
+    private calculateRectangleMeasurements(
+        coords: number[][],
+        feature: GeoJSONFeature | undefined
+    ): { text: string; position: [number, number] } | undefined {
+        if (!feature?.geometry || feature.geometry.type !== 'Polygon') return
+
+        const [topLeft, topRight, _bottomRight, bottomLeft] = coords
+        if (!topLeft || !topRight || !bottomLeft) return
+
+        const areaInSqMeters = area(feature)
+        const areaInSqKm = areaInSqMeters * this.SQM_TO_SQKM_FACTOR
+        const width = MapConvertMeasureUtils.calculateDistance(topLeft, topRight)
+        const height = MapConvertMeasureUtils.calculateDistance(topLeft, bottomLeft)
+
+        const widthLabel = this.translocoService.translate('map.drawing.width')
+        const heightLabel = this.translocoService.translate('map.drawing.height')
+        const areaLabel = this.translocoService.translate('map.drawing.area')
+
+        const tooltipText = [
+            `${widthLabel}: ${MapConvertMeasureUtils.formatRadius(width)}`,
+            `${heightLabel}: ${MapConvertMeasureUtils.formatRadius(height)}`,
+            `${areaLabel}: ${areaInSqKm.toFixed(2)} km²`
+        ].join('\n')
+
+        return {
+            text: tooltipText,
+            position: [topLeft[0], topLeft[1]]
+        }
+    }
+
+    private createOrUpdateTooltip(position: [number, number], text: string): void {
+        if (!this.map) return
 
         if (this.measureTooltip && this.measureTooltipElement) {
-            this.measureTooltipElement.textContent = radiusText
-            this.measureTooltip.setLngLat(coords[0] as LngLatLike)
+            this.measureTooltipElement.innerHTML = text.replace(/\n/g, '<br>')
+            this.measureTooltip.setLngLat(position as LngLatLike)
             if (!this.measureTooltip.isOpen()) this.measureTooltip.addTo(this.map)
             return
         }
 
         this.measureTooltipElement = document.createElement('div')
-        this.measureTooltipElement.style.cssText =
-            'padding:4px 8px;background:rgba(0,0,0,0.8);color:white;font-size:12px;border-radius:3px;'
-        this.measureTooltipElement.textContent = radiusText
+        this.measureTooltipElement.style.cssText = this.TOOLTIP_STYLES
+        this.measureTooltipElement.textContent = text
 
-        this.measureTooltip = new Popup({ closeButton: false, closeOnClick: false, offset: [0, -15] })
-            .setLngLat(coords[0] as LngLatLike)
+        this.measureTooltip = new Popup({ closeButton: false, closeOnClick: false, offset: this.TOOLTIP_OFFSET })
+            .setLngLat(position as LngLatLike)
             .setDOMContent(this.measureTooltipElement)
             .addTo(this.map)
     }
