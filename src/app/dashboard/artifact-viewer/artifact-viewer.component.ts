@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { Download, GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
+import { GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ArtifactViewerService } from './artifact-viewer.service'
@@ -24,7 +24,6 @@ import { ArtifactViewerService } from './artifact-viewer.service'
 })
 export class ArtifactViewerComponent {
     readonly GripHorizontal = GripHorizontal
-    readonly Download = Download
     readonly Maximize2 = Maximize2
     readonly Minimize2 = Minimize2
     readonly X = X
@@ -36,31 +35,6 @@ export class ArtifactViewerComponent {
 
     toggleMinimise(): void {
         this.artifactViewerService.minimised = !this.artifactViewerService.minimised
-    }
-
-    downloadContent(): void {
-        if (this.artifactService.downloadJsonHref) {
-            const a = document.createElement('a')
-            document.body.appendChild(a)
-            a.style.display = 'none'
-            a.href = (
-                this.artifactService.downloadJsonHref as { changingThisBreaksApplicationSecurity: string }
-            ).changingThisBreaksApplicationSecurity
-            a.download = 'data.json'
-            a.click()
-            document.body.removeChild(a)
-        } else if (this.artifactService.currentUrl) {
-            const a = document.createElement('a')
-            a.href = this.artifactService.currentUrl
-            a.download = this.getFileName(this.artifactService.currentUrl)
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-        }
-    }
-
-    private getFileName(url: string): string {
-        return url.split('/').pop() || 'download'
     }
 
     closeArtifactViewer(): void {

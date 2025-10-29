@@ -91,10 +91,10 @@
                 border-bottom-color: #008080;
                 border-radius: 50%;
                 box-sizing: border-box;
-                display: inline-block;
-                height: 24px;
-                margin-left: auto;
-                width: 24px;
+                height: 25px;
+                left: 10px;
+                position: absolute;
+                width: 25px;
             }
 
             @keyframes rotation {
@@ -123,12 +123,30 @@
     padding: 10px;
 }
 
-.add-to-report-btn {
+.artifact-actions {
+    display: flex;
     margin-left: auto;
-    opacity: 0;
-    transition: opacity 0.2s;
+
+    button {
+        border-radius: 0;
+        border-right-width: 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &:first-of-type {
+            border-bottom-left-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+        &:last-of-type {
+            border-bottom-right-radius: 10px;
+            border-right-width: 1.5px;
+            border-top-right-radius: 10px;
+        }
+    }
 }
 
+.child-computation:hover .download-btn,
 .child-computation:hover .add-to-report-btn,
 .child-computations-wrapper.report-active .add-to-report-btn {
     opacity: 1;

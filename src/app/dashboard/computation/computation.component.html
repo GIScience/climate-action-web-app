@@ -33,18 +33,27 @@
                     <mat-icon aria-hidden="false" aria-label="Computation" fontIcon="{{ artifact.icon }}"></mat-icon>
                     <div>{{ artifact.name }}</div>
                 </div>
-                <button
-                    class="add-to-report-btn"
-                    [ngClass]="{
-                        'btn-onlyicon btn-onlyicon--cta': !isReportVisible,
-                        'btn-small btn-alt btn-withtext': isReportVisible
-                    }"
-                    (click)="addToReport(artifact)"
-                    [tp]="'computation.addToReport' | transloco"
-                    tpPlacement="left">
-                    <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
-                    <span *ngIf="isReportVisible">{{ 'computation.add' | transloco }}</span>
-                </button>
+                <div class="artifact-actions">
+                    <button
+                        class="download-btn btn-onlyicon btn-onlyicon--cta"
+                        (click)="downloadContent(artifact, $event)"
+                        [tp]="'artifactViewer.download' | transloco"
+                        tpPlacement="bottom">
+                        <i-lucide [img]="Download" size="17"></i-lucide>
+                    </button>
+                    <button
+                        class="add-to-report-btn"
+                        [ngClass]="{
+                            'btn-onlyicon btn-onlyicon--cta': !isReportVisible,
+                            'btn-small btn-alt btn-withtext': isReportVisible
+                        }"
+                        (click)="addToReport(artifact)"
+                        [tp]="'computation.addToReport' | transloco"
+                        tpPlacement="bottom">
+                        <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
+                        <span *ngIf="isReportVisible">{{ 'computation.add' | transloco }}</span>
+                    </button>
+                </div>
                 <div *ngIf="artifact.isLoading" class="loading-circle"></div>
             </li>
         </ng-container>

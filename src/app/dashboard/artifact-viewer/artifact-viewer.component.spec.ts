@@ -44,22 +44,4 @@ describe('ArtifactViewerComponent', () => {
         expect(nameElement).toBeTruthy()
         expect(nameElement.nativeElement.textContent).toContain(testName)
     })
-
-    it('should create a link and trigger a download when downloadContent is called', () => {
-        const fakeAnchor = document.createElement('a')
-        jest.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
-        const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(fakeAnchor)
-        const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
-        const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
-        component.artifactService.currentUrl = 'http://localhost:4200/dashboard/sample-image.png'
-        component.downloadContent()
-
-        expect(createElementSpy).toHaveBeenCalled()
-        expect(createElementSpy).toHaveBeenCalledWith('a')
-        expect(fakeAnchor.href).toBe('http://localhost:4200/dashboard/sample-image.png')
-        expect(fakeAnchor.download).toBeTruthy()
-        expect(fakeAnchor.click).toHaveBeenCalled()
-        expect(appendChildSpy).toHaveBeenCalled()
-        expect(removeChildSpy).toHaveBeenCalled()
-    })
 })
