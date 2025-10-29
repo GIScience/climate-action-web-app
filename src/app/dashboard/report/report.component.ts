@@ -172,7 +172,8 @@ export class ReportComponent implements OnInit {
 
     closeReport() {
         if (!this.hasExported) {
-            if (confirm('Are you sure you want to close the report without exporting? It will not be saved.')) {
+            const confirmMessage = this.translocoService.translate('report.confirmCloseWithoutExport')
+            if (confirm(confirmMessage)) {
                 this.reportService.closeReport()
             }
             return

@@ -43,6 +43,9 @@
             "methodology": "Methodology",
             "sources": "Sources",
             "credits": "Credits"
+        },
+        "reportExitConfirm": {
+            "message": "The Report Builder must be exited before a new computation can be started. Are you sure? Your report will be lost if not exported."
         }
     },
     "computationsIndex": {
@@ -113,7 +116,8 @@
         "artifactAlreadyInReport": "This artifact is already in the report.",
         "maximumArtifactsAllowed": "Maximum of 4 artifacts allowed in the report. Please remove an existing artifact first.",
         "exportingPdf": "Preparing PDF export, please wait...",
-        "errorExportingPdf": "Error exporting PDF. Please try again."
+        "errorExportingPdf": "Error exporting PDF. Please try again.",
+        "confirmCloseWithoutExport": "Are you sure you want to close the Report Builder without exporting? It will not be saved."
     },
     "search": {
         "placeholder": "Search...",
