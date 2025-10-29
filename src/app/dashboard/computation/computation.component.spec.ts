@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
+import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationDisplayEntity, ComputationMetadata } from '../computations-index/computation.interface'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
@@ -433,6 +434,40 @@ describe('ComputationComponent', () => {
         const computationComponent = childComponents[0].componentInstance as ComputationComponent
 
         expect(computationComponent.shouldShowFilters).toBe(false)
+
+        discardPeriodicTasks()
+    }))
+
+    it('should create a link and trigger a download when downloadContent is called', fakeAsync(() => {
+        const computationFixture = TestBed.createComponent(ComputationComponent)
+        const computationComponent = computationFixture.componentInstance
+
+        const testArtifact = {
+            name: 'Test Image',
+            modality: 'IMAGE',
+            correlation_uuid: 'test-uuid',
+            store_id: 'sample-image',
+            file_path: 'sample-image.png',
+            primary: true,
+            tags: [],
+            attachments: {}
+        }
+
+        const fakeAnchor = document.createElement('a')
+        jest.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
+        const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(fakeAnchor)
+        const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
+        const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
+
+        computationComponent.downloadContent(testArtifact as ArtifactEntity)
+
+        expect(createElementSpy).toHaveBeenCalled()
+        expect(createElementSpy).toHaveBeenCalledWith('a')
+        expect(fakeAnchor.href).toContain('/store/test-uuid/sample-image')
+        expect(fakeAnchor.download).toBeTruthy()
+        expect(fakeAnchor.click).toHaveBeenCalled()
+        expect(appendChildSpy).toHaveBeenCalled()
+        expect(removeChildSpy).toHaveBeenCalled()
 
         discardPeriodicTasks()
     }))

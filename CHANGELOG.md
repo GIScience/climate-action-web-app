@@ -13,6 +13,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computations are now paginated during fetch from Appwrite, also switched storage to be Appwrite first (and switch to local for fallback) ([#337](https://gitlab.heigit.org/climate-action/web-app/-/issues/337))
 - Switched to Globe Projection on load, which spins while in Landing view ([#174](https://gitlab.heigit.org/climate-action/web-app/-/issues/174))
 - Primary/Secondary artifacts are not folded under a 'Show More' view anymore; rather primary artifacts are grouped and displayed under a 'main' tag ([#258](https://gitlab.heigit.org/climate-action/web-app/-/issues/258))
+- Move the artifact 'Download' button to the computations list, to allow access without opening it first ([#96](https://gitlab.heigit.org/climate-action/web-app/-/issues/96))
 
 ### Added
 
@@ -28,7 +29,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Landing page now displays last computation details only, since we do only paginated fetches when required
-- Scheduled computations are more stable, and periodic sync isn't broken by switching between browser tabs ([#378](https://gitlab.heigit.org/climate-action/web-app/-/issues/378))
+- Periodic sync for scheduled computations isn't broken by switching between browser tabs ([#378](https://gitlab.heigit.org/climate-action/web-app/-/issues/378))
+- Scheduled runs are more stable and shouldn't vanish randomly ([#404](https://gitlab.heigit.org/climate-action/web-app/-/issues/404))
 
 ## [2.5.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/2.5.1) - 2025-07-21
 

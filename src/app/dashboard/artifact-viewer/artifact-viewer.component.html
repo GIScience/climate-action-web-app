@@ -7,13 +7,6 @@
     <div cdkDragHandle class="artifact-header">
         <i-lucide [img]="GripHorizontal" size="15" class="grip-icon"></i-lucide>
         <h3 class="artifact-name">{{ artifactViewerService.name }}</h3>
-        <button
-            *ngIf="artifactService.currentUrl || artifactService.downloadJsonHref"
-            (click)="downloadContent()"
-            class="download-btn btn-onlyicon"
-            [tp]="'artifactViewer.download' | transloco">
-            <i-lucide [img]="Download" size="15"></i-lucide>
-        </button>
         <div class="artifact-window-controls">
             <button
                 (click)="toggleMinimise()"

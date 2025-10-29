@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
+import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { ClipboardPlus, LucideAngularModule } from 'lucide-angular'
+import { ClipboardPlus, Download, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -67,10 +68,11 @@ export class ComputationComponent implements OnInit, OnDestroy {
     shouldShowFilters: boolean = false
 
     readonly ClipboardPlus = ClipboardPlus
+    readonly Download = Download
     readonly DefaultTag = DefaultTag
 
     constructor(
-        private artifactService: ArtifactService,
+        public artifactService: ArtifactService,
         private pluginService: PluginService,
         private mapService: MapService,
         private reportService: ReportService,
@@ -190,6 +192,31 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         this.reportService.addArtifact(artifact, computationBasicInfo)
+    }
+
+    downloadContent(artifact: ArtifactEntity, event?: Event): void {
+        event?.stopPropagation()
+
+        const apiUrl = environment.climateActionApiUrl
+        const artifactUrl = `${apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`
+
+        let filename = 'download'
+        if (artifact.modality === 'CHART' || artifact.modality === 'CHART_PLOTLY') {
+            filename = 'data.json'
+        } else {
+            filename = this.getFileName(artifactUrl)
+        }
+
+        const a = document.createElement('a')
+        a.href = artifactUrl
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
+
+    private getFileName(url: string): string {
+        return url.split('/').pop() || 'download'
     }
 
     private initializeTagsAndFiltering(): void {
