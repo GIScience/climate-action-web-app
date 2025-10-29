@@ -259,6 +259,13 @@
     },
     "map": {
         "baseMaps": "Base Maps",
-        "layers": "Layers"
+        "layers": "Layers",
+        "drawing": {
+            "radius": "Radius",
+            "area": "Area",
+            "width": "Width",
+            "height": "Height",
+            "measuring": "Measuring..."
+        }
     }
 }

@@ -23,6 +23,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Plotly control added to view plots in fullscreen, especially useful for dense treemaps
 - App will now check for upcoming maintenance entries and display a toast on launch ([#357](https://gitlab.heigit.org/climate-action/web-app/-/issues/357))
 - Interface has been made multi-lingual, with German|Deutsch offered as an option for now ([#54](https://gitlab.heigit.org/climate-action/web-app/-/issues/54))
+- Display live area in km² when using the Circle or Rectangle drawing tool ([#405](https://gitlab.heigit.org/climate-action/web-app/-/issues/405))
 
 ### Fixed
 
