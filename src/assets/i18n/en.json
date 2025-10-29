@@ -12,9 +12,9 @@
         "notes": {
             "title": "A few notes before you begin…",
             "onDemand": "CAN results are <strong>calculated on-demand</strong>. This reduces our energy consumption, but means that assessments may take up to 60 minutes during high traffic.",
-            "urbanAreas": "Our tools are <strong>adapted to urban areas</strong>, where free and open source data quality is better. Results in rural areas may be less accurate.",
+            "urbanAreas": "Our tools are at their <strong>best in urban areas</strong>, where open data is most readily available. Results in rural areas may vary.",
             "experts": "While CAN is open to everyone, our assessment tools are <strong>tailored to experts</strong>. As such, they may include technical terms.",
-            "worksInProgress": "All tools and assessments within CAN are <strong>works in progress</strong> and will be continuously improved as new methods and datasets become available."
+            "worksInProgress": "All tools and assessments within CAN are <strong>continuously updated</strong> as new methods and datasets become available. Check back regularly for new and improved features."
         },
         "cta": {
             "startExploring": "Start exploring your region now and see where climate action can take you.",
