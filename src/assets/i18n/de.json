@@ -43,6 +43,9 @@
             "methodology": "Methoden",
             "sources": "Quellen",
             "credits": "Autoren"
+        },
+        "reportExitConfirm": {
+            "message": "Der Bericht-Modus muss zuerst geschlossen werden, bevor eine neue Berechnung gestartet werden kann. Möchtest du den Bericht wirklich schließen? Der Bericht wird nicht gespeichert, wenn er nicht exportiert wird."
         }
     },
     "computationsIndex": {
@@ -113,7 +116,8 @@
         "artifactAlreadyInReport": "Dieses Ergebnis ist bereits im Bericht enthalten.",
         "maximumArtifactsAllowed": "Es sind nur vier Ergebnisse pro Bericht erlaubt. Bitte entferne zuerst ein Ergebnis aus dem Bericht, bevor du ein neues hinzufügst.",
         "exportingPdf": "Der PDF-Bericht wird vorbereitet, bitte habe einen Moment Geduld...",
-        "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Berichts. Bitte versuche es noch einmal."
+        "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Berichts. Bitte versuche es noch einmal.",
+        "confirmCloseWithoutExport": "Möchtest du den Bericht wirklich schließen ohne zu exportieren? Der Bericht wird nicht gespeichert."
     },
     "search": {
         "placeholder": "Suche...",
