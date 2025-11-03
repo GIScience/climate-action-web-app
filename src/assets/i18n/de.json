@@ -145,7 +145,7 @@
         "language": {
             "english": "English",
             "german": "Deutsch",
-            "otherLangComputationWarning": "Die Berechnungen sind momentan noch nicht auf Deutsch sondern nur auf Englisch verfügbar."
+            "otherLangComputationWarning": "Die Ergebnisdarstellung ist zur Zeit noch nicht auf Deutsch, sondern nur auf Englisch verfügbar."
         }
     },
     "walkthrough": {
