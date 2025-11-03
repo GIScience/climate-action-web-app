@@ -2,22 +2,22 @@
     "landing": {
         "revisit": {
             "totalComputations": "Du hast {count, plural, =0 {leider noch keine Ergebnisse} one {bereits 1 Ergebnis} other {bereits # Ergebnisse}}.",
-            "latestComputation": "Sieh dir deine neuste Berechnung an:"
+            "latestComputation": "Sieh dir deine neueste Berechnung an:"
         },
         "loading": "Lade...",
         "welcome": {
             "title": "Willkommen beim Klimaschutznavigator (CAN)",
-            "description": "Der CAN ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen. Er stellt hochaufgelöste Daten und Analysen für wichtige Klimaschutzindikatoren, wie beispielsweise Heizungsemissionen oder zur Fußläufigkeit, bereit, die dir helfen die Stärken, aber auch die Verbesserungspotentiale deiner Stadt oder Region zu identifizieren."
+            "description": "Der CAN ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen. Er stellt hochaufgelöste Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder zur Fußläufigkeit bereit, die dir helfen, die Stärken, aber auch die Verbesserungspotentiale deiner Stadt oder Region zu identifizieren."
         },
         "notes": {
             "title": "Bevor du beginnst ein paar Hinweise:",
             "onDemand": "Die CAN Berechnungen werden <strong>auf Anfrage</strong> erstellt. Dies reduziert den Energieverbrauch, heißt aber auch, dass Analysen in manchen Fällen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben.",
-            "urbanAreas": "Unsere Module sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von Nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
-            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Module <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb könnte es Vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
+            "urbanAreas": "Unsere Module sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
+            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Module <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
             "worksInProgress": "Alle Module und Analysen im CAN sind in <strong>aktiver Entwicklung</strong> und werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
         },
         "cta": {
-            "startExploring": "Analysiere jetzt deine Region und Entdecke neues zum Thema Klimaschutz.",
+            "startExploring": "Analysiere jetzt deine Region und entdecke neues zum Thema Klimaschutz.",
             "selectTool": "Starte, indem du ein Analysemodul aus der Seitenleiste links auswählst.",
             "or": "ODER",
             "guidedWalkthrough": "Starte das Tutorial"
@@ -32,7 +32,7 @@
         "readMore": "Weitere Informationen",
         "showLess": "Einklappen",
         "methodology": "Methoden »",
-        "credits": "Autoren »",
+        "credits": "Autor:innen »",
         "computations": "Ergebnisse",
         "newComputation": "Neue Berechnung",
         "loginToCompute": "Bitte melde dich an, um eine Berechnung zu starten.",
@@ -42,15 +42,15 @@
         "dialog": {
             "methodology": "Methoden",
             "sources": "Quellen",
-            "credits": "Autoren"
+            "credits": "Autor:innen"
         },
         "reportExitConfirm": {
-            "message": "Der Bericht-Modus muss zuerst geschlossen werden, bevor eine neue Berechnung gestartet werden kann. Möchtest du den Bericht wirklich schließen? Der Bericht wird nicht gespeichert, wenn er nicht exportiert wird."
+            "message": "Der Report-Modus muss zuerst geschlossen werden, bevor eine neue Berechnung gestartet werden kann. Möchtest du den Report wirklich schließen? Der Report wird nicht gespeichert, wenn er nicht exportiert wird."
         }
     },
     "computationsIndex": {
-        "reportBuilder": "Bericht erstellen",
-        "exitReportBuilder": "Bericht schließen",
+        "reportBuilder": "Report erstellen",
+        "exitReportBuilder": "Report schließen",
         "archive": "Archiv",
         "backToAll": "Zurück zu deinen Ergebnissen",
         "createReport": "Erstelle eine PDF-Zusammenfassung, indem du verschiedene Ergebnisse kombinierst.",
@@ -84,16 +84,16 @@
             "title": "Einstellungen",
             "noParams": "Es wurden keine Einstellungsparameter angegeben."
         },
-        "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen. Dies kann nicht rückgängig gemacht werden.",
-        "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden",
-        "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert",
-        "errorImportingComputation": "Es gab einen Fehler beim importieren des Ergebnisses"
+        "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+        "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden.",
+        "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert.",
+        "errorImportingComputation": "Es gab einen Fehler beim Importieren des Ergebnisses."
     },
     "computation": {
-        "addToReport": "Zum Bericht hinzufügen",
+        "addToReport": "Zum Report hinzufügen",
         "add": "Hinzufügen »",
-        "noResults": "Bei dieser Berechnung wurden keine Resultate produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Modulautoren",
-        "pleaseExitReportBuilder": "Bitte schließe zuerst den Bericht-Modus, oder füge das Ergebnis zum Bericht hinzu."
+        "noResults": "Bei dieser Berechnung wurden keine Resultate produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Autor:innen des Moduls",
+        "pleaseExitReportBuilder": "Bitte schließe zuerst den Report-Modus, oder füge das Ergebnis zum Report hinzu."
     },
     "artifactViewer": {
         "download": "Ergebnis herunterladen",
@@ -106,18 +106,18 @@
         "detailedDescription": "Detaillierte Beschreibung"
     },
     "report": {
-        "title": "Bericht",
+        "title": "Report",
         "exportToPDF": "Als PDF exportieren",
         "removeAll": "Alle entfernen",
-        "exitBuilder": "Bericht schließen",
+        "exitBuilder": "Report schließen",
         "itemsCounter": "{{ count }}/{{ max }} Ergebnisse",
-        "emptyMessage": "Wähle \"Hinzufügen »\" an einem beliebigen Ergebnis einer Analyse, um es dem Bericht beizufügen.",
+        "emptyMessage": "Wähle \"Hinzufügen »\" bei einem beliebigen Ergebnis einer Analyse, um es dem Report beizufügen.",
         "mapZoomNote": "Verwende + / - um die Kartenansicht zu vergrößern oder zu verkleinern",
-        "artifactAlreadyInReport": "Dieses Ergebnis ist bereits im Bericht enthalten.",
-        "maximumArtifactsAllowed": "Es sind nur vier Ergebnisse pro Bericht erlaubt. Bitte entferne zuerst ein Ergebnis aus dem Bericht, bevor du ein neues hinzufügst.",
-        "exportingPdf": "Der PDF-Bericht wird vorbereitet, bitte habe einen Moment Geduld...",
-        "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Berichts. Bitte versuche es noch einmal.",
-        "confirmCloseWithoutExport": "Möchtest du den Bericht wirklich schließen ohne zu exportieren? Der Bericht wird nicht gespeichert."
+        "artifactAlreadyInReport": "Dieses Ergebnis ist bereits im Report enthalten.",
+        "maximumArtifactsAllowed": "Es sind nur vier Ergebnisse pro Report erlaubt. Bitte entferne zuerst ein Ergebnis aus dem Report, bevor du ein neues hinzufügst.",
+        "exportingPdf": "Der PDF-Report wird vorbereitet, bitte habe einen Moment Geduld...",
+        "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Reports. Bitte versuche es noch einmal.",
+        "confirmCloseWithoutExport": "Möchtest du den Report wirklich schließen, ohne zu exportieren? Der Report wird nicht gespeichert."
     },
     "search": {
         "placeholder": "Suche...",
@@ -134,7 +134,7 @@
         "footer": {
             "copyright": "© {{ year }} HeiGIT gGmbH",
             "aboutClimateAction": "Über das Climate Action Projekt",
-            "partnerWithUs": "Werde unser Partner",
+            "partnerWithUs": "Werde Partner:in",
             "imprint": "Impressum",
             "privacyPolicy": "Datenschutz",
             "faqs": "FAQs",
@@ -151,7 +151,7 @@
     "walkthrough": {
         "tourChoiceDialog": {
             "title": "Los geht's!",
-            "description": "Dieses Tutorial funktioniert am besten, wenn du angemeldet bist. Alternativ kannst du die kürzere Gästeinführung machen, um zu sehen was der Navigator bietet.",
+            "description": "Dieses Tutorial funktioniert am besten, wenn du angemeldet bist. Alternativ kannst du die kürzere Gästeinführung machen, um zu sehen, was der Navigator bietet.",
             "loginButton": "Anmelden, um das komplette Tutorial zu starten",
             "guestTourButton": "Die Gästeeinführung starten",
             "guestNote": "Die Gästeeinführung gibt dir einen Vorgeschmack von der Funktionalität des Navigators, verwendet aber Demo-Daten."
@@ -167,11 +167,11 @@
             },
             "searchArea": {
                 "title": "Suche deine Zielregion",
-                "description": "Jetzt müssen wir unsere Zielregion spezifizieren. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus um die Karte dort zu zentrieren."
+                "description": "Jetzt müssen wir unsere Zielregion spezifizieren. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus, um die Karte dort zu zentrieren."
             },
             "selectBoundary": {
                 "title": "Wähle den Umriss aus",
-                "description": "Wähle nun den Umriss der gewünschten Zielregion aus, indem du auf die Karte klickst. Zoome mit dem Mausrad um die Ansicht anzupassen."
+                "description": "Wähle nun den Umriss der gewünschten Zielregion aus, indem du auf die Karte klickst. Zoome mit dem Mausrad, um die Ansicht anzupassen."
             },
             "requestCompute": {
                 "title": "Starte eine Berechnung",
@@ -180,12 +180,12 @@
             "openComputation": {
                 "titleFull": "Eine Berechnung öffnen",
                 "titleGuest": "Eine Berechnung öffnen",
-                "descriptionFull": "Die Berechnung ist abgeschlossen! Klick sie an, um die einzelnen Ergebnisse zu begutachten.",
+                "descriptionFull": "Die Berechnung ist abgeschlossen! Klicke sie an, um die einzelnen Ergebnisse zu begutachten.",
                 "descriptionGuest": "Im nächsten Schritt kannst du dir die Demoberechnung ansehen."
             },
             "viewFirstResult": {
                 "title": "Ergebnisse ansehen",
-                "description": "Öffne das erste Ergebnis um dir dessen Inhalt anzeigen zu lassen."
+                "description": "Öffne das erste Ergebnis, um dir dessen Inhalt anzeigen zu lassen."
             },
             "exploreResult": {
                 "title": "Details zum Ergebnis",
@@ -226,8 +226,8 @@
         "reset": "Zurücksetzen"
     },
     "pluginParameter": {
-        "areaSelection": "Regionsauswahl",
-        "searchOrZoomInstruction": "Fokussiere einen Ort auf der Karte. Nutze dazu das Mausrad oder suche einen Ort in der Suchleiste. Du kannst dann eine der folgenden Methoden nutzen um das Berechnungsgebiet einzugrenzen.",
+        "areaSelection": "Auswahl einer Region",
+        "searchOrZoomInstruction": "Wähle einen Ort auf der Karte. Nutze dazu das Mausrad oder suche einen Ort in der Suchleiste. Du kannst dann eine der folgenden Methoden nutzen, um das Berechnungsgebiet einzugrenzen.",
         "boundary": "Administrative Grenze",
         "circle": "Umkreis",
         "rectangle": "Rechteck",
@@ -236,9 +236,9 @@
         "drawCircle": "Zeichne einen Umkreis",
         "drawRectangle": "Zeichne ein Rechteck",
         "drawPolygon": "Zeichne ein beliebiges Polygon",
-        "clickInsideBoundary": "Durch einen Klick auf die Karte kannst du eine Administrative Grenze auswählen. Die administrative Ebene passt sich dem Zoom an.",
-        "clickAndMovePointer": "Klicke auf die Karte und bewege danach den Mauszeiger um {shape, select, Umkreis {einen Kreis} Rechteck {ein Rechteck} other {ein Objekt}} zu zeichnen. Klicke zum abschließen ein weiteres Mal.",
-        "clickMultiplePoints": "Klicke auf die Karte um die Stützpunkte des Polygons zu zeichnen. Mit einem Doppelklick schließt du das Zeichnen ab.",
+        "clickInsideBoundary": "Durch einen Klick auf die Karte kannst du eine administrative Grenze auswählen. Die administrative Ebene passt sich dem Zoomlevel an.",
+        "clickAndMovePointer": "Klicke auf die Karte und bewege danach den Mauszeiger, um {shape, select, Umkreis {einen Kreis} Rechteck {ein Rechteck} other {}} zu zeichnen. Klicke zum Abschließen ein weiteres Mal.",
+        "clickMultiplePoints": "Klicke auf die Karte, um die Eckpunkte des Polygons zu zeichnen. Mit einem Doppelklick schließt du das Zeichnen ab.",
         "multipleAreasSelected": "Es wurde mehr als eine Region ausgewählt. Bitte wähle nur eine Region aus.",
         "selectedRegionLarge": "Die ausgewählte Region ist sehr groß (> 500 km²).",
         "processingMayTakeLonger": "Die Berechnung könnte länger dauern oder möglicherweise auch fehlschlagen.",
@@ -254,7 +254,7 @@
         "pleaseEnsureLoggedIn": "Stelle bitte sicher, dass du angemeldet bist und deine E-Mailadresse verifiziert hast.",
         "thereIsAnIssueWithYourAccount": "Es gibt ein Problem mit deinem Profil. Bitte kontaktiere den Support über das Profil-Menü.",
         "thereIsAnIssueWithYourSelectedArea": "Die ausgewählte Region hat ein Problem verursacht. Bitte versuche es mit einer anderen Region erneut oder kontaktiere den Support über das Profil-Menü.",
-        "youHaveReachedTheMaximumNumberOfRequests": "Du hast im Moment die Maximale Anzahl an Anfragen erreicht, bitte versuche es in ein paar Minuten noch einmal.",
+        "youHaveReachedTheMaximumNumberOfRequests": "Du hast im Moment die maximale Anzahl an Anfragen erreicht, bitte versuche es in ein paar Minuten noch einmal.",
         "errorWhileSubmittingYourRequest": "Beim Absenden der Anfrage ist ein Fehler aufgetreten, bitte versuche es erneut."
     },
     "map": {
