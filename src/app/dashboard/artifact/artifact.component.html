@@ -19,14 +19,6 @@
             <p *ngIf="modality !== 'TABLE'" class="artifact-summary">
                 <span>{{ summary }}</span>
             </p>
-            <div *ngIf="showAccordion">
-                <mat-expansion-panel *ngIf="description" class="artifact-description">
-                    <mat-expansion-panel-header>{{
-                        'artifact.detailedDescription' | transloco
-                    }}</mat-expansion-panel-header>
-                    <app-markdown [rawMarkdown]="description"></app-markdown>
-                </mat-expansion-panel>
-            </div>
         </div>
     </ng-scrollbar>
 </div>

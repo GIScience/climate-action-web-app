@@ -1,11 +1,5 @@
-<div
-    cdkDrag
-    [cdkDragDisabled]="artifactViewerService.minimised"
-    cdkDragBoundary=".dashboard__middle-column"
-    [class.minimised]="artifactViewerService.minimised"
-    class="artifact-container">
-    <div cdkDragHandle class="artifact-header">
-        <i-lucide [img]="GripHorizontal" size="15" class="grip-icon"></i-lucide>
+<div [class.minimised]="artifactViewerService.minimised" class="artifact-container">
+    <div class="artifact-header">
         <h3 class="artifact-name">{{ artifactViewerService.name }}</h3>
         <div class="artifact-window-controls">
             <button

@@ -1,15 +1,19 @@
 .maplibregl-control-container {
     .maplibregl-ctrl-top-right {
-        align-items: flex-start;
         display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
         margin-right: 0.5vw;
+        max-width: 250px;
         top: calc(0.5vw + 35px);
     }
 
     .maplibregl-ctrl.maplibregl-ctrl-scale {
+        backdrop-filter: blur(5px);
         font-size: 12px;
         height: 29px;
         line-height: 29px;
+        margin-right: 0;
     }
 
     .maplibregl-ctrl.navigation-controls {

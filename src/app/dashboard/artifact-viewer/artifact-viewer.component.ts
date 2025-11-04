@@ -1,4 +1,3 @@
-import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
@@ -10,15 +9,7 @@ import { ArtifactViewerService } from './artifact-viewer.service'
 
 @Component({
     selector: 'app-artifact-viewer',
-    imports: [
-        CommonModule,
-        CdkDrag,
-        CdkDragHandle,
-        LucideAngularModule,
-        TippyDirective,
-        ArtifactComponent,
-        TranslocoModule
-    ],
+    imports: [CommonModule, LucideAngularModule, TippyDirective, ArtifactComponent, TranslocoModule],
     templateUrl: './artifact-viewer.component.html',
     styleUrl: './artifact-viewer.component.scss'
 })

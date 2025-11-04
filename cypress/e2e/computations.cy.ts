@@ -56,6 +56,21 @@ describe('computations', () => {
         cy.get('.table-artifact-item').should('exist')
     })
 
+    it('should display the detailed description for an artifact when available', () => {
+        setupTest()
+
+        cy.get('.parent-computation').eq(0).click()
+
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).find('.description-btn').should('not.exist')
+
+        cy.get('.child-computation').eq(1).realHover()
+        cy.get('.child-computation').eq(1).find('.description-btn').click()
+
+        cy.get('.description-dialog').should('exist')
+        cy.get('.description-dialog').find('.markdown-artifact-item').should('contain', 'A table with two columns.')
+    })
+
     it('should generate a share link', () => {
         setupTest()
 

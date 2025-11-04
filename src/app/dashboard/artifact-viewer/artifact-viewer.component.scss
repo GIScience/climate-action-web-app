@@ -3,40 +3,32 @@
     background-color: rgb(255 255 255 / 85%);
     border: 1px solid #ccc;
     border-radius: 10px;
-    height: auto;
-    max-width: 40vw;
-    min-width: 40vw;
+    height: 100%;
     overflow: hidden;
     pointer-events: all;
     position: absolute;
-    right: calc(50% - 17.5vw);
-    top: 5vw;
+    width: 100%;
+
+    @media (min-width: 1800px) {
+        height: 90%;
+        right: 5%;
+        top: 5%;
+        width: 90%;
+    }
 
     &.minimised {
         height: 47.5px;
+        left: 20%;
         margin-top: calc(98vh - 132.5px);
         top: 0;
-        transform: none !important;
-
-        & .artifact-header {
-            cursor: unset;
-
-            .grip-icon {
-                display: none;
-            }
-        }
+        width: 60%;
     }
 
     .artifact-header {
         align-items: center;
         background-color: rgba(240, 248, 255, 0.5);
-        cursor: move;
         display: flex;
         padding: 10px;
-
-        .grip-icon {
-            color: #9c9c9c;
-        }
 
         .artifact-name {
             margin: 0 7.5px;

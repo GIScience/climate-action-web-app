@@ -166,7 +166,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     @ViewChild(ComputationComponent) computationComponent!: ComputationComponent
 
     get activeArtifact(): ArtifactEntity | undefined {
-        return this.artifactViewerService.isViewerVisible ? this._activeArtifact : undefined
+        return this._activeArtifact
     }
 
     user: Models.User<Models.Preferences> | null = null
@@ -255,6 +255,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         this.reportService.isVisible$.subscribe(isVisible => {
             this.isReportVisible = isVisible
+        })
+
+        this.artifactViewerService.isViewerVisible$.subscribe(isVisible => {
+            if (!isVisible && this._activeArtifact) {
+                this._activeArtifact = undefined
+            }
         })
     }
 

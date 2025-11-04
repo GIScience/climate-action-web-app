@@ -93,7 +93,8 @@
         "addToReport": "Add to Report",
         "add": "Add »",
         "noResults": "This run created no results. If you think that is an error, please contact the plugin developers",
-        "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this artifact to the report."
+        "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this artifact to the report.",
+        "viewDescription": "View Detailed Description"
     },
     "artifactViewer": {
         "download": "Download Artifact",

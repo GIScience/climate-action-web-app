@@ -13,7 +13,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computations are now paginated during fetch from Appwrite, also switched storage to be Appwrite first (and switch to local for fallback) ([#337](https://gitlab.heigit.org/climate-action/web-app/-/issues/337))
 - Switched to Globe Projection on load, which spins while in Landing view ([#174](https://gitlab.heigit.org/climate-action/web-app/-/issues/174))
 - Primary/Secondary artifacts are not folded under a 'Show More' view anymore; rather primary artifacts are grouped and displayed under a 'main' tag ([#258](https://gitlab.heigit.org/climate-action/web-app/-/issues/258))
-- Move the artifact 'Download' button to the computations list, to allow access without opening it first ([#96](https://gitlab.heigit.org/climate-action/web-app/-/issues/96))
+- Move the artifact's 'Download' & 'Detailed Description' to be accessible directly from the list overview ([#96](https://gitlab.heigit.org/climate-action/web-app/-/issues/96))
 
 ### Added
 

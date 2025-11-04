@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { BehaviorSubject } from 'rxjs'
 import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 
@@ -6,13 +7,24 @@ import { ArtifactService } from '../artifact/artifact.service'
     providedIn: 'root'
 })
 export class ArtifactViewerService {
+    private isViewerVisibleSubject = new BehaviorSubject<boolean>(false)
+    isViewerVisible$ = this.isViewerVisibleSubject.asObservable()
+
+    minimised = false
+    name: string | null = null
+
     constructor(
         private artifactService: ArtifactService,
         private storageService: StorageService
     ) {}
-    isViewerVisible = false
-    minimised = false
-    name: string | null = null
+
+    get isViewerVisible(): boolean {
+        return this.isViewerVisibleSubject.value
+    }
+
+    set isViewerVisible(value: boolean) {
+        this.isViewerVisibleSubject.next(value)
+    }
 
     setName(name: string | null): void {
         this.name = name

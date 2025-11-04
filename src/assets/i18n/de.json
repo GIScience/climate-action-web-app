@@ -93,7 +93,8 @@
         "addToReport": "Zum Report hinzufügen",
         "add": "Hinzufügen »",
         "noResults": "Bei dieser Berechnung wurden keine Resultate produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Autor:innen des Moduls",
-        "pleaseExitReportBuilder": "Bitte schließe zuerst den Report-Modus, oder füge das Ergebnis zum Report hinzu."
+        "pleaseExitReportBuilder": "Bitte schließe zuerst den Report-Modus, oder füge das Ergebnis zum Report hinzu.",
+        "viewDescription": "Detaillierte Beschreibung anzeigen"
     },
     "artifactViewer": {
         "download": "Ergebnis herunterladen",
