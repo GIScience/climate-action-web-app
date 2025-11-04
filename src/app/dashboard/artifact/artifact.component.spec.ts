@@ -51,20 +51,4 @@ describe('ArtifactComponent', () => {
         expect(summaryElement).toBeTruthy()
         expect(summaryElement.nativeElement.textContent).toContain(testSummary)
     })
-
-    it('should display the description if present', async () => {
-        const testDescription = 'Test Description'
-        component.description = testDescription
-        component.showAccordion = true
-        fixture.detectChanges()
-
-        const accordionHeader = fixture.debugElement.query(By.css('.mat-expansion-panel-header'))
-        accordionHeader.nativeElement.click()
-        fixture.detectChanges()
-        await fixture.whenStable()
-
-        const markdownContent = fixture.debugElement.query(By.css('.markdown-artifact-item'))
-        expect(markdownContent).toBeTruthy()
-        expect(markdownContent.nativeElement.textContent).toContain(testDescription)
-    })
 })

@@ -205,9 +205,9 @@ export class MapService {
             visualizeRoll: true
         })
         navigationControl._container.className += ' navigation-controls'
-        this.map!.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'top-right')
         this.map!.addControl(navigationControl, 'top-right')
         this.map!.addControl(MapControlsUtils.createZoomToZeroControl(), 'top-right')
+        this.map!.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'top-right')
 
         this.addLayerSwitcher()
 

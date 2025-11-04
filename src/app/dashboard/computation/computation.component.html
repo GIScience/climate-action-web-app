@@ -35,6 +35,14 @@
                 </div>
                 <div class="artifact-actions">
                     <button
+                        *ngIf="artifact.description"
+                        class="description-btn btn-onlyicon btn-onlyicon--cta"
+                        (click)="viewDescription(artifact, $event)"
+                        [tp]="'computation.viewDescription' | transloco"
+                        tpPlacement="bottom">
+                        <i-lucide [img]="ReceiptText" size="17"></i-lucide>
+                    </button>
+                    <button
                         class="download-btn btn-onlyicon btn-onlyicon--cta"
                         (click)="downloadContent(artifact, $event)"
                         [tp]="'artifactViewer.download' | transloco"
@@ -63,3 +71,17 @@
         {{ 'computation.noResults' | transloco }}
     </div>
 </div>
+
+<ng-template #descriptionDialog let-data>
+    <div class="description-dialog">
+        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
+            <div class="description-dialog__content" scrollViewport>
+                <h3>{{ 'artifact.detailedDescription' | transloco }}</h3>
+                <app-markdown [rawMarkdown]="data.description"></app-markdown>
+            </div>
+        </ng-scrollbar>
+        <button (click)="closeDescriptionDialog()" class="close-dialog">
+            <i-lucide [img]="CircleX" size="30"></i-lucide>
+        </button>
+    </div>
+</ng-template>

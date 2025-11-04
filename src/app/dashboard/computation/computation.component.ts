@@ -1,17 +1,20 @@
 import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { ClipboardPlus, Download, LucideAngularModule } from 'lucide-angular'
+import { CircleX, ClipboardPlus, Download, LucideAngularModule, ReceiptText } from 'lucide-angular'
+import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
+import { MarkdownComponent } from '../artifact/markdown/markdown.component'
 import { ComputationBasicInfo, ComputationDisplayEntity } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
@@ -25,7 +28,15 @@ enum DefaultTag {
 
 @Component({
     selector: 'app-computation',
-    imports: [CommonModule, LucideAngularModule, MatIconModule, TippyDirective, TranslocoModule],
+    imports: [
+        CommonModule,
+        LucideAngularModule,
+        MatIconModule,
+        TippyDirective,
+        TranslocoModule,
+        MarkdownComponent,
+        NgScrollbarModule
+    ],
     animations: [
         trigger('expandCollapse', [
             state(
@@ -57,6 +68,10 @@ export class ComputationComponent implements OnInit, OnDestroy {
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
 
+    @ViewChild('descriptionDialog') descriptionDialog!: TemplateRef<{
+        description: string
+    }>
+
     private artifactFetchSubscription: Subscription | undefined
     private reportVisibilitySubscription: Subscription | undefined
     isReportVisible = false
@@ -69,6 +84,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
     readonly ClipboardPlus = ClipboardPlus
     readonly Download = Download
+    readonly ReceiptText = ReceiptText
+    readonly CircleX = CircleX
     readonly DefaultTag = DefaultTag
 
     constructor(
@@ -78,7 +95,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
         private reportService: ReportService,
         private artifactViewerService: ArtifactViewerService,
         private toastr: ToastrService,
-        private translocoService: TranslocoService
+        private translocoService: TranslocoService,
+        private dialog: MatDialog
     ) {}
 
     ngOnInit(): void {
@@ -112,7 +130,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         this.pluginService.collapsePluginCatalog()
-        this.artifactViewerService.isViewerVisible = true
 
         const waitForMapRender = (artifact: ArtifactEntity): Promise<void> => {
             return new Promise<void>(resolve => {
@@ -158,8 +175,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         if (artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF') {
+            this.artifactViewerService.isViewerVisible = false
             waitForMapRender(artifact)
-            this.artifactViewerService.minimised = true
         } else if (
             artifact.modality === 'CHART' ||
             artifact.modality === 'CHART_PLOTLY' ||
@@ -167,6 +184,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
             artifact.modality === 'IMAGE' ||
             artifact.modality === 'MARKDOWN'
         ) {
+            this.artifactViewerService.isViewerVisible = true
             this.artifactViewerService.minimised = false
             const { observable, check } = artifactTypeMap[artifact.modality]
             waitForArtifactFetch(observable, check)
@@ -217,6 +235,19 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
     private getFileName(url: string): string {
         return url.split('/').pop() || 'download'
+    }
+
+    viewDescription(artifact: ArtifactEntity, event?: Event): void {
+        event?.stopPropagation()
+
+        this.dialog.open(this.descriptionDialog, {
+            data: { description: artifact.description },
+            autoFocus: false
+        })
+    }
+
+    closeDescriptionDialog(): void {
+        this.dialog.closeAll()
     }
 
     private initializeTagsAndFiltering(): void {
