@@ -93,14 +93,14 @@
         "addToReport": "Add to Report",
         "add": "Add »",
         "noResults": "This run created no results. If you think that is an error, please contact the plugin developers",
-        "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this artifact to the report.",
+        "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this result to the report.",
         "viewDescription": "View Detailed Description"
     },
     "artifactViewer": {
-        "download": "Download Artifact",
-        "maximize": "Maximise Artifact",
-        "minimize": "Minimise Artifact",
-        "close": "Close Artifact"
+        "download": "Download Result",
+        "maximize": "Maximise",
+        "minimize": "Minimise",
+        "close": "Close"
     },
     "artifact": {
         "abstract": "Abstract",
@@ -114,8 +114,8 @@
         "itemsCounter": "{{ count }}/{{ max }} results",
         "emptyMessage": "Click \"Add »\" next to any result under a computation to build your report.",
         "mapZoomNote": "Use the + / - buttons to zoom the map",
-        "artifactAlreadyInReport": "This artifact is already in the report.",
-        "maximumArtifactsAllowed": "Maximum of 4 artifacts allowed in the report. Please remove an existing artifact first.",
+        "artifactAlreadyInReport": "This result is already in the report.",
+        "maximumArtifactsAllowed": "Maximum of 4 results allowed in the report. Please remove an existing result first.",
         "exportingPdf": "Preparing PDF export, please wait...",
         "errorExportingPdf": "Error exporting PDF. Please try again.",
         "confirmCloseWithoutExport": "Are you sure you want to close the Report Builder without exporting? It will not be saved."
