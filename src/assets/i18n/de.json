@@ -12,19 +12,19 @@
         "notes": {
             "title": "Bevor du beginnst ein paar Hinweise:",
             "onDemand": "Die CAN Berechnungen werden <strong>auf Anfrage</strong> erstellt. Dies reduziert den Energieverbrauch, heißt aber auch, dass Analysen in manchen Fällen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben.",
-            "urbanAreas": "Unsere Module sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
-            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Module <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
-            "worksInProgress": "Alle Module und Analysen im CAN sind in <strong>aktiver Entwicklung</strong> und werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
+            "urbanAreas": "Unsere Analysewerkzeuge sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
+            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Analysewerkzeuge <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
+            "worksInProgress": "Alle Analysewerkzeuge und Analysen im CAN sind in <strong>aktiver Entwicklung</strong> und werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
         },
         "cta": {
             "startExploring": "Analysiere jetzt deine Region und entdecke neues zum Thema Klimaschutz.",
-            "selectTool": "Starte, indem du ein Analysemodul aus der Seitenleiste links auswählst.",
+            "selectTool": "Starte, indem du ein Analysewerkzeug aus der Seitenleiste links auswählst.",
             "or": "ODER",
             "guidedWalkthrough": "Starte das Tutorial"
         }
     },
     "pluginCatalog": {
-        "title": "Module",
+        "title": "Analysewerkzeug",
         "loading": "Lade..."
     },
     "plugin": {
@@ -92,7 +92,7 @@
     "computation": {
         "addToReport": "Zum Report hinzufügen",
         "add": "Hinzufügen »",
-        "noResults": "Bei dieser Berechnung wurden keine Resultate produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Autor:innen des Moduls",
+        "noResults": "Bei dieser Berechnung wurden keine Ergebnisse produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Autor:innen des Analysewerkzeugs",
         "pleaseExitReportBuilder": "Bitte schließe zuerst den Report-Modus, oder füge das Ergebnis zum Report hinzu.",
         "viewDescription": "Detaillierte Beschreibung anzeigen"
     },
@@ -159,20 +159,20 @@
         },
         "tourSteps": {
             "choosePlugin": {
-                "title": "Wähle ein Modul",
-                "description": "Um zu beginnen, wählen wir eines der verfügbaren Module aus. In diesem Beispiel wählen wir <strong>hiWalk</strong> aus."
+                "title": "Wähle ein Analysewerkzeug",
+                "description": "Um zu beginnen, wählen wir eines der verfügbaren Analysewerkzeuge aus. In diesem Beispiel wählen wir <strong>hiWalk</strong> aus."
             },
             "newComputation": {
                 "title": "Konfiguriere eine Berechnung",
                 "description": "Als nächstes starten wir über die Schaltfläche <strong>Neue Berechnung</strong> eine neue Indikatoranfrage."
             },
             "searchArea": {
-                "title": "Suche deine Zielregion",
-                "description": "Jetzt müssen wir unsere Zielregion spezifizieren. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus, um die Karte dort zu zentrieren."
+                "title": "Wähle eine Region aus",
+                "description": "Jetzt müssen wir die Region spezifizieren, die uns interessiert. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus, um die Karte dort zu zentrieren."
             },
             "selectBoundary": {
                 "title": "Wähle den Umriss aus",
-                "description": "Wähle nun den Umriss der gewünschten Zielregion aus, indem du auf die Karte klickst. Zoome mit dem Mausrad, um die Ansicht anzupassen."
+                "description": "Wähle nun den Umriss der entsprechenden Region aus, indem Du auf die Karte klickst. Zoome mit dem Mausrad, um die Ansicht anzupassen."
             },
             "requestCompute": {
                 "title": "Starte eine Berechnung",
@@ -199,7 +199,7 @@
             "completion": {
                 "title": "Geschafft!",
                 "descriptionGuest": "Geschafft! Wenn du dir nun ein Profil anlegst und dich anmeldest, kannst du Berechnungen in jeder beliebigen Region anfragen. Du kannst dieses Tutorial über das <strong>Profil</strong>-Menü immer wieder neu starten.",
-                "descriptionFull": "Geschafft! Nun kannst du deine eigenen Berechnungen in jeder beliebigen Region starten. Sieh dir auch an, was die anderen Module zu bieten haben. Du kannst dieses Tutorial über das <strong>Profil</strong>-Menü immer wieder neu starten.",
+                "descriptionFull": "Geschafft! Nun kannst du deine eigenen Berechnungen in jeder beliebigen Region starten. Sieh dir auch an, was die anderen Analysewerkzeuge zu bieten haben. Du kannst dieses Tutorial über das <strong>Profil</strong>-Menü immer wieder neu starten.",
                 "exitButton": "Tutorial abschließen"
             }
         },
