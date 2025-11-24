@@ -43,5 +43,8 @@ console.error = (...args: any[]) => {
     if (errorMessage.includes('without installing the canvas npm package')) {
         return
     }
+    if (errorMessage.includes('Error fetching plugins')) {
+        return
+    }
     originalConsoleError.apply(console, args)
 }
