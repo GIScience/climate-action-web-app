@@ -16,7 +16,8 @@ test_jest_and_lint:
     stage: test
     tags: []
     rules:
-        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
     image:
         name: trion/ng-cli-karma:19.2.13
     variables:
@@ -43,7 +44,8 @@ test_cypress:
     stage: test
     tags: []
     rules:
-        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
     variables:
         NODE_ENV: 'test'
         NODE_OPTIONS: '--no-warnings'
