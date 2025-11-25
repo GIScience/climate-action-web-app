@@ -9,8 +9,10 @@ cache:
             - pnpm-lock.yaml
         prefix: $CI_COMMIT_REF_NAME
     paths:
-        - node_modules
-        - .cache/Cypress
+        - .pnpm-store
+
+variables:
+    PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
 
 test_jest_and_lint:
     stage: test
@@ -18,6 +20,14 @@ test_jest_and_lint:
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
         - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+            prefix: $CI_COMMIT_REF_NAME
+        paths:
+            - .pnpm-store
+        policy: pull
     image:
         name: trion/ng-cli-karma:19.2.13
     variables:
@@ -30,7 +40,8 @@ test_jest_and_lint:
                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
             })(this)
             EOF
-        - pnpm install
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
     script:
         - pnpm lint
         - pnpm test:coverage
@@ -46,6 +57,14 @@ test_cypress:
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
         - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+            prefix: $CI_COMMIT_REF_NAME
+        paths:
+            - .pnpm-store
+            - .cache/Cypress
     variables:
         NODE_ENV: 'test'
         NODE_OPTIONS: '--no-warnings'
@@ -64,9 +83,15 @@ test_cypress:
             })(this)
             EOF
         - npm install -g pnpm
-        - pnpm install
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
         - mkdir -p .cache/Cypress
-        - pnpm exec cypress install
+        - |
+            if ls "$CYPRESS_CACHE_FOLDER"/*/Cypress >/dev/null 2>&1; then
+              echo "Using cached Cypress binary"
+            else
+              pnpm exec cypress install
+            fi
     script:
         - pnpm start & pnpm exec wait-on http://localhost:4200
         - pnpm cy:run
