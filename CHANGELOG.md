@@ -14,6 +14,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Switched to Globe Projection on load, which spins while in Landing view ([#174](https://gitlab.heigit.org/climate-action/web-app/-/issues/174))
 - Primary/Secondary artifacts are not folded under a 'Show More' view anymore; rather primary artifacts are grouped and displayed under a 'main' tag ([#258](https://gitlab.heigit.org/climate-action/web-app/-/issues/258))
 - Move the artifact's 'Download' & 'Detailed Description' to be accessible directly from the list overview ([#96](https://gitlab.heigit.org/climate-action/web-app/-/issues/96))
+- Replace requests to WMS + GetFeatureInfo with Vector Tile Server + OGC API, for Ohsome Boundaries ([#387](https://gitlab.heigit.org/climate-action/web-app/-/issues/387))
 
 ### Added
 

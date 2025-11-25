@@ -248,9 +248,11 @@ export class MapService {
         const layers = {
             markers: { sourceId: 'markers' },
             regions: {
-                sourceId: 'region-wms-source',
-                layerId: 'region-wms-layer',
-                tiles: 'https://maps.heigit.org/ohsome/service/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=ohsome:admin_world_water&WIDTH=256&HEIGHT=256&SRS=EPSG:3857&STYLES=&BBOX={bbox-epsg-3857}',
+                sourceId: 'region-vector-source',
+                fillLayerId: 'region-boundaries-fill',
+                outlineLayerId: 'region-boundaries-outline',
+                sourceLayer: 'default',
+                tiles: 'https://maps.heigit.org/vector/tiles/public.admin_boundaries_layer/{z}/{x}/{y}.pbf',
                 attribution:
                     'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
             },
@@ -270,24 +272,70 @@ export class MapService {
             }
         })
 
-        // Region WMS Layer
+        // Region Vector Tile Source
         this.map.addSource(layers.regions.sourceId, {
-            type: 'raster',
+            type: 'vector',
             tiles: [layers.regions.tiles],
-            tileSize: 256,
+            minzoom: 0,
+            maxzoom: 15,
             attribution: layers.regions.attribution
         })
 
+        // Region boundary fill layer (transparent, used for click detection)
         this.map.addLayer({
-            id: layers.regions.layerId,
-            type: 'raster',
+            id: layers.regions.fillLayerId,
+            type: 'fill',
             source: layers.regions.sourceId,
-            paint: { 'raster-opacity': 1 },
+            'source-layer': layers.regions.sourceLayer,
+            paint: {
+                'fill-opacity': 0,
+                'fill-color': 'transparent'
+            },
             layout: { visibility: 'none' }
         })
 
+        // Region boundary outline layer
+        this.map.addLayer({
+            id: layers.regions.outlineLayerId,
+            type: 'line',
+            source: layers.regions.sourceId,
+            'source-layer': layers.regions.sourceLayer,
+            paint: {
+                'line-color': [
+                    'match',
+                    ['get', 'admin_level'],
+                    2,
+                    '#e78ac3',
+                    3,
+                    '#4d5fb4',
+                    4,
+                    '#59b796',
+                    5,
+                    '#d35d5d',
+                    6,
+                    '#f39a30',
+                    7,
+                    '#bd6eb6',
+                    8,
+                    '#7da5eb',
+                    9,
+                    '#6ee0b7',
+                    10,
+                    '#eb7c7c',
+                    11,
+                    '#ffb982',
+                    '#ccc'
+                ],
+                'line-width': 2
+            },
+            layout: {
+                'line-sort-key': ['-', ['get', 'admin_level']],
+                visibility: 'none'
+            }
+        })
+
         this.regionLayer = {
-            layerId: layers.regions.layerId,
+            layerId: layers.regions.fillLayerId,
             sourceId: layers.regions.sourceId,
             visible: false
         }
@@ -331,7 +379,11 @@ export class MapService {
             let showPointer = false
 
             if (this.regionLayer?.visible) {
-                showPointer = true
+                // For vector layers, check if we're hovering over a feature
+                const features = this.map.queryRenderedFeatures(e.point, {
+                    layers: ['region-boundaries-fill']
+                })
+                showPointer = features.length > 0
             } else if (this.geojsonLayer) {
                 const existingLayers = this.geojsonLayer.layerIds.filter(id => this.map!.getLayer(id))
                 if (existingLayers.length > 0) {
@@ -759,7 +811,8 @@ export class MapService {
 
     removeComputeLayers(): void {
         if (this.regionLayer && this.map) {
-            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'none')
+            this.map.setLayoutProperty('region-boundaries-fill', 'visibility', 'none')
+            this.map.setLayoutProperty('region-boundaries-outline', 'visibility', 'none')
             this.regionLayer.visible = false
         }
 
@@ -794,8 +847,8 @@ export class MapService {
 
     enableComputeLayers() {
         if (this.regionLayer && this.map) {
-            // Show the region WMS layer
-            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'visible')
+            this.map.setLayoutProperty('region-boundaries-fill', 'visibility', 'visible')
+            this.map.setLayoutProperty('region-boundaries-outline', 'visibility', 'visible')
             this.regionLayer.visible = true
         }
 
@@ -813,101 +866,64 @@ export class MapService {
     selectRegions(pixel: [number, number]) {
         if (!this.regionLayer?.visible || !this.map) return
 
-        const canvas = this.map.getCanvas()
-        const bbox = this.map.getBounds()
-        const [sw, ne] = [bbox.getSouthWest(), bbox.getNorthEast()]
-        const [swM, neM]: [Position, Position] = [
-            MapConvertMeasureUtils.lngLatToMercator(sw.lng, sw.lat),
-            MapConvertMeasureUtils.lngLatToMercator(ne.lng, ne.lat)
-        ]
-
-        const wmsParams = new URLSearchParams({
-            SERVICE: 'WMS',
-            VERSION: '1.1.1',
-            REQUEST: 'GetFeatureInfo',
-            FORMAT: 'image/png',
-            TRANSPARENT: 'true',
-            INFO_FORMAT: 'application/json',
-            QUERY_LAYERS: 'ohsome:admin_world_water',
-            LAYERS: 'ohsome:admin_world_water',
-            FEATURE_COUNT: '10',
-            STYLES: '',
-            SRS: 'EPSG:3857',
-            X: Math.round(pixel[0]).toString(),
-            Y: Math.round(pixel[1]).toString(),
-            WIDTH: canvas.clientWidth.toString(),
-            HEIGHT: canvas.clientHeight.toString(),
-            BBOX: `${swM[0]},${swM[1]},${neM[0]},${neM[1]}`
+        const vectorFeatures = this.map.queryRenderedFeatures([pixel[0], pixel[1]], {
+            layers: ['region-boundaries-fill']
         })
 
-        this.http.get(`https://maps.heigit.org/ohsome/service/wms?${wmsParams}`, { responseType: 'text' }).subscribe({
-            next: responseText => {
-                try {
-                    const response = JSON.parse(responseText) as FeatureCollection
-                    if (!response.features?.length) return
+        if (!vectorFeatures.length) return
 
-                    this.selectedOlFeatures.clear()
-                    this.selectedGeoJSONFeatures = []
-                    const features: GeoJSONFeature[] = response.features.map((feature: GeoJSONFeature) => {
-                        // Transform geometry if needed (WMS returns EPSG:3857)
-                        const needsTransform =
-                            feature.geometry?.type === 'MultiPolygon' &&
-                            Math.abs(feature.geometry.coordinates[0]?.[0]?.[0]?.[0] || 0) > 180
+        const clickedFeature = vectorFeatures[0]
+        const featureId = clickedFeature.properties?.['id']
 
-                        const geometry = needsTransform
-                            ? MapConvertMeasureUtils.transformGeometryToWgs84(feature.geometry!)
-                            : feature.geometry
+        if (!featureId) {
+            console.error('No feature ID found in vector tile')
+            return
+        }
 
-                        const processedFeature: GeoJSONFeature = {
-                            type: 'Feature',
-                            geometry,
-                            properties: {
-                                name: feature.properties?.['name'] || 'Unnamed Region',
-                                id: (
-                                    feature.properties?.['id'] || Math.random().toString(36).substring(2, 9)
-                                ).toString(),
-                                area: 0
-                            }
-                        }
+        const ogcApiUrl = `https://maps.heigit.org/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
 
-                        // Calculate area after feature is created
-                        if (geometry) {
-                            processedFeature.properties!['area'] = Number(
-                                (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
-                            )
-                        }
+        this.http.get<GeoJSONFeature>(ogcApiUrl, { headers: { Accept: 'application/geo+json' } }).subscribe({
+            next: feature => {
+                if (!feature?.geometry) return
 
-                        // Add OpenLayers compatibility wrapper
-                        this.selectedOlFeatures.push({
-                            get: (key: string) => processedFeature.properties![key],
-                            set: (key: string, value: string | number | boolean | null | undefined) => {
-                                processedFeature.properties![key] = value
-                            },
-                            getGeometry: () => processedFeature.geometry,
-                            getProperties: () => processedFeature.properties
-                        } as unknown as Feature)
+                this.selectedOlFeatures.clear()
+                this.selectedGeoJSONFeatures = []
 
-                        return processedFeature
-                    })
-
-                    // Store GeoJSON features for easy removal
-                    this.selectedGeoJSONFeatures = features
-
-                    // Update map layer
-                    if (this.selectedRegionLayer) {
-                        const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
-                        source?.setData({ type: 'FeatureCollection', features })
-                    }
-                } catch (error) {
-                    if (responseText.includes('ServiceException')) {
-                        const xmlDoc = new DOMParser().parseFromString(responseText, 'text/xml')
-                        console.error('WMS Service Exception:', xmlDoc.querySelector('ServiceException')?.textContent)
-                    } else {
-                        console.error('Failed to parse GetFeatureInfo response:', error)
+                const processedFeature: GeoJSONFeature = {
+                    type: 'Feature',
+                    geometry: feature.geometry,
+                    properties: {
+                        name: feature.properties?.['name'] || feature.properties?.['display_name'] || 'Unnamed Region',
+                        id: (feature.properties?.['id'] || featureId).toString(),
+                        area: 0
                     }
                 }
+
+                // Calculate area after feature is created
+                if (feature.geometry) {
+                    processedFeature.properties!['area'] = Number(
+                        (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
+                    )
+                }
+
+                // Add OpenLayers compatibility wrapper
+                this.selectedOlFeatures.push({
+                    get: (key: string) => processedFeature.properties![key],
+                    set: (key: string, value: string | number | boolean | null | undefined) => {
+                        processedFeature.properties![key] = value
+                    },
+                    getGeometry: () => processedFeature.geometry,
+                    getProperties: () => processedFeature.properties
+                } as unknown as Feature)
+
+                this.selectedGeoJSONFeatures = [processedFeature]
+
+                if (this.selectedRegionLayer) {
+                    const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+                    source?.setData({ type: 'FeatureCollection', features: [processedFeature] })
+                }
             },
-            error: error => console.error('Error fetching WMS feature info:', error)
+            error: error => console.error('Error fetching feature from OGC API:', error)
         })
     }
 
@@ -964,14 +980,16 @@ export class MapService {
 
     enableBoundarySelection(): void {
         if (this.regionLayer && this.map) {
-            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'visible')
+            this.map.setLayoutProperty('region-boundaries-fill', 'visibility', 'visible')
+            this.map.setLayoutProperty('region-boundaries-outline', 'visibility', 'visible')
             this.regionLayer.visible = true
         }
     }
 
     disableBoundarySelection(): void {
         if (this.regionLayer && this.map) {
-            this.map.setLayoutProperty(this.regionLayer.layerId, 'visibility', 'none')
+            this.map.setLayoutProperty('region-boundaries-fill', 'visibility', 'none')
+            this.map.setLayoutProperty('region-boundaries-outline', 'visibility', 'none')
             this.regionLayer.visible = false
         }
     }
