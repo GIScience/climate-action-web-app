@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common'
 import { Component } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 
@@ -6,7 +5,7 @@ import { TranslocoModule } from '@jsverse/transloco'
     selector: 'app-mobile-warning',
     templateUrl: './mobile-warning.component.html',
     styleUrls: ['./mobile-warning.component.scss'],
-    imports: [NgIf, TranslocoModule]
+    imports: [TranslocoModule]
 })
 export class MobileWarningComponent {
     isMobile = window.innerWidth < 768

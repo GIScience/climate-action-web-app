@@ -1,5 +1,4 @@
 import { animate, style, transition, trigger } from '@angular/animations'
-import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
@@ -21,7 +20,6 @@ import { ReportService } from './report.service'
 @Component({
     selector: 'app-report',
     imports: [
-        CommonModule,
         ArtifactComponent,
         MatIconModule,
         LucideAngularModule,

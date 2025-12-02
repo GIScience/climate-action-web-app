@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
@@ -6,7 +5,7 @@ import { Remarkable } from 'remarkable'
 
 @Component({
     selector: 'app-markdown',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './markdown.component.html',
     styleUrls: ['./markdown.component.scss'],
     encapsulation: ViewEncapsulation.None

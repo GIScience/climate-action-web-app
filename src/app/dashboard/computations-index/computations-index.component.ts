@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { CommonModule, NgClass, NgIf } from '@angular/common'
+import { CommonModule, NgClass } from '@angular/common'
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
@@ -73,7 +73,6 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     imports: [
         MatIconModule,
         TippyDirective,
-        NgIf,
         NgClass,
         CommonModule,
         NgScrollbarModule,

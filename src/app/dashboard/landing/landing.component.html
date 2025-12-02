@@ -2,78 +2,88 @@
     <div class="bg bg1"></div>
     <div class="bg bg2"></div>
 
-    <div *ngIf="!loading && totalActiveComputations > 0" class="welcome-content__revisit">
-        <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalActiveComputations } }}</h2>
-
-        <div *ngIf="latestComputation" class="latest-computation">
-            <h3>{{ 'landing.revisit.latestComputation' | transloco }}</h3>
-            <a [routerLink]="'/dashboard/plugin/' + latestComputation.pluginId" class="latest-computation-card">
-                <div class="card-header">
-                    <span class="plugin-name">{{ getPluginName(latestComputation.pluginId) }}</span>
-                    <span class="status status-{{ latestComputation.status.toLowerCase() }}">{{
-                        latestComputation.status
-                    }}</span>
+    @if (!loading && totalActiveComputations > 0) {
+        <div class="welcome-content__revisit">
+            <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalActiveComputations } }}</h2>
+            @if (latestComputation) {
+                <div class="latest-computation">
+                    <h3>{{ 'landing.revisit.latestComputation' | transloco }}</h3>
+                    <a [routerLink]="'/dashboard/plugin/' + latestComputation.pluginId" class="latest-computation-card">
+                        <div class="card-header">
+                            <span class="plugin-name">{{ getPluginName(latestComputation.pluginId) }}</span>
+                            <span class="status status-{{ latestComputation.status.toLowerCase() }}">{{
+                                latestComputation.status
+                            }}</span>
+                        </div>
+                        <div class="card-body">
+                            @if (latestComputation.aoiName) {
+                                <span class="aoi-name">{{ latestComputation.aoiName }}</span>
+                            }
+                            <span class="timestamp">{{ latestComputation.timestamp | date: 'medium' }}</span>
+                        </div>
+                    </a>
                 </div>
-                <div class="card-body">
-                    <span *ngIf="latestComputation.aoiName" class="aoi-name">{{ latestComputation.aoiName }}</span>
-                    <span class="timestamp">{{ latestComputation.timestamp | date: 'medium' }}</span>
-                </div>
-            </a>
+            }
         </div>
-    </div>
+    }
 
-    <div *ngIf="loading" class="welcome-content__loading">
-        <div class="loading-text">{{ 'landing.loading' | transloco }}</div>
-    </div>
-
-    <div *ngIf="!loading && totalActiveComputations === 0" class="welcome-content__new">
-        <div class="intro-section">
-            <h1>{{ 'landing.welcome.title' | transloco }}</h1>
-            <p [innerHTML]="'landing.welcome.description' | transloco"></p>
+    @if (loading) {
+        <div class="welcome-content__loading">
+            <div class="loading-text">{{ 'landing.loading' | transloco }}</div>
         </div>
+    }
 
-        <div class="notes-section">
-            <h3>{{ 'landing.notes.title' | transloco }}</h3>
-
-            <div class="note-cards">
-                <div class="note-card" style="animation-delay: 0s">
-                    <div class="icon-wrapper">
-                        <img ngSrc="assets/images/landing/hourglass.png" alt="Lazy computing" height="50" width="50" />
+    @if (!loading && totalActiveComputations === 0) {
+        <div class="welcome-content__new">
+            <div class="intro-section">
+                <h1>{{ 'landing.welcome.title' | transloco }}</h1>
+                <p [innerHTML]="'landing.welcome.description' | transloco"></p>
+            </div>
+            <div class="notes-section">
+                <h3>{{ 'landing.notes.title' | transloco }}</h3>
+                <div class="note-cards">
+                    <div class="note-card" style="animation-delay: 0s">
+                        <div class="icon-wrapper">
+                            <img
+                                ngSrc="assets/images/landing/hourglass.png"
+                                alt="Lazy computing"
+                                height="50"
+                                width="50" />
+                        </div>
+                        <p [innerHTML]="'landing.notes.onDemand' | transloco"></p>
                     </div>
-                    <p [innerHTML]="'landing.notes.onDemand' | transloco"></p>
-                </div>
-                <div class="note-card" style="animation-delay: 0.15s">
-                    <div class="icon-wrapper">
-                        <img ngSrc="assets/images/landing/urban.png" alt="Lazy computing" height="50" width="50" />
+                    <div class="note-card" style="animation-delay: 0.15s">
+                        <div class="icon-wrapper">
+                            <img ngSrc="assets/images/landing/urban.png" alt="Lazy computing" height="50" width="50" />
+                        </div>
+                        <p [innerHTML]="'landing.notes.urbanAreas' | transloco"></p>
                     </div>
-                    <p [innerHTML]="'landing.notes.urbanAreas' | transloco"></p>
-                </div>
-                <div class="note-card" style="animation-delay: 0.3s">
-                    <div class="icon-wrapper">
-                        <img ngSrc="assets/images/landing/expert.png" alt="Lazy computing" height="50" width="50" />
+                    <div class="note-card" style="animation-delay: 0.3s">
+                        <div class="icon-wrapper">
+                            <img ngSrc="assets/images/landing/expert.png" alt="Lazy computing" height="50" width="50" />
+                        </div>
+                        <p [innerHTML]="'landing.notes.experts' | transloco"></p>
                     </div>
-                    <p [innerHTML]="'landing.notes.experts' | transloco"></p>
-                </div>
-                <div class="note-card" style="animation-delay: 0.45s">
-                    <div class="icon-wrapper">
-                        <img ngSrc="assets/images/landing/tools.png" alt="Lazy computing" height="50" width="50" />
+                    <div class="note-card" style="animation-delay: 0.45s">
+                        <div class="icon-wrapper">
+                            <img ngSrc="assets/images/landing/tools.png" alt="Lazy computing" height="50" width="50" />
+                        </div>
+                        <p [innerHTML]="'landing.notes.worksInProgress' | transloco"></p>
                     </div>
-                    <p [innerHTML]="'landing.notes.worksInProgress' | transloco"></p>
                 </div>
             </div>
+            <div class="cta-section">
+                <p>{{ 'landing.cta.startExploring' | transloco }}</p>
+                <p>
+                    <strong><span></span>{{ 'landing.cta.selectTool' | transloco }}</strong>
+                </p>
+                <p class="or-text">{{ 'landing.cta.or' | transloco }}</p>
+                <button class="btn-primary btn-withtext" (click)="startTour()">
+                    {{ 'landing.cta.guidedWalkthrough' | transloco }}
+                </button>
+            </div>
         </div>
-
-        <div class="cta-section">
-            <p>{{ 'landing.cta.startExploring' | transloco }}</p>
-            <p>
-                <strong><span></span>{{ 'landing.cta.selectTool' | transloco }}</strong>
-            </p>
-            <p class="or-text">{{ 'landing.cta.or' | transloco }}</p>
-            <button class="btn-primary btn-withtext" (click)="startTour()">
-                {{ 'landing.cta.guidedWalkthrough' | transloco }}
-            </button>
-        </div>
-    </div>
+    }
 </div>
 
 <svg style="display: none">

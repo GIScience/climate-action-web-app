@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import type { FeatureCollection } from 'geojson'
@@ -9,7 +8,7 @@ import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geojson',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './geojson.component.html',
     styleUrls: ['./geojson.component.scss']
 })

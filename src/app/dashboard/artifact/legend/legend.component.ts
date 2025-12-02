@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { convertToTitleCase } from '@app/utils/artifact.utils'
 import { NgScrollbar } from 'ngx-scrollbar'
@@ -12,7 +11,7 @@ interface LegendItem {
 
 @Component({
     selector: 'app-legend',
-    imports: [CommonModule, NgScrollbar],
+    imports: [NgScrollbar],
     templateUrl: './legend.component.html',
     styleUrls: ['./legend.component.scss']
 })

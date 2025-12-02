@@ -1,11 +1,10 @@
-import { CommonModule } from '@angular/common'
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { MapService } from '../../map/map.service'
 import { Artifact } from '../artifact.interface'
 
 @Component({
     selector: 'app-geotiff',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './geotiff.component.html',
     styleUrls: ['./geotiff.component.scss']
 })

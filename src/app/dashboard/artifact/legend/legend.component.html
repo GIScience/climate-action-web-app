@@ -1,28 +1,38 @@
-<div *ngIf="legendData" class="legend-container">
-    <h3 class="title">
-        {{ legendData.title }}
-        <span *ngIf="legendData.unit !== undefined">({{ legendData.unit }})</span>
-    </h3>
-    <ng-scrollbar orientation="vertical">
-        <div *ngIf="legendData.legend_type === 'DISCRETE'" class="discrete-legend">
-            <ul>
-                <li *ngFor="let item of discreteItems(); trackBy: trackByFn">
-                    <span [style.backgroundColor]="item.color" class="legend-color-box"></span>
-                    {{ item.name }}
-                </li>
-            </ul>
-        </div>
-        <div *ngIf="legendData.legend_type === 'CONTINUOUS'" class="continuous-legend">
-            <div #legendWrapper class="vertical-legend-wrapper">
-                <canvas [id]="getCanvasId(legendData.legend_data.cmap_name)" width="25" height="200"></canvas>
-                <div #ticksContainer class="ticks">
-                    <span
-                        *ngFor="let item of continuousItems(); trackBy: trackByFn"
-                        [style.bottom]="item.position + '%'">
-                        {{ item.name }}
-                    </span>
+@if (legendData) {
+    <div class="legend-container">
+        <h3 class="title">
+            {{ legendData.title }}
+            @if (legendData.unit !== undefined) {
+                <span>({{ legendData.unit }})</span>
+            }
+        </h3>
+        <ng-scrollbar orientation="vertical">
+            @if (legendData.legend_type === 'DISCRETE') {
+                <div class="discrete-legend">
+                    <ul>
+                        @for (item of discreteItems(); track trackByFn($index, item)) {
+                            <li>
+                                <span [style.backgroundColor]="item.color" class="legend-color-box"></span>
+                                {{ item.name }}
+                            </li>
+                        }
+                    </ul>
                 </div>
-            </div>
-        </div>
-    </ng-scrollbar>
-</div>
+            }
+            @if (legendData.legend_type === 'CONTINUOUS') {
+                <div class="continuous-legend">
+                    <div #legendWrapper class="vertical-legend-wrapper">
+                        <canvas [id]="getCanvasId(legendData.legend_data.cmap_name)" width="25" height="200"></canvas>
+                        <div #ticksContainer class="ticks">
+                            @for (item of continuousItems(); track trackByFn($index, item)) {
+                                <span [style.bottom]="item.position + '%'">
+                                    {{ item.name }}
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </ng-scrollbar>
+    </div>
+}

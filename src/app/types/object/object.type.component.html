@@ -1,8 +1,16 @@
 <div class="object-field">
-    <h4 *ngIf="props.label" class="object-field__label">{{ props.label }}</h4>
-    <p *ngIf="props.description">{{ props.description }}</p>
-    <div class="alert alert-danger" role="alert" *ngIf="showError && formControl.errors">
-        <formly-validation-message [field]="field"></formly-validation-message>
-    </div>
-    <formly-field *ngFor="let f of field.fieldGroup" [field]="f"></formly-field>
+    @if (props.label) {
+        <h4 class="object-field__label">{{ props.label }}</h4>
+    }
+    @if (props.description) {
+        <p>{{ props.description }}</p>
+    }
+    @if (showError && formControl.errors) {
+        <div class="alert alert-danger" role="alert">
+            <formly-validation-message [field]="field"></formly-validation-message>
+        </div>
+    }
+    @for (f of field.fieldGroup; track f) {
+        <formly-field [field]="f"></formly-field>
+    }
 </div>

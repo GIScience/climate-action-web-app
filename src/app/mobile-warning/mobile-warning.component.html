@@ -1,9 +1,11 @@
-<div *ngIf="isMobile" class="mobile-warning">
-    <div class="mobile-warning__content">
-        <h2>{{ 'mobileWarning.title' | transloco }}</h2>
-        <p>{{ 'mobileWarning.description' | transloco }}</p>
-        <button type="button" class="btn-alt btn-withtext" (click)="dismissWarning()">
-            {{ 'mobileWarning.understand' | transloco }}
-        </button>
+@if (isMobile) {
+    <div class="mobile-warning">
+        <div class="mobile-warning__content">
+            <h2>{{ 'mobileWarning.title' | transloco }}</h2>
+            <p>{{ 'mobileWarning.description' | transloco }}</p>
+            <button type="button" class="btn-alt btn-withtext" (click)="dismissWarning()">
+                {{ 'mobileWarning.understand' | transloco }}
+            </button>
+        </div>
     </div>
-</div>
+}

@@ -1,82 +1,88 @@
-<div class="report-window" *ngIf="isVisible" [@reportAnimation]>
-    <div class="report-header">
-        <h2>{{ 'report.title' | transloco }}</h2>
-        <div class="report-controls">
-            <button (click)="exportToPDF()" class="export-btn btn-withtext" [disabled]="artifacts.length === 0">
-                <i-lucide [img]="FileDown" size="20"></i-lucide>
-                {{ 'report.exportToPDF' | transloco }}
-            </button>
-            <div class="report-controls__clear-exit">
-                <button
-                    class="remove-all-btn btn-onlyicon"
-                    (click)="removeAllReportItems()"
-                    [tp]="'report.removeAll' | transloco"
-                    tpPlacement="bottom"
-                    [disabled]="artifacts.length === 0">
-                    <i-lucide [img]="ListX" size="20"></i-lucide>
+@if (isVisible) {
+    <div class="report-window" [@reportAnimation]>
+        <div class="report-header">
+            <h2>{{ 'report.title' | transloco }}</h2>
+            <div class="report-controls">
+                <button (click)="exportToPDF()" class="export-btn btn-withtext" [disabled]="artifacts.length === 0">
+                    <i-lucide [img]="FileDown" size="20"></i-lucide>
+                    {{ 'report.exportToPDF' | transloco }}
                 </button>
-                <button
-                    class="close-btn btn-onlyicon"
-                    (click)="closeReport()"
-                    [tp]="'report.exitBuilder' | transloco"
-                    tpPlacement="bottom">
-                    <i-lucide [img]="X" size="20"></i-lucide>
-                </button>
-            </div>
-        </div>
-        <span class="artifact-counter">{{
-            'report.itemsCounter' | transloco: { count: artifacts.length, max: maxArtifacts }
-        }}</span>
-    </div>
-
-    <div class="report-body">
-        <div *ngIf="artifacts.length === 0" class="empty-report-message">
-            <p [innerHTML]="'report.emptyMessage' | transloco"></p>
-        </div>
-
-        <ng-scrollbar>
-            <div class="report-contents">
-                <div
-                    *ngFor="let artifact of artifacts"
-                    class="report-item"
-                    #artifactContainer
-                    [attr.data-artifact-id]="artifact.store_id">
-                    <div class="report-item-header">
-                        <div class="report-item-info">
-                            <h3>{{ artifact.name }}</h3>
-                            <div class="report-item-metadata" *ngIf="getComputationInfo(artifact) as computationInfo">
-                                (<span>{{ computationInfo.aoiName }}</span> |
-                                <span>{{ computationInfo.pluginName }}</span> |
-                                <span>#{{ computationInfo.correlation_uuid.substring(0, 8) }}</span
-                                >)
-                            </div>
-                        </div>
-                        <button class="remove-btn btn-onlyicon" (click)="removeReportItem(artifact)">
-                            <i-lucide [img]="Minus" size="22.5"></i-lucide>
-                        </button>
-                    </div>
-
-                    <div *ngIf="reportService.isMapArtifact(artifact)" class="report-map-container">
-                        <div [id]="'report-map-' + artifact.store_id" class="report-map"></div>
-                        <div #legendContainer [id]="'report-map-legend-' + artifact.store_id"></div>
-                        <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.store_id">
-                            {{ 'report.mapZoomNote' | transloco }}
-                        </div>
-                    </div>
-
-                    <app-artifact
-                        *ngIf="!reportService.isMapArtifact(artifact)"
-                        [artifact]="artifact"
-                        [artifactService]="reportService.getServiceForArtifact(artifact)">
-                    </app-artifact>
+                <div class="report-controls__clear-exit">
+                    <button
+                        class="remove-all-btn btn-onlyicon"
+                        (click)="removeAllReportItems()"
+                        [tp]="'report.removeAll' | transloco"
+                        tpPlacement="bottom"
+                        [disabled]="artifacts.length === 0">
+                        <i-lucide [img]="ListX" size="20"></i-lucide>
+                    </button>
+                    <button
+                        class="close-btn btn-onlyicon"
+                        (click)="closeReport()"
+                        [tp]="'report.exitBuilder' | transloco"
+                        tpPlacement="bottom">
+                        <i-lucide [img]="X" size="20"></i-lucide>
+                    </button>
                 </div>
             </div>
-        </ng-scrollbar>
+            <span class="artifact-counter">{{
+                'report.itemsCounter' | transloco: { count: artifacts.length, max: maxArtifacts }
+            }}</span>
+        </div>
+        <div class="report-body">
+            @if (artifacts.length === 0) {
+                <div class="empty-report-message">
+                    <p [innerHTML]="'report.emptyMessage' | transloco"></p>
+                </div>
+            }
+            <ng-scrollbar>
+                <div class="report-contents">
+                    @for (artifact of artifacts; track artifact) {
+                        <div class="report-item" #artifactContainer [attr.data-artifact-id]="artifact.store_id">
+                            <div class="report-item-header">
+                                <div class="report-item-info">
+                                    <h3>{{ artifact.name }}</h3>
+                                    @if (getComputationInfo(artifact); as computationInfo) {
+                                        <div class="report-item-metadata">
+                                            (<span>{{ computationInfo.aoiName }}</span> |
+                                            <span>{{ computationInfo.pluginName }}</span> |
+                                            <span>#{{ computationInfo.correlation_uuid.substring(0, 8) }}</span
+                                            >)
+                                        </div>
+                                    }
+                                </div>
+                                <button class="remove-btn btn-onlyicon" (click)="removeReportItem(artifact)">
+                                    <i-lucide [img]="Minus" size="22.5"></i-lucide>
+                                </button>
+                            </div>
+                            @if (reportService.isMapArtifact(artifact)) {
+                                <div class="report-map-container">
+                                    <div [id]="'report-map-' + artifact.store_id" class="report-map"></div>
+                                    <div #legendContainer [id]="'report-map-legend-' + artifact.store_id"></div>
+                                    <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.store_id">
+                                        {{ 'report.mapZoomNote' | transloco }}
+                                    </div>
+                                </div>
+                            }
+                            @if (!reportService.isMapArtifact(artifact)) {
+                                <app-artifact
+                                    [artifact]="artifact"
+                                    [artifactService]="reportService.getServiceForArtifact(artifact)">
+                                </app-artifact>
+                            }
+                        </div>
+                    }
+                </div>
+            </ng-scrollbar>
+        </div>
+        @if (artifacts.length === 0) {
+            <div class="circles-background">
+                <ul class="circles">
+                    @for (item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track item) {
+                        <li></li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
-
-    <div *ngIf="artifacts.length === 0" class="circles-background">
-        <ul class="circles">
-            <li *ngFor="let item of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"></li>
-        </ul>
-    </div>
-</div>
+}

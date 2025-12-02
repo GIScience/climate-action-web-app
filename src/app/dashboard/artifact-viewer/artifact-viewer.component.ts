@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -9,7 +8,7 @@ import { ArtifactViewerService } from './artifact-viewer.service'
 
 @Component({
     selector: 'app-artifact-viewer',
-    imports: [CommonModule, LucideAngularModule, TippyDirective, ArtifactComponent, TranslocoModule],
+    imports: [LucideAngularModule, TippyDirective, ArtifactComponent, TranslocoModule],
     templateUrl: './artifact-viewer.component.html',
     styleUrl: './artifact-viewer.component.scss'
 })
