@@ -29,7 +29,7 @@ test_jest_and_lint:
             - .pnpm-store
         policy: pull
     image:
-        name: trion/ng-cli-karma:19.2.13
+        name: trion/ng-cli-karma:20.3.11
     variables:
         NODE_OPTIONS: '--no-warnings'
     before_script:
