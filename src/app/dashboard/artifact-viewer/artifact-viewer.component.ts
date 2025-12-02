@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
@@ -13,15 +13,13 @@ import { ArtifactViewerService } from './artifact-viewer.service'
     styleUrl: './artifact-viewer.component.scss'
 })
 export class ArtifactViewerComponent {
+    artifactViewerService = inject(ArtifactViewerService)
+    artifactService = inject(ArtifactService)
+
     readonly GripHorizontal = GripHorizontal
     readonly Maximize2 = Maximize2
     readonly Minimize2 = Minimize2
     readonly X = X
-
-    constructor(
-        public artifactViewerService: ArtifactViewerService,
-        public artifactService: ArtifactService
-    ) {}
 
     toggleMinimise(): void {
         this.artifactViewerService.minimised = !this.artifactViewerService.minimised

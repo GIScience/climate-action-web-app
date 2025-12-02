@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Feature } from 'ol'
 import GeoJSON from 'ol/format/GeoJSON'
@@ -19,6 +19,9 @@ import { ComputeState, Plugin } from './plugin.interface'
     providedIn: 'root'
 })
 export class PluginService {
+    private http = inject(HttpClient)
+    private storageService = inject(StorageService)
+
     private apiUrl = environment.climateActionApiUrl
 
     private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
@@ -30,12 +33,7 @@ export class PluginService {
     private catalogToggleInput!: HTMLInputElement
 
     private metadataCache = new Map<string, { data: ComputationMetadata; timestamp: number }>()
-    private readonly METADATA_CACHE_TTL = 60 * 60 * 1000 // 1 hour
-
-    constructor(
-        private http: HttpClient,
-        private storageService: StorageService
-    ) {}
+    private readonly METADATA_CACHE_TTL = 60 * 60 * 1000
 
     getIconUrl(pluginId: string) {
         return `${this.apiUrl}/store/${pluginId}/icon`

@@ -7,7 +7,8 @@ import {
     Type,
     ViewChild,
     ViewContainerRef,
-    ViewEncapsulation
+    ViewEncapsulation,
+    inject
 } from '@angular/core'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { DomSanitizer } from '@angular/platform-browser'
@@ -31,6 +32,10 @@ import { TableComponent } from './table/table.component'
     encapsulation: ViewEncapsulation.None
 })
 export class ArtifactComponent implements OnInit, AfterViewInit {
+    private defaultArtifactService = inject(ArtifactService)
+    private sanitizer = inject(DomSanitizer)
+    private changeDetector = inject(ChangeDetectorRef)
+
     @ViewChild('container', { read: ViewContainerRef })
     container!: ViewContainerRef
     @ViewChild('descriptionContainer', { read: ViewContainerRef })
@@ -43,12 +48,6 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
     description: string | null = null
     showAccordion = false
     modality: string | null = null
-
-    constructor(
-        private defaultArtifactService: ArtifactService,
-        private sanitizer: DomSanitizer,
-        private changeDetector: ChangeDetectorRef
-    ) {}
 
     private getService(): ArtifactService {
         return this.artifactService || this.defaultArtifactService

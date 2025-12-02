@@ -1,6 +1,16 @@
 import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    TemplateRef,
+    ViewChild,
+    inject
+} from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
@@ -64,6 +74,15 @@ enum DefaultTag {
     styleUrls: ['./computation.component.scss']
 })
 export class ComputationComponent implements OnInit, OnDestroy {
+    artifactService = inject(ArtifactService)
+    private pluginService = inject(PluginService)
+    private mapService = inject(MapService)
+    private reportService = inject(ReportService)
+    private artifactViewerService = inject(ArtifactViewerService)
+    private toastr = inject(ToastrService)
+    private translocoService = inject(TranslocoService)
+    private dialog = inject(MatDialog)
+
     @Input() computation!: ComputationDisplayEntity
     @Input() activeArtifact?: ArtifactEntity
     @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
@@ -87,17 +106,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
     readonly ReceiptText = ReceiptText
     readonly CircleX = CircleX
     readonly DefaultTag = DefaultTag
-
-    constructor(
-        public artifactService: ArtifactService,
-        private pluginService: PluginService,
-        private mapService: MapService,
-        private reportService: ReportService,
-        private artifactViewerService: ArtifactViewerService,
-        private toastr: ToastrService,
-        private translocoService: TranslocoService,
-        private dialog: MatDialog
-    ) {}
 
     ngOnInit(): void {
         this.reportVisibilitySubscription = this.reportService.isVisible$.subscribe(isVisible => {

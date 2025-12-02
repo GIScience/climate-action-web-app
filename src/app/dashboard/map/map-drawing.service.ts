@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
@@ -20,6 +20,8 @@ export type DrawMode = 'polygon' | 'circle' | 'rectangle' | null
     providedIn: 'root'
 })
 export class MapDrawingService {
+    private translocoService = inject(TranslocoService)
+
     private readonly SQM_TO_SQKM_FACTOR = 1e-6
     private readonly DRAW_MODES = { Polygon: 'polygon', Circle: 'circle', Box: 'rectangle' } as const
     private readonly TYPE_MAP = { circle: 'Circle', rectangle: 'Box', polygon: 'Polygon' } as const
@@ -36,8 +38,6 @@ export class MapDrawingService {
 
     private measureTooltipElement: HTMLElement | undefined
     private measureTooltip: Popup | undefined
-
-    constructor(private translocoService: TranslocoService) {}
 
     get drawnFeatures$(): Observable<DrawingFeature[]> {
         return this.drawnFeatures.asObservable()

@@ -1,5 +1,5 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Observable, from, lastValueFrom } from 'rxjs'
 import { default as packageInfo } from '../../../package.json'
@@ -8,6 +8,9 @@ import { AppwriteService } from './appwrite.service'
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+    private databaseService = inject(DatabaseService)
+    private appwriteService = inject(AppwriteService)
+
     private apiKey: string | null = null
     private currentUserId: string | null = null
     private keyLoadPromise: Promise<void> | null = null
@@ -15,10 +18,7 @@ export class AuthInterceptor implements HttpInterceptor {
     private authInitPromise: Promise<void> | null = null
     private readonly clientInfo = `${packageInfo.name}/${packageInfo.version}`
 
-    constructor(
-        private databaseService: DatabaseService,
-        private appwriteService: AppwriteService
-    ) {
+    constructor() {
         this.authInitPromise = this.initAuth()
 
         this.appwriteService._user.subscribe(user => {

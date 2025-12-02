@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
@@ -57,6 +57,14 @@ import { PluginService } from './plugin.service'
     ]
 })
 export class PluginComponent implements AfterViewInit, OnDestroy {
+    private pluginService = inject(PluginService)
+    private route = inject(ActivatedRoute)
+    private cdr = inject(ChangeDetectorRef)
+    private appwriteService = inject(AppwriteService)
+    private dialog = inject(MatDialog)
+    private reportService = inject(ReportService)
+    private translocoService = inject(TranslocoService)
+
     @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
     @ViewChild('pluginCreditsDialog') pluginCreditsDialog!: TemplateRef<Plugin>
 
@@ -76,16 +84,6 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     readonly DiamondPlus = DiamondPlus
     readonly CircleX = CircleX
     readonly CloudOff = CloudOff
-
-    constructor(
-        private pluginService: PluginService,
-        private route: ActivatedRoute,
-        private cdr: ChangeDetectorRef,
-        private appwriteService: AppwriteService,
-        private dialog: MatDialog,
-        private reportService: ReportService,
-        private translocoService: TranslocoService
-    ) {}
 
     ngAfterViewInit(): void {
         this.loadPluginDetails()

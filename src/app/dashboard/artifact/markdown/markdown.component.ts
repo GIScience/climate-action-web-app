@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core'
+import { Component, Input, OnInit, ViewEncapsulation, inject } from '@angular/core'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { Remarkable } from 'remarkable'
 
@@ -11,16 +11,16 @@ import { Remarkable } from 'remarkable'
     encapsulation: ViewEncapsulation.None
 })
 export class MarkdownComponent implements OnInit {
+    private http = inject(HttpClient)
+    private sanitizer = inject(DomSanitizer)
+
     @Input() url: string | undefined
     @Input() rawMarkdown: string | undefined
     markdownContent: SafeHtml | '' = ''
 
     private mdParser: Remarkable
 
-    constructor(
-        private http: HttpClient,
-        private sanitizer: DomSanitizer
-    ) {
+    constructor() {
         this.mdParser = new Remarkable('full', {
             html: false,
             breaks: false,

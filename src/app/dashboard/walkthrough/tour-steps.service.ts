@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
 import { MapService } from '../map/map.service'
 import { ExtendedDriveStep } from './tour.interfaces'
@@ -7,13 +7,11 @@ import { ExtendedDriveStep } from './tour.interfaces'
     providedIn: 'root'
 })
 export class TourStepsService {
+    private mapService = inject(MapService)
+    private translocoService = inject(TranslocoService)
+
     private activeEventHandlers: (() => void)[] = []
     private nextStepCallback: () => void = () => {}
-
-    constructor(
-        private mapService: MapService,
-        private translocoService: TranslocoService
-    ) {}
 
     cleanupEventHandlers() {
         this.activeEventHandlers.forEach(cleanup => cleanup())

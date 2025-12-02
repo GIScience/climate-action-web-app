@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common'
-import { AfterViewInit, Component } from '@angular/core'
+import { AfterViewInit, Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatDateFnsModule } from '@angular/material-date-fns-adapter'
 import { MatDialogModule } from '@angular/material/dialog'
@@ -46,6 +46,13 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
     ]
 })
 export class AppComponent implements AfterViewInit {
+    private dashboardService = inject(DashboardService)
+    private tourEngine = inject(TourEngine)
+
+    constructor() {
+        void inject(MigrationService)
+    }
+
     title = 'Climate Action Navigator'
     name = 'HeiGIT'
     version: string = packageInfo.version
@@ -53,12 +60,6 @@ export class AppComponent implements AfterViewInit {
     currentYear(): number {
         return new Date().getFullYear()
     }
-
-    constructor(
-        private dashboardService: DashboardService,
-        private tourEngine: TourEngine,
-        _migrationService: MigrationService
-    ) {}
 
     ngAfterViewInit(): void {
         this.tourEngine.checkForPendingTour()

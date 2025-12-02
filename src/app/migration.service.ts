@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { filter, take } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
 import { DatabaseService } from './database.service'
@@ -7,12 +7,12 @@ import { DatabaseService } from './database.service'
     providedIn: 'root'
 })
 export class MigrationService {
+    private databaseService = inject(DatabaseService)
+    private appwriteService = inject(AppwriteService)
+
     private readonly MIGRATION_KEY = 'computation_state_migration_completed'
 
-    constructor(
-        private databaseService: DatabaseService,
-        private appwriteService: AppwriteService
-    ) {
+    constructor() {
         this.waitForUserAndRunMigration()
     }
 

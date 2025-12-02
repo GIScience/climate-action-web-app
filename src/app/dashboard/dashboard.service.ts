@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
 import { MapService } from './map/map.service'
 import { PluginService } from './plugin/plugin.service'
@@ -8,12 +8,10 @@ import { ReportService } from './report/report.service'
     providedIn: 'root'
 })
 export class DashboardService {
-    constructor(
-        private artifactViewerService: ArtifactViewerService,
-        private mapService: MapService,
-        private reportService: ReportService,
-        private pluginService: PluginService
-    ) {}
+    private artifactViewerService = inject(ArtifactViewerService)
+    private mapService = inject(MapService)
+    private reportService = inject(ReportService)
+    private pluginService = inject(PluginService)
 
     clearDashboardState() {
         const searchInput = document.querySelector('input.search-locations') as HTMLInputElement

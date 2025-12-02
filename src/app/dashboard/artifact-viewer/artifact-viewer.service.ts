@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -7,16 +7,14 @@ import { ArtifactService } from '../artifact/artifact.service'
     providedIn: 'root'
 })
 export class ArtifactViewerService {
+    private artifactService = inject(ArtifactService)
+    private storageService = inject(StorageService)
+
     private isViewerVisibleSubject = new BehaviorSubject<boolean>(false)
     isViewerVisible$ = this.isViewerVisibleSubject.asObservable()
 
     minimised = false
     name: string | null = null
-
-    constructor(
-        private artifactService: ArtifactService,
-        private storageService: StorageService
-    ) {}
 
     get isViewerVisible(): boolean {
         return this.isViewerVisibleSubject.value

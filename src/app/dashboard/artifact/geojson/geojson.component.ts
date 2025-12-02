@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core'
 import type { FeatureCollection } from 'geojson'
 import { Subscription } from 'rxjs'
 import { MapService } from '../../map/map.service'
@@ -13,14 +13,12 @@ import { Artifact } from '../artifact.interface'
     styleUrls: ['./geojson.component.scss']
 })
 export class GeojsonComponent implements OnInit, OnDestroy {
+    private http = inject(HttpClient)
+    private mapService = inject(MapService)
+
     @Input() inputData: { url: string; artifact: Artifact | null } | undefined
     private subscription?: Subscription
     private layer?: { layerIds: string[]; sourceId: string; name: string }
-
-    constructor(
-        private http: HttpClient,
-        private mapService: MapService
-    ) {}
 
     ngOnInit() {
         if (!this.inputData?.artifact?.store_id.endsWith('.geojson') || !this.inputData.url) return

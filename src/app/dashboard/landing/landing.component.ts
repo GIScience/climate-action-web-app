@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common'
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TranslocoModule } from '@jsverse/transloco'
@@ -14,15 +14,13 @@ import { TourEngine } from '../walkthrough/tour-engine.service'
     styleUrl: './landing.component.scss'
 })
 export class LandingComponent implements OnInit {
+    private storageService = inject(StorageService)
+    private cdr = inject(ChangeDetectorRef)
+    private tourEngine = inject(TourEngine)
+
     totalActiveComputations = 0
     latestComputation: ComputationDatabaseEntity | null = null
     loading = true
-
-    constructor(
-        private storageService: StorageService,
-        private cdr: ChangeDetectorRef,
-        private tourEngine: TourEngine
-    ) {}
 
     async ngOnInit() {
         try {

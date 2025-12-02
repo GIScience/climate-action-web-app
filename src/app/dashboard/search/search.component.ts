@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslocoModule } from '@jsverse/transloco'
 import { CircleX, LucideAngularModule } from 'lucide-angular'
@@ -21,6 +21,8 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
     styleUrl: './search.component.scss'
 })
 export class SearchComponent implements OnInit {
+    mapService = inject(MapService)
+
     searchControl = new FormControl()
     suggestions: AutocompleteFeature[] = []
     searchInput: HTMLInputElement | null = null
@@ -30,8 +32,6 @@ export class SearchComponent implements OnInit {
     private blurTimeout: ReturnType<typeof setTimeout> | null = null
 
     readonly CircleX = CircleX
-
-    constructor(public mapService: MapService) {}
 
     ngOnInit(): void {
         setTimeout(() => {

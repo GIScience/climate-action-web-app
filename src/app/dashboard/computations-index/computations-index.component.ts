@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule, NgClass } from '@angular/common'
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
@@ -110,6 +110,20 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
     styleUrl: './computations-index.component.scss'
 })
 export class ComputationsIndexComponent implements OnInit, OnDestroy {
+    private pluginService = inject(PluginService)
+    artifactViewerService = inject(ArtifactViewerService)
+    private mapService = inject(MapService)
+    private route = inject(ActivatedRoute)
+    private shareService = inject(ShareService)
+    private toastr = inject(ToastrService)
+    private dialog = inject(MatDialog)
+    private storageService = inject(StorageService)
+    private appwriteService = inject(AppwriteService)
+    private reportService = inject(ReportService)
+    private databaseService = inject(DatabaseService)
+    private translocoService = inject(TranslocoService)
+    private cdr = inject(ChangeDetectorRef)
+
     computations: ComputationDisplayEntity[] = []
     dataChange = new BehaviorSubject<ComputationDisplayEntity[]>([])
     currentRuns: ComputationDatabaseEntity[] = []
@@ -178,21 +192,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private readonly POLL_INTERVAL = 5000
     private readonly MAX_INTERVAL = 1800000
 
-    constructor(
-        private pluginService: PluginService,
-        public artifactViewerService: ArtifactViewerService,
-        private mapService: MapService,
-        private route: ActivatedRoute,
-        private shareService: ShareService,
-        private toastr: ToastrService,
-        private dialog: MatDialog,
-        private storageService: StorageService,
-        private appwriteService: AppwriteService,
-        private reportService: ReportService,
-        private databaseService: DatabaseService,
-        private translocoService: TranslocoService,
-        private cdr: ChangeDetectorRef
-    ) {
+    constructor() {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
         })

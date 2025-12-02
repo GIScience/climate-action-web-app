@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
@@ -18,14 +18,12 @@ export enum TourChoice {
     styleUrls: ['./tour-choice-dialog.component.scss']
 })
 export class TourChoiceDialogComponent {
+    dialogRef = inject<MatDialogRef<TourChoiceDialogComponent>>(MatDialogRef)
+    private appwriteService = inject(AppwriteService)
+
     readonly CircleX = CircleX
     readonly LogIn = LogIn
     readonly Play = Play
-
-    constructor(
-        public dialogRef: MatDialogRef<TourChoiceDialogComponent>,
-        private appwriteService: AppwriteService
-    ) {}
 
     closeDialog(): void {
         this.dialogRef.close(TourChoice.CANCEL)

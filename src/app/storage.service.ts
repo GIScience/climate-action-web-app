@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
@@ -23,6 +23,9 @@ interface MapPreferences {
     providedIn: 'root'
 })
 export class StorageService {
+    private appwriteService = inject(AppwriteService)
+    private databaseService = inject(DatabaseService)
+
     private readonly STORAGE_KEYS = {
         PLUGIN_RUNS: 'plugin_runs',
         ACTIVE_ARTIFACT: 'active_artifact',
@@ -36,10 +39,7 @@ export class StorageService {
     private paginationState: { [pluginId: string]: { cursor?: string; hasMore: boolean } } = {}
     private readonly DEFAULT_PAGE_SIZE = 10
 
-    constructor(
-        private appwriteService: AppwriteService,
-        private databaseService: DatabaseService
-    ) {
+    constructor() {
         this.appwriteService.onLogout.subscribe(() => {
             this.savePluginRunsToLocal([])
             this.pluginRunsSubject.next([])

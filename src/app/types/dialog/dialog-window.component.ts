@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -13,12 +13,10 @@ import { ToastrService } from 'ngx-toastr'
     styleUrls: ['./dialog-window.component.scss']
 })
 export class DialogWindowComponent {
-    constructor(
-        public dialogRef: MatDialogRef<DialogWindowComponent>,
-        private toastr: ToastrService,
-        private translocoService: TranslocoService,
-        @Inject(MAT_DIALOG_DATA) public data: FormlyFieldConfig
-    ) {}
+    dialogRef = inject<MatDialogRef<DialogWindowComponent>>(MatDialogRef)
+    private toastr = inject(ToastrService)
+    private translocoService = inject(TranslocoService)
+    data = inject<FormlyFieldConfig>(MAT_DIALOG_DATA)
 
     readonly CircleX = CircleX
 

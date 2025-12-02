@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { Models } from 'appwrite'
 import {
@@ -25,6 +25,10 @@ import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
     styleUrl: './account.component.scss'
 })
 export class AccountComponent implements OnInit, OnDestroy {
+    private appwriteService = inject(AppwriteService)
+    private tourEngine = inject(TourEngine)
+    private dashboardService = inject(DashboardService)
+
     user: Models.User<Models.Preferences> | null = null
     accountMenuOpen = false
     private userSubscription: Subscription
@@ -40,11 +44,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     readonly TestTubeDiagonal = TestTubeDiagonal
     readonly Footprints = Footprints
 
-    constructor(
-        private appwriteService: AppwriteService,
-        private tourEngine: TourEngine,
-        private dashboardService: DashboardService
-    ) {
+    constructor() {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
         })

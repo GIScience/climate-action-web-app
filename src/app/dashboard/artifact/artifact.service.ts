@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { SafeUrl } from '@angular/platform-browser'
 import { environment } from '@environments/environment'
 import { BehaviorSubject } from 'rxjs'
@@ -9,6 +9,8 @@ import { Artifact, ArtifactData, ChartData, LegendObject, PlotlyChartData } from
     providedIn: 'root'
 })
 export class ArtifactService {
+    private http = inject(HttpClient)
+
     currentUrl: string | null = null
     downloadJsonHref: SafeUrl | null = null
 
@@ -43,8 +45,6 @@ export class ArtifactService {
         artifact: null
     })
     plotlyChart = this.plotlyChartSubject.asObservable()
-
-    constructor(private http: HttpClient) {}
 
     getMarkdown(artifact: Artifact): void {
         this.markdownSubject.next({
