@@ -1,20 +1,19 @@
 <div class="account-container">
-    <ng-container *ngIf="!user">
+    @if (!user) {
         <div class="login-container">
-            <button
-                *ngIf="environment.environmentType === 'development' || environment.environmentType === 'testing'"
-                (click)="loginAsFakeUser()"
-                class="fake-user-button">
-                {{ 'account.loginFakeUser' | transloco }}
-                <i-lucide [img]="TestTubeDiagonal" size="27.5" color="#e78400"></i-lucide>
-            </button>
+            @if (environment.environmentType === 'development' || environment.environmentType === 'testing') {
+                <button (click)="loginAsFakeUser()" class="fake-user-button">
+                    {{ 'account.loginFakeUser' | transloco }}
+                    <i-lucide [img]="TestTubeDiagonal" size="27.5" color="#e78400"></i-lucide>
+                </button>
+            }
             <a type="button" class="profile-button" [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())">
                 {{ 'account.login' | transloco }}
                 <i-lucide [img]="LogIn" size="30" color="#008080"></i-lucide>
             </a>
         </div>
-    </ng-container>
-    <ng-container *ngIf="user">
+    }
+    @if (user) {
         <div class="account-menu">
             <button class="profile-button" (click)="toggleAccountMenu()">
                 {{ 'account.account' | transloco }}
@@ -53,5 +52,5 @@
                 </button>
             </div>
         </div>
-    </ng-container>
+    }
 </div>

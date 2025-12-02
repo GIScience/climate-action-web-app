@@ -1,17 +1,29 @@
 <div class="bd mY-2 table-artifact-item">
-    <table class="artifact-table table-bordered table-hover bgc-white" *ngIf="csvData.length > 0">
-        <thead>
-            <tr *ngFor="let record of csvData | slice: 0 : 1">
-                <th *ngFor="let field of record | keyvalue">
-                    <strong>{{ field.value }}</strong>
-                </th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            <tr *ngFor="let record of csvData | slice: 1">
-                <td *ngFor="let field of record | keyvalue">{{ field.value }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <div *ngIf="csvData.length === 0">No CSV data available.</div>
+    @if (csvData.length > 0) {
+        <table class="artifact-table table-bordered table-hover bgc-white">
+            <thead>
+                @for (record of csvData | slice: 0 : 1; track record) {
+                    <tr>
+                        @for (field of record | keyvalue; track field) {
+                            <th>
+                                <strong>{{ field.value }}</strong>
+                            </th>
+                        }
+                    </tr>
+                }
+            </thead>
+            <tbody class="table-group-divider">
+                @for (record of csvData | slice: 1; track record) {
+                    <tr>
+                        @for (field of record | keyvalue; track field) {
+                            <td>{{ field.value }}</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    @if (csvData.length === 0) {
+        <div>No CSV data available.</div>
+    }
 </div>

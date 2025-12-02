@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
@@ -14,7 +13,7 @@ export enum TourChoice {
 
 @Component({
     selector: 'app-tour-choice-dialog',
-    imports: [CommonModule, MatDialogModule, MatButtonModule, LucideAngularModule, TranslocoModule],
+    imports: [MatDialogModule, MatButtonModule, LucideAngularModule, TranslocoModule],
     templateUrl: './tour-choice-dialog.component.html',
     styleUrls: ['./tour-choice-dialog.component.scss']
 })

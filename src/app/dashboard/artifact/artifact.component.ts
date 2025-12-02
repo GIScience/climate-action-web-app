@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import {
     AfterViewInit,
     ChangeDetectorRef,
@@ -28,7 +27,7 @@ import { TableComponent } from './table/table.component'
     selector: 'app-artifact',
     templateUrl: './artifact.component.html',
     styleUrls: ['./artifact.component.scss'],
-    imports: [CommonModule, MatExpansionModule, NgScrollbarModule, TranslocoModule],
+    imports: [MatExpansionModule, NgScrollbarModule, TranslocoModule],
     encapsulation: ViewEncapsulation.None
 })
 export class ArtifactComponent implements OnInit, AfterViewInit {

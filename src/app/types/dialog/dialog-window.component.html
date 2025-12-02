@@ -5,7 +5,9 @@
     </button>
     <ng-scrollbar orientation="vertical">
         <div class="optional-attributes">
-            <p *ngIf="data.props?.description">{{ data.props?.description | transloco }}</p>
+            @if (data.props?.description) {
+                <p>{{ data.props?.description | transloco }}</p>
+            }
             <formly-field [field]="data"></formly-field>
         </div>
     </ng-scrollbar>

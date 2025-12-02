@@ -1,24 +1,34 @@
 <div class="artifact" id="artifact-page">
     <ng-scrollbar>
-        <div *ngIf="showAccordion && modality === 'MARKDOWN'" class="artifact-meta">
-            <mat-expansion-panel *ngIf="summary" class="artifact-abstract">
-                <mat-expansion-panel-header>{{ 'artifact.abstract' | transloco }}</mat-expansion-panel-header>
-                {{ summary }}
-            </mat-expansion-panel>
-        </div>
+        @if (showAccordion && modality === 'MARKDOWN') {
+            <div class="artifact-meta">
+                @if (summary) {
+                    <mat-expansion-panel class="artifact-abstract">
+                        <mat-expansion-panel-header>{{ 'artifact.abstract' | transloco }}</mat-expansion-panel-header>
+                        {{ summary }}
+                    </mat-expansion-panel>
+                }
+            </div>
+        }
 
-        <div *ngIf="modality === 'TABLE'" class="artifact-meta">
-            <p class="table-summary">
-                <span>{{ summary }}</span>
-            </p>
-        </div>
+        @if (modality === 'TABLE') {
+            <div class="artifact-meta">
+                <p class="table-summary">
+                    <span>{{ summary }}</span>
+                </p>
+            </div>
+        }
 
         <ng-container #container></ng-container>
 
-        <div *ngIf="modality !== 'MARKDOWN'" class="artifact-meta">
-            <p *ngIf="modality !== 'TABLE'" class="artifact-summary">
-                <span>{{ summary }}</span>
-            </p>
-        </div>
+        @if (modality !== 'MARKDOWN') {
+            <div class="artifact-meta">
+                @if (modality !== 'TABLE') {
+                    <p class="artifact-summary">
+                        <span>{{ summary }}</span>
+                    </p>
+                }
+            </div>
+        }
     </ng-scrollbar>
 </div>

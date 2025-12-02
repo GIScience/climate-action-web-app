@@ -42,87 +42,95 @@
             </button>
         </div>
 
-        <div
-            class="area-selection-message"
-            [ngClass]="{
-                'message--info': !areaSelected,
-                'message--blocked': areaSelected && this.mapService.selectedOlFeatures.getLength() > 1,
-                'message--warning':
-                    areaSelected &&
-                    this.mapService.selectedOlFeatures.getLength() === 1 &&
-                    this.mapService.selectedOlFeatures.item(0).get('area') > 500
-            }"
-            *ngIf="
-                !areaSelected ||
-                (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) ||
-                (areaSelected &&
-                    this.mapService.selectedOlFeatures.getLength() === 1 &&
-                    this.mapService.selectedOlFeatures.item(0).get('area') > 500)
-            ">
-            <i-lucide
-                [img]="
-                    !areaSelected
-                        ? Info
-                        : this.mapService.selectedOlFeatures.getLength() > 1
-                          ? TriangleAlert
-                          : CircleAlert
-                "
-                size="20"></i-lucide>
-            <span>
-                <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Boundary'">
-                    {{ 'pluginParameter.clickInsideBoundary' | transloco }}
-                </ng-container>
-                <ng-container
-                    *ngIf="!areaSelected && (currentSelectionMode === 'Circle' || currentSelectionMode === 'Box')">
-                    {{
-                        'pluginParameter.clickAndMovePointer'
-                            | transloco
-                                : {
-                                      shape:
-                                          (currentSelectionMode === 'Box'
-                                              ? 'pluginParameter.rectangle'
-                                              : 'pluginParameter.circle'
-                                          ) | transloco
-                                  }
-                    }}
-                </ng-container>
-                <ng-container *ngIf="!areaSelected && currentSelectionMode === 'Polygon'">
-                    {{ 'pluginParameter.clickMultiplePoints' | transloco }}
-                </ng-container>
-                <ng-container *ngIf="areaSelected && this.mapService.selectedOlFeatures.getLength() > 1">{{
-                    'pluginParameter.multipleAreasSelected' | transloco
-                }}</ng-container>
-                <ng-container
-                    *ngIf="
+        @if (
+            !areaSelected ||
+            (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) ||
+            (areaSelected &&
+                this.mapService.selectedOlFeatures.getLength() === 1 &&
+                this.mapService.selectedOlFeatures.item(0).get('area') > 500)
+        ) {
+            <div
+                class="area-selection-message"
+                [ngClass]="{
+                    'message--info': !areaSelected,
+                    'message--blocked': areaSelected && this.mapService.selectedOlFeatures.getLength() > 1,
+                    'message--warning':
                         areaSelected &&
                         this.mapService.selectedOlFeatures.getLength() === 1 &&
                         this.mapService.selectedOlFeatures.item(0).get('area') > 500
-                    ">
-                    {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
-                        'pluginParameter.processingMayTakeLonger' | transloco
-                    }}</ng-container
-                >
-            </span>
-        </div>
+                }">
+                <i-lucide
+                    [img]="
+                        !areaSelected
+                            ? Info
+                            : this.mapService.selectedOlFeatures.getLength() > 1
+                              ? TriangleAlert
+                              : CircleAlert
+                    "
+                    size="20"></i-lucide>
+                <span>
+                    @if (!areaSelected && currentSelectionMode === 'Boundary') {
+                        {{ 'pluginParameter.clickInsideBoundary' | transloco }}
+                    }
+                    @if (!areaSelected && (currentSelectionMode === 'Circle' || currentSelectionMode === 'Box')) {
+                        {{
+                            'pluginParameter.clickAndMovePointer'
+                                | transloco
+                                    : {
+                                          shape:
+                                              (currentSelectionMode === 'Box'
+                                                  ? 'pluginParameter.rectangle'
+                                                  : 'pluginParameter.circle'
+                                              ) | transloco
+                                      }
+                        }}
+                    }
+                    @if (!areaSelected && currentSelectionMode === 'Polygon') {
+                        {{ 'pluginParameter.clickMultiplePoints' | transloco }}
+                    }
+                    @if (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) {
+                        {{ 'pluginParameter.multipleAreasSelected' | transloco }}
+                    }
+                    @if (
+                        areaSelected &&
+                        this.mapService.selectedOlFeatures.getLength() === 1 &&
+                        this.mapService.selectedOlFeatures.item(0).get('area') > 500
+                    ) {
+                        {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
+                            'pluginParameter.processingMayTakeLonger' | transloco
+                        }}
+                    }
+                </span>
+            </div>
+        }
 
-        <div *ngIf="areaSelected" class="selected-regions">
-            <div *ngFor="let region of this.mapService.selectedOlFeatures.getArray()" class="region-item">
-                <span *ngIf="currentSelectionMode === 'Boundary'" class="region-name">{{ region.get('name') }}</span>
-                <input
-                    *ngIf="currentSelectionMode !== 'Boundary'"
-                    type="text"
-                    id="custom-area-label"
-                    class="region-name"
-                    [placeholder]="'pluginParameter.customAreaName' | transloco"
-                    [formControl]="areaLabelControl"
-                    [value]="areaLabelControl.value" />
-                <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
-                <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
+        @if (areaSelected) {
+            <div class="selected-regions">
+                @for (region of this.mapService.selectedOlFeatures.getArray(); track region) {
+                    <div class="region-item">
+                        @if (currentSelectionMode === 'Boundary') {
+                            <span class="region-name">{{ region.get('name') }}</span>
+                        }
+                        @if (currentSelectionMode !== 'Boundary') {
+                            <input
+                                type="text"
+                                id="custom-area-label"
+                                class="region-name"
+                                [placeholder]="'pluginParameter.customAreaName' | transloco"
+                                [formControl]="areaLabelControl"
+                                [value]="areaLabelControl.value" />
+                        }
+                        <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
+                        <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
+                    </div>
+                }
+                @if (areaLabelControl.invalid && currentSelectionMode !== 'Boundary') {
+                    <div class="error-message">
+                        {{ 'pluginParameter.areaNameRequired' | transloco }}
+                    </div>
+                }
             </div>
-            <div *ngIf="areaLabelControl.invalid && currentSelectionMode !== 'Boundary'" class="error-message">
-                {{ 'pluginParameter.areaNameRequired' | transloco }}
-            </div>
-        </div>
+        }
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit(model)">

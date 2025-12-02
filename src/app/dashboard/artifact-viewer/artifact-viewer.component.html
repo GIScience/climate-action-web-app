@@ -10,13 +10,11 @@
                         ? ('artifactViewer.maximize' | transloco)
                         : ('artifactViewer.minimize' | transloco)
                 ">
-                <i-lucide
-                    *ngIf="artifactViewerService.minimised; else minimizeIcon"
-                    [img]="Maximize2"
-                    size="15"></i-lucide>
-                <ng-template #minimizeIcon>
+                @if (artifactViewerService.minimised) {
+                    <i-lucide [img]="Maximize2" size="15"></i-lucide>
+                } @else {
                     <i-lucide [img]="Minimize2" size="15"></i-lucide>
-                </ng-template>
+                }
             </button>
             <button
                 (click)="closeArtifactViewer()"

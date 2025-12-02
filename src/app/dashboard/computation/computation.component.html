@@ -3,73 +3,85 @@
     class="child-computations-wrapper"
     [ngClass]="{ 'report-active': isReportVisible }"
     (@expandCollapse.done)="onAnimationEvent($event, computation)">
-    <div *ngIf="(computation.isExpanded || computation.keepInDOM) && shouldShowFilters" class="tag-filters">
-        <button
-            *ngFor="let tag of availableTags"
-            class="tag-pill"
-            [class.active]="selectedTag === tag"
-            (click)="selectTag(tag)">
-            <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
-            <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>
-        </button>
-    </div>
+    @if ((computation.isExpanded || computation.keepInDOM) && shouldShowFilters) {
+        <div class="tag-filters">
+            @for (tag of availableTags; track tag) {
+                <button class="tag-pill" [class.active]="selectedTag === tag" (click)="selectTag(tag)">
+                    <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
+                    <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>
+                </button>
+            }
+        </div>
+    }
 
-    <ul *ngIf="computation.isExpanded || computation.keepInDOM" class="child-computations">
-        <ng-container *ngFor="let artifact of filteredArtifacts; let i = index">
-            <li
-                class="child-computation"
-                [ngClass]="{
-                    'child-computation-highlight': activeArtifact === artifact,
-                    loading: artifact.isLoading
-                }"
-                tp="{{ artifact.summary }}"
-                tpPlacement="right"
-                tabindex="0">
-                <div
-                    class="computation-content"
-                    (click)="renderArtifact(artifact)"
-                    (keyup.enter)="renderArtifact(artifact)"
+    @if (computation.isExpanded || computation.keepInDOM) {
+        <ul class="child-computations">
+            @for (artifact of filteredArtifacts; track artifact; let i = $index) {
+                <li
+                    class="child-computation"
+                    [ngClass]="{
+                        'child-computation-highlight': activeArtifact === artifact,
+                        loading: artifact.isLoading
+                    }"
+                    tp="{{ artifact.summary }}"
+                    tpPlacement="right"
                     tabindex="0">
-                    <mat-icon aria-hidden="false" aria-label="Computation" fontIcon="{{ artifact.icon }}"></mat-icon>
-                    <div>{{ artifact.name }}</div>
-                </div>
-                <div class="artifact-actions">
-                    <button
-                        *ngIf="artifact.description"
-                        class="description-btn btn-onlyicon btn-onlyicon--cta"
-                        (click)="viewDescription(artifact, $event)"
-                        [tp]="'computation.viewDescription' | transloco"
-                        tpPlacement="bottom">
-                        <i-lucide [img]="ReceiptText" size="17"></i-lucide>
-                    </button>
-                    <button
-                        class="download-btn btn-onlyicon btn-onlyicon--cta"
-                        (click)="downloadContent(artifact, $event)"
-                        [tp]="'artifactViewer.download' | transloco"
-                        tpPlacement="bottom">
-                        <i-lucide [img]="Download" size="17"></i-lucide>
-                    </button>
-                    <button
-                        class="add-to-report-btn"
-                        [ngClass]="{
-                            'btn-onlyicon btn-onlyicon--cta': !isReportVisible,
-                            'btn-small btn-alt btn-withtext': isReportVisible
-                        }"
-                        (click)="addToReport(artifact)"
-                        [tp]="'computation.addToReport' | transloco"
-                        tpPlacement="bottom">
-                        <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
-                        <span *ngIf="isReportVisible">{{ 'computation.add' | transloco }}</span>
-                    </button>
-                </div>
-                <div *ngIf="artifact.isLoading" class="loading-circle"></div>
-            </li>
-        </ng-container>
-    </ul>
+                    <div
+                        class="computation-content"
+                        (click)="renderArtifact(artifact)"
+                        (keyup.enter)="renderArtifact(artifact)"
+                        tabindex="0">
+                        <mat-icon
+                            aria-hidden="false"
+                            aria-label="Computation"
+                            fontIcon="{{ artifact.icon }}"></mat-icon>
+                        <div>{{ artifact.name }}</div>
+                    </div>
+                    <div class="artifact-actions">
+                        @if (artifact.description) {
+                            <button
+                                class="description-btn btn-onlyicon btn-onlyicon--cta"
+                                (click)="viewDescription(artifact, $event)"
+                                [tp]="'computation.viewDescription' | transloco"
+                                tpPlacement="bottom">
+                                <i-lucide [img]="ReceiptText" size="17"></i-lucide>
+                            </button>
+                        }
+                        <button
+                            class="download-btn btn-onlyicon btn-onlyicon--cta"
+                            (click)="downloadContent(artifact, $event)"
+                            [tp]="'artifactViewer.download' | transloco"
+                            tpPlacement="bottom">
+                            <i-lucide [img]="Download" size="17"></i-lucide>
+                        </button>
+                        <button
+                            class="add-to-report-btn"
+                            [ngClass]="{
+                                'btn-onlyicon btn-onlyicon--cta': !isReportVisible,
+                                'btn-small btn-alt btn-withtext': isReportVisible
+                            }"
+                            (click)="addToReport(artifact)"
+                            [tp]="'computation.addToReport' | transloco"
+                            tpPlacement="bottom">
+                            <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
+                            @if (isReportVisible) {
+                                <span>{{ 'computation.add' | transloco }}</span>
+                            }
+                        </button>
+                    </div>
+                    @if (artifact.isLoading) {
+                        <div class="loading-circle"></div>
+                    }
+                </li>
+            }
+        </ul>
+    }
 
-    <div *ngIf="computation.artifacts.length === 0" class="no-results-message">
-        {{ 'computation.noResults' | transloco }}
-    </div>
+    @if (computation.artifacts.length === 0) {
+        <div class="no-results-message">
+            {{ 'computation.noResults' | transloco }}
+        </div>
+    }
 </div>
 
 <ng-template #descriptionDialog let-data>

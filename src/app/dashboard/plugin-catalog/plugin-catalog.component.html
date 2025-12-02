@@ -7,51 +7,60 @@
         </label>
     </div>
     <div class="plugins-list">
-        <div *ngIf="loading" class="loading-state">
-            <ul>
-                <li class="plugin-card" *ngFor="let i of [1, 2, 3, 4, 5]">
-                    <div class="plugin-card__icon">
-                        <img src="assets/images/plugin-icons/loading.png" alt="Loading..." />
-                    </div>
-                    <div class="plugin-card__text">
-                        <h3>{{ 'pluginCatalog.loading' | transloco }}</h3>
-                        <span>N/A</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        @if (loading) {
+            <div class="loading-state">
+                <ul>
+                    @for (i of [1, 2, 3, 4, 5]; track i) {
+                        <li class="plugin-card">
+                            <div class="plugin-card__icon">
+                                <img src="assets/images/plugin-icons/loading.png" alt="Loading..." />
+                            </div>
+                            <div class="plugin-card__text">
+                                <h3>{{ 'pluginCatalog.loading' | transloco }}</h3>
+                                <span>N/A</span>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
 
-        <ng-container *ngIf="!loading">
+        @if (!loading) {
             <ng-scrollbar visibility="hover" orientation="vertical" position="invertY">
                 <ul>
-                    <li
-                        *ngFor="let card of cards; let i = index"
-                        class="plugin-card"
-                        (click)="showPlugin(card)"
-                        (keydown)="showPlugin(card)"
-                        [ngClass]="{ 'plugin-card-highlight': activeCard === card }"
-                        tabindex="0"
-                        [tp]="tpl"
-                        tpPlacement="right">
-                        <div class="plugin-card__icon">
-                            <img [src]="card.icon" alt="{{ card.icon_credit }}" (error)="onImageError($event)" />
-                            <div class="plugin-card__icon-text">
-                                <h5>{{ card.name }}</h5>
+                    @for (card of cards; track card; let i = $index) {
+                        <li
+                            class="plugin-card"
+                            (click)="showPlugin(card)"
+                            (keydown)="showPlugin(card)"
+                            [ngClass]="{ 'plugin-card-highlight': activeCard === card }"
+                            tabindex="0"
+                            [tp]="tpl"
+                            tpPlacement="right">
+                            <div class="plugin-card__icon">
+                                <img [src]="card.icon" alt="{{ card.icon_credit }}" (error)="onImageError($event)" />
+                                <div class="plugin-card__icon-text">
+                                    <h5>{{ card.name }}</h5>
+                                </div>
                             </div>
-                        </div>
-                        <div class="plugin-card__text">
-                            <h3>{{ card.name }}</h3>
-                            <span *ngIf="card.version && card.library_version"
-                                >ver. {{ card.version }}/{{ card.library_version }}</span
-                            >
-                            <span *ngIf="!(card.version && card.library_version)">ver. 0.0.1/0.0.1</span>
-                        </div>
-                        <ng-template #tpl>
-                            <span *ngIf="card.teaser">{{ card.teaser }}</span>
-                        </ng-template>
-                    </li>
+                            <div class="plugin-card__text">
+                                <h3>{{ card.name }}</h3>
+                                @if (card.version && card.library_version) {
+                                    <span>ver. {{ card.version }}/{{ card.library_version }}</span>
+                                }
+                                @if (!(card.version && card.library_version)) {
+                                    <span>ver. 0.0.1/0.0.1</span>
+                                }
+                            </div>
+                            <ng-template #tpl>
+                                @if (card.teaser) {
+                                    <span>{{ card.teaser }}</span>
+                                }
+                            </ng-template>
+                        </li>
+                    }
                 </ul>
             </ng-scrollbar>
-        </ng-container>
+        }
     </div>
 </div>

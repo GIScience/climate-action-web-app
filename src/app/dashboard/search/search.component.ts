@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslocoModule } from '@jsverse/transloco'
@@ -11,7 +10,6 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
 @Component({
     selector: 'app-search',
     imports: [
-        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         SearchTermHighlightPipe,

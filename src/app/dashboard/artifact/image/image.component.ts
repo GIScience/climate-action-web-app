@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
 
 @Component({
     selector: 'app-image',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './image.component.html',
     styleUrls: ['./image.component.scss']
 })

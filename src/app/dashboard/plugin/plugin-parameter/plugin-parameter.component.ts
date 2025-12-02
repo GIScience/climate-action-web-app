@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { AppwriteService } from '@app/auth/appwrite.service'
@@ -41,7 +41,6 @@ import { FormlyModel } from './plugin-parameter.interface'
         FormlyForm,
         FormsModule,
         ReactiveFormsModule,
-        NgIf,
         LucideAngularModule,
         CommonModule,
         NgScrollbarModule,

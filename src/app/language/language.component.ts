@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { Languages, LucideAngularModule } from 'lucide-angular'
@@ -9,7 +8,7 @@ import { SupportedLanguage } from '../types/language.types'
 
 @Component({
     selector: 'app-language',
-    imports: [CommonModule, TranslocoModule, LucideAngularModule],
+    imports: [TranslocoModule, LucideAngularModule],
     templateUrl: './language.component.html',
     styleUrl: './language.component.scss'
 })

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { Models } from 'appwrite'
@@ -21,7 +20,7 @@ import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-account',
-    imports: [CommonModule, LucideAngularModule, TranslocoModule],
+    imports: [LucideAngularModule, TranslocoModule],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
 })
