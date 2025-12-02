@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { ElementRef, Injectable, QueryList } from '@angular/core'
+import { ElementRef, Injectable, QueryList, inject } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
@@ -15,12 +15,10 @@ type Html2CanvasType = typeof html2canvas
     providedIn: 'root'
 })
 export class ExportPDFService {
-    constructor(
-        private http: HttpClient,
-        private toastr: ToastrService,
-        private reportService: ReportService,
-        private translocoService: TranslocoService
-    ) {}
+    private http = inject(HttpClient)
+    private toastr = inject(ToastrService)
+    private reportService = inject(ReportService)
+    private translocoService = inject(TranslocoService)
 
     async exportToPDF(
         artifacts: ArtifactEntity[],

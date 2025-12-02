@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { BehaviorSubject, filter, map, take } from 'rxjs'
 import { getCurrentCanonicalUrl } from '../../utils/url.utils'
@@ -7,12 +7,12 @@ import { getCurrentCanonicalUrl } from '../../utils/url.utils'
     providedIn: 'root'
 })
 export class ShareService {
+    private router = inject(Router)
+    private route = inject(ActivatedRoute)
+
     private computationToImport = new BehaviorSubject<string | null>(null)
 
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute
-    ) {
+    constructor() {
         this.route.queryParams
             .pipe(
                 map(params => params['share-id']),

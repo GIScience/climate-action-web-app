@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { Languages, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
@@ -13,6 +13,10 @@ import { SupportedLanguage } from '../types/language.types'
     styleUrl: './language.component.scss'
 })
 export class LanguageComponent {
+    private translocoService = inject(TranslocoService)
+    private storageService = inject(StorageService)
+    private toastr = inject(ToastrService)
+
     currentLang: SupportedLanguage
     private lastPersistedLanguage: SupportedLanguage | null = null
     languageMenuOpen = false
@@ -20,11 +24,7 @@ export class LanguageComponent {
     readonly supportedLanguages = SupportedLanguage
     readonly Languages = Languages
 
-    constructor(
-        private translocoService: TranslocoService,
-        private storageService: StorageService,
-        private toastr: ToastrService
-    ) {
+    constructor() {
         const storedPreference = this.storageService.getLanguagePreference()
         const activeLanguage = this.translocoService.getActiveLang() as SupportedLanguage
 

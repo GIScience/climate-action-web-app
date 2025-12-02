@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
 import { TranslocoModule } from '@jsverse/transloco'
@@ -17,18 +17,16 @@ import { PluginCard } from './plugin-catalog.interface'
     imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule, TranslocoModule]
 })
 export class PluginCatalogComponent implements AfterViewInit, OnInit {
+    private router = inject(Router)
+    private pluginService = inject(PluginService)
+    private artifactViewerService = inject(ArtifactViewerService)
+    private mapService = inject(MapService)
+
     @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>
 
     cards: Array<PluginCard> = []
     activeCard?: PluginCard
     loading = true
-
-    constructor(
-        private router: Router,
-        private pluginService: PluginService,
-        private artifactViewerService: ArtifactViewerService,
-        private mapService: MapService
-    ) {}
 
     ngAfterViewInit(): void {
         if (this.catalogToggle) {

@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
+import {
+    ChangeDetectorRef,
+    Component,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    ViewEncapsulation,
+    inject
+} from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationRunState } from '@app/dashboard/common/status.types'
@@ -50,6 +59,14 @@ import { FormlyModel } from './plugin-parameter.interface'
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
+    private pluginService = inject(PluginService)
+    private toastr = inject(ToastrService)
+    mapService = inject(MapService)
+    private cdr = inject(ChangeDetectorRef)
+    private formlyJsonschema = inject(FormlyJsonschema)
+    private appwriteService = inject(AppwriteService)
+    private translocoService = inject(TranslocoService)
+
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
@@ -77,15 +94,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     currentSelectionMode: 'Boundary' | 'Circle' | 'Box' | 'Polygon' = 'Boundary'
     areaLabelControl = new FormControl('')
 
-    constructor(
-        private pluginService: PluginService,
-        private toastr: ToastrService,
-        public mapService: MapService,
-        private cdr: ChangeDetectorRef,
-        private formlyJsonschema: FormlyJsonschema,
-        private appwriteService: AppwriteService,
-        private translocoService: TranslocoService
-    ) {
+    constructor() {
         const highlightedFeaturesObservable = fromEventPattern(handler =>
             this.mapService.selectedOlFeatures.on('change:length', handler)
         )

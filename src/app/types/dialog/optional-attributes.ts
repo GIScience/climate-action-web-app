@@ -1,4 +1,4 @@
-import { Component, DoCheck } from '@angular/core'
+import { Component, DoCheck, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
 import { FieldType } from '@ngx-formly/core'
@@ -11,11 +11,9 @@ import { DialogWindowComponent } from './dialog-window.component'
     imports: [LucideAngularModule, TranslocoModule]
 })
 export class OptionalAttributesTypeComponent extends FieldType implements DoCheck {
-    isDisabled = false
+    private dialog = inject(MatDialog)
 
-    constructor(private dialog: MatDialog) {
-        super()
-    }
+    isDisabled = false
 
     readonly ListTodo = ListTodo
 

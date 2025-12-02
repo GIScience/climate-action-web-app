@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core'
 import { MapService } from '../../map/map.service'
 import { Artifact } from '../artifact.interface'
 
@@ -9,10 +9,10 @@ import { Artifact } from '../artifact.interface'
     styleUrls: ['./geotiff.component.scss']
 })
 export class GeoTiffComponent implements OnInit, OnDestroy {
+    private mapService = inject(MapService)
+
     @Input() inputData: { url: string; artifact: Artifact | null } | undefined
     private geoTiffLayer?: { id: string; sourceId: string; name: string }
-
-    constructor(private mapService: MapService) {}
 
     async ngOnInit() {
         if (!this.inputData?.artifact || !this.inputData.url) return

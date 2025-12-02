@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, Optional } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
 import { StorageService } from '@app/storage.service'
 import { TranslocoService } from '@jsverse/transloco'
@@ -96,6 +96,13 @@ interface RasterLayer {
     providedIn: 'root'
 })
 export class MapService {
+    private pluginService = inject(PluginService)
+    private http = inject(HttpClient)
+    storageService = inject(StorageService)
+    private translocoService = inject(TranslocoService)
+    private router = inject(Router, { optional: true })
+    private mapDrawingService = inject(MapDrawingService, { optional: true })
+
     // Core Map Instance
     map: Map | undefined
     mapId: string = 'main-map'
@@ -135,14 +142,7 @@ export class MapService {
     static readonly sqmToSqkmFactor = 1 / 1000000
     private static readonly HEIDELBERG_COORDS: [number, number] = [8.6759928, 49.4187355]
 
-    constructor(
-        private pluginService: PluginService,
-        private http: HttpClient,
-        public storageService: StorageService,
-        private translocoService: TranslocoService,
-        @Optional() private router?: Router,
-        @Optional() private mapDrawingService?: MapDrawingService
-    ) {
+    constructor() {
         this.isOnLanding = this.router?.url === '/dashboard'
 
         if (this.router) {

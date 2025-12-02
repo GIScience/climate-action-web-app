@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core'
+import { AfterViewInit, Component, inject } from '@angular/core'
 import { MapService } from './map.service'
 
 @Component({
@@ -8,7 +8,7 @@ import { MapService } from './map.service'
     standalone: true
 })
 export class MapComponent implements AfterViewInit {
-    constructor(private mapService: MapService) {}
+    private mapService = inject(MapService)
 
     ngAfterViewInit(): void {
         this.mapService.initMap('main-map')

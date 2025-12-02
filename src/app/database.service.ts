@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
 import { AppwriteService } from './auth/appwrite.service'
 import { ComputationItemState } from './dashboard/common/status.types'
@@ -34,12 +34,12 @@ export interface PaginatedResult<T> {
     providedIn: 'root'
 })
 export class DatabaseService {
+    private appwriteService = inject(AppwriteService)
+
     private readonly DATABASE_ID = 'climate_action'
     private readonly RUNS_COLLECTION_ID = 'dashboard_data'
     // @ts-ignore: Suppress TypeScript error for test environment detection
     private isTestEnvironment = typeof jest !== 'undefined' || typeof Cypress !== 'undefined'
-
-    constructor(private appwriteService: AppwriteService) {}
 
     private get databases(): Databases {
         return this.appwriteService.getDatabases()

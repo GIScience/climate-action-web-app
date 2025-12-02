@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { TranslocoService } from '@jsverse/transloco'
 import { Driver, driver } from 'driver.js'
@@ -14,18 +14,18 @@ import { ExtendedDriveStep } from './tour.interfaces'
     providedIn: 'root'
 })
 export class TourEngine {
+    private dashboardService = inject(DashboardService)
+    private appwriteService = inject(AppwriteService)
+    private dialog = inject(MatDialog)
+    private tourStepsService = inject(TourStepsService)
+    private storageService = inject(StorageService)
+    private translocoService = inject(TranslocoService)
+
     private driverObj: Driver | null = null
     private currentSteps: ExtendedDriveStep[] = []
     private driverInitPromise: Promise<void>
 
-    constructor(
-        private dashboardService: DashboardService,
-        private appwriteService: AppwriteService,
-        private dialog: MatDialog,
-        private tourStepsService: TourStepsService,
-        private storageService: StorageService,
-        private translocoService: TranslocoService
-    ) {
+    constructor() {
         this.driverInitPromise = this.loadDriver()
         this.translocoService.langChanges$.subscribe(lang => {
             this.driverInitPromise = this.loadDriver(lang)

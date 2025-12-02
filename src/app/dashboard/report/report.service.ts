@@ -1,20 +1,24 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, Injector } from '@angular/core'
+import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
 import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
-import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
-import { PluginService } from '../plugin/plugin.service'
 @Injectable({
     providedIn: 'root'
 })
 export class ReportService {
+    private http = inject(HttpClient)
+    private injector = inject(EnvironmentInjector)
+    private toastr = inject(ToastrService)
+    private artifactViewerService = inject(ArtifactViewerService)
+    private translocoService = inject(TranslocoService)
+
     private artifacts: {
         artifact: ArtifactEntity
         service: ArtifactService
@@ -30,14 +34,6 @@ export class ReportService {
     collapseLeftColumn$ = this.collapseLeftColumnSubject.asObservable()
 
     readonly MAX_ARTIFACTS = 4
-
-    constructor(
-        private http: HttpClient,
-        private injector: Injector,
-        private toastr: ToastrService,
-        private artifactViewerService: ArtifactViewerService,
-        private translocoService: TranslocoService
-    ) {}
 
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
         const artifactInstance = JSON.parse(JSON.stringify(artifact))
@@ -57,7 +53,7 @@ export class ReportService {
 
         this.artifactViewerService.closeArtifactViewer()
 
-        const artifactService = new ArtifactService(this.http)
+        const artifactService = runInInjectionContext(this.injector, () => new ArtifactService())
         this.artifacts.push({
             artifact: artifactInstance,
             service: artifactService,
@@ -69,25 +65,7 @@ export class ReportService {
             setTimeout(() => {
                 const mapId = `report-map-${artifactInstance.store_id}`
 
-                const injector = Injector.create({
-                    providers: [
-                        {
-                            provide: MapService,
-                            useFactory: (
-                                pluginService: PluginService,
-                                http: HttpClient,
-                                storageService: StorageService,
-                                translocoService: TranslocoService
-                            ) => {
-                                return new MapService(pluginService, http, storageService, translocoService)
-                            },
-                            deps: [PluginService, HttpClient, StorageService, TranslocoService]
-                        }
-                    ],
-                    parent: this.injector
-                })
-
-                const mapService = injector.get(MapService)
+                const mapService = runInInjectionContext(this.injector, () => new MapService())
                 const mapElement = document.getElementById(mapId)
                 if (mapElement) {
                     mapService.initMap(mapId, true)

@@ -1,19 +1,26 @@
 import { animate, style, transition, trigger } from '@angular/animations'
-import { HttpClient } from '@angular/common/http'
-import { Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChildren, ViewContainerRef } from '@angular/core'
+import {
+    Component,
+    ComponentRef,
+    ElementRef,
+    EnvironmentInjector,
+    OnInit,
+    QueryList,
+    ViewChildren,
+    ViewContainerRef,
+    inject,
+    runInInjectionContext
+} from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { Router } from '@angular/router'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { StorageService } from '../../storage.service'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
 import { LegendComponent } from '../artifact/legend/legend.component'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
-import { PluginService } from '../plugin/plugin.service'
 import { ExportPDFService } from './export-pdf.service'
 import { ReportService } from './report.service'
 
@@ -39,6 +46,11 @@ import { ReportService } from './report.service'
     ]
 })
 export class ReportComponent implements OnInit {
+    reportService = inject(ReportService)
+    private injector = inject(EnvironmentInjector)
+    private ExportPDFService = inject(ExportPDFService)
+    private translocoService = inject(TranslocoService)
+
     artifacts: ArtifactEntity[] = []
     isVisible = false
     hasExported = false
@@ -60,16 +72,6 @@ export class ReportComponent implements OnInit {
     private mapServices: Map<string, MapService> = new Map()
     private legendComponents: Map<string, ComponentRef<LegendComponent>> = new Map()
 
-    constructor(
-        public reportService: ReportService,
-        private pluginService: PluginService,
-        private http: HttpClient,
-        private storageService: StorageService,
-        private ExportPDFService: ExportPDFService,
-        private router: Router,
-        private translocoService: TranslocoService
-    ) {}
-
     ngOnInit(): void {
         this.reportService.artifacts$.subscribe(artifacts => {
             const previousArtifactIds = this.artifacts.map(a => a.store_id)
@@ -82,13 +84,7 @@ export class ReportComponent implements OnInit {
 
             addedArtifacts.forEach(artifact => {
                 if (this.reportService.isMapArtifact(artifact) && !this.mapServices.has(artifact.store_id)) {
-                    const mapService = new MapService(
-                        this.pluginService,
-                        this.http,
-                        this.storageService,
-                        this.translocoService,
-                        this.router
-                    )
+                    const mapService = runInInjectionContext(this.injector, () => new MapService())
                     this.mapServices.set(artifact.store_id, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)

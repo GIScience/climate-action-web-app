@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
+import { Component, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
@@ -43,6 +43,14 @@ interface MaintenanceAnnouncement {
     ]
 })
 export class DashboardComponent implements OnInit {
+    artifactService = inject(ArtifactService)
+    artifactViewerService = inject(ArtifactViewerService)
+    reportService = inject(ReportService)
+    mapService = inject(MapService)
+    private elementRef = inject(ElementRef)
+    private toastr = inject(ToastrService)
+    private http = inject(HttpClient)
+
     @ViewChild(ComputationsIndexComponent) computationsIndexComponent?: ComputationsIndexComponent
     @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
@@ -54,16 +62,6 @@ export class DashboardComponent implements OnInit {
 
     readonly PanelLeftClose = PanelLeftClose
     readonly PanelLeftOpen = PanelLeftOpen
-
-    constructor(
-        public artifactService: ArtifactService,
-        public artifactViewerService: ArtifactViewerService,
-        public reportService: ReportService,
-        public mapService: MapService,
-        private elementRef: ElementRef,
-        private toastr: ToastrService,
-        private http: HttpClient
-    ) {}
 
     ngOnInit(): void {
         this.legendSubscription = this.artifactService.legend.subscribe(legend => {
