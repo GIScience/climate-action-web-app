@@ -1,47 +1,43 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "schedule": [
-    "* * 1 * *"
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": [
-        "npm"
-      ],
-      "minimumReleaseAge": "3 days"
-    },
-    {
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "groupName": "dependency patches"
-    },
-    {
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "groupName": "dependency feature release updates"
-    },
-    {
-      "matchDepNames": [
-        "@ngx-formly/*"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "groupName": "ngx-formly"
-    },
-    {
-      "matchDepNames": [
-        "@angular/*",
-        "@angular-builders/*",
-        "@angular-eslint/*"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "minimumReleaseAge": "6 months",
-      "groupName": "angular"
-    }
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "schedule": ["* * 1 * *"],
+    "draftPR": true,
+    "packageRules": [
+        {
+            "matchDepNames": ["chart.js"],
+            "enabled": false
+        },
+        {
+            "matchDatasources": ["npm"],
+            "minimumReleaseAge": "3 days"
+        },
+        {
+            "matchUpdateTypes": ["patch"],
+            "groupName": "dependency patches",
+            "schedule": ["* 0-3 * * *"]
+        },
+        {
+            "matchUpdateTypes": ["minor"],
+            "groupName": "dependency feature release updates"
+        },
+        {
+            "matchDepNames": ["@ngx-formly/*"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "ngx-formly"
+        },
+        {
+            "matchDepNames": [
+                "@angular/*",
+                "@angular-builders/*",
+                "@angular-eslint/*",
+                "typescript",
+                "rxjs",
+                "zone.js",
+                "trion/ng-cli-karma"
+            ],
+            "matchUpdateTypes": ["major"],
+            "minimumReleaseAge": "6 months",
+            "groupName": "angular"
+        }
+    ]
 }
