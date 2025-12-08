@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
 import { StorageService } from '@app/storage.service'
+import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
@@ -893,7 +894,7 @@ export class MapService {
                     type: 'Feature',
                     geometry: feature.geometry,
                     properties: {
-                        name: feature.properties?.['name'] || feature.properties?.['display_name'] || 'Unnamed Region',
+                        name: resolveLocalizedName(feature.properties, this.translocoService.getActiveLang()),
                         id: (feature.properties?.['id'] || featureId).toString(),
                         area: 0
                     }
