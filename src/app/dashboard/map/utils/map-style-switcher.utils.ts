@@ -1,5 +1,5 @@
 import { TranslocoService } from '@jsverse/transloco'
-import { IControl, Map, StyleSpecification } from 'maplibre-gl'
+import { ControlPosition, IControl, Map, StyleSpecification } from 'maplibre-gl'
 import { Subscription } from 'rxjs'
 
 export interface MapStyle {
@@ -46,6 +46,10 @@ export class MapStyleSwitcherControl implements IControl {
         }
         this.controlContainer?.remove()
         this.map = undefined
+    }
+
+    getDefaultPosition(): ControlPosition {
+        return 'bottom-right'
     }
 
     private setupTranslations(): void {

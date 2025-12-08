@@ -25,6 +25,7 @@ import maplibregl, {
     Popup,
     StyleSpecification
 } from 'maplibre-gl'
+import { updateMaplibreLocale } from 'maplibre-ui-translations'
 import { Collection } from 'ol'
 import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
@@ -178,6 +179,12 @@ export class MapService {
                 }
             })
         }
+
+        this.translocoService.langChanges$.subscribe(lang => {
+            if (this.map) {
+                updateMaplibreLocale(this.map, lang)
+            }
+        })
     }
 
     initMap(targetId: string, isReportMap: boolean = false) {
@@ -197,6 +204,8 @@ export class MapService {
             maxPitch: 85
         })
 
+        updateMaplibreLocale(this.map, this.translocoService.getActiveLang())
+
         if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
             maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
         }
@@ -207,7 +216,7 @@ export class MapService {
         })
         navigationControl._container.className += ' navigation-controls'
         this.map!.addControl(navigationControl, 'top-right')
-        this.map!.addControl(MapControlsUtils.createZoomToZeroControl(), 'top-right')
+        this.map!.addControl(MapControlsUtils.createZoomToZeroControl(this.translocoService), 'top-right')
         this.map!.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'top-right')
 
         this.addLayerSwitcher()

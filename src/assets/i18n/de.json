@@ -261,6 +261,7 @@
     "map": {
         "baseMaps": "Hintergrundkarte",
         "layers": "Kartenebenen",
+        "zoomToWorldView": "Auf Globus zoomen",
         "drawing": {
             "radius": "Radius",
             "area": "Fläche",

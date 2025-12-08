@@ -261,6 +261,7 @@
     "map": {
         "baseMaps": "Base Maps",
         "layers": "Layers",
+        "zoomToWorldView": "Zoom out to globe view",
         "drawing": {
             "radius": "Radius",
             "area": "Area",
