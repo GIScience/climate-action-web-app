@@ -95,6 +95,9 @@ importers:
       maplibre-gl:
         specifier: ^5.6.1
         version: 5.13.0
+      maplibre-ui-translations:
+        specifier: ^0.4.0
+        version: 0.4.0(maplibre-gl@5.13.0)
       marked:
         specifier: ^17.0.0
         version: 17.0.1
@@ -4518,6 +4521,11 @@ packages:
   maplibre-gl@5.13.0:
     resolution: {integrity: sha512-UsIVP34rZdM4TjrjhwBAhbC3HT7AzFx9p/draiAPlLr8/THozZF6WmJnZ9ck4q94uO55z7P7zoGCh+AZVoagsQ==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
+
+  maplibre-ui-translations@0.4.0:
+    resolution: {integrity: sha512-3eyGRASgjPMv2J+y+NH/A1CT30TPgzdcayxHpoGrayjJGi1XJv546rwcA/M2iw83L3yhK//z3smNJrPI31fZsQ==}
+    peerDependencies:
+      maplibre-gl: '>=2.0.0'
 
   marked@16.4.2:
     resolution: {integrity: sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==}
@@ -10994,6 +11002,10 @@ snapshots:
       quickselect: 3.0.0
       supercluster: 8.0.1
       tinyqueue: 3.0.0
+
+  maplibre-ui-translations@0.4.0(maplibre-gl@5.13.0):
+    dependencies:
+      maplibre-gl: 5.13.0
 
   marked@16.4.2:
     optional: true

@@ -1,5 +1,6 @@
-import { IControl } from 'maplibre-gl'
 import { TranslocoService } from '@jsverse/transloco'
+import { IControl } from 'maplibre-gl'
+import { Subscription } from 'rxjs'
 import { MapStyle, MapStyleSwitcherControl } from './map-style-switcher.utils'
 
 export class MapControlsUtils {
@@ -21,22 +22,40 @@ export class MapControlsUtils {
         return btn
     }
 
-    static createZoomToZeroControl(): IControl {
+    static createZoomToZeroControl(translocoService: TranslocoService): IControl {
+        let container: HTMLDivElement | undefined
+        let button: HTMLButtonElement | undefined
+        let subscription: Subscription | undefined
+        const setButtonTitle = (title: string) => {
+            if (button) {
+                button.title = title
+            }
+        }
+
         return {
             onAdd: map => {
-                const div = Object.assign(document.createElement('div'), {
+                container = Object.assign(document.createElement('div'), {
                     className: 'maplibregl-ctrl maplibregl-ctrl-group zoom-to-zero-control'
                 })
-                div.append(
-                    this.createControlButton({
-                        text: '<img src="assets/images/globe.svg" />',
-                        title: 'Zoom to world view',
-                        action: () => map.easeTo({ zoom: 3, pitch: 0, bearing: 0, center: [10, 30], duration: 1000 })
-                    })
-                )
-                return div
+                button = this.createControlButton({
+                    text: '<img src="assets/images/globe.svg" />',
+                    title: translocoService.translate('map.zoomToWorldView'),
+                    action: () => map.easeTo({ zoom: 3, pitch: 0, bearing: 0, center: [10, 30], duration: 1000 })
+                })
+                container.append(button)
+
+                subscription = translocoService.selectTranslate('map.zoomToWorldView').subscribe(setButtonTitle)
+
+                return container
             },
-            onRemove: () => {}
+            onRemove: () => {
+                subscription?.unsubscribe()
+                subscription = undefined
+                container?.remove()
+                container = undefined
+                button = undefined
+            },
+            getDefaultPosition: () => 'top-right'
         }
     }
 
