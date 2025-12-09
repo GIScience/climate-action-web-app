@@ -39,7 +39,7 @@ export class MapControlsUtils {
                 })
                 button = this.createControlButton({
                     text: '<img src="assets/images/globe.svg" />',
-                    title: translocoService.translate('map.zoomToWorldView'),
+                    title: '',
                     action: () => map.easeTo({ zoom: 3, pitch: 0, bearing: 0, center: [10, 30], duration: 1000 })
                 })
                 container.append(button)
