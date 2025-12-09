@@ -1,4 +1,4 @@
-import { GeoJSONSource, LayerSpecification, Map, Popup } from 'maplibre-gl'
+import { GeoJSONSource, LayerSpecification, Map, MapGeoJSONFeature, Popup } from 'maplibre-gl'
 
 export class MapGeoJsonUtils {
     private static readonly HIGHLIGHT_COLOR = 'rgba(255, 255, 255, 0.8)'
@@ -73,7 +73,15 @@ export class MapGeoJsonUtils {
             hoverFeatureId = featureId
             const highlightSource = map.getSource('hover-highlight') as GeoJSONSource
             map.getCanvas().style.cursor = feature ? 'pointer' : ''
-            highlightSource?.setData({ type: 'FeatureCollection', features: feature ? [feature] : [] })
+            const mapGeoJsonFeature = feature as MapGeoJSONFeature | undefined
+            const hoverFeature = mapGeoJsonFeature
+                ? typeof mapGeoJsonFeature.toJSON === 'function'
+                    ? mapGeoJsonFeature.toJSON()
+                    : JSON.parse(JSON.stringify(mapGeoJsonFeature))
+                : undefined
+            if (hoverFeature) {
+                highlightSource?.setData({ type: 'FeatureCollection', features: [hoverFeature] })
+            }
 
             if (popupTimeout) {
                 clearTimeout(popupTimeout)
