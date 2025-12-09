@@ -1,6 +1,6 @@
 {
     "name": "climate-action-navigator",
-    "version": "2.5.1",
+    "version": "3.0.0",
     "scripts": {
         "ng": "ng",
         "start": "ng serve --no-hmr --host=127.0.0.1",
