@@ -771,12 +771,15 @@ export class MapService {
             const tiff = await geoTiffFromUrl(sourceURL)
             const image = await tiff.getImage()
             const bbox = image.getBoundingBox()
+            const rawNoData = image.getGDALNoData && image.getGDALNoData()
+            const nodataValue = Number.isFinite(Number(rawNoData)) ? Number(rawNoData) : 0
             const { rasters, width, height } = await MapGeoTiffUtils.readDownsampledGeoTiffRasters(tiff)
             const canvas = MapGeoTiffUtils.renderPalettedGeoTiff(
                 width,
                 height,
                 MapGeoTiffUtils.getFirstRaster(rasters),
-                image.getFileDirectory().ColorMap
+                image.getFileDirectory().ColorMap,
+                nodataValue
             )
 
             this.map.addSource(sourceId, {

@@ -35,7 +35,8 @@ export class MapGeoTiffUtils {
         width: number,
         height: number,
         raster: TypedArray,
-        colorMap: number[]
+        colorMap: number[],
+        nodata?: number | null
     ): HTMLCanvasElement {
         const canvas = Object.assign(document.createElement('canvas'), { width, height })
         const ctx = canvas.getContext('2d')!
@@ -53,6 +54,11 @@ export class MapGeoTiffUtils {
                 g = Math.round(g / this.COLOR_CONVERSION_FACTOR)
                 b = Math.round(b / this.COLOR_CONVERSION_FACTOR)
             }
+            // Treat as transparent: (1) nodata pixels (from file metadata, defaulting to 0),
+            // or (2) black RGB output - matching OpenLayers' nodata:0 with convertToRGB:true
+            const isNoDataByValue = nodata === null || nodata === undefined ? p === 0 : p === nodata
+            const isTransparentBlack = r === 0 && g === 0 && b === 0
+            if (isNoDataByValue || isTransparentBlack) continue
             imageData.data.set([r, g, b, 255], i * 4)
         }
         ctx.putImageData(imageData, 0, 0)
