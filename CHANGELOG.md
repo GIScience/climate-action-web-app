@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Fix black pixel (nodata) handling in GeoTIFFs to match previous OL workaround
+- Added a link to take the user home in the 404 (Page not found) page
 
 ## [3.0.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.0) - 2025-12-09
 

@@ -1,4 +1,13 @@
 <div class="page-not-found">
-    <img ngSrc="../../assets/images/no-results.svg" width="256" height="256" alt="page not found" priority="true" />
-    <div>Page not found</div>
+    <div class="error-code">
+        <span class="digit">4</span>
+        <div class="portal">
+            <div class="stars-window"></div>
+        </div>
+        <span class="digit">4</span>
+    </div>
+    <p class="message">{{ 'pageNotFound.message' | transloco }}</p>
+    <button class="btn-primary btn-withtext" (click)="goToDashboard()">
+        {{ 'pageNotFound.returnToDashboard' | transloco }}
+    </button>
 </div>
