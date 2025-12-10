@@ -131,6 +131,10 @@
         "description": "Diese Website ist momentan nicht für mobile Endgeräte und kleine Bildschirmgrößen optimiert. Bitte verwende ein anderes Gerät für eine angenehmere Nutzungserfahrung.",
         "understand": "Trotzdem fortfahren"
     },
+    "pageNotFound": {
+        "message": "Es scheint, als hätten Sie unbekanntes Terrain betreten.",
+        "returnToDashboard": "Zurück zum Dashboard"
+    },
     "app": {
         "footer": {
             "copyright": "© {{ year }} HeiGIT gGmbH",

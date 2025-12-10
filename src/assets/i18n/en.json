@@ -131,6 +131,10 @@
         "description": "This website is currently not optimized for mobile devices. For the best experience, please visit from a desktop computer.",
         "understand": "I understand"
     },
+    "pageNotFound": {
+        "message": "It appears you have ventured into uncharted territory.",
+        "returnToDashboard": "Return to Dashboard"
+    },
     "app": {
         "footer": {
             "copyright": "© {{ year }} HeiGIT gGmbH",
