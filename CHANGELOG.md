@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project mostly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.0...main)
+## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.1...main)
+
+## [3.0.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.1) - 2025-12-10
 
 ### Fixed
 
