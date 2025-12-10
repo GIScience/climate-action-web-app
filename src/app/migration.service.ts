@@ -13,7 +13,14 @@ export class MigrationService {
     private readonly MIGRATION_KEY = 'computation_state_migration_completed'
 
     constructor() {
+        this.setupLogoutCleanup()
         this.waitForUserAndRunMigration()
+    }
+
+    private setupLogoutCleanup(): void {
+        this.appwriteService.onLogout.subscribe(() => {
+            sessionStorage.removeItem(this.MIGRATION_KEY)
+        })
     }
 
     private waitForUserAndRunMigration(): void {
@@ -28,20 +35,15 @@ export class MigrationService {
     }
 
     private async runMigrationOnce(): Promise<void> {
-        const migrationCompleted = localStorage.getItem(this.MIGRATION_KEY)
-        if (migrationCompleted === 'true') {
+        if (sessionStorage.getItem(this.MIGRATION_KEY) === 'true') {
             return
         }
 
         try {
-            console.log('🚀 Auto-running database migration after user login...')
-            console.log('This will set the state field based on existing ARCHIVED flags')
-
+            console.log('🚀 Running database migration...')
             await this.databaseService.migrateComputationsToStateField()
-
-            // Mark migration as completed
-            localStorage.setItem(this.MIGRATION_KEY, 'true')
-            console.log('✅ Migration completed successfully!')
+            sessionStorage.setItem(this.MIGRATION_KEY, 'true')
+            console.log('✅ Migration completed!')
         } catch (error) {
             console.error('❌ Migration failed:', error)
         }
