@@ -14,6 +14,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Fix misclicks on search location suggestions caused by cursor microdrags
+- Fix URL rewrite for /webapp to be able to handle old share links
 
 ## [3.0.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.1) - 2025-12-10
 

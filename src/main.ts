@@ -101,11 +101,6 @@ const routes: Routes = [
             }
         ]
     },
-    // Legacy redirect: /webapp/* → /dashboard (old URL structure)
-    {
-        path: 'webapp',
-        children: [{ path: '**', redirectTo: '/dashboard' }]
-    },
     {
         path: '**',
         component: PageNotFoundComponent
