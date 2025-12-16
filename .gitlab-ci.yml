@@ -156,7 +156,7 @@ deploy_staging:
     script:
         - |
             argocd app actions \
-              run argocd/${ARGOCD_STAGING_APPLICATION_NAME} \
+              run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
               restart --kind Deployment \
               --server ${ARGOCD_SERVER} \
               --auth-token ${ARGOCD_AUTH_TOKEN}\
