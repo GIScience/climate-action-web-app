@@ -21,6 +21,7 @@
                 @for (suggestion of suggestions; track suggestion) {
                     <div
                         class="location-suggestion__item"
+                        (mousedown)="selectSuggestion(suggestion)"
                         (click)="selectSuggestion(suggestion)"
                         (keyup.enter)="selectSuggestion(suggestion)"
                         (mouseover)="this.mapService.addMarker(suggestion)"

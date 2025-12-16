@@ -11,6 +11,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Set caching to 1 year for hashed assets served by nginx
 
+### Fixed
+
+- Fix misclicks on search location suggestions caused by cursor microdrags
+
 ## [3.0.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.1) - 2025-12-10
 
 ### Fixed
