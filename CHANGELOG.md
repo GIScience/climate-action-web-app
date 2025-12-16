@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.2...main)
 
+### Fixed
+
+- Fix nginx URL rewrite to work regardless of trailing slash
+
 ## [3.0.2](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.2) - 2025-12-16
 
 ### Added
