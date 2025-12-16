@@ -139,6 +139,7 @@
         "footer": {
             "copyright": "© {{ year }} HeiGIT gGmbH",
             "aboutClimateAction": "Über das Climate Action Projekt",
+            "sourceCode": "Quellcode",
             "partnerWithUs": "Werde Partner:in",
             "imprint": "Impressum",
             "privacyPolicy": "Datenschutz",
