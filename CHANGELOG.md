@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.1...main)
 
+### Added
+
+- Set caching to 1 year for hashed assets served by nginx
+
 ## [3.0.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.1) - 2025-12-10
 
 ### Fixed
