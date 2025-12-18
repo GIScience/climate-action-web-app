@@ -27,7 +27,8 @@ test_jest_and_lint:
             prefix: $CI_COMMIT_REF_NAME
         paths:
             - .pnpm-store
-        policy: pull
+            - .jest-cache
+        policy: pull-push
     image:
         name: trion/ng-cli-karma:20.3.11
     variables:

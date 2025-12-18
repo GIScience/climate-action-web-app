@@ -86,7 +86,7 @@
                     "builder": "@angular/build:dev-server",
                     "configurations": {
                         "production": {
-                            "buildTarget": "climate-action-app:build:prod"
+                            "buildTarget": "climate-action-app:build:production"
                         },
                         "development": {
                             "buildTarget": "climate-action-app:build:development"

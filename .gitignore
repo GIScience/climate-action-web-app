@@ -30,6 +30,7 @@ logs
 /.sass-cache
 /connect.lock
 /coverage
+/.jest-cache
 /libpeerconnection.log
 npm-debug.log
 testem.log
