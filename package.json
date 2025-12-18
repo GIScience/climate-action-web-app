@@ -11,7 +11,7 @@
         "analyze": "pnpm dlx esbuild-visualizer --metadata ./dist/browser/stats.json",
         "watch": "ng build --watch --configuration development",
         "test": "jest --setupFiles=./jest.mocks.ts",
-        "test:watch": "jest --watch --setupFiles=./jest.mocks.ts",
+        "test:watch": "jest --watch --onlyChanged --setupFiles=./jest.mocks.ts",
         "test:coverage": "jest --coverage --setupFiles=./jest.mocks.ts",
         "test-chromium-headless": "jest --setupFiles=./jest.mocks.ts",
         "cy:open": "cypress open",

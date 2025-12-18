@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.3...main)
 
+### Fixed
+
+- Define and use a cache for Jest in dev and pipeline
+
 ## [3.0.3](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.3) - 2025-12-16
 
 ### Fixed
