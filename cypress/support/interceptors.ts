@@ -899,7 +899,7 @@ export const mockGeoTiffComputation = () => {
     }).as('getGeoTiffComputation')
 }
 
-export const mockGeoJsonComputation = () => {
+export const mockGeoJsonComputationJinrongjie = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/metadata`, {
         body: {
             correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
@@ -947,7 +947,7 @@ export const mockGeoJsonComputation = () => {
                     name: 'Connectivity',
                     modality: 'MAP_LAYER_GEOJSON',
                     primary: true,
-                    file_path: 'cypress/fixtures/sample_vector_blueprint.geojson',
+                    file_path: 'cypress/fixtures/sample_vector_blueprint-1.geojson',
                     summary:
                         'Connectivity of path segments:\n\nThe map shows how accessible the locations surrounding each path are. High connectivity for a given path means a high share of the surrounding paths can be reached in the maximum trip duration.\n\nMore specifically, we define connectivity as the proportion of accessible locations out of the total number of locations in an area of interest (AOI). The AOI includes all the road intersections that can be reached from a given point traveling at the walking speed for the maximum trip duration in a straight line (\"as the crow flies\"). A target location is considered accessible if the actual walking distance through the street network is smaller or equal to the radius of the AOI.\n\nWhen calculating connectivity, it is possible to take into account that people are more likely to walk shorter rather than longer distances, and therefore give more weight to closer locations. For more details see the description below.\n\n\n',
                     description:
@@ -976,7 +976,150 @@ export const mockGeoJsonComputation = () => {
             status: 'SUCCESS',
             message: '-'
         }
-    }).as('getGeoJsonComputation')
+    }).as('getGeoJsonComputationJinrongjie')
+}
+
+export const mockGeoJsonComputationWestChangan = () => {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/0f4552a1-79c4-452c-9e01-3c33a9bae0e8/metadata`, {
+        body: {
+            correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
+            timestamp: new Date('2023-05-25T16:57:52+01:00'),
+            params: {
+                bool_blueprint: true
+            },
+            aoi: {
+                type: 'Feature',
+                geometry: {
+                    type: 'MultiPolygon',
+                    coordinates: [
+                        [
+                            [
+                                [116.36729191619845, 39.92106930491204],
+                                [116.36788351619852, 39.90443380490862],
+                                [116.36798711619858, 39.90086520490789],
+                                [116.36812361619855, 39.898351404907345],
+                                [116.37799271619996, 39.89866260490746],
+                                [116.38609911620111, 39.898918104907494],
+                                [116.38674661620121, 39.89892810490747],
+                                [116.38709961620125, 39.89892310490745],
+                                [116.38787301620135, 39.89887570490748],
+                                [116.38977311620158, 39.89872340490743],
+                                [116.38971731620163, 39.89904530490753],
+                                [116.38964031620154, 39.90033930490776],
+                                [116.38950361620154, 39.90297610490833],
+                                [116.38937031620154, 39.90560950490891],
+                                [116.38932271620156, 39.90654810490909],
+                                [116.3885066162014, 39.906532104909076],
+                                [116.38850161620134, 39.906632804909094],
+                                [116.38580641620104, 39.906572304909076],
+                                [116.38580821620101, 39.90678640490913],
+                                [116.38606701620107, 39.906790304909094],
+                                [116.38630971620113, 39.90700930490914],
+                                [116.38655521620116, 39.90722610490923],
+                                [116.38647021620113, 39.90907680490963],
+                                [116.38640681620107, 39.90907640490963],
+                                [116.38639701620109, 39.909278304909634],
+                                [116.38559821620103, 39.909266804909606],
+                                [116.385562016201, 39.91029150490988],
+                                [116.38554621620104, 39.91087620491001],
+                                [116.38549121620096, 39.91087600490994],
+                                [116.38548761620103, 39.91097240491001],
+                                [116.38582181620104, 39.91098470490999],
+                                [116.38580871620103, 39.91153040491008],
+                                [116.38636981620108, 39.91155400491016],
+                                [116.38634821620109, 39.91207880491024],
+                                [116.38631661620116, 39.91322940491048],
+                                [116.38629881620113, 39.9136226049105],
+                                [116.3862715162011, 39.913621904910514],
+                                [116.38626571620108, 39.91372630491057],
+                                [116.38596491620105, 39.919582804911755],
+                                [116.38590911620109, 39.921060204912095],
+                                [116.38814681620134, 39.92113800491214],
+                                [116.38922741620148, 39.9211726049121],
+                                [116.3896376162016, 39.92118890491216],
+                                [116.39028041620165, 39.921213904912065],
+                                [116.3902449162017, 39.92181310491222],
+                                [116.38581991620106, 39.921703204912205],
+                                [116.385536216201, 39.92167820491224],
+                                [116.38542241620101, 39.92165030491222],
+                                [116.38526011620094, 39.921577004912194],
+                                [116.38508351620096, 39.92144260491213],
+                                [116.38487231620088, 39.921204604912134],
+                                [116.3845992162009, 39.920857904912026],
+                                [116.38339041620074, 39.92084710491207],
+                                [116.38307781620064, 39.92085870491201],
+                                [116.38276681620056, 39.920902904912055],
+                                [116.38241791620058, 39.92100460491207],
+                                [116.38225661620052, 39.921054604912115],
+                                [116.38210181620055, 39.92108520491206],
+                                [116.38181861620053, 39.92108480491211],
+                                [116.38085151620035, 39.92105100491207],
+                                [116.38048831620024, 39.92106210491207],
+                                [116.38022461620025, 39.921104604912074],
+                                [116.37995561620023, 39.921124004912144],
+                                [116.37829941620004, 39.9210783049121],
+                                [116.37804181619998, 39.92110450491211],
+                                [116.37759371619987, 39.92122210491215],
+                                [116.37735411619988, 39.92124620491214],
+                                [116.36729191619845, 39.92106930491204]
+                            ],
+                            [
+                                [116.38188301620048, 39.90060140490783],
+                                [116.38235661620054, 39.9006251049079],
+                                [116.38275131620063, 39.90059060490782],
+                                [116.38298121620063, 39.900559404907824],
+                                [116.38307521620068, 39.90053270490779],
+                                [116.38307291620067, 39.90042830490779],
+                                [116.38296561620068, 39.90015050490774],
+                                [116.38299911620068, 39.89920390490755],
+                                [116.38197311620047, 39.89915760490757],
+                                [116.38188301620048, 39.90060140490783]
+                            ]
+                        ]
+                    ]
+                },
+                properties: {
+                    name: "West Chang'an",
+                    id: '-13210714'
+                }
+            },
+            artifacts: [
+                {
+                    name: 'Path Category',
+                    modality: 'MAP_LAYER_GEOJSON',
+                    primary: true,
+                    tags: ['traffic'],
+                    file_path: '/tmp/0f4552a1-79c4-452c-9e01-3c33a9bae0e8ek2dxiem/walkable.geojson',
+                    summary: 'Who shares this path with me?',
+                    description:
+                        'Paths exclusively for pedestrians are safer and more comfortable than paths shared with bikes or, even worse, fast\nmotorised traffic. This indicator categorises paths according to which other users share space with pedestrians.\n\nCategories (from better to worse):\n* Designated: Paths exclusively for pedestrians (e.g., sidewalks).\n* Shared with bikes: Paths where pedestrians share space with cyclists.\n* Shared with cars up to 15 km/h: Streets without a sidewalk and with speed limits up to 15 km/h, such as living streets and service ways.\n* Shared with cars up to 30 km/h: Streets without a sidewalk, with speed limits up to 30 km/h.\n* Shared with cars up to 50 km/h: Streets without a sidewalk, with speed limits up to 50 km/h.\n* Shared with cars above 50 km/h: Streets without a sidewalk and with speed limits higher than 50 km/h. Shown to explicitly highlight barriers\n* Shared with cars of unknown speed: Streets without a sidewalk and with unknown speed limit.\n* Unknown: Paths without enough information to categorise (e.g., streets with no information about sidewalk presence).\n\nThe categorisation is based on OpenStreetMap (OSM) tags.',
+                    correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
+                    store_id: '67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson',
+                    attachments: {
+                        legend: {
+                            legend_data: {
+                                Designated: '#3b4cc0',
+                                'Shared with bikes': '#7b9ff9',
+                                'Shared with cars up to 15 km/h': '#c0d4f5',
+                                'Shared with cars up to 30 km/h': '#f2cbb7',
+                                'Shared with cars up to 50 km/h': '#ee8468',
+                                'Shared with cars above 50 km/h': '#b40426',
+                                'Shared with cars of unknown speed': '#b40426',
+                                Unknown: '#808080'
+                            },
+                            legend_type: 'DISCRETE'
+                        }
+                    }
+                }
+            ],
+            plugin_info: {
+                name: 'Plugin Blueprint',
+                plugin_id: 'plugin_blueprint'
+            },
+            status: 'SUCCESS',
+            message: '-'
+        }
+    }).as('getGeoJsonComputationWestChangan')
 }
 
 export const mockSimpleGeoJsonComputation = () => {
@@ -1027,7 +1170,7 @@ export const mockSimpleGeoJsonComputation = () => {
                     name: 'Connectivity',
                     modality: 'MAP_LAYER_GEOJSON',
                     primary: true,
-                    file_path: 'cypress/fixtures/sample_vector_blueprint.geojson',
+                    file_path: 'cypress/fixtures/sample_vector_blueprint-1.geojson',
                     summary:
                         'Connectivity of path segments:\n\nThe map shows how accessible the locations surrounding each path are. High connectivity for a given path means a high share of the surrounding paths can be reached in the maximum trip duration.\n\nMore specifically, we define connectivity as the proportion of accessible locations out of the total number of locations in an area of interest (AOI). The AOI includes all the road intersections that can be reached from a given point traveling at the walking speed for the maximum trip duration in a straight line (\"as the crow flies\"). A target location is considered accessible if the actual walking distance through the street network is smaller or equal to the radius of the AOI.\n\nWhen calculating connectivity, it is possible to take into account that people are more likely to walk shorter rather than longer distances, and therefore give more weight to closer locations. For more details see the description below.\n\n\n',
                     description:
@@ -1068,13 +1211,22 @@ export const mockGeoTiff = () => {
     ).as('getGeoTiff')
 }
 
-export const mockGeoJson = () => {
+export const mockGeoJsonJinrongjie = () => {
     cy.intercept(
         `${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson`,
         {
-            fixture: 'sample_vector_blueprint.geojson'
+            fixture: 'sample_vector_blueprint-jinrongjie.geojson'
         }
-    ).as('getGeoJson')
+    ).as('getGeoJsonJinrongjie')
+}
+
+export const mockGeoJsonWestChangan = () => {
+    cy.intercept(
+        `${cypressEnvironment.apiBasePath}/store/0f4552a1-79c4-452c-9e01-3c33a9bae0e8/67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson`,
+        {
+            fixture: 'sample_vector_blueprint-westchangan.geojson'
+        }
+    ).as('getGeoJsonWestChangan')
 }
 
 export const mockSimpleGeoJson = () => {

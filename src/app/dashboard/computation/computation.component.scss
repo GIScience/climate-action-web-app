@@ -40,6 +40,7 @@
     transition: max-height 0.25s ease-in-out;
 
     ul.child-computations {
+        background-color: rgba(255, 255, 255, 0.75);
         border: 1px solid #ccc;
         border-radius: 10px;
         margin: 5px 5px 10px;
@@ -128,10 +129,19 @@
     margin-left: auto;
 
     button {
+        background-color: transparent;
+        border-color: transparent;
         border-radius: 0;
         border-right-width: 0;
-        opacity: 0;
-        transition: opacity 0.2s;
+        transition: none;
+
+        i-lucide {
+            opacity: 0;
+        }
+
+        &:hover i-lucide {
+            color: #008080;
+        }
 
         &:first-of-type {
             border-bottom-left-radius: 10px;
@@ -143,12 +153,30 @@
             border-right-width: 1.5px;
             border-top-right-radius: 10px;
         }
+
+        &.layer-unpin-btn i-lucide {
+            color: #4d0080;
+            opacity: 1;
+        }
+
+        &.layer-disabled-btn {
+            color: #666;
+            cursor: not-allowed;
+        }
     }
 }
 
 .child-computation:hover .artifact-actions button,
-.child-computation.child-computation-highlight .artifact-actions button,
-.child-computations-wrapper.report-active .add-to-report-btn {
+.child-computation.child-computation-highlight .artifact-actions button {
+    background-color: #ffffffbf;
+    border-color: unset;
+
+    i-lucide {
+        opacity: 1;
+    }
+}
+
+.child-computations-wrapper.report-active button.add-to-report-btn i-lucide {
     opacity: 1;
 }
 

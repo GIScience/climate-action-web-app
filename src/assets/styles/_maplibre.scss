@@ -4,8 +4,14 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         margin-right: 0.5vw;
-        max-width: 250px;
         top: calc(0.5vw + 35px);
+
+        &::before {
+            content: '';
+            flex-basis: 100%;
+            height: 0;
+            order: 2;
+        }
     }
 
     .maplibregl-ctrl.maplibregl-ctrl-scale {
@@ -14,6 +20,7 @@
         height: 29px;
         line-height: 29px;
         margin-right: 0;
+        order: 3;
     }
 
     .maplibregl-ctrl.navigation-controls {
@@ -22,10 +29,12 @@
         flex-direction: row;
         gap: 10px;
         justify-content: center;
+        order: 1;
     }
 
     .maplibregl-ctrl.zoom-to-zero-control {
         margin-right: 0;
+        order: 1;
 
         button {
             align-items: center;
@@ -38,95 +47,198 @@
             width: 18px;
         }
     }
-
-    .maplibregl-ctrl-bottom-right {
-        margin-right: 0.5vw;
-    }
 }
 
-.maplibregl-ctrl.maplibregl-style-switcher-container {
-    backdrop-filter: blur(5px);
-    background-color: rgb(255 255 255 / 85%);
-    margin: 0;
-    max-width: 200px;
+.maplibregl-ctrl-bottom-right {
+    margin-right: 0.5vw;
 
-    .panel-container {
-        display: none;
-        padding: 10px;
-    }
-
-    .maplibregl-layer-controls {
-        margin-bottom: 20px;
-
-        h3 {
-            margin-bottom: 15px;
-            margin-top: 0;
-        }
-
-        input[type='range'] {
-            border-radius: 3px;
-            box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-            height: 4px;
-        }
-
-        .map-layer {
-            background-color: rgb(204 204 204 / 50%);
-            border-radius: 5px;
-            margin-bottom: 15px;
-            padding: 10px;
-
-            .map-layer-header {
-                align-items: flex-start;
-                display: flex;
-                justify-content: space-between;
-            }
-
-            label {
-                display: block;
-                font-size: 12px;
-                margin-bottom: 5px;
-            }
-
-            span {
-                color: #666;
-                font-size: 11px;
-            }
-        }
-    }
-
-    .maplibregl-style-switcher {
-        background-color: #fff;
-        background-image: url('../../assets/images/layers.svg');
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 65%;
-        border-radius: 5px;
-        box-sizing: content-box;
-        height: 27.5px;
+    .maplibregl-ctrl.maplibregl-style-switcher-container {
+        backdrop-filter: blur(5px);
+        background-color: rgb(255 255 255 / 85%);
         margin: 0;
-        position: relative;
-        transition: background-color 0.2s ease;
-        width: 27.5px;
-        z-index: 2;
-
-        &:hover {
-            background-color: rgb(0 0 0 / 5%);
-        }
-    }
-
-    &.expanded {
-        .maplibregl-style-switcher {
-            background-image: url('../../assets/images/chevron-down.svg');
-            background-size: 65%;
-            border: 1px solid #ddd;
-            position: absolute;
-            right: 7.5px;
-            top: 7.5px;
-        }
+        max-width: 200px;
 
         .panel-container {
-            display: block;
+            display: none;
+            padding: 10px;
         }
+
+        .maplibregl-layer-controls {
+            margin-bottom: 20px;
+
+            h3 {
+                margin-bottom: 15px;
+                margin-top: 0;
+            }
+
+            .slider-container {
+                height: 22px;
+                margin-top: 8px;
+                position: relative;
+
+                &:hover {
+                    .slider-handle,
+                    .slider-fill {
+                        background-color: rgb(0 128 128 / 75%);
+                    }
+                }
+            }
+
+            .slider-track {
+                background: #ddd;
+                border-radius: 3px;
+                height: 6px;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 100%;
+
+                .slider-fill {
+                    background-color: #008080;
+                    border-radius: 3px;
+                    height: 6px;
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    transition: background-color 0.15s ease-out;
+                }
+
+                .slider-handle {
+                    align-items: center;
+                    background-color: #008080;
+                    border-radius: 9px;
+                    box-shadow:
+                        0 2px 4px rgba(0, 0, 0, 0.2),
+                        0 1px 2px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    height: 18px;
+                    justify-content: center;
+                    position: absolute;
+                    top: 50%;
+                    transform: translateX(-2.5px) translateY(-50%);
+                    transition: background-color 0.15s ease-out;
+                    width: 35px;
+                }
+            }
+
+            .slider-percentage {
+                color: #fff;
+                font-size: 10px;
+                font-weight: 600;
+                user-select: none;
+            }
+
+            .slider-input {
+                cursor: pointer;
+                height: 100%;
+                left: 0;
+                margin: 0;
+                opacity: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+            }
+
+            .map-layer {
+                background-color: rgb(204 204 204 / 50%);
+                border: 2px solid rgba(0, 128, 128, 0.5);
+                border-radius: 5px;
+                margin-bottom: 15px;
+                padding: 10px;
+
+                &.map-layer--pinned {
+                    border-color: #4d0080;
+                }
+
+                .map-layer-header {
+                    align-items: center;
+                    display: grid;
+                    grid-template-columns: 1fr 45px;
+
+                    label {
+                        font-size: 12px;
+                    }
+
+                    .map-layer-actions {
+                        align-items: center;
+                        display: flex;
+                        gap: 4px;
+
+                        .map-layer-pin {
+                            background: transparent;
+                            border: none;
+                            color: #666;
+                            cursor: pointer;
+                            padding: 0 4px;
+                            transition: all 0.2s ease;
+
+                            svg {
+                                display: block;
+                            }
+
+                            &:hover {
+                                color: #008080;
+                            }
+
+                            &.map-layer-pin--pinned {
+                                color: #008080;
+                            }
+                        }
+
+                        .map-layer-remove {
+                            background: transparent;
+                            border: none;
+                            cursor: pointer;
+                            font-size: 14px;
+                            padding: 0 4px;
+
+                            &:hover {
+                                color: #dc3545;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .maplibregl-style-switcher {
+            background-color: #fff;
+            background-image: url('../../assets/images/layers.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 65%;
+            border-radius: 5px;
+            box-sizing: content-box;
+            height: 27.5px;
+            margin: 0;
+            position: relative;
+            transition: background-color 0.2s ease;
+            width: 27.5px;
+            z-index: 2;
+
+            &:hover {
+                background-color: rgb(0 0 0 / 5%);
+            }
+        }
+
+        &.expanded {
+            .maplibregl-style-switcher {
+                background-image: url('../../assets/images/chevron-down.svg');
+                background-size: 65%;
+                border: 1px solid #ddd;
+                position: absolute;
+                right: 7.5px;
+                top: 7.5px;
+            }
+
+            .panel-container {
+                display: block;
+            }
+        }
+    }
+
+    .maplibregl-ctrl-attrib.maplibregl-compact {
+        margin-right: 0;
     }
 }
 
@@ -174,10 +286,6 @@
             }
         }
     }
-}
-
-.maplibregl-ctrl-attrib.maplibregl-compact {
-    margin-right: 0;
 }
 
 .maplibregl-popup {

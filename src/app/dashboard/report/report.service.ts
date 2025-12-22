@@ -61,7 +61,7 @@ export class ReportService {
         })
         this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
 
-        if (this.isMapArtifact(artifactInstance)) {
+        if (this.isMapArtifact(artifactInstance.modality)) {
             setTimeout(() => {
                 const mapId = `report-map-${artifactInstance.store_id}`
 
@@ -151,7 +151,7 @@ export class ReportService {
         this.collapseLeftColumnSubject.next(collapse)
     }
 
-    isMapArtifact(artifact: ArtifactEntity): boolean {
-        return artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF'
+    isMapArtifact(modality: ArtifactEntity['modality']): boolean {
+        return modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
     }
 }

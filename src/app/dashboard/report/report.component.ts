@@ -83,7 +83,7 @@ export class ReportComponent implements OnInit {
             this.artifacts = artifacts
 
             addedArtifacts.forEach(artifact => {
-                if (this.reportService.isMapArtifact(artifact) && !this.mapServices.has(artifact.store_id)) {
+                if (this.reportService.isMapArtifact(artifact.modality) && !this.mapServices.has(artifact.store_id)) {
                     const mapService = runInInjectionContext(this.injector, () => new MapService())
                     this.mapServices.set(artifact.store_id, mapService)
 
@@ -115,7 +115,7 @@ export class ReportComponent implements OnInit {
 
             if (!isVisible) {
                 this.artifacts.forEach(artifact => {
-                    if (this.reportService.isMapArtifact(artifact)) {
+                    if (this.reportService.isMapArtifact(artifact.modality)) {
                         this.removeLegend(artifact.store_id)
                     }
                 })
@@ -148,7 +148,7 @@ export class ReportComponent implements OnInit {
     }
 
     removeReportItem(artifact: ArtifactEntity) {
-        if (this.reportService.isMapArtifact(artifact)) {
+        if (this.reportService.isMapArtifact(artifact.modality)) {
             this.mapServices.delete(artifact.store_id)
             this.removeLegend(artifact.store_id)
         }
@@ -157,7 +157,7 @@ export class ReportComponent implements OnInit {
 
     removeAllReportItems() {
         this.artifacts.forEach(artifact => {
-            if (this.reportService.isMapArtifact(artifact)) {
+            if (this.reportService.isMapArtifact(artifact.modality)) {
                 this.mapServices.delete(artifact.store_id)
             }
             this.reportService.removeArtifact(artifact)

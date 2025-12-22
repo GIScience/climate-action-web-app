@@ -94,7 +94,20 @@
         "add": "Add »",
         "noResults": "This run created no results. If you think that is an error, please contact the plugin developers",
         "pleaseExitReportBuilder": "Please exit the Report Builder first, or add this result to the report.",
-        "viewDescription": "View Detailed Description"
+        "viewDescription": "View Detailed Description",
+        "tooltip": {
+            "unpinLayer": "Unpin from map",
+            "pinLayer": "Pin to map",
+            "pinLimitReached": "Maximum of 2 pinned layers reached"
+        },
+        "toast": {
+            "layerPinnedMessage": "{{ name }} pinned",
+            "layerPinnedTitle": "Layer Pinned",
+            "layerUnpinnedMessage": "{{ name }} unpinned",
+            "layerUnpinnedTitle": "Layer Unpinned",
+            "mapLayerLimitMessage": "Maximum of 2 map layers can be displayed simultaneously. Remove or unpin a layer to add another.",
+            "mapLayerLimitTitle": "Map Layer Limit"
+        }
     },
     "artifactViewer": {
         "download": "Download Result",
@@ -267,6 +280,9 @@
         "baseMaps": "Base Maps",
         "layers": "Layers",
         "zoomToWorldView": "Zoom out to globe view",
+        "unpinLayer": "Unpin layer",
+        "pinLayer": "Pin layer",
+        "removeLayer": "Remove from map",
         "drawing": {
             "radius": "Radius",
             "area": "Area",

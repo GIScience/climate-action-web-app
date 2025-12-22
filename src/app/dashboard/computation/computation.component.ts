@@ -17,7 +17,7 @@ import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { CircleX, ClipboardPlus, Download, LucideAngularModule, ReceiptText } from 'lucide-angular'
+import { CircleX, ClipboardPlus, Download, LucideAngularModule, Pin, PinOff, ReceiptText, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
@@ -26,6 +26,7 @@ import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../art
 import { ArtifactService } from '../artifact/artifact.service'
 import { MarkdownComponent } from '../artifact/markdown/markdown.component'
 import { ComputationBasicInfo, ComputationDisplayEntity } from '../computations-index/computation.interface'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
@@ -77,6 +78,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
     artifactService = inject(ArtifactService)
     private pluginService = inject(PluginService)
     private mapService = inject(MapService)
+    mapArtifactManager = inject(MapArtifactManagerService)
     private reportService = inject(ReportService)
     private artifactViewerService = inject(ArtifactViewerService)
     private toastr = inject(ToastrService)
@@ -105,6 +107,9 @@ export class ComputationComponent implements OnInit, OnDestroy {
     readonly Download = Download
     readonly ReceiptText = ReceiptText
     readonly CircleX = CircleX
+    readonly Pin = Pin
+    readonly PinOff = PinOff
+    readonly X = X
     readonly DefaultTag = DefaultTag
 
     ngOnInit(): void {
@@ -115,11 +120,13 @@ export class ComputationComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.artifactFetchSubscription) {
-            this.artifactFetchSubscription.unsubscribe()
-        }
-        if (this.reportVisibilitySubscription) {
-            this.reportVisibilitySubscription.unsubscribe()
+        this.artifactFetchSubscription?.unsubscribe()
+        this.reportVisibilitySubscription?.unsubscribe()
+    }
+
+    onAnimationStart(event: AnimationEvent, computation: ComputationDisplayEntity) {
+        if (event.toState === 'collapsed') {
+            this.mapArtifactManager.clearTransientArtifacts(computation.correlation_uuid)
         }
     }
 
@@ -129,13 +136,92 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
     }
 
-    renderArtifact(artifact: ArtifactEntity) {
+    viewArtifact(artifact: ArtifactEntity): void {
         if (this.isReportVisible) {
             this.toastr.warning(this.translocoService.translate('computation.pleaseExitReportBuilder'), '', {
                 timeOut: 4000
             })
             return
         }
+
+        const isMapArtifact = this.mapArtifactManager.isMapArtifact(artifact.modality)
+
+        if (isMapArtifact) {
+            const added = this.mapArtifactManager.setTransientArtifact(
+                artifact,
+                this.computation.correlation_uuid,
+                this.computation.geometry
+            )
+            if (!added) {
+                this.showToast(
+                    'warning',
+                    'computation.toast.mapLayerLimitMessage',
+                    'computation.toast.mapLayerLimitTitle'
+                )
+                return
+            }
+        } else {
+            this.mapArtifactManager.clearTransientArtifacts()
+        }
+
+        this.renderArtifact(artifact)
+    }
+
+    pinArtifact(artifact: ArtifactEntity): void {
+        if (!this.mapArtifactManager.isMapArtifact(artifact.modality)) return
+        if (this.mapArtifactManager.isArtifactPersisted(artifact)) return
+
+        if (this.mapArtifactManager.isArtifactOnMap(artifact)) {
+            if (!this.mapArtifactManager.promoteToPin(artifact)) return
+            this.showToast('success', 'computation.toast.layerPinnedMessage', 'computation.toast.layerPinnedTitle', {
+                name: artifact.name
+            })
+            return
+        }
+
+        const added = this.mapArtifactManager.addMapArtifact(artifact, {
+            pinned: true,
+            computationGeometry: this.computation.geometry,
+            computationId: this.computation.correlation_uuid
+        })
+        if (!added) return
+
+        this.renderArtifact(artifact)
+        this.showToast('success', 'computation.toast.layerPinnedMessage', 'computation.toast.layerPinnedTitle', {
+            name: artifact.name
+        })
+    }
+
+    unpinArtifact(artifact: ArtifactEntity): void {
+        if (!this.mapArtifactManager.isMapArtifact(artifact.modality)) return
+        if (!this.mapArtifactManager.unpinArtifact(artifact, this.computation.correlation_uuid)) return
+
+        if (!this.activeArtifact || !this.isSameArtifact(this.activeArtifact, artifact)) {
+            this.removeMapArtifact(artifact)
+        }
+        this.showToast('info', 'computation.toast.layerUnpinnedMessage', 'computation.toast.layerUnpinnedTitle', {
+            name: artifact.name
+        })
+    }
+
+    private removeMapArtifact(artifact: ArtifactEntity): void {
+        const layerInfo = this.mapArtifactManager.getLayerInfo(artifact)
+        if (layerInfo?.layerIds && layerInfo.sourceId) {
+            if (artifact.modality === 'MAP_LAYER_GEOJSON') {
+                this.mapService.removeGeoJsonLayer({
+                    layerIds: layerInfo.layerIds,
+                    sourceId: layerInfo.sourceId,
+                    name: artifact.name
+                })
+            } else if (artifact.modality === 'MAP_LAYER_GEOTIFF' && layerInfo.layerIds[0]) {
+                this.mapService.removeGeoTiffLayer(layerInfo.layerIds[0], layerInfo.sourceId)
+            }
+        }
+        this.mapArtifactManager.removeMapArtifact(artifact)
+    }
+
+    private renderArtifact(artifact: ArtifactEntity) {
+        const isMapArtifact = this.mapArtifactManager.isMapArtifact(artifact.modality)
 
         this.pluginService.collapsePluginCatalog()
 
@@ -152,21 +238,20 @@ export class ComputationComponent implements OnInit, OnDestroy {
         // Allow for any type of report
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const waitForArtifactFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
+            this.artifactFetchSubscription?.unsubscribe()
             this.artifactFetchSubscription = observable.subscribe({
                 next: data => {
                     if (dataCheck(data)) {
                         artifact.isLoading = false
-                        if (this.artifactFetchSubscription) {
-                            this.artifactFetchSubscription.unsubscribe()
-                        }
+                        this.artifactFetchSubscription?.unsubscribe()
+                        this.artifactFetchSubscription = undefined
                     }
                 },
                 error: err => {
                     console.error('Error fetching artifact:', err)
                     artifact.isLoading = false
-                    if (this.artifactFetchSubscription) {
-                        this.artifactFetchSubscription.unsubscribe()
-                    }
+                    this.artifactFetchSubscription?.unsubscribe()
+                    this.artifactFetchSubscription = undefined
                 }
             })
         }
@@ -201,7 +286,11 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.artifactViewerService.setName(artifact.name)
 
         this.artifactService.fetchArtifact(artifact, { setLoading: true })
-        this.artifactService.clearLegend()
+
+        if (!isMapArtifact || this.mapArtifactManager.getActiveMapArtifacts().length === 0) {
+            this.artifactService.clearLegend()
+        }
+
         this.artifactActivated.emit(artifact)
     }
 
@@ -323,16 +412,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
     }
 
     getTagDisplayName(tag: string): string {
-        switch (tag) {
-            case DefaultTag.UNTAGGED:
-                return 'untagged'
-            case DefaultTag.ALL:
-                return 'all'
-            case DefaultTag.MAIN:
-                return 'main'
-            default:
-                return tag
-        }
+        return tag
     }
 
     private filterArtifacts(): void {
@@ -358,5 +438,77 @@ export class ComputationComponent implements OnInit, OnDestroy {
                     artifact.tags?.includes(this.selectedTag)
                 )
         }
+    }
+
+    getMapButtonState(artifact: ArtifactEntity): 'pin' | 'unpin' | 'disabled' | null {
+        if (!this.mapArtifactManager.isMapArtifact(artifact.modality)) return null
+
+        if (this.mapArtifactManager.isArtifactPersisted(artifact)) {
+            return 'unpin'
+        }
+
+        const pinnedCount = this.mapArtifactManager.getActiveMapArtifacts().filter(layer => layer.pinned).length
+        if (pinnedCount >= this.mapArtifactManager.MAX_MAP_ARTIFACTS) {
+            return 'disabled'
+        }
+
+        return 'pin'
+    }
+
+    getMapButtonTooltip(artifact: ArtifactEntity): string {
+        const state = this.getMapButtonState(artifact)
+        switch (state) {
+            case 'unpin':
+                return this.translocoService.translate('computation.tooltip.unpinLayer')
+            case 'pin':
+                return this.translocoService.translate('computation.tooltip.pinLayer')
+            case 'disabled':
+                return this.translocoService.translate('computation.tooltip.pinLimitReached')
+            default:
+                return ''
+        }
+    }
+
+    toggleMapArtifact(artifact: ArtifactEntity, event: Event): void {
+        event.stopPropagation()
+
+        const state = this.getMapButtonState(artifact)
+        if (state === null) {
+            return
+        }
+
+        switch (state) {
+            case 'disabled':
+                this.showToast(
+                    'warning',
+                    'computation.toast.mapLayerLimitMessage',
+                    'computation.toast.mapLayerLimitTitle'
+                )
+                return
+            case 'unpin':
+                this.unpinArtifact(artifact)
+                return
+            case 'pin':
+                this.pinArtifact(artifact)
+                return
+            default:
+                return
+        }
+    }
+
+    private showToast(
+        type: 'success' | 'info' | 'warning',
+        messageKey: string,
+        titleKey: string,
+        params?: Record<string, string>,
+        timeOut = 2000
+    ): void {
+        const message = this.translocoService.translate(messageKey, params)
+        const title = this.translocoService.translate(titleKey)
+        this.toastr[type](message, title, { timeOut })
+    }
+
+    private isSameArtifact(a: ArtifactEntity, b: ArtifactEntity): boolean {
+        return a.correlation_uuid === b.correlation_uuid && a.store_id === b.store_id
     }
 }

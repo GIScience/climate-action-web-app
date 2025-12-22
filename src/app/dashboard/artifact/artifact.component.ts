@@ -3,6 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
     Input,
+    OnDestroy,
     OnInit,
     Type,
     ViewChild,
@@ -14,11 +15,10 @@ import { MatExpansionModule } from '@angular/material/expansion'
 import { DomSanitizer } from '@angular/platform-browser'
 import { TranslocoModule } from '@jsverse/transloco'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { Artifact } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
 import { ChartComponent } from './chart/chart.component'
-import { GeojsonComponent } from './geojson/geojson.component'
-import { GeoTiffComponent } from './geotiff/geotiff.component'
 import { ImageComponent } from './image/image.component'
 import { MarkdownComponent } from './markdown/markdown.component'
 import { PlotlyChartComponent } from './plotly-chart/plotly-chart.component'
@@ -31,18 +31,22 @@ import { TableComponent } from './table/table.component'
     imports: [MatExpansionModule, NgScrollbarModule, TranslocoModule],
     encapsulation: ViewEncapsulation.None
 })
-export class ArtifactComponent implements OnInit, AfterViewInit {
+export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
     private defaultArtifactService = inject(ArtifactService)
     private sanitizer = inject(DomSanitizer)
     private changeDetector = inject(ChangeDetectorRef)
+    private mapArtifactManager = inject(MapArtifactManagerService)
 
     @ViewChild('container', { read: ViewContainerRef })
     container!: ViewContainerRef
     @ViewChild('descriptionContainer', { read: ViewContainerRef })
     descriptionContainer!: ViewContainerRef
+    @ViewChild('mapArtifactContainer', { read: ViewContainerRef })
+    mapArtifactContainer!: ViewContainerRef
 
     @Input() artifact?: Artifact
     @Input() artifactService?: ArtifactService
+    @Input() enableMapHost = false
 
     summary: string | null = null
     description: string | null = null
@@ -118,11 +122,9 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
         })
         service.geojson.subscribe(v => {
             if (!v) this.clearContainer()
-            else this.display(GeojsonComponent, 'inputData', { url: v.url, artifact: v }, v)
         })
         service.geotiff.subscribe(v => {
             if (!v) this.clearContainer()
-            else this.display(GeoTiffComponent, 'inputData', { url: v.url, artifact: v }, v)
         })
         service.chart.subscribe(v => {
             if (!v.data) this.clearContainer()
@@ -136,6 +138,15 @@ export class ArtifactComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.detectChanges()
+        if (this.enableMapHost && this.mapArtifactContainer) {
+            this.mapArtifactManager.setComponentContainer(this.mapArtifactContainer)
+        }
+    }
+
+    ngOnDestroy(): void {
+        if (this.enableMapHost && this.mapArtifactContainer) {
+            this.mapArtifactManager.clearComponentContainer(this.mapArtifactContainer)
+        }
     }
 
     private detectChanges(): void {

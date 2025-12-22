@@ -19,7 +19,7 @@ interface MockReportService {
     artifacts$: Observable<ArtifactEntity[]>
     isVisible$: Observable<boolean>
     MAX_ARTIFACTS: 10
-    isMapArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => boolean>
+    isMapArtifact: jest.MockedFunction<(modality: ArtifactEntity['modality']) => boolean>
     getServiceForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ArtifactService | undefined>
     removeArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     closeReport: jest.MockedFunction<() => void>
@@ -127,7 +127,7 @@ describe('ReportComponent', () => {
             isMapArtifact: jest
                 .fn()
                 .mockImplementation(
-                    artifact => artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF'
+                    modality => modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
                 ),
             getServiceForArtifact: jest.fn(),
             removeArtifact: jest.fn(),
@@ -214,8 +214,8 @@ describe('ReportComponent', () => {
                 getPlotlyChart: jest.fn()
             }
 
-            reportService.isMapArtifact.mockImplementation(artifact => {
-                return artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF'
+            reportService.isMapArtifact.mockImplementation(modality => {
+                return modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
             })
             reportService.getServiceForArtifact.mockReturnValue(mockArtifactService as unknown as ArtifactService)
 
@@ -227,7 +227,7 @@ describe('ReportComponent', () => {
             reportService._artifactsSubject.next([mockMapArtifact])
             fixture.detectChanges()
 
-            expect(reportService.isMapArtifact).toHaveBeenCalledWith(mockMapArtifact)
+            expect(reportService.isMapArtifact).toHaveBeenCalledWith(mockMapArtifact.modality)
             expect(reportService.getServiceForArtifact).toHaveBeenCalledWith(mockMapArtifact)
             expect(mockArtifactService.clearLegend).toHaveBeenCalled()
             expect(mockArtifactService.getLegend).toHaveBeenCalledWith(mockMapArtifact)

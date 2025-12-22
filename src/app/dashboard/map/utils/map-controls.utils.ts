@@ -1,6 +1,8 @@
 import { TranslocoService } from '@jsverse/transloco'
 import { IControl } from 'maplibre-gl'
 import { Subscription } from 'rxjs'
+import type { Artifact, ArtifactEntity } from '../../artifact/artifact.interface'
+import type { MapArtifactLayer } from '../map-artifact-manager.service'
 import { MapStyle, MapStyleSwitcherControl } from './map-style-switcher.utils'
 
 export class MapControlsUtils {
@@ -65,7 +67,12 @@ export class MapControlsUtils {
         translocoService: TranslocoService,
         onStyleChange: (styleName: string) => void,
         onStateChange?: (isExpanded: boolean) => void,
-        initialExpanded?: boolean
+        initialExpanded?: boolean,
+        getActiveLayers?: () => MapArtifactLayer[],
+        onRemoveLayer?: (layer: MapArtifactLayer) => void,
+        promoteToPin?: (artifact: ArtifactEntity) => boolean,
+        unpinArtifact?: (artifact: ArtifactEntity, computationId?: string) => boolean,
+        isArtifactActive?: (artifact: Artifact) => boolean
     ): MapStyleSwitcherControl {
         return new MapStyleSwitcherControl(
             styles,
@@ -73,7 +80,12 @@ export class MapControlsUtils {
             translocoService,
             onStyleChange,
             onStateChange,
-            initialExpanded
+            initialExpanded,
+            getActiveLayers,
+            onRemoveLayer,
+            promoteToPin,
+            unpinArtifact,
+            isArtifactActive
         )
     }
 }

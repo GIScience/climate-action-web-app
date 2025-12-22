@@ -86,7 +86,13 @@ main.dashboard {
 
         ::ng-deep {
             app-legend {
-                margin-top: 85px;
+                &:first-of-type {
+                    margin-top: 85px;
+                }
+
+                &:not(:first-of-type) {
+                    margin-top: 10px;
+                }
             }
         }
     }

@@ -1,6 +1,15 @@
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core'
+import {
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewContainerRef,
+    inject
+} from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
@@ -11,6 +20,7 @@ import { LegendObject } from './artifact/artifact.interface'
 import { ArtifactService } from './artifact/artifact.service'
 import { LegendComponent } from './artifact/legend/legend.component'
 import { ComputationsIndexComponent } from './computations-index/computations-index.component'
+import { MapArtifactLayer, MapArtifactManagerService } from './map/map-artifact-manager.service'
 import { MapComponent } from './map/map.component'
 import { MapService } from './map/map.service'
 import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
@@ -42,11 +52,12 @@ interface MaintenanceAnnouncement {
         LucideAngularModule
     ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
     artifactService = inject(ArtifactService)
     artifactViewerService = inject(ArtifactViewerService)
     reportService = inject(ReportService)
     mapService = inject(MapService)
+    private mapArtifactManager = inject(MapArtifactManagerService)
     private elementRef = inject(ElementRef)
     private toastr = inject(ToastrService)
     private http = inject(HttpClient)
@@ -55,7 +66,7 @@ export class DashboardComponent implements OnInit {
     @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
     legendSubscription!: Subscription
-
+    mapArtifactsSubscription!: Subscription
     leftColumnCollapsed = false
     isReportVisible = false
     private collapseTimeout?: number
@@ -64,11 +75,17 @@ export class DashboardComponent implements OnInit {
     readonly PanelLeftOpen = PanelLeftOpen
 
     ngOnInit(): void {
+        this.mapArtifactsSubscription = this.mapArtifactManager.activeMapArtifacts$.subscribe(activeArtifacts => {
+            this.updateLegends(activeArtifacts)
+        })
+
         this.legendSubscription = this.artifactService.legend.subscribe(legend => {
-            if (legend) {
-                this.displayLegend(legend)
-            } else {
-                this.removeLegendContainer()
+            if (this.mapArtifactManager.getActiveMapArtifacts().length === 0) {
+                if (legend) {
+                    this.displayLegend(legend)
+                } else {
+                    this.removeLegendContainer()
+                }
             }
         })
 
@@ -123,6 +140,24 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    private updateLegends(activeArtifacts: MapArtifactLayer[]): void {
+        this.removeLegendContainer()
+        activeArtifacts.forEach(layer => {
+            if (layer.artifact.attachments?.legend) {
+                const legendData = { ...layer.artifact.attachments.legend }
+                legendData.title = legendData.title || layer.artifact.name
+                this.displayLegendWithTitle(legendData)
+            }
+        })
+    }
+
+    private displayLegendWithTitle(legendData: LegendObject): void {
+        if (this.legendContainer) {
+            const componentRef = this.legendContainer.createComponent(LegendComponent)
+            componentRef.instance.legendData = legendData
+        }
+    }
+
     collapseLeftColumn(): void {
         this.leftColumnCollapsed = !this.leftColumnCollapsed
         this.reportService.collapseLeftColumn(this.leftColumnCollapsed)
@@ -156,5 +191,15 @@ export class DashboardComponent implements OnInit {
     private setCollapsed(collapsed: boolean): void {
         this.leftColumnCollapsed = collapsed
         this.reportService.collapseLeftColumn(collapsed)
+    }
+
+    ngOnDestroy(): void {
+        if (this.legendSubscription) {
+            this.legendSubscription.unsubscribe()
+        }
+        if (this.mapArtifactsSubscription) {
+            this.mapArtifactsSubscription.unsubscribe()
+        }
+        this.removeLegendContainer()
     }
 }

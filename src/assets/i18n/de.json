@@ -94,7 +94,20 @@
         "add": "Hinzufügen »",
         "noResults": "Bei dieser Berechnung wurden keine Ergebnisse produziert. Wenn du denkst, dass ein Fehler vorliegt, kontaktiere bitte die Autor:innen des Analysewerkzeugs",
         "pleaseExitReportBuilder": "Bitte schließe zuerst den Report-Modus, oder füge das Ergebnis zum Report hinzu.",
-        "viewDescription": "Detaillierte Beschreibung anzeigen"
+        "viewDescription": "Detaillierte Beschreibung anzeigen",
+        "tooltip": {
+            "unpinLayer": "Von Karte lösen",
+            "pinLayer": "An Karte anheften",
+            "pinLimitReached": "Momentan können maximal 2 Ebenen angeheftet werden"
+        },
+        "toast": {
+            "layerPinnedMessage": "{{ name }} angeheftet",
+            "layerPinnedTitle": "Ebene angeheftet",
+            "layerUnpinnedMessage": "{{ name }} gelöst",
+            "layerUnpinnedTitle": "Ebene gelöst",
+            "mapLayerLimitMessage": "Es können maximal 2 Kartenebenen gleichzeitig angezeigt werden. Entferne oder löse eine Ebene, um eine andere anzuzeigen.",
+            "mapLayerLimitTitle": "Kartenebenen-Limit"
+        }
     },
     "artifactViewer": {
         "download": "Ergebnis herunterladen",
@@ -267,6 +280,9 @@
         "baseMaps": "Hintergrundkarte",
         "layers": "Kartenebenen",
         "zoomToWorldView": "Auf Globus zoomen",
+        "unpinLayer": "Ebene lösen",
+        "pinLayer": "Ebene anheften",
+        "removeLayer": "Von der Karte entfernen",
         "drawing": {
             "radius": "Radius",
             "area": "Fläche",

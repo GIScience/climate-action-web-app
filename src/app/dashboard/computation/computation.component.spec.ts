@@ -64,7 +64,9 @@ describe('ComputationComponent', () => {
         }
 
         mockArtifactService = {
-            getImage: jest.fn()
+            getImage: jest.fn(),
+            geojson: new BehaviorSubject(null),
+            geotiff: new BehaviorSubject(null)
         }
         mockMapService = {
             initMap: jest.fn()
