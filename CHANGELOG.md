@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Define and use a cache for Jest in dev and pipeline
+- Fix longer artifacts getting clipped in the viewer without a scrollbar ([#431](https://gitlab.heigit.org/climate-action/web-app/-/issues/431))
 
 ## [3.0.3](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.3) - 2025-12-16
 
