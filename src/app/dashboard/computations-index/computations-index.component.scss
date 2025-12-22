@@ -116,6 +116,7 @@
                 .ng-scrollbar {
                     max-height: 45vh;
                     min-height: 20vh;
+                    padding: 10px 0;
                 }
             }
         }
@@ -155,6 +156,7 @@
     .computation {
         animation: fadeInUp 0.4s ease-out;
         animation-fill-mode: both;
+        border-radius: 10px;
 
         @for $i from 1 through 10 {
             &:nth-child(#{$i}) {
@@ -170,8 +172,12 @@
             width: 80%;
         }
 
-        &:last-of-type {
-            margin-bottom: 20px;
+        &.computation-expanded {
+            background-color: #def0ff;
+
+            .parent-computation .computation-arrow mat-icon {
+                transform: rotate(90deg);
+            }
         }
 
         .parent-computation {
@@ -228,12 +234,6 @@
                     height: 27.5px;
                     transition: transform 0.3s ease-in-out;
                     width: 27.5px;
-                }
-            }
-
-            &.computation-expanded {
-                .computation-arrow mat-icon {
-                    transform: rotate(90deg);
                 }
             }
 

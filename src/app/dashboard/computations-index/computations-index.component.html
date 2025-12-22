@@ -101,12 +101,10 @@
                                 computation of computations | filterByCriteria: pluginId;
                                 track trackByComputation($index, computation)
                             ) {
-                                <div class="computation">
+                                <div class="computation" [ngClass]="{ 'computation-expanded': computation.isExpanded }">
                                     <div
                                         [ngClass]="{
                                             'parent-computation': true,
-                                            'computation-expanded': computation.isExpanded,
-                                            'computation-collapsed': !computation.isExpanded,
                                             'is-new': newRuns.includes(computation.correlation_uuid),
                                             'is-demo': demoRuns.includes(computation.correlation_uuid),
                                             'is-imported': importedRuns.includes(computation.correlation_uuid),

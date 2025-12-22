@@ -6,6 +6,7 @@ import { TranslocoModule } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { PluginCard } from './plugin-catalog.interface'
@@ -21,6 +22,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
     private pluginService = inject(PluginService)
     private artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
+    private mapArtifactManager = inject(MapArtifactManagerService)
 
     @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>
 
@@ -118,6 +120,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         this.pluginService.setComputeState('inactive')
         this.mapService.removeFocusedLayer()
         this.mapService.removeComputeLayers()
+        this.mapArtifactManager.clearTransientArtifacts()
         this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
             this.activeCard = card
         })

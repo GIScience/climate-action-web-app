@@ -55,7 +55,7 @@
                                     <i-lucide [img]="Minus" size="22.5"></i-lucide>
                                 </button>
                             </div>
-                            @if (reportService.isMapArtifact(artifact)) {
+                            @if (reportService.isMapArtifact(artifact.modality)) {
                                 <div class="report-map-container">
                                     <div [id]="'report-map-' + artifact.store_id" class="report-map"></div>
                                     <div #legendContainer [id]="'report-map-legend-' + artifact.store_id"></div>
@@ -64,7 +64,7 @@
                                     </div>
                                 </div>
                             }
-                            @if (!reportService.isMapArtifact(artifact)) {
+                            @if (!reportService.isMapArtifact(artifact.modality)) {
                                 <app-artifact
                                     [artifact]="artifact"
                                     [artifactService]="reportService.getServiceForArtifact(artifact)">

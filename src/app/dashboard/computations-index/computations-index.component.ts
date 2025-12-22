@@ -36,6 +36,7 @@ import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
@@ -113,6 +114,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private pluginService = inject(PluginService)
     artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
+    private mapArtifactManager = inject(MapArtifactManagerService)
     private route = inject(ActivatedRoute)
     private shareService = inject(ShareService)
     private toastr = inject(ToastrService)
@@ -187,6 +189,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     userSubscription: Subscription
     private syncSubscription?: Subscription
     private reportVisibilitySubscription: Subscription = new Subscription()
+    private mapArtifactsSubscription?: Subscription
     private visibilityChangeHandler?: () => void
 
     private readonly POLL_INTERVAL = 5000
@@ -259,6 +262,21 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.artifactViewerService.isViewerVisible$.subscribe(isVisible => {
             if (!isVisible && this._activeArtifact) {
                 this._activeArtifact = undefined
+                this.mapArtifactManager.setActiveArtifactId(null)
+            }
+        })
+
+        this.mapArtifactsSubscription = this.mapArtifactManager.activeMapArtifacts$.subscribe(layers => {
+            if (this._activeArtifact) {
+                const stillOnMap = layers.some(
+                    l =>
+                        l.artifact.correlation_uuid === this._activeArtifact!.correlation_uuid &&
+                        l.artifact.store_id === this._activeArtifact!.store_id
+                )
+                if (!stillOnMap) {
+                    this._activeArtifact = undefined
+                    this.mapArtifactManager.setActiveArtifactId(null)
+                }
             }
         })
     }
@@ -366,6 +384,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
         if (this.reportVisibilitySubscription) {
             this.reportVisibilitySubscription.unsubscribe()
+        }
+        if (this.mapArtifactsSubscription) {
+            this.mapArtifactsSubscription.unsubscribe()
         }
         if (this.visibilityChangeHandler) {
             document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
@@ -553,6 +574,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (previousActiveComputation === computation) {
             this.activeComputation = undefined
             this._activeArtifact = undefined
+            this.mapArtifactManager.setActiveArtifactId(null)
         } else {
             computation.keepInDOM = true
             setTimeout(() => (computation.isExpanded = true), 0)
@@ -602,6 +624,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     storeActiveArtifact(artifact: ArtifactEntity) {
         if (artifact) {
             this._activeArtifact = artifact
+            this.mapArtifactManager.setActiveArtifactId(artifact)
 
             this.storageService.saveActiveArtifact({
                 correlation_uuid: artifact.correlation_uuid,
@@ -625,7 +648,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                         x => x.store_id === activeArtifactRef.store_id
                     )
                     if (this._activeArtifact) {
-                        this.computationComponent.renderArtifact(this._activeArtifact)
+                        this.computationComponent.viewArtifact(this._activeArtifact)
                     }
                 }
             }
@@ -671,6 +694,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         if (isCurrentComputation) {
             this.artifactViewerService.closeArtifactViewer()
             this.mapService.removeFocusedLayer()
+            this.activeComputation = undefined
         }
 
         if (this.currentRuns.length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {

@@ -14,6 +14,7 @@ import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { Observable, Subscription, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { ReportService } from '../report/report.service'
 import { PluginParameterComponent } from './plugin-parameter/plugin-parameter.component'
 import { ComputeState, Plugin } from './plugin.interface'
@@ -64,6 +65,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     private dialog = inject(MatDialog)
     private reportService = inject(ReportService)
     private translocoService = inject(TranslocoService)
+    private mapArtifactManager = inject(MapArtifactManagerService)
 
     @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
     @ViewChild('pluginCreditsDialog') pluginCreditsDialog!: TemplateRef<Plugin>
@@ -186,6 +188,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         }
 
         this.pluginService.setComputeState('compute-ready')
+        this.mapArtifactManager.clearAll()
         this.pluginService.collapsePluginCatalog()
     }
 

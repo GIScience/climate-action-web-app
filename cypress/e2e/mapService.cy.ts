@@ -1,6 +1,8 @@
 import {
-    mockGeoJson,
-    mockGeoJsonComputation,
+    mockGeoJsonComputationJinrongjie,
+    mockGeoJsonComputationWestChangan,
+    mockGeoJsonJinrongjie,
+    mockGeoJsonWestChangan,
     mockGeoTiff,
     mockGeoTiffComputation,
     mockPluginBlueprint,
@@ -140,8 +142,8 @@ describe('mapService', () => {
     it('should render a geojson layer correctly ', () => {
         mockPluginsList()
         mockPluginBlueprint()
-        mockGeoJsonComputation()
-        mockGeoJson()
+        mockGeoJsonComputationJinrongjie()
+        mockGeoJsonJinrongjie()
 
         beforeCompareSnapshots(
             'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
@@ -170,15 +172,82 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputation')
+        cy.wait('@getGeoJsonComputationJinrongjie')
 
         cy.get('.parent-computation').eq(0).click()
+        cy.wait(1500)
         cy.get('.child-computation').eq(0).click()
 
-        cy.wait('@getGeoJson')
+        cy.wait('@getGeoJsonJinrongjie')
         cy.waitForRenderComplete()
+        cy.wait(500)
 
         cy.compareSnapshot('geojson', 0.05)
+    })
+
+    it('should be able to pin two map artifacts correctly ', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+        mockGeoJsonComputationJinrongjie()
+        mockGeoJsonComputationWestChangan()
+        mockGeoJsonJinrongjie()
+        mockGeoJsonWestChangan()
+
+        beforeCompareSnapshots(
+            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
+        )
+
+        cy.window().then(win => {
+            win.localStorage.setItem(
+                'plugin_runs',
+                JSON.stringify([
+                    {
+                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2024-08-07T12:43:08.373768',
+                        status: 'SUCCESS'
+                    },
+                    {
+                        correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2023-05-25T16:57:52+01:00',
+                        status: 'SUCCESS'
+                    }
+                ])
+            )
+        })
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.wait('@getGeoJsonComputationJinrongjie')
+
+        cy.get('.parent-computation').eq(0).click()
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).get('.layer-pin-btn').click()
+
+        cy.wait('@getGeoJsonJinrongjie')
+        cy.waitForRenderComplete()
+
+        cy.get('.parent-computation').eq(1).click()
+        cy.wait(500)
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).get('.layer-pin-btn').click()
+
+        cy.wait('@getGeoJsonWestChangan')
+        cy.waitForRenderComplete()
+        cy.wait(500)
+
+        cy.get('.maplibregl-layer-controls .map-layer').should('have.length', 2)
+
+        // TODO: add snapshot comparison
     })
 
     it('should display tooltips from a geojson layer ', () => {

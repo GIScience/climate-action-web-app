@@ -173,7 +173,7 @@ export class ExportPDFService {
         imageCache: Record<string, string>
     ): Promise<void> {
         const imageArtifacts = artifacts.filter(artifact => artifact.modality === 'IMAGE')
-        const mapArtifacts = artifacts.filter(artifact => this.reportService.isMapArtifact(artifact))
+        const mapArtifacts = artifacts.filter(artifact => this.reportService.isMapArtifact(artifact.modality))
 
         const mapCapturePromises = mapArtifacts.map(artifact => this.captureMapFromDOM(artifact, imageCache))
 
@@ -255,7 +255,7 @@ export class ExportPDFService {
         imageCache: Record<string, string>,
         artifactContainers: QueryList<ElementRef>
     ) {
-        const isMap = this.reportService.isMapArtifact(artifact)
+        const isMap = this.reportService.isMapArtifact(artifact.modality)
         const isImage = artifact.modality === 'IMAGE'
 
         if (isMap || isImage) {

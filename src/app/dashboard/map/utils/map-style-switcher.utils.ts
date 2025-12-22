@@ -1,6 +1,8 @@
 import { TranslocoService } from '@jsverse/transloco'
 import { ControlPosition, IControl, Map, StyleSpecification } from 'maplibre-gl'
 import { Subscription } from 'rxjs'
+import type { Artifact, ArtifactEntity } from '../../artifact/artifact.interface'
+import type { MapArtifactLayer } from '../map-artifact-manager.service'
 
 export interface MapStyle {
     title: string
@@ -17,6 +19,11 @@ export class MapStyleSwitcherControl implements IControl {
     private baseMapsHeading?: HTMLHeadingElement
     private layersHeading?: HTMLHeadingElement
     private subscriptions: Subscription[] = []
+    private getActiveLayers?: () => MapArtifactLayer[]
+    private removeMapLayer?: (layer: MapArtifactLayer) => void
+    private promoteToPin?: (artifact: ArtifactEntity) => boolean
+    private unpinArtifact?: (artifact: ArtifactEntity, computationId?: string) => boolean
+    private isArtifactActive?: (artifact: Artifact) => boolean
 
     constructor(
         private styles: MapStyle[],
@@ -24,9 +31,19 @@ export class MapStyleSwitcherControl implements IControl {
         private translocoService: TranslocoService,
         private onStyleChange?: (styleName: string) => void,
         private onStateChange?: (isExpanded: boolean) => void,
-        initialExpanded: boolean = true
+        initialExpanded: boolean = true,
+        getActiveLayers?: () => MapArtifactLayer[],
+        removeMapLayer?: (layer: MapArtifactLayer) => void,
+        promoteToPin?: (artifact: ArtifactEntity) => boolean,
+        unpinArtifact?: (artifact: ArtifactEntity, computationId?: string) => boolean,
+        isArtifactActive?: (artifact: Artifact) => boolean
     ) {
         this.isExpanded = initialExpanded
+        this.getActiveLayers = getActiveLayers
+        this.removeMapLayer = removeMapLayer
+        this.promoteToPin = promoteToPin
+        this.unpinArtifact = unpinArtifact
+        this.isArtifactActive = isArtifactActive
     }
 
     onAdd(map: Map): HTMLElement {
@@ -142,8 +159,9 @@ export class MapStyleSwitcherControl implements IControl {
 
                 const customLayers = (previousStyle.layers || []).filter(
                     layer =>
-                        /^(custom-|geojson-|geotiff-|region-|selected-|focused-|hover-highlight)/.test(layer.id) ||
-                        layer.id === 'markers'
+                        /^(custom-|geojson-|geotiff-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-|unified-border-)/.test(
+                            layer.id
+                        ) || layer.id === 'markers'
                 )
 
                 const layers = (nextStyle.layers || []).concat(customLayers)
@@ -151,7 +169,7 @@ export class MapStyleSwitcherControl implements IControl {
                 const sources = { ...(nextStyle.sources || {}) }
                 Object.entries(previousStyle.sources || {}).forEach(([key, value]) => {
                     if (
-                        /^(custom-|source-geojson-|source-geotiff-|region-|selected-|focused-|hover-highlight)/.test(
+                        /^(custom-|source-geojson-|source-geotiff-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-)/.test(
                             key
                         ) ||
                         key === 'markers'
@@ -218,6 +236,7 @@ export class MapStyleSwitcherControl implements IControl {
 
     updateLayerControls(): void {
         if (!this.map || !this.layerControlsContainer) return
+
         const groups: { [key: string]: string[] } = {}
         this.map
             .getStyle()
@@ -226,6 +245,7 @@ export class MapStyleSwitcherControl implements IControl {
                 const base = l.id.match(/^((?:geojson|geotiff)-[^-]+-\d+)/)?.[1]
                 if (base) (groups[base] ??= []).push(l.id)
             })
+
         const keys = Object.keys(groups)
         this.layerControlsContainer.style.display = keys.length ? 'block' : 'none'
         this.layerControlsContainer.innerHTML = ''
@@ -233,23 +253,127 @@ export class MapStyleSwitcherControl implements IControl {
         this.layersHeading.textContent = this.translocoService.translate('map.layers')
         this.layerControlsContainer.appendChild(this.layersHeading)
 
-        keys.forEach(base => {
-            const div = Object.assign(document.createElement('div'), { className: 'map-layer' })
-            div.innerHTML = `
-            <div class="map-layer-header">
-                <label>
-                    ${base.replace(/^(geojson|geotiff)-|-\d+$/g, '')}
-                </label>
-                <span>
-                    80%
-                </span>
-            </div>
-            <input type="range" min="0" max="1" step="0.1" value="0.8" style="width:100%;cursor:pointer">`
-            const slider = div.querySelector('input') as HTMLInputElement
-            const span = div.querySelector('span') as HTMLSpanElement
-            slider.oninput = () => {
-                const v = +slider.value
-                span.textContent = `${Math.round(v * 100)}%`
+        const activeLayers = this.getActiveLayers?.() ?? []
+
+        keys.reverse().forEach(base => {
+            const matchingLayer = activeLayers.find(layer => layer.layerIds?.some(id => groups[base].includes(id)))
+
+            const displayName = matchingLayer?.artifact.name ?? base.replace(/^(geojson|geotiff)-|-\d+$/g, '')
+
+            const container = Object.assign(document.createElement('div'), { className: 'map-layer' })
+            if (matchingLayer && matchingLayer.pinned) {
+                container.classList.add('map-layer--pinned')
+            }
+            const header = Object.assign(document.createElement('div'), { className: 'map-layer-header' })
+            const label = document.createElement('label')
+            label.textContent = displayName
+            header.appendChild(label)
+
+            const actions = Object.assign(document.createElement('div'), { className: 'map-layer-actions' })
+
+            if (matchingLayer) {
+                const isPinned = matchingLayer.pinned
+                const pinTitleKey = isPinned ? 'map.unpinLayer' : 'map.pinLayer'
+                let pinTitle = this.translocoService.translate(pinTitleKey)
+                if (!pinTitle || pinTitle === pinTitleKey) {
+                    pinTitle = isPinned ? 'Unpin layer' : 'Pin layer for comparison'
+                }
+
+                const pinIconSvg =
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#008080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/></svg>'
+                const pinOffIconSvg =
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d0080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M15 9.34V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1v2.34"/><path d="M6 14a2 2 0 0 0-.3 1.12V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V9"/><line x1="2" x2="22" y1="2" y2="22"/></svg>'
+
+                const pinBtn = Object.assign(document.createElement('button'), {
+                    type: 'button',
+                    className: isPinned ? 'map-layer-pin map-layer-pin--pinned' : 'map-layer-pin',
+                    title: pinTitle
+                }) as HTMLButtonElement
+                pinBtn.setAttribute('aria-label', pinBtn.title)
+                pinBtn.innerHTML = isPinned ? pinOffIconSvg : pinIconSvg
+
+                pinBtn.onclick = () => {
+                    if (isPinned) {
+                        this.unpinArtifact?.(matchingLayer.artifact)
+                        if (!this.isArtifactActive?.(matchingLayer.artifact)) {
+                            this.removeMapLayer?.(matchingLayer)
+                        }
+                    } else {
+                        this.promoteToPin?.(matchingLayer.artifact)
+                    }
+                    setTimeout(() => this.updateLayerControls(), 100)
+                }
+                actions.appendChild(pinBtn)
+
+                if (this.removeMapLayer) {
+                    const removeTitleKey = 'map.removeLayer'
+                    let removeTitle = this.translocoService.translate(removeTitleKey)
+                    if (!removeTitle || removeTitle === removeTitleKey) {
+                        removeTitle = 'Remove from map'
+                    }
+                    const removeBtn = Object.assign(document.createElement('button'), {
+                        type: 'button',
+                        className: 'map-layer-remove',
+                        title: removeTitle
+                    }) as HTMLButtonElement
+                    removeBtn.setAttribute('aria-label', removeBtn.title)
+                    removeBtn.textContent = '✕'
+                    removeBtn.onclick = () => {
+                        this.removeMapLayer?.(matchingLayer)
+                        setTimeout(() => this.updateLayerControls(), 0)
+                    }
+                    actions.appendChild(removeBtn)
+                }
+            }
+
+            header.appendChild(actions)
+            container.appendChild(header)
+
+            const sliderContainer = Object.assign(document.createElement('div'), { className: 'slider-container' })
+            const sliderTrack = Object.assign(document.createElement('div'), { className: 'slider-track' })
+            const sliderFill = Object.assign(document.createElement('div'), { className: 'slider-fill' })
+            const sliderHandle = Object.assign(document.createElement('div'), { className: 'slider-handle' })
+            const percentage = Object.assign(document.createElement('span'), { className: 'slider-percentage' })
+
+            sliderHandle.appendChild(percentage)
+            sliderTrack.appendChild(sliderFill)
+            sliderTrack.appendChild(sliderHandle)
+
+            const slider = Object.assign(document.createElement('input'), {
+                type: 'range',
+                min: '0',
+                max: '1',
+                step: '0.1',
+                className: 'slider-input'
+            }) as HTMLInputElement
+
+            let initialOpacity = 0.8
+            const firstLayerId = groups[base][0]
+            if (firstLayerId) {
+                const layer = this.map!.getLayer(firstLayerId)
+                if (layer) {
+                    const paintKey = `${layer.type}-opacity`
+                    const currentValue = this.map!.getPaintProperty(firstLayerId, paintKey)
+                    if (typeof currentValue === 'number' && !Number.isNaN(currentValue)) {
+                        initialOpacity = currentValue
+                    }
+                }
+            }
+            slider.value = `${initialOpacity}`
+
+            const handleWidth = 32
+            const updateOpacity = () => {
+                const v = Number(slider.value)
+                const pct = Math.round(v * 100)
+                percentage.textContent = `${pct}%`
+
+                // Position handle and fill based on value
+                const trackWidth = sliderTrack.offsetWidth || 150
+                const maxOffset = trackWidth - handleWidth
+                const handlePos = v * maxOffset
+                sliderHandle.style.left = `${handlePos}px`
+                sliderFill.style.width = `${handlePos}px`
+
                 groups[base].forEach(id => {
                     const layer = this.map!.getLayer(id)
                     if (!layer) return
@@ -261,8 +385,14 @@ export class MapStyleSwitcherControl implements IControl {
                     }
                 })
             }
-            slider.dispatchEvent(new Event('input'))
-            this.layerControlsContainer!.appendChild(div)
+
+            slider.oninput = updateOpacity
+            sliderContainer.appendChild(sliderTrack)
+            sliderContainer.appendChild(slider)
+
+            container.appendChild(sliderContainer)
+            this.layerControlsContainer!.appendChild(container)
+            updateOpacity()
         })
     }
 }

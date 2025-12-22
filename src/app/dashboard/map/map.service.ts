@@ -6,14 +6,7 @@ import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
-import type {
-    BBox,
-    FeatureCollection,
-    Feature as GeoJSONFeature,
-    Point as GeoJSONPoint,
-    MultiPolygon,
-    Position
-} from 'geojson'
+import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
 import { fromUrl as geoTiffFromUrl } from 'geotiff'
 import maplibregl, {
     GeoJSONSource,
@@ -27,7 +20,6 @@ import maplibregl, {
 } from 'maplibre-gl'
 import { updateMaplibreLocale } from 'maplibre-ui-translations'
 import { Collection } from 'ol'
-import { Coordinate } from 'ol/coordinate'
 import { Extent } from 'ol/extent'
 import Feature from 'ol/Feature'
 import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
@@ -35,7 +27,9 @@ import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
+import { MapArtifactLayer, MapArtifactManagerService } from './map-artifact-manager.service'
 import { MapDrawingService } from './map-drawing.service'
+import { MapFoWManagerService } from './map-fow-manager.service'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
@@ -86,6 +80,7 @@ interface VectorLayerGroup {
     sourceId: string
     name: string
     visible?: boolean
+    baseLayerId?: string
 }
 
 interface RasterLayer {
@@ -102,8 +97,10 @@ export class MapService {
     private http = inject(HttpClient)
     storageService = inject(StorageService)
     private translocoService = inject(TranslocoService)
+    private fowManager = inject(MapFoWManagerService)
     private router = inject(Router, { optional: true })
     private mapDrawingService = inject(MapDrawingService, { optional: true })
+    private mapArtifactManager = inject(MapArtifactManagerService, { optional: true })
 
     // Core Map Instance
     map: Map | undefined
@@ -132,7 +129,6 @@ export class MapService {
     selectedGeoJSONFeatures: GeoJSONFeature[] = [] // Track GeoJSON features for MapLibre
 
     // Layer Management
-    focusedLayer: { aoiLayerId: string; fowLayerId: string; sourceId: string } | undefined
     regionLayer: RasterLayer | undefined
     selectedRegionLayer: VectorLayerGroup | undefined
     geojsonLayer: VectorLayerGroup | undefined
@@ -185,6 +181,10 @@ export class MapService {
                 updateMaplibreLocale(this.map, lang)
             }
         })
+
+        this.mapArtifactManager?.activeMapArtifacts$?.subscribe(() => {
+            this.layerSwitcherControl?.updateLayerControls()
+        })
     }
 
     initMap(targetId: string, isReportMap: boolean = false) {
@@ -205,6 +205,13 @@ export class MapService {
         })
 
         updateMaplibreLocale(this.map, this.translocoService.getActiveLang())
+        
+        // Initialize FoW manager with the map
+        this.fowManager.setMap(this.map)
+
+        if (this.mapArtifactManager) {
+            this.mapArtifactManager.setMapInstance(this.map, this)
+        }
 
         if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
             maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
@@ -579,102 +586,18 @@ export class MapService {
     }
 
     highlightAoI(feature: Feature<Geometry>): Extent | null {
-        this.removeFocusedLayer()
+        if (!feature) return null
+
         const geometry = feature?.getGeometry?.() as OLMultiPolygon | OLPolygon | null
         if (!geometry) return null
 
         const extent = geometry.getExtent()
         if (!extent?.length) return null
 
-        try {
-            const transformCoords = (coords: Coordinate[]) =>
-                coords.map(c => MapConvertMeasureUtils.mercatorToWgs84(c[0], c[1]))
-            const coords = geometry.getCoordinates()
-            const transformedCoordinates: Position[][][] =
-                geometry instanceof OLMultiPolygon
-                    ? (coords as Coordinate[][][]).map(poly => poly.map(transformCoords))
-                    : [(coords as Coordinate[][]).map(transformCoords)]
+        this.fowManager.clearByType('focused')
+        this.fowManager.addGeometry('focused-computation', feature, 'focused')
 
-            const [aoiLayerId, fowLayerId, sourceId] = ['focused-aoi-layer', 'focused-fow-layer', 'focused-source']
-            ;[aoiLayerId, fowLayerId].forEach(id => this.map?.getLayer(id) && this.map.removeLayer(id))
-            if (this.map?.getSource(sourceId)) this.map.removeSource(sourceId)
-
-            this.map?.addSource(sourceId, {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: [
-                        {
-                            type: 'Feature',
-                            geometry: { type: 'MultiPolygon', coordinates: transformedCoordinates },
-                            properties: { renderStyle: 'AOI' }
-                        },
-                        this.cutFromGlobalPolygon(geometry)
-                    ]
-                }
-            })
-
-            this.map?.addLayer({
-                id: fowLayerId,
-                type: 'fill',
-                source: sourceId,
-                filter: ['==', ['get', 'renderStyle'], 'FoW'],
-                paint: { 'fill-color': 'rgba(128, 128, 128, 0.3)', 'fill-outline-color': 'rgba(128, 128, 128, 0.3)' }
-            })
-
-            this.map?.addLayer({
-                id: aoiLayerId,
-                type: 'line',
-                source: sourceId,
-                filter: ['==', ['get', 'renderStyle'], 'AOI'],
-                paint: { 'line-color': '#008080', 'line-width': 3 }
-            })
-
-            this.focusedLayer = { aoiLayerId, fowLayerId, sourceId }
-            return extent
-        } catch (error) {
-            console.error('Error highlighting AOI:', error)
-            return null
-        }
-    }
-
-    cutFromGlobalPolygon(scissor: OLMultiPolygon | OLPolygon): GeoJSONFeature<MultiPolygon> {
-        // Create a global polygon covering the entire world in EPSG:4326
-        const globalCoords: Position[] = [
-            [-180, -90],
-            [180, -90],
-            [180, 90],
-            [-180, 90],
-            [-180, -90]
-        ]
-
-        // Get the scissor coordinates and convert from EPSG:3857 to EPSG:4326
-        const scissorPolygons =
-            'getPolygons' in scissor ? (scissor as OLMultiPolygon).getPolygons() : [scissor as OLPolygon]
-
-        // Collect all holes (each polygon becomes a hole in the global polygon)
-        const holes: Position[][] = scissorPolygons.map(polygon =>
-            polygon
-                .getLinearRing(0)!
-                .getCoordinates()
-                .map((coord: Coordinate) => MapConvertMeasureUtils.mercatorToWgs84(coord[0], coord[1]))
-        )
-
-        // Create a single polygon with the global boundary as outer ring and all AOI polygons as holes
-        const coordinates: Position[][][] = [[globalCoords, ...holes]]
-
-        // Create the FoW feature as a MultiPolygon
-        return {
-            type: 'Feature',
-            geometry: {
-                type: 'MultiPolygon',
-                coordinates
-            },
-            properties: {
-                name: 'FogOfWar',
-                renderStyle: 'FoW'
-            }
-        } as GeoJSONFeature<MultiPolygon>
+        return extent
     }
 
     addGeoJsonLayer(data: FeatureCollection, artifactName: string): VectorLayerGroup | undefined {
@@ -697,7 +620,7 @@ export class MapService {
                         id: `${layerId}-fill`,
                         type: 'fill' as const,
                         filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
-                        paint: { 'fill-color': ['coalesce', ['get', 'color'], '#3388ff'], 'fill-opacity': 0.5 }
+                        paint: { 'fill-color': ['coalesce', ['get', 'color'], '#3388ff'], 'fill-opacity': 0.8 }
                     },
                     {
                         id: `${layerId}-outline`,
@@ -751,14 +674,22 @@ export class MapService {
             }
         })
 
-        this.geojsonLayer = { layerIds, sourceId, name: artifactName }
-        MapGeoJsonUtils.setupGeoJsonInteractions(this.map, layerId, artifactName, this.featureHoverOverlay, overlay => {
-            this.featureHoverOverlay = overlay
-        })
+        const layerGroup: VectorLayerGroup = { layerIds, sourceId, name: artifactName, baseLayerId: layerId }
+        this.geojsonLayer = layerGroup
+
+        MapGeoJsonUtils.setupGeoJsonInteractions(
+            this.map,
+            layerId,
+            artifactName,
+            this.featureHoverOverlay,
+            (overlay: Popup | undefined) => {
+                this.featureHoverOverlay = overlay
+            }
+        )
 
         this.layerSwitcherControl?.updateLayerControls()
 
-        return this.geojsonLayer
+        return layerGroup
     }
 
     async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
@@ -822,6 +753,71 @@ export class MapService {
         }
     }
 
+    private removeManagedMapLayer(layer: MapArtifactLayer): void {
+        if (!this.mapArtifactManager) return
+
+        if (layer.layerIds && layer.sourceId) {
+            if (layer.artifact.modality === 'MAP_LAYER_GEOJSON') {
+                this.removeGeoJsonLayer({
+                    layerIds: layer.layerIds,
+                    sourceId: layer.sourceId,
+                    name: layer.artifact.name
+                })
+            } else if (layer.artifact.modality === 'MAP_LAYER_GEOTIFF' && layer.layerIds.length > 0) {
+                this.removeGeoTiffLayer(layer.layerIds[0], layer.sourceId)
+            }
+        }
+
+        this.mapArtifactManager.removeMapArtifact(layer.artifact)
+        this.layerSwitcherControl?.updateLayerControls()
+    }
+
+    removeGeoJsonLayer(layerGroup: VectorLayerGroup): void {
+        if (!this.map || !layerGroup) return
+
+        const baseLayerId = this.getBaseLayerId(layerGroup)
+
+        layerGroup.layerIds.forEach(id => {
+            if (this.map!.getLayer(id)) {
+                this.map!.removeLayer(id)
+            }
+        })
+
+        if (this.map.getSource(layerGroup.sourceId)) {
+            this.map.removeSource(layerGroup.sourceId)
+        }
+
+        if (this.geojsonLayer?.sourceId === layerGroup.sourceId) {
+            this.geojsonLayer = undefined
+        }
+
+        if (baseLayerId) {
+            MapGeoJsonUtils.cleanupGeoJsonInteractions(this.map, baseLayerId)
+        }
+
+        this.layerSwitcherControl?.updateLayerControls()
+    }
+
+    private getBaseLayerId(layerGroup: VectorLayerGroup): string | undefined {
+        if (layerGroup.baseLayerId) return layerGroup.baseLayerId
+        const firstLayerId = layerGroup.layerIds[0]
+        if (!firstLayerId) return undefined
+        return firstLayerId.replace(/-(fill|outline|line|point)$/, '')
+    }
+
+    removeGeoTiffLayer(layerId: string, sourceId: string): void {
+        if (!this.map) return
+
+        if (this.map.getLayer(layerId)) {
+            this.map.removeLayer(layerId)
+        }
+
+        if (this.map.getSource(sourceId)) {
+            this.map.removeSource(sourceId)
+        }
+        this.layerSwitcherControl?.updateLayerControls()
+    }
+
     removeComputeLayers(): void {
         if (this.regionLayer && this.map) {
             this.map.setLayoutProperty('region-boundaries-fill', 'visibility', 'none')
@@ -847,15 +843,18 @@ export class MapService {
     }
 
     removeFocusedLayer(): void {
-        if (!this.focusedLayer || !this.map) return
-        ;[this.focusedLayer.aoiLayerId, this.focusedLayer.fowLayerId].forEach(id => {
-            if (this.map!.getLayer(id)) this.map!.removeLayer(id)
-        })
+        this.fowManager.clearByType('focused')
+    }
 
-        if (this.map.getSource(this.focusedLayer.sourceId)) {
-            this.map.removeSource(this.focusedLayer.sourceId)
-        }
-        this.focusedLayer = undefined
+    updateFoWGeometries(geometries: Feature<Geometry>[], type: 'pinned'): void {
+        this.fowManager.clearByType(type)
+        geometries.forEach((geom, index) => {
+            this.fowManager.addGeometry(`${type}-${index}`, geom, type)
+        })
+    }
+
+    clearFoWByType(type: 'pinned'): void {
+        this.fowManager.clearByType(type)
     }
 
     enableComputeLayers() {
@@ -1074,7 +1073,12 @@ export class MapService {
             (isExpanded: boolean) => {
                 this.storageService.saveLayerSwitcherCollapsed(!isExpanded)
             },
-            initialExpanded
+            initialExpanded,
+            this.mapArtifactManager ? () => this.mapArtifactManager!.getActiveMapArtifacts() : undefined,
+            this.mapArtifactManager ? layer => this.removeManagedMapLayer(layer) : undefined,
+            this.mapArtifactManager ? artifact => this.mapArtifactManager!.promoteToPin(artifact) : undefined,
+            this.mapArtifactManager ? artifact => this.mapArtifactManager!.unpinArtifact(artifact) : undefined,
+            this.mapArtifactManager ? artifact => this.mapArtifactManager!.isArtifactActive(artifact) : undefined
         )
 
         this.map.addControl(this.layerSwitcherControl as IControl, 'bottom-right')
