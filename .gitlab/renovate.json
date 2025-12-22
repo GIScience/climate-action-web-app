@@ -14,7 +14,7 @@
         {
             "matchUpdateTypes": ["patch"],
             "groupName": "dependency patches",
-            "schedule": ["* 0-3 * * *"]
+            "schedule": ["* 0-3 1 * *"]
         },
         {
             "matchUpdateTypes": ["minor"],
