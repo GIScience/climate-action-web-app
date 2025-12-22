@@ -1,15 +1,14 @@
 import { HttpClient } from '@angular/common/http'
 import { ElementRef, Injectable, QueryList, inject } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
-import html2canvas from 'html2canvas'
-import { jsPDF } from 'jspdf'
+import type { jsPDF } from 'jspdf'
 import { ToastrService } from 'ngx-toastr'
 import { lastValueFrom } from 'rxjs'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { ReportService } from './report.service'
 
-type Html2CanvasType = typeof html2canvas
+type Html2CanvasType = typeof import('html2canvas').default
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +18,17 @@ export class ExportPDFService {
     private toastr = inject(ToastrService)
     private reportService = inject(ReportService)
     private translocoService = inject(TranslocoService)
+
+    private async loadPdfLibraries(): Promise<{
+        jsPDF: typeof import('jspdf').jsPDF
+        html2canvas: Html2CanvasType
+    }> {
+        const [jsPDFModule, html2canvasModule] = await Promise.all([import('jspdf'), import('html2canvas')])
+        return {
+            jsPDF: jsPDFModule.jsPDF,
+            html2canvas: html2canvasModule.default
+        }
+    }
 
     async exportToPDF(
         artifacts: ArtifactEntity[],
@@ -30,6 +40,8 @@ export class ExportPDFService {
                 timeOut: 30000,
                 positionClass: 'toast-top-center'
             })
+
+            const { jsPDF, html2canvas } = await this.loadPdfLibraries()
 
             const imageCache: Record<string, string> = {}
             await this.prepareArtifactImages(artifacts, artifactContainers, imageCache)
@@ -112,6 +124,7 @@ export class ExportPDFService {
 
     private addPageHeaderFooter(pdf: jsPDF, pageNumber: number, totalPages: number) {
         const { width: pageWidth, height: pageHeight } = pdf.internal.pageSize
+
         const margin = 10
 
         // Header

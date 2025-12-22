@@ -1,11 +1,15 @@
+import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core'
-import Plotly, { Data, Layout, PlotlyInstance } from 'plotly.js-strict-dist'
+import type { Data, Layout, PlotlyInstance } from 'plotly.js-strict-dist'
 import { Artifact, PlotlyChartData } from '../artifact.interface'
+
+type PlotlyModule = typeof import('plotly.js-strict-dist')
 
 @Component({
     selector: 'app-plotly-chart',
     templateUrl: './plotly-chart.component.html',
-    styleUrls: ['./plotly-chart.component.scss']
+    styleUrls: ['./plotly-chart.component.scss'],
+    imports: [CommonModule]
 })
 export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('plotlyChart') plotlyChart?: ElementRef<HTMLDivElement>
@@ -14,6 +18,10 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
     public plotlyData: Data[] | null = null
     public plotlyLayout: Partial<Layout> | null = null
     private plotlyInstance: PlotlyInstance | null = null
+
+    private Plotly: PlotlyModule | null = null
+    isLoading = false
+    loadError = false
 
     private isFullscreen = false
     private originalParent: HTMLElement | null = null
@@ -42,7 +50,12 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.plotlyChart?.nativeElement || !this.plotlyData || !this.plotlyLayout) return
 
         try {
-            this.plotlyInstance = await Plotly.newPlot(
+            this.isLoading = true
+            this.loadError = false
+
+            this.Plotly = await import('plotly.js-strict-dist')
+
+            this.plotlyInstance = await this.Plotly.default.newPlot(
                 this.plotlyChart.nativeElement,
                 this.plotlyData,
                 this.plotlyLayout,
@@ -67,8 +80,11 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
                     ]
                 }
             )
+            this.isLoading = false
         } catch (error) {
             console.error('Error initializing Plotly chart:', error)
+            this.isLoading = false
+            this.loadError = true
         }
     }
 
@@ -77,8 +93,8 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.isFullscreen && this.plotlyChart?.nativeElement) {
             this.exitFullscreen(this.plotlyChart.nativeElement)
         }
-        if (this.plotlyInstance && this.plotlyChart?.nativeElement) {
-            Plotly.purge(this.plotlyChart.nativeElement)
+        if (this.plotlyInstance && this.plotlyChart?.nativeElement && this.Plotly) {
+            this.Plotly.default.purge(this.plotlyChart.nativeElement)
         }
     }
 
@@ -121,10 +137,12 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private deferResize(element: HTMLElement) {
+        if (!this.Plotly) return
+        const Plotly = this.Plotly
         // Two RAFs to ensure layout has settled after DOM move
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                Plotly.Plots.resize(element)
+                Plotly.default.Plots.resize(element)
             })
         })
     }

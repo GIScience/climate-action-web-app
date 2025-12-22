@@ -7,7 +7,6 @@ import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
-import { fromUrl as geoTiffFromUrl } from 'geotiff'
 import maplibregl, {
     GeoJSONSource,
     IControl,
@@ -205,7 +204,7 @@ export class MapService {
         })
 
         updateMaplibreLocale(this.map, this.translocoService.getActiveLang())
-        
+
         // Initialize FoW manager with the map
         this.fowManager.setMap(this.map)
 
@@ -699,6 +698,7 @@ export class MapService {
         const sourceId = `source-${layerId}`
 
         try {
+            const { fromUrl: geoTiffFromUrl } = await import('geotiff')
             const tiff = await geoTiffFromUrl(sourceURL)
             const image = await tiff.getImage()
             const bbox = image.getBoundingBox()

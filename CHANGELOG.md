@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.3...main)
 
+### Added
+
+- Lazy loading implemented for bigger libraries (Plotly, jsPDF) to reduce initial bundle size
+
 ### Fixed
 
 - Define and use a cache for Jest in dev and pipeline

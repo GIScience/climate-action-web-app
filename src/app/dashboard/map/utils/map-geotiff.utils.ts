@@ -1,4 +1,4 @@
-import { GeoTIFF as GeoTIFFClass, TypedArray } from 'geotiff'
+import type { GeoTIFF as GeoTIFFClass, TypedArray } from 'geotiff'
 
 export class MapGeoTiffUtils {
     private static readonly MAX_DIMENSION = 4096
