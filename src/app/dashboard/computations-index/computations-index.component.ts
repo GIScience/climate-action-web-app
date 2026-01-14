@@ -55,8 +55,8 @@ const ARTIFACT_ICON_MAP: { [index: string]: string } = {
     CHART: 'data_usage',
     CHART_PLOTLY: 'bar_chart',
     TABLE: 'table_chart',
-    MAP_LAYER_GEOJSON: 'layers',
-    MAP_LAYER_GEOTIFF: 'map'
+    VECTOR_MAP_LAYER: 'layers',
+    RASTER_MAP_LAYER: 'map'
 }
 
 const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
@@ -271,7 +271,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 const stillOnMap = layers.some(
                     l =>
                         l.artifact.correlation_uuid === this._activeArtifact!.correlation_uuid &&
-                        l.artifact.store_id === this._activeArtifact!.store_id
+                        l.artifact.filename === this._activeArtifact!.filename
                 )
                 if (!stillOnMap) {
                     this._activeArtifact = undefined
@@ -489,10 +489,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     correlation_uuid: run.correlation_uuid,
                     artifacts: [],
                     status: response.status,
-                    timestamp: response.timestamp,
+                    request_ts: response.request_ts,
                     aoiName: response.aoi?.get('name'),
                     geometry: response.aoi,
-                    pluginId: response.plugin_info?.plugin_id,
+                    pluginId: response.plugin_info?.id,
                     params: response.params,
                     artifact_errors: response.artifact_errors,
                     flags: run.flags
@@ -506,12 +506,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 modality: x.modality,
                                 primary: x.primary,
                                 tags: x.tags,
-                                file_path: x.file_path,
                                 summary: x.summary,
                                 description: x.description,
                                 correlation_uuid: x.correlation_uuid,
-                                store_id: x.store_id,
+                                filename: x.filename,
                                 attachments: x.attachments,
+                                rank: x.rank,
+                                sources: x.sources,
                                 icon: ARTIFACT_ICON_MAP[x.modality]
                             }
                         })
@@ -542,7 +543,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.computations = this.computations.filter(x => x.correlation_uuid != correlation_uuid)
             this.computations.push(computation)
             this.computations.sort((a, b) => {
-                return compareDesc(new Date(a.timestamp?.valueOf() || 0), new Date(b.timestamp?.valueOf() || 0))
+                return compareDesc(new Date(a.request_ts?.valueOf() || 0), new Date(b.request_ts?.valueOf() || 0))
             })
             this.dataChange.next(this.computations)
         }
@@ -628,7 +629,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
             this.storageService.saveActiveArtifact({
                 correlation_uuid: artifact.correlation_uuid,
-                store_id: artifact.store_id
+                filename: artifact.filename
             })
         } else {
             console.error('Cannot persist active artifact: ', artifact)
@@ -645,7 +646,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 if (parentComputation) {
                     this.toggleComputation(parentComputation)
                     this._activeArtifact = parentComputation.artifacts.find(
-                        x => x.store_id === activeArtifactRef.store_id
+                        x => x.filename === activeArtifactRef.filename
                     )
                     if (this._activeArtifact) {
                         this.computationComponent.viewArtifact(this._activeArtifact)
@@ -732,7 +733,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             const allExceededMaxInterval =
                 hasPendingRuns &&
                 pendingRuns.every(run => {
-                    const runTs = new Date(run.timestamp).getTime()
+                    const runTs = new Date(run.request_ts).getTime()
                     return now - runTs >= this.MAX_INTERVAL
                 })
 
@@ -799,8 +800,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             next: (response: ComputationMetadata) => {
                 const computation: ComputationDatabaseEntity = {
                     correlation_uuid: correlationUuid,
-                    pluginId: response.plugin_info?.plugin_id,
-                    timestamp: response.timestamp,
+                    pluginId: response.plugin_info?.id,
+                    request_ts: response.request_ts,
                     status: 'SUCCESS',
                     aoiName: response.aoi?.get('name'),
                     flags: ['IMPORTED']
@@ -862,7 +863,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                             const compute: ComputationDatabaseEntity = {
                                 correlation_uuid: data.correlation_uuid,
                                 pluginId: this.pluginId,
-                                timestamp: new Date(),
+                                request_ts: new Date(),
                                 aoiName: 'Demo',
                                 status: stateInfo.state,
                                 flags: ['DEMO']
@@ -880,7 +881,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                             const compute: ComputationDatabaseEntity = {
                                 correlation_uuid: data.correlation_uuid,
                                 pluginId: this.pluginId,
-                                timestamp: new Date(),
+                                request_ts: new Date(),
                                 aoiName: 'Demo',
                                 status: stateInfo.state,
                                 flags: ['DEMO']

@@ -12,8 +12,10 @@ export interface BasicKeyInfo extends Models.Document {
     key: string
 }
 
-export interface ComputationDocument extends Models.Document, ComputationDatabaseEntity {
+// Map request_ts to timestamp to maintain Appwrite compatibility
+export interface ComputationDocument extends Models.Document, Omit<ComputationDatabaseEntity, 'request_ts'> {
     user_id: string
+    timestamp: ComputationDatabaseEntity['request_ts']
 }
 
 export interface PaginationParams {
@@ -88,7 +90,7 @@ export class DatabaseService {
                         flags: doc.flags,
                         state: doc.state,
                         pluginId: doc.pluginId,
-                        timestamp: doc.timestamp,
+                        request_ts: doc.timestamp,
                         status: doc.status,
                         aoiName: doc.aoiName
                     }) as ComputationDatabaseEntity
@@ -118,12 +120,14 @@ export class DatabaseService {
 
             const permissions = [Permission.read(Role.user(this.user_id)), Permission.update(Role.user(this.user_id))]
 
+            const { request_ts, ...rest } = run
             const response = await this.databases.createDocument(
                 this.DATABASE_ID,
                 this.RUNS_COLLECTION_ID,
                 ID.unique(),
                 {
-                    ...run,
+                    ...rest,
+                    timestamp: request_ts,
                     user_id: this.user_id
                 },
                 permissions
@@ -225,7 +229,7 @@ export class DatabaseService {
                 flags: doc.flags,
                 state: doc.state,
                 pluginId: doc.pluginId,
-                timestamp: doc.timestamp,
+                request_ts: doc.timestamp,
                 status: doc.status,
                 aoiName: doc.aoiName
             } as ComputationDatabaseEntity

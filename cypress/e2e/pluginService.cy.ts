@@ -45,6 +45,12 @@ describe('pluginService', () => {
 
         cy.get('button.new-compute').click()
 
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+
+        cy.waitForRenderComplete()
+
         cy.get('canvas.maplibregl-canvas').click(1000, 300)
 
         cy.get('formly-form label.mdc-label').should('contain.text', 'Boolean Input')
@@ -70,7 +76,7 @@ describe('pluginService', () => {
     //                     correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
     //                     pluginId: 'plugin_blueprint',
     //                     pluginName: 'Plugin Blueprint',
-    //                     timestamp: '2024-12-17T08:55:23.807074Z',
+    //                     request_ts: '2024-12-17T08:55:23.807074Z',
     //                     status: 'SUCCESS'
     //                 }
     //             ])

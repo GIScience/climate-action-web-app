@@ -40,7 +40,7 @@ export const mockPluginsList = () => {
                 assets: {
                     icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
                 },
-                plugin_id: 'plugin_blueprint',
+                id: 'plugin_blueprint',
                 library_version: '5.1.0'
             },
             {
@@ -69,7 +69,7 @@ export const mockPluginsList = () => {
                 assets: {
                     icon: 'assets/walkability/1.0.0/ICON.jpeg'
                 },
-                plugin_id: 'hiwalk',
+                id: 'hiwalk',
                 operator_schema: {
                     $defs: {
                         NaturalnessIndex: {
@@ -145,7 +145,7 @@ export const mockPluginsListWithoutBlueprint = () => {
                 assets: {
                     icon: 'assets/hiwalk/1.0.0/ICON.jpeg'
                 },
-                plugin_id: 'hiwalk',
+                id: 'hiwalk',
                 operator_schema: {
                     $defs: {
                         IDW: {
@@ -380,7 +380,7 @@ export const mockPluginBlueprint = () => {
             assets: {
                 icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
             },
-            plugin_id: 'plugin_blueprint',
+            id: 'plugin_blueprint',
             operator_schema: {
                 $defs: {
                     Mapping: {
@@ -534,7 +534,7 @@ export const mockPluginHiWalk = () => {
             assets: {
                 icon: 'assets/walkability/1.0.0/ICON.jpeg'
             },
-            plugin_id: 'hiwalk',
+            id: 'hiwalk',
             operator_schema: {
                 $defs: {
                     NaturalnessIndex: {
@@ -604,7 +604,7 @@ export const mockPluginHiWalkComputation = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/8d81bea0-7183-4083-aae0-b751f9813de5/metadata`, {
         body: {
             correlation_uuid: '8d81bea0-7183-4083-aae0-b751f9813de5',
-            timestamp: '2025-06-10T12:26:34.929303',
+            request_ts: '2025-06-10T12:26:34.929303',
             deduplication_key: 'df845f2d-f836-4288-7ee2-91d9dad16cca',
             cache_epoch: 120,
             valid_until: '2025-08-28T00:00:00',
@@ -639,15 +639,16 @@ export const mockPluginHiWalkComputation = () => {
             artifacts: [
                 {
                     name: 'Path Category',
-                    modality: 'MAP_LAYER_GEOJSON',
+                    modality: 'VECTOR_MAP_LAYER',
                     primary: true,
                     tags: [],
-                    file_path: '/tmp/67bc4e3e-605b-4baa-8d18-df733d37f6c0ghd04ds1/walkable.geojson',
                     summary: 'Who shares this path with me?',
                     description:
                         'Paths exclusively for pedestrians are safer and more comfortable than paths shared with bikes or, even worse, fast\nmotorised traffic.',
                     correlation_uuid: '67bc4e3e-605b-4baa-8d18-df733d37f6c0',
-                    store_id: '40368c53-5c5d-4070-b6c8-a6ec2b630d27_walkable.geojson',
+                    filename: '40368c53-5c5d-4070-b6c8-a6ec2b630d27_walkable.geojson',
+                    sources: [],
+                    rank: 0,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -667,15 +668,16 @@ export const mockPluginHiWalkComputation = () => {
                 },
                 {
                     name: 'Surface Quality',
-                    modality: 'MAP_LAYER_GEOJSON',
+                    modality: 'VECTOR_MAP_LAYER',
                     primary: true,
                     tags: [],
-                    file_path: '/tmp/67bc4e3e-605b-4baa-8d18-df733d37f6c0ghd04ds1/pavement_quality.geojson',
                     summary: 'Can I walk comfortably on this surface?',
                     description:
                         "A path's surface quality refers to how safe and comfortable it is for walking. A smooth, solid surface is especially important for people with limited mobility, as well as for those using wheelchairs, walking frames, or prams/strollers",
                     correlation_uuid: '67bc4e3e-605b-4baa-8d18-df733d37f6c0',
-                    store_id: 'a5bbab88-21a6-4bc9-a1c2-155a446c6ea7_pavement_quality.geojson',
+                    filename: 'a5bbab88-21a6-4bc9-a1c2-155a446c6ea7_pavement_quality.geojson',
+                    sources: [],
+                    rank: 1,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -695,31 +697,31 @@ export const mockPluginHiWalkComputation = () => {
                     modality: 'CHART_PLOTLY',
                     primary: true,
                     tags: [],
-                    file_path:
-                        '/tmp/67bc4e3e-605b-4baa-8d18-df733d37f6c0ghd04ds1/aggregation_aoi_category_stacked_bar.json',
                     summary: 'How is the total length of paths distributed across the path categories?',
                     description: null,
                     correlation_uuid: '67bc4e3e-605b-4baa-8d18-df733d37f6c0',
-                    store_id: '761e46a7-3cdb-4068-b477-7e331c5eccfe_aggregation_aoi_category_stacked_bar.json',
-                    attachments: null
+                    filename: '761e46a7-3cdb-4068-b477-7e331c5eccfe_aggregation_aoi_category_stacked_bar.json',
+                    sources: [],
+                    rank: 2,
+                    attachments: {}
                 },
                 {
                     name: 'Distribution of Surface Quality',
                     modality: 'CHART_PLOTLY',
                     primary: true,
                     tags: [],
-                    file_path:
-                        '/tmp/67bc4e3e-605b-4baa-8d18-df733d37f6c0ghd04ds1/aggregation_aoi_quality_stacked_bar.json',
                     summary: 'How is the total length of paths distributed across the surface quality categories?',
                     description: null,
                     correlation_uuid: '67bc4e3e-605b-4baa-8d18-df733d37f6c0',
-                    store_id: 'a20d6a62-9970-42e2-8308-1213fdcadbc8_aggregation_aoi_quality_stacked_bar.json',
-                    attachments: null
+                    filename: 'a20d6a62-9970-42e2-8308-1213fdcadbc8_aggregation_aoi_quality_stacked_bar.json',
+                    sources: [],
+                    rank: 3,
+                    attachments: {}
                 }
             ],
             plugin_info: {
-                plugin_id: 'hiwalk',
-                plugin_version: '2.0.1'
+                id: 'hiwalk',
+                version: '2.0.1'
             },
             status: 'SUCCESS',
             message: null,
@@ -750,7 +752,7 @@ export const mockPluginBlueprintComputation = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/8649e714-f29d-423f-85ce-cd55f4e5022a/metadata`, {
         body: {
             correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-            timestamp: '2024-12-17T08:55:23.807074Z',
+            request_ts: '2024-12-17T08:55:23.807074Z',
             params: {
                 bool_showcase: true
             },
@@ -781,11 +783,12 @@ export const mockPluginBlueprintComputation = () => {
                     modality: 'MARKDOWN',
                     primary: true,
                     tags: ['input'],
-                    file_path: '/tmp/8649e714-f29d-423f-85ce-cd55f4e5022aqsjobeas/markdown.md',
                     summary: 'A JSON-block of the input parameters',
                     description: null,
                     correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                    store_id: '73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md',
+                    filename: '73fb8180-efb4-43b7-8d69-f223d5473dc7_markdown.md',
+                    sources: [],
+                    rank: 0,
                     attachments: {}
                 },
                 {
@@ -793,17 +796,18 @@ export const mockPluginBlueprintComputation = () => {
                     modality: 'TABLE',
                     primary: true,
                     tags: ['input'],
-                    file_path: '/tmp/8649e714-f29d-423f-85ce-cd55f4e5022aqsjobeas/table.csv',
                     summary: 'The table lists the number of occurrences for each character in the input parameters.',
                     description: 'A table with two columns.',
                     correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                    store_id: '2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv',
+                    filename: '2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv',
+                    sources: [],
+                    rank: 1,
                     attachments: {}
                 }
             ],
             plugin_info: {
-                plugin_id: 'plugin_blueprint',
-                plugin_version: '0.3.0'
+                id: 'plugin_blueprint',
+                version: '0.3.0'
             },
             status: 'SUCCESS',
             message: '-'
@@ -824,7 +828,7 @@ export const mockGeoTiffComputation = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/8a897536-c4b4-4e5a-9d70-50430183ac66/metadata`, {
         body: {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-            timestamp: new Date('2023-09-27T16:42:52+01:00'),
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
             params: {
                 bool_blueprint: true
             },
@@ -866,13 +870,15 @@ export const mockGeoTiffComputation = () => {
             artifacts: [
                 {
                     name: 'LULC Classification',
-                    modality: 'MAP_LAYER_GEOTIFF',
+                    modality: 'RASTER_MAP_LAYER',
                     primary: true,
-                    file_path: 'cypress/fixtures/sample_raster_blueprint.tiff',
+                    tags: [],
                     summary: 'A land-use and land-cover classification of a user defined area.',
                     description: 'The classification is created using a deep learning model.',
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    store_id: 'a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff',
+                    filename: 'a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff',
+                    sources: [],
+                    rank: 0,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -890,8 +896,8 @@ export const mockGeoTiffComputation = () => {
                 }
             ],
             plugin_info: {
-                name: 'Plugin Blueprint',
-                plugin_id: 'plugin_blueprint'
+                id: 'plugin_blueprint',
+                version: '1.0.0'
             },
             status: 'SUCCESS',
             message: '-'
@@ -903,7 +909,7 @@ export const mockGeoJsonComputationJinrongjie = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/metadata`, {
         body: {
             correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-            timestamp: new Date('2023-09-27T16:42:52+01:00'),
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
             params: {
                 bool_blueprint: true
             },
@@ -945,15 +951,17 @@ export const mockGeoJsonComputationJinrongjie = () => {
             artifacts: [
                 {
                     name: 'Connectivity',
-                    modality: 'MAP_LAYER_GEOJSON',
+                    modality: 'VECTOR_MAP_LAYER',
                     primary: true,
-                    file_path: 'cypress/fixtures/sample_vector_blueprint-1.geojson',
+                    tags: [],
                     summary:
                         'Connectivity of path segments:\n\nThe map shows how accessible the locations surrounding each path are. High connectivity for a given path means a high share of the surrounding paths can be reached in the maximum trip duration.\n\nMore specifically, we define connectivity as the proportion of accessible locations out of the total number of locations in an area of interest (AOI). The AOI includes all the road intersections that can be reached from a given point traveling at the walking speed for the maximum trip duration in a straight line (\"as the crow flies\"). A target location is considered accessible if the actual walking distance through the street network is smaller or equal to the radius of the AOI.\n\nWhen calculating connectivity, it is possible to take into account that people are more likely to walk shorter rather than longer distances, and therefore give more weight to closer locations. For more details see the description below.\n\n\n',
                     description:
                         'For each segment the connectivity is calculated as:\n\n`Connectivity = #(Segments in AOI) / ∑(Weighting of reachable segments),`\n\nwhere the AOI is centred on the root segment with a radius corresponding to the maximum walking distance:\n\n`Maximum walking distance = Walking speed * Maximum trip time`\n\nand a destination segment in the AOI is counted as reachable if:\n\n`Actual walking distance ≤ Maximum walking distance`\n\nThe weighting of the reachable segments is determined from the beeline distance to the root segment using a distance decay function chosen in the input. One can choose between:\n\nNo decay:\n* `w(d) = 1`\n\nPolynomial decay ([Frank et al. 2010](https://bjsm.bmj.com/content/44/13/924)):\n* `w(d) =`\n  * `[335.9229 * d⁵ - 1327.84 * d⁴ + 1802.56 * d³ - 935.68 * d² + 61.92 * d + 100.1072] / 100` if `d ≤ 1.5`\n  * `0` if `d > 1.5`\n\n(Default) A step function ([Xia et al. 2018](https://www.mdpi.com/2071-1050/10/11/3879/pdf?version=1540460686)):\n* `w(d) =`\n  * `1 if d < 0.4`\n  * `0.6 if d < 0.8`\n  * `0.25 if d < 1.2`\n  * `0.08 if d < 1.8`\n  * `0 if d ≥ 1.8`\n\nwhere `w` is the weighting and `d` the beeline distance in kilometers.',
                     correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                    store_id: '2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson',
+                    filename: '2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson',
+                    sources: [],
+                    rank: 0,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -970,8 +978,8 @@ export const mockGeoJsonComputationJinrongjie = () => {
                 }
             ],
             plugin_info: {
-                name: 'Plugin Blueprint',
-                plugin_id: 'plugin_blueprint'
+                id: 'plugin_blueprint',
+                version: '1.0.0'
             },
             status: 'SUCCESS',
             message: '-'
@@ -983,7 +991,7 @@ export const mockGeoJsonComputationWestChangan = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/0f4552a1-79c4-452c-9e01-3c33a9bae0e8/metadata`, {
         body: {
             correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
-            timestamp: new Date('2023-05-25T16:57:52+01:00'),
+            request_ts: new Date('2023-05-25T16:57:52+01:00'),
             params: {
                 bool_blueprint: true
             },
@@ -1086,15 +1094,16 @@ export const mockGeoJsonComputationWestChangan = () => {
             artifacts: [
                 {
                     name: 'Path Category',
-                    modality: 'MAP_LAYER_GEOJSON',
+                    modality: 'VECTOR_MAP_LAYER',
                     primary: true,
                     tags: ['traffic'],
-                    file_path: '/tmp/0f4552a1-79c4-452c-9e01-3c33a9bae0e8ek2dxiem/walkable.geojson',
                     summary: 'Who shares this path with me?',
                     description:
                         'Paths exclusively for pedestrians are safer and more comfortable than paths shared with bikes or, even worse, fast\nmotorised traffic. This indicator categorises paths according to which other users share space with pedestrians.\n\nCategories (from better to worse):\n* Designated: Paths exclusively for pedestrians (e.g., sidewalks).\n* Shared with bikes: Paths where pedestrians share space with cyclists.\n* Shared with cars up to 15 km/h: Streets without a sidewalk and with speed limits up to 15 km/h, such as living streets and service ways.\n* Shared with cars up to 30 km/h: Streets without a sidewalk, with speed limits up to 30 km/h.\n* Shared with cars up to 50 km/h: Streets without a sidewalk, with speed limits up to 50 km/h.\n* Shared with cars above 50 km/h: Streets without a sidewalk and with speed limits higher than 50 km/h. Shown to explicitly highlight barriers\n* Shared with cars of unknown speed: Streets without a sidewalk and with unknown speed limit.\n* Unknown: Paths without enough information to categorise (e.g., streets with no information about sidewalk presence).\n\nThe categorisation is based on OpenStreetMap (OSM) tags.',
                     correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
-                    store_id: '67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson',
+                    filename: '67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson',
+                    sources: [],
+                    rank: 0,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -1113,8 +1122,8 @@ export const mockGeoJsonComputationWestChangan = () => {
                 }
             ],
             plugin_info: {
-                name: 'Plugin Blueprint',
-                plugin_id: 'plugin_blueprint'
+                id: 'plugin_blueprint',
+                version: '1.0.0'
             },
             status: 'SUCCESS',
             message: '-'
@@ -1126,7 +1135,7 @@ export const mockSimpleGeoJsonComputation = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/1cfd2634-1724-43a2-ab1e-6466ba433364/metadata`, {
         body: {
             correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
-            timestamp: new Date('2023-09-27T16:42:52+01:00'),
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
             params: {
                 bool_blueprint: true
             },
@@ -1168,15 +1177,17 @@ export const mockSimpleGeoJsonComputation = () => {
             artifacts: [
                 {
                     name: 'Connectivity',
-                    modality: 'MAP_LAYER_GEOJSON',
+                    modality: 'VECTOR_MAP_LAYER',
                     primary: true,
-                    file_path: 'cypress/fixtures/sample_vector_blueprint-1.geojson',
+                    tags: [],
                     summary:
                         'Connectivity of path segments:\n\nThe map shows how accessible the locations surrounding each path are. High connectivity for a given path means a high share of the surrounding paths can be reached in the maximum trip duration.\n\nMore specifically, we define connectivity as the proportion of accessible locations out of the total number of locations in an area of interest (AOI). The AOI includes all the road intersections that can be reached from a given point traveling at the walking speed for the maximum trip duration in a straight line (\"as the crow flies\"). A target location is considered accessible if the actual walking distance through the street network is smaller or equal to the radius of the AOI.\n\nWhen calculating connectivity, it is possible to take into account that people are more likely to walk shorter rather than longer distances, and therefore give more weight to closer locations. For more details see the description below.\n\n\n',
                     description:
                         'For each segment the connectivity is calculated as:\n\n`Connectivity = #(Segments in AOI) / ∑(Weighting of reachable segments),`\n\nwhere the AOI is centred on the root segment with a radius corresponding to the maximum walking distance:\n\n`Maximum walking distance = Walking speed * Maximum trip time`\n\nand a destination segment in the AOI is counted as reachable if:\n\n`Actual walking distance ≤ Maximum walking distance`\n\nThe weighting of the reachable segments is determined from the beeline distance to the root segment using a distance decay function chosen in the input. One can choose between:\n\nNo decay:\n* `w(d) = 1`\n\nPolynomial decay ([Frank et al. 2010](https://bjsm.bmj.com/content/44/13/924)):\n* `w(d) =`\n  * `[335.9229 * d⁵ - 1327.84 * d⁴ + 1802.56 * d³ - 935.68 * d² + 61.92 * d + 100.1072] / 100` if `d ≤ 1.5`\n  * `0` if `d > 1.5`\n\n(Default) A step function ([Xia et al. 2018](https://www.mdpi.com/2071-1050/10/11/3879/pdf?version=1540460686)):\n* `w(d) =`\n  * `1 if d < 0.4`\n  * `0.6 if d < 0.8`\n  * `0.25 if d < 1.2`\n  * `0.08 if d < 1.8`\n  * `0 if d ≥ 1.8`\n\nwhere `w` is the weighting and `d` the beeline distance in kilometers.',
                     correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
-                    store_id: '4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson',
+                    filename: '4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson',
+                    sources: [],
+                    rank: 0,
                     attachments: {
                         legend: {
                             legend_data: {
@@ -1193,8 +1204,8 @@ export const mockSimpleGeoJsonComputation = () => {
                 }
             ],
             plugin_info: {
-                name: 'Plugin Blueprint',
-                plugin_id: 'plugin_blueprint'
+                id: 'plugin_blueprint',
+                version: '1.0.0'
             },
             status: 'SUCCESS',
             message: '-'

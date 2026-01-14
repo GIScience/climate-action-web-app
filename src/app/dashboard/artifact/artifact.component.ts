@@ -120,10 +120,10 @@ export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
             if (!v) this.clearContainer()
             else this.display(TableComponent, 'url', v.url, v)
         })
-        service.geojson.subscribe(v => {
+        service.vector.subscribe(v => {
             if (!v) this.clearContainer()
         })
-        service.geotiff.subscribe(v => {
+        service.raster.subscribe(v => {
             if (!v) this.clearContainer()
         })
         service.chart.subscribe(v => {

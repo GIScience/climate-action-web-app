@@ -53,8 +53,12 @@ button {
         padding: 5px 15px;
     }
 
-    &.btn-withtext i-lucide {
+    &.btn-withtext--after i-lucide {
         margin-right: 5px;
+    }
+
+    &.btn-withtext--before i-lucide {
+        margin-left: 5px;
     }
 
     &.btn-onlyicon {

@@ -46,11 +46,10 @@ describe('PluginService', () => {
                 name: 'Image',
                 modality: 'IMAGE',
                 primary: true,
-                file_path: 'test_image.png',
                 summary: 'An image.',
                 description: 'The image is under CC0 license.',
                 correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                filename: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
                 attachments: {}
             }
         ],
@@ -98,7 +97,7 @@ describe('PluginService', () => {
                 ID: 'gree00'
             }
         ],
-        plugin_id: 'blueprint_plugin',
+        id: 'blueprint_plugin',
         operator_schema: {},
         library_version: '2.6.4',
         assets: { icon: '...' }
@@ -214,7 +213,7 @@ describe('PluginService', () => {
             pluginId: 'test_plugin',
             aoiName: 'Test Area',
             status: 'PENDING',
-            timestamp: new Date()
+            request_ts: new Date()
         })
         expect(storageService.storeNewCompute).toHaveBeenCalled()
     })

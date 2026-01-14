@@ -4,12 +4,20 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, Vi
 import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
-import { Source } from '@app/types/sources/sources.type'
+import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
-import { ChevronsDown, ChevronsUp, CircleX, CloudOff, DiamondPlus, LucideAngularModule } from 'lucide-angular'
+import {
+    ChevronsDown,
+    ChevronsUp,
+    CircleX,
+    CloudOff,
+    DiamondPlus,
+    ExternalLink,
+    LucideAngularModule
+} from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { Observable, Subscription, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
@@ -86,6 +94,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     readonly DiamondPlus = DiamondPlus
     readonly CircleX = CircleX
     readonly CloudOff = CloudOff
+    readonly ExternalLink = ExternalLink
 
     ngAfterViewInit(): void {
         this.loadPluginDetails()
@@ -111,21 +120,6 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    processSourceUrls(plugin: Plugin) {
-        if (plugin.sources) {
-            plugin.sources = plugin.sources.map(y => {
-                if (!y.url && y.note) {
-                    const noteUrlMatch = y.note.match('\\url{(.*)}')
-                    if (noteUrlMatch) {
-                        y.url = noteUrlMatch[1]
-                    }
-                }
-                return y
-            })
-        }
-        return plugin
-    }
-
     private loadPluginDetails() {
         this.pluginObs$ = this.route.paramMap.pipe(
             map(params => params.get('name')),
@@ -137,9 +131,9 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                 this.loading = true
 
                 return this.pluginService.getPluginDetails(pluginId).pipe(
-                    tap(this.processSourceUrls),
+                    tap(plugin => processSourceUrls(plugin.sources)),
                     tap(plugin => {
-                        plugin.assets.icon = this.pluginService.getIconUrl(plugin.plugin_id)
+                        plugin.assets.icon = this.pluginService.getIconUrl(plugin.id)
                         this.shortPurpose = this.extractFirstSentence(plugin.purpose)
                         this.loading = false
                         return plugin
@@ -151,7 +145,8 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
 
                             const plugin: Plugin = {
                                 name: displayName,
-                                plugin_id: pluginId,
+                                id: pluginId,
+                                repository: 'N/A',
                                 version: 'N/A',
                                 library_version: 'N/A',
                                 teaser: 'This plugin is currently offline. Previous computations are still available.',
@@ -205,21 +200,8 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         this.isPurposeExpanded = !this.isPurposeExpanded
     }
 
-    processSourceText(source: Source) {
-        const commonFields = [source.author, source.year]
-
-        switch (source.ENTRYTYPE) {
-            case 'article':
-                return [...commonFields, source.journal, source.volume, source.pages].filter(Boolean).join(', ')
-            case 'inbook':
-            case 'inproceedings':
-                return [...commonFields, source.pages].filter(Boolean).join(', ')
-            case 'misc':
-                return [...commonFields].filter(Boolean).join(', ')
-            default:
-                return ''
-        }
-    }
+    formatSourceText = formatSourceText
+    sortSourcesByAuthor = sortSourcesByAuthor
 
     openDialog(plugin: Plugin): void {
         this.dialog.open(this.pluginMethodologyDialog, {

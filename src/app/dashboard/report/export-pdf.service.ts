@@ -192,14 +192,14 @@ export class ExportPDFService {
 
         const imagePromises = imageArtifacts.map(async artifact => {
             const artifactElement = artifactContainers?.find(
-                container => container.nativeElement.getAttribute('data-artifact-id') === artifact.store_id
+                container => container.nativeElement.getAttribute('data-artifact-id') === artifact.filename
             )
 
             if (artifactElement) {
                 const img = artifactElement.nativeElement.querySelector('app-artifact img') as HTMLImageElement
                 if (img && img.src) {
                     try {
-                        imageCache[artifact.store_id] = await this.convertImageToBase64(img.src)
+                        imageCache[artifact.filename] = await this.convertImageToBase64(img.src)
                     } catch (error) {
                         console.warn(`Failed to convert image for ${artifact.name}:`, error)
                     }
@@ -212,7 +212,7 @@ export class ExportPDFService {
 
     private async captureMapFromDOM(artifact: ArtifactEntity, mapImageCache: Record<string, string>): Promise<void> {
         // @ts-ignore: Access global map instance for PDF export
-        const mapInstance = window[`maplibre_map_${artifact.store_id}`]
+        const mapInstance = window[`maplibre_map_${artifact.filename}`]
         if (!mapInstance) return
 
         try {
@@ -226,7 +226,7 @@ export class ExportPDFService {
                 setTimeout(() => resolve(''), 3000)
             })
 
-            if (screenshot?.length > 5000) mapImageCache[artifact.store_id] = screenshot
+            if (screenshot?.length > 5000) mapImageCache[artifact.filename] = screenshot
         } catch (error) {
             console.warn(`Failed to capture map for ${artifact.name}:`, error)
         }
@@ -272,10 +272,10 @@ export class ExportPDFService {
         const isImage = artifact.modality === 'IMAGE'
 
         if (isMap || isImage) {
-            if (imageCache[artifact.store_id]) {
+            if (imageCache[artifact.filename]) {
                 return `
                     <div class="map-image-container">
-                        <img src="${imageCache[artifact.store_id]}" alt="${artifact.name}" />
+                        <img src="${imageCache[artifact.filename]}" alt="${artifact.name}" />
                     </div>
                 `
             }
@@ -283,7 +283,7 @@ export class ExportPDFService {
         }
 
         const artifactComponent = artifactContainers
-            ?.find(container => container.nativeElement.getAttribute('data-artifact-id') === artifact.store_id)
+            ?.find(container => container.nativeElement.getAttribute('data-artifact-id') === artifact.filename)
             ?.nativeElement.querySelector('app-artifact')
 
         if (artifactComponent) {

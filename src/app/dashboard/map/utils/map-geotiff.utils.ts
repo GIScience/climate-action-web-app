@@ -1,6 +1,7 @@
-import type { GeoTIFF as GeoTIFFClass, TypedArray } from 'geotiff'
+import { fromUrl as geoTiffFromUrl, type GeoTIFF as GeoTIFFClass, type TypedArray } from 'geotiff'
 
 export class MapGeoTiffUtils {
+    private static readonly WEB_MERCATOR_CODES = [3857, 900913]
     private static readonly MAX_DIMENSION = 4096
     private static readonly MAX_PIXELS = this.MAX_DIMENSION * this.MAX_DIMENSION
     private static readonly COLOR_PALETTE_SIZE = 768
@@ -66,4 +67,17 @@ export class MapGeoTiffUtils {
     }
 
     static getFirstRaster = (rasters: TypedArray | TypedArray[]) => (Array.isArray(rasters) ? rasters[0] : rasters)
+
+    static async isWebMercator(url: string): Promise<boolean> {
+        try {
+            const tiff = await geoTiffFromUrl(url)
+            const image = await tiff.getImage()
+            const geoKeys = image.getGeoKeys()
+
+            const projectedCSType = geoKeys?.ProjectedCSTypeGeoKey
+            return this.WEB_MERCATOR_CODES.includes(projectedCSType)
+        } catch {
+            return false
+        }
+    }
 }

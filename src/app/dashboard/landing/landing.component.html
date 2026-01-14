@@ -19,7 +19,7 @@
                             @if (latestComputation.aoiName) {
                                 <span class="aoi-name">{{ latestComputation.aoiName }}</span>
                             }
-                            <span class="timestamp">{{ latestComputation.timestamp | date: 'medium' }}</span>
+                            <span class="timestamp">{{ latestComputation.request_ts | date: 'medium' }}</span>
                         </div>
                     </a>
                 </div>
@@ -78,7 +78,7 @@
                     <strong><span></span>{{ 'landing.cta.selectTool' | transloco }}</strong>
                 </p>
                 <p class="or-text">{{ 'landing.cta.or' | transloco }}</p>
-                <button class="btn-primary btn-withtext" (click)="startTour()">
+                <button class="btn-primary btn-withtext--after" (click)="startTour()">
                     {{ 'landing.cta.guidedWalkthrough' | transloco }}
                 </button>
             </div>

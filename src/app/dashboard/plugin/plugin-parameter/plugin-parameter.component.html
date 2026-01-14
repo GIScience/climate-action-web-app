@@ -147,13 +147,13 @@
                 <button
                     type="submit"
                     appearance="primary"
-                    class="btn-primary btn-withtext"
+                    class="btn-primary btn-withtext--after"
                     [disabled]="!user || !form.valid || !hasValidAreaSelection()">
                     <i-lucide [img]="CirclePlay" size="20"></i-lucide>
                     {{ 'plugin.computeStart' | transloco }}
                 </button>
             </div>
-            <button type="button" class="btn-light btn-withtext" (click)="resetForm()">
+            <button type="button" class="btn-light btn-withtext--after" (click)="resetForm()">
                 {{ 'pluginParameter.reset' | transloco }}
             </button>
         </div>

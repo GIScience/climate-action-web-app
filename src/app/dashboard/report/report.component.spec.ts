@@ -53,10 +53,10 @@ interface MockArtifactService {
     image: Observable<ArtifactData | null>
     tableSubject: BehaviorSubject<ArtifactData | null>
     table: Observable<ArtifactData | null>
-    geojsonSubject: BehaviorSubject<ArtifactData | null>
-    geojson: Observable<ArtifactData | null>
-    geotiffSubject: BehaviorSubject<ArtifactData | null>
-    geotiff: Observable<ArtifactData | null>
+    vectorSubject: BehaviorSubject<ArtifactData | null>
+    vector: Observable<ArtifactData | null>
+    rasterSubject: BehaviorSubject<ArtifactData | null>
+    raster: Observable<ArtifactData | null>
     legendSubject: BehaviorSubject<LegendObject | null>
     chartSubject: BehaviorSubject<{ data: ChartData | null; artifact: ArtifactEntity | null }>
     chart: Observable<{ data: ChartData | null; artifact: ArtifactEntity | null }>
@@ -65,8 +65,8 @@ interface MockArtifactService {
     getMarkdown: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     getImage: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     getTable: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getGeoJson: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getGeoTiff: jest.MockedFunction<(artifact: ArtifactEntity) => void>
+    getVector: jest.MockedFunction<(artifact: ArtifactEntity) => void>
+    getRaster: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     getChart: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     getPlotlyChart: jest.MockedFunction<(artifact: ArtifactEntity) => void>
 }
@@ -88,32 +88,34 @@ describe('ReportComponent', () => {
     let pluginService: jest.Mocked<MockPluginService>
 
     const mockArtifact: ArtifactEntity = {
-        store_id: 'test-123',
+        filename: 'test-123',
         name: 'Test Artifact',
         modality: 'MARKDOWN',
         primary: true,
         tags: [],
-        file_path: '/path/to/test/artifact',
         correlation_uuid: '12345678-1234-1234-1234-123456789012',
-        attachments: {}
+        attachments: {},
+        sources: [],
+        rank: 0
     }
 
     const mockMapArtifact: ArtifactEntity = {
-        store_id: 'map-123',
+        filename: 'map-123',
         name: 'Test Map',
-        modality: 'MAP_LAYER_GEOJSON',
+        modality: 'VECTOR_MAP_LAYER',
         primary: true,
         tags: [],
-        file_path: '/path/to/map/artifact',
         correlation_uuid: '12345678-1234-1234-1234-123456789012',
-        attachments: {}
+        attachments: {},
+        sources: [],
+        rank: 0
     }
 
     const mockComputationInfo: ComputationBasicInfo = {
         aoiName: 'Test AOI',
         pluginName: 'Test Plugin',
         correlation_uuid: '12345678-1234-1234-1234-123456789012',
-        timestamp: new Date()
+        request_ts: new Date()
     }
 
     beforeEach(async () => {
@@ -126,9 +128,7 @@ describe('ReportComponent', () => {
             MAX_ARTIFACTS: 10,
             isMapArtifact: jest
                 .fn()
-                .mockImplementation(
-                    modality => modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
-                ),
+                .mockImplementation(modality => modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'),
             getServiceForArtifact: jest.fn(),
             removeArtifact: jest.fn(),
             closeReport: jest.fn(),
@@ -184,10 +184,10 @@ describe('ReportComponent', () => {
                 image: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
                 tableSubject: new BehaviorSubject<ArtifactData | null>(null),
                 table: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
-                geojsonSubject: new BehaviorSubject<ArtifactData | null>(null),
-                geojson: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
-                geotiffSubject: new BehaviorSubject<ArtifactData | null>(null),
-                geotiff: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
+                vectorSubject: new BehaviorSubject<ArtifactData | null>(null),
+                vector: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
+                rasterSubject: new BehaviorSubject<ArtifactData | null>(null),
+                raster: new BehaviorSubject<ArtifactData | null>(null).asObservable(),
                 legendSubject: new BehaviorSubject<LegendObject | null>(null),
                 chartSubject: new BehaviorSubject<{ data: ChartData | null; artifact: ArtifactEntity | null }>({
                     data: null,
@@ -208,14 +208,14 @@ describe('ReportComponent', () => {
                 getMarkdown: jest.fn(),
                 getImage: jest.fn(),
                 getTable: jest.fn(),
-                getGeoJson: jest.fn(),
-                getGeoTiff: jest.fn(),
+                getVector: jest.fn(),
+                getRaster: jest.fn(),
                 getChart: jest.fn(),
                 getPlotlyChart: jest.fn()
             }
 
             reportService.isMapArtifact.mockImplementation(modality => {
-                return modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
+                return modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'
             })
             reportService.getServiceForArtifact.mockReturnValue(mockArtifactService as unknown as ArtifactService)
 

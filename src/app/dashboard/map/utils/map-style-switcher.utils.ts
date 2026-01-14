@@ -159,7 +159,7 @@ export class MapStyleSwitcherControl implements IControl {
 
                 const customLayers = (previousStyle.layers || []).filter(
                     layer =>
-                        /^(custom-|geojson-|geotiff-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-|unified-border-)/.test(
+                        /^(custom-|geojson-|geotiff-|pmtiles-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-|unified-border-)/.test(
                             layer.id
                         ) || layer.id === 'markers'
                 )
@@ -169,7 +169,7 @@ export class MapStyleSwitcherControl implements IControl {
                 const sources = { ...(nextStyle.sources || {}) }
                 Object.entries(previousStyle.sources || {}).forEach(([key, value]) => {
                     if (
-                        /^(custom-|source-geojson-|source-geotiff-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-)/.test(
+                        /^(custom-|source-geojson-|source-geotiff-|source-pmtiles-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-)/.test(
                             key
                         ) ||
                         key === 'markers'
@@ -240,9 +240,9 @@ export class MapStyleSwitcherControl implements IControl {
         const groups: { [key: string]: string[] } = {}
         this.map
             .getStyle()
-            .layers.filter(l => l.id.match(/^(geojson|geotiff)-.*-\d+/))
+            .layers.filter(l => l.id.match(/^(geojson|geotiff|pmtiles)-.*-\d+/))
             .forEach(l => {
-                const base = l.id.match(/^((?:geojson|geotiff)-[^-]+-\d+)/)?.[1]
+                const base = l.id.match(/^((?:geojson|geotiff|pmtiles)-[^-]+-\d+)/)?.[1]
                 if (base) (groups[base] ??= []).push(l.id)
             })
 
@@ -258,7 +258,7 @@ export class MapStyleSwitcherControl implements IControl {
         keys.reverse().forEach(base => {
             const matchingLayer = activeLayers.find(layer => layer.layerIds?.some(id => groups[base].includes(id)))
 
-            const displayName = matchingLayer?.artifact.name ?? base.replace(/^(geojson|geotiff)-|-\d+$/g, '')
+            const displayName = matchingLayer?.artifact.name ?? base.replace(/^(geojson|geotiff|pmtiles)-|-\d+$/g, '')
 
             const container = Object.assign(document.createElement('div'), { className: 'map-layer' })
             if (matchingLayer && matchingLayer.pinned) {

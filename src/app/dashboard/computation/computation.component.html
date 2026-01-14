@@ -39,7 +39,7 @@
                         <div>{{ artifact.name }}</div>
                     </div>
                     <div class="artifact-actions">
-                        @if (artifact.description) {
+                        @if (artifact.description || artifact.sources.length) {
                             <button
                                 class="description-btn btn-onlyicon"
                                 (click)="viewDescription(artifact, $event)"
@@ -74,7 +74,7 @@
                             class="add-to-report-btn"
                             [ngClass]="{
                                 'btn-onlyicon': !isReportVisible,
-                                'btn-small btn-alt btn-withtext': isReportVisible
+                                'btn-small btn-alt btn-withtext--after': isReportVisible
                             }"
                             (click)="addToReport(artifact)"
                             [tp]="'computation.addToReport' | transloco"
@@ -104,8 +104,27 @@
     <div class="description-dialog">
         <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
             <div class="description-dialog__content" scrollViewport>
-                <h3>{{ 'artifact.detailedDescription' | transloco }}</h3>
-                <app-markdown [rawMarkdown]="data.description"></app-markdown>
+                @if (data.description) {
+                    <h3>{{ 'artifact.detailedDescription' | transloco }}</h3>
+                    <app-markdown [rawMarkdown]="data.description"></app-markdown>
+                }
+                @if (data.sources && data.sources.length > 0) {
+                    <div class="artifact-sources-section">
+                        <h3>{{ 'artifact.sources' | transloco }}</h3>
+                        <ul class="artifact-sources">
+                            @for (source of data.sources; track source.ID) {
+                                <li>
+                                    {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
+                                    @if (source.url) {
+                                        <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
+                                            source.url
+                                        }}</a>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
             </div>
         </ng-scrollbar>
         <button (click)="closeDescriptionDialog()" class="close-dialog">

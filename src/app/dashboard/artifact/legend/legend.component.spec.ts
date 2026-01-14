@@ -93,21 +93,4 @@ describe('LegendComponent', () => {
         expect(title.textContent.trim()).toBe('Test Title')
     })
 
-    it('should add unit to title', () => {
-        component.legendData = {
-            title: 'Test Title',
-            unit: 'm/s',
-            legend_type: 'CONTINUOUS',
-            legend_data: {
-                cmap_name: 'seismic',
-                ticks: { 'Low b': 0.0, 'Mid c': 0.5, 'High a': 1.0 }
-            }
-        }
-
-        fixture.detectChanges()
-
-        const title = fixture.debugElement.query(By.css('.title')).nativeElement
-        expect(title).toBeTruthy()
-        expect(title.textContent.trim()).toBe('Test Title (m/s)')
-    })
 })

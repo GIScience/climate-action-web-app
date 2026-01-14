@@ -112,6 +112,7 @@
 
         .plugin-links-container {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-start;
             padding: 15px 0 5px;
@@ -242,12 +243,19 @@
         padding: 5px;
     }
 
-    ul.plugin-sources {
-        list-style: unset;
-        padding: 0 2em;
+    .plugin-sources {
+        .plugin-source-entry {
+            margin-bottom: 0.75em;
+            padding-left: 2em;
+            text-indent: -2em;
 
-        li {
-            margin-bottom: 0.5em;
+            .source-title {
+                font-weight: 600;
+            }
+
+            a {
+                word-break: break-all;
+            }
         }
     }
 }

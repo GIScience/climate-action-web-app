@@ -25,11 +25,11 @@ export class ArtifactService {
     private tableSubject = new BehaviorSubject<ArtifactData | null>(null)
     table = this.tableSubject.asObservable()
 
-    private geojsonSubject = new BehaviorSubject<ArtifactData | null>(null)
-    geojson = this.geojsonSubject.asObservable()
+    private vectorSubject = new BehaviorSubject<ArtifactData | null>(null)
+    vector = this.vectorSubject.asObservable()
 
-    private geotiffSubject = new BehaviorSubject<ArtifactData | null>(null)
-    geotiff = this.geotiffSubject.asObservable()
+    private rasterSubject = new BehaviorSubject<ArtifactData | null>(null)
+    raster = this.rasterSubject.asObservable()
 
     private legendSubject = new BehaviorSubject<LegendObject | null>(null)
     legend = this.legendSubject.asObservable()
@@ -48,28 +48,28 @@ export class ArtifactService {
 
     getMarkdown(artifact: Artifact): void {
         this.markdownSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
             ...artifact
         })
     }
 
     getImage(artifact: Artifact): void {
         this.imageSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
             ...artifact
         })
     }
 
     getTable(artifact: Artifact): void {
         this.tableSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
             ...artifact
         })
     }
 
     getChart(artifact: Artifact): void {
         this.http
-            .get<ChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+            .get<ChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`)
             .subscribe(data => {
                 this.chartSubject.next({
                     data: data,
@@ -80,7 +80,7 @@ export class ArtifactService {
 
     getPlotlyChart(artifact: Artifact): void {
         this.http
-            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`)
+            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`)
             .subscribe(data => {
                 this.plotlyChartSubject.next({
                     data: data,
@@ -89,16 +89,18 @@ export class ArtifactService {
             })
     }
 
-    getGeoTiff(artifact: Artifact): void {
-        this.geotiffSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+    getRaster(artifact: Artifact): void {
+        const filename = artifact.attachments.display_filename || artifact.filename
+        this.rasterSubject.next({
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`,
             ...artifact
         })
     }
 
-    getGeoJson(artifact: Artifact): void {
-        this.geojsonSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`,
+    getVector(artifact: Artifact): void {
+        const filename = artifact.attachments.display_filename || artifact.filename
+        this.vectorSubject.next({
+            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`,
             ...artifact
         })
     }
@@ -124,11 +126,11 @@ export class ArtifactService {
                 case 'TABLE':
                     this.getTable(artifact)
                     break
-                case 'MAP_LAYER_GEOJSON':
-                    this.getGeoJson(artifact)
+                case 'VECTOR_MAP_LAYER':
+                    this.getVector(artifact)
                     break
-                case 'MAP_LAYER_GEOTIFF':
-                    this.getGeoTiff(artifact)
+                case 'RASTER_MAP_LAYER':
+                    this.getRaster(artifact)
                     break
                 case 'CHART':
                     this.getChart(artifact)
@@ -160,8 +162,8 @@ export class ArtifactService {
         this.tableSubject.next(null)
         this.chartSubject.next({ data: null, artifact: null })
         this.plotlyChartSubject.next({ data: null, artifact: null })
-        this.geojsonSubject.next(null)
-        this.geotiffSubject.next(null)
+        this.vectorSubject.next(null)
+        this.rasterSubject.next(null)
         this.legendSubject.next(null)
     }
 }
