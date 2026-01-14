@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
+import { processSourceUrls } from '@app/utils/source.utils'
 import { TranslocoTestingModule } from '@jsverse/transloco'
 import { ToastrModule } from 'ngx-toastr'
 import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
@@ -51,7 +52,7 @@ describe('PluginComponent', () => {
         assets: {
             icon: '...'
         },
-        plugin_id: 'blueprint_plugin',
+        id: 'blueprint_plugin',
         operator_schema: {},
         library_version: '2.6.4'
     } as Plugin
@@ -77,7 +78,8 @@ describe('PluginComponent', () => {
     })
 
     it('should update url when present in notes', () => {
-        expect(component.processSourceUrls(test_plugin).sources).toEqual([
+        processSourceUrls(test_plugin.sources)
+        expect(test_plugin.sources).toEqual([
             {
                 url: 'https://some.url.com',
                 ENTRYTYPE: 'misc',

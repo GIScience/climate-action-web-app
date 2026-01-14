@@ -18,23 +18,22 @@ describe('ArtifactService', () => {
     const test_artifact = {
         name: 'test_artifact',
         modality: 'IMAGE',
-        file_path: './',
         summary: 'artifact summary',
         description: 'artifact description',
         correlation_uuid: correlation_uuid,
-        store_id: store_uuid
+        filename: store_uuid,
+        attachments: {}
     } as Artifact
 
     const test_legend = { legend_type: 'DISCRETE', legend_data: { a: '#ffffff' } } as LegendObject
 
     const test_geojson = {
         name: 'test_artifact',
-        modality: 'MAP_LAYER_GEOJSON',
-        file_path: './',
+        modality: 'VECTOR_MAP_LAYER',
         summary: 'artifact summary',
         description: 'artifact description',
         correlation_uuid: correlation_uuid,
-        store_id: store_uuid,
+        filename: store_uuid,
         attachments: { legend: test_legend }
     } as Artifact
 
@@ -80,9 +79,9 @@ describe('ArtifactService', () => {
         })
     })
 
-    it('should get geojson artifact item', done => {
-        service.getGeoJson(test_artifact)
-        service.geojson.subscribe(x => {
+    it('should get vector artifact item', done => {
+        service.getVector(test_artifact)
+        service.vector.subscribe(x => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,
@@ -93,9 +92,9 @@ describe('ArtifactService', () => {
         })
     })
 
-    it('should get geotiff artifact item', done => {
-        service.getGeoTiff(test_artifact)
-        service.geotiff.subscribe(x => {
+    it('should get raster artifact item', done => {
+        service.getRaster(test_artifact)
+        service.raster.subscribe(x => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,

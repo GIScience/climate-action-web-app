@@ -31,8 +31,9 @@
         "loading": "Loading...",
         "readMore": "Read more",
         "showLess": "Show less",
-        "methodology": "Read about the methodology »",
-        "credits": "View credits »",
+        "methodology": "Read about the methodology",
+        "credits": "View credits",
+        "repository": "Access source code",
         "computations": "Computations",
         "newComputation": "New computation",
         "loginToCompute": "Please login to request a computation.",
@@ -117,7 +118,8 @@
     },
     "artifact": {
         "abstract": "Abstract",
-        "detailedDescription": "Detailed Description"
+        "detailedDescription": "Detailed Description",
+        "sources": "Sources"
     },
     "report": {
         "title": "Report Builder",

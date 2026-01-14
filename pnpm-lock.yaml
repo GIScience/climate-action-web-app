@@ -41,6 +41,9 @@ importers:
       '@angular/router':
         specifier: ^20.3.15
         version: 20.3.15(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@20.3.15(@angular/animations@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
+      '@geomatico/maplibre-cog-protocol':
+        specifier: ^0.8.0
+        version: 0.8.0(maplibre-gl@5.13.0)
       '@jsverse/transloco':
         specifier: 8.2.0
         version: 8.2.0(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)(typescript@5.9.3)
@@ -128,6 +131,9 @@ importers:
       plotly.js-strict-dist:
         specifier: ^3.0.1
         version: 3.3.0
+      pmtiles:
+        specifier: ^4.3.0
+        version: 4.3.0
       remarkable:
         specifier: ^2.0.1
         version: 2.0.1
@@ -1181,6 +1187,11 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@geomatico/maplibre-cog-protocol@0.8.0':
+    resolution: {integrity: sha512-q5Pg7pOp/fRB/UrAUEZ4AEF/B68XwvxMg0YRk0z+UwwHfOKQThkY7u91Kusx2AwIme6QOURFK6Fvw39ooj68RQ==}
+    peerDependencies:
+      maplibre-gl: ^4.5.0 || ^5.0.0
+
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
     engines: {node: '>=14.0.0'}
@@ -1630,6 +1641,10 @@ packages:
 
   '@mapbox/point-geometry@1.1.0':
     resolution: {integrity: sha512-YGcBz1cg4ATXDCM/71L9xveh4dynfGmcLDqufR+nQQy3fKwsAZsWd/x4621/6uJaeB9mwOHE6hPeDgXz9uViUQ==}
+
+  '@mapbox/sphericalmercator@1.2.0':
+    resolution: {integrity: sha512-ZTOuuwGuMOJN+HEmG/68bSEw15HHaMWmQ5gdTsWdWsjDe56K1kGvLOK6bOSC8gWgIvEO0w6un/2Gvv1q5hJSkQ==}
+    hasBin: true
 
   '@mapbox/tiny-sdf@2.0.7':
     resolution: {integrity: sha512-25gQLQMcpivjOSA40g3gO6qgiFPDpWRoMfd+G/GoppPIeP6JDaMMkMrEJnMZhKyyS6iKwVt5YKu02vCUyJM3Ug==}
@@ -5038,6 +5053,9 @@ packages:
   plotly.js-strict-dist@3.3.0:
     resolution: {integrity: sha512-+rSBN4MAbVqv2UE7/hIOAXRiDJYf2azS2ISaX4qpI2FayIkhsFyphDwfHXcQYPFmwrMSVp38o8WkT+jI0xHs+g==}
 
+  pmtiles@4.3.0:
+    resolution: {integrity: sha512-wnzQeSiYT/MyO63o7AVxwt7+uKqU0QUy2lHrivM7GvecNy0m1A4voVyGey7bujnEW5Hn+ZzLdvHPoFaqrOzbPA==}
+
   pngjs@6.0.0:
     resolution: {integrity: sha512-TRzzuFRRmEoSW/p1KVAmiOgPco2Irlah+bGFCeNfJXxxYGwSw7YwAOAcd7X28K/m5bjBWKsC29KyoMfHbypayg==}
     engines: {node: '>=12.13.0'}
@@ -5163,6 +5181,10 @@ packages:
   quick-lru@6.1.2:
     resolution: {integrity: sha512-AAFUA5O1d83pIHEhJwWCq/RQcRukCkn/NSm2QsTEMle5f2hP0ChI2+3Xb051PZCkLryI/Ir1MVKviT2FIloaTQ==}
     engines: {node: '>=12'}
+
+  quick-lru@7.3.0:
+    resolution: {integrity: sha512-k9lSsjl36EJdK7I06v7APZCbyGT2vMTsYSRX1Q2nbYmnkBqgUhRkAuzH08Ciotteu/PLJmIF2+tti7o3C/ts2g==}
+    engines: {node: '>=18'}
 
   quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
@@ -7007,6 +7029,14 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
+  '@geomatico/maplibre-cog-protocol@0.8.0(maplibre-gl@5.13.0)':
+    dependencies:
+      '@mapbox/sphericalmercator': 1.2.0
+      d3-scale: 4.0.2
+      geotiff: 2.1.3
+      maplibre-gl: 5.13.0
+      quick-lru: 7.3.0
+
   '@hapi/address@5.1.1':
     dependencies:
       '@hapi/hoek': 11.0.7
@@ -7539,6 +7569,8 @@ snapshots:
   '@mapbox/mapbox-gl-rtl-text@0.3.0': {}
 
   '@mapbox/point-geometry@1.1.0': {}
+
+  '@mapbox/sphericalmercator@1.2.0': {}
 
   '@mapbox/tiny-sdf@2.0.7': {}
 
@@ -9180,7 +9212,6 @@ snapshots:
   d3-array@3.2.4:
     dependencies:
       internmap: 2.0.3
-    optional: true
 
   d3-axis@3.0.0:
     optional: true
@@ -9199,8 +9230,7 @@ snapshots:
       d3-path: 3.1.0
     optional: true
 
-  d3-color@3.1.0:
-    optional: true
+  d3-color@3.1.0: {}
 
   d3-contour@4.0.2:
     dependencies:
@@ -9243,8 +9273,7 @@ snapshots:
       d3-timer: 3.0.1
     optional: true
 
-  d3-format@3.1.0:
-    optional: true
+  d3-format@3.1.0: {}
 
   d3-geo@3.1.1:
     dependencies:
@@ -9257,7 +9286,6 @@ snapshots:
   d3-interpolate@3.0.1:
     dependencies:
       d3-color: 3.1.0
-    optional: true
 
   d3-path@1.0.9:
     optional: true
@@ -9293,7 +9321,6 @@ snapshots:
       d3-interpolate: 3.0.1
       d3-time: 3.1.0
       d3-time-format: 4.1.0
-    optional: true
 
   d3-selection@3.0.0:
     optional: true
@@ -9311,12 +9338,10 @@ snapshots:
   d3-time-format@4.1.0:
     dependencies:
       d3-time: 3.1.0
-    optional: true
 
   d3-time@3.1.0:
     dependencies:
       d3-array: 3.2.4
-    optional: true
 
   d3-timer@3.0.1:
     optional: true
@@ -10192,8 +10217,7 @@ snapshots:
   internmap@1.0.1:
     optional: true
 
-  internmap@2.0.3:
-    optional: true
+  internmap@2.0.3: {}
 
   iobuffer@5.4.0: {}
 
@@ -11587,6 +11611,10 @@ snapshots:
 
   plotly.js-strict-dist@3.3.0: {}
 
+  pmtiles@4.3.0:
+    dependencies:
+      fflate: 0.8.2
+
   pngjs@6.0.0: {}
 
   pngjs@7.0.0: {}
@@ -11697,6 +11725,8 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quick-lru@6.1.2: {}
+
+  quick-lru@7.3.0: {}
 
   quickselect@3.0.0: {}
 

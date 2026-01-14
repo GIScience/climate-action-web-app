@@ -49,5 +49,8 @@ console.error = (...args: any[]) => {
     if (fullMessage.includes('Plugin null does not exist')) {
         return
     }
+    if (fullMessage.includes('Unsupported vector file format')) {
+        return
+    }
     originalConsoleError.apply(console, args)
 }

@@ -5,8 +5,8 @@ import type { Geometry } from 'ol/geom'
 import { BehaviorSubject, Subscription } from 'rxjs'
 import { Artifact, ArtifactData, ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { GeojsonComponent } from '../artifact/geojson/geojson.component'
-import { GeoTiffComponent } from '../artifact/geotiff/geotiff.component'
+import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
+import { RasterComponent } from '@app/dashboard/artifact/raster/raster.component'
 import type { MapService } from './map.service'
 import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 
@@ -14,7 +14,7 @@ export interface MapArtifactLayer {
     artifact: ArtifactEntity
     layerIds?: string[]
     sourceId?: string
-    componentRef?: ComponentRef<GeojsonComponent | GeoTiffComponent>
+    componentRef?: ComponentRef<VectorComponent | RasterComponent>
     pinned: boolean
     computationId?: string
     computationGeometry?: Feature<Geometry>
@@ -34,12 +34,12 @@ export class MapArtifactManagerService implements OnDestroy {
     private container?: ViewContainerRef
     private map?: MapLibreMap
     private mapService?: MapService
-    private activeArtifactId: { correlation_uuid: string; store_id: string } | null = null
+    private activeArtifactId: { correlation_uuid: string; filename: string } | null = null
 
     constructor() {
         const streams = [
-            { key: 'geojson', component: GeojsonComponent },
-            { key: 'geotiff', component: GeoTiffComponent }
+            { key: 'vector', component: VectorComponent },
+            { key: 'raster', component: RasterComponent }
         ] as const
 
         for (const { key, component } of streams) {
@@ -66,7 +66,7 @@ export class MapArtifactManagerService implements OnDestroy {
         this.mapService = mapService
     }
 
-    setActiveArtifactId(artifact: { correlation_uuid: string; store_id: string } | null): void {
+    setActiveArtifactId(artifact: { correlation_uuid: string; filename: string } | null): void {
         this.activeArtifactId = artifact
     }
 
@@ -74,7 +74,7 @@ export class MapArtifactManagerService implements OnDestroy {
         return (
             this.activeArtifactId !== null &&
             this.activeArtifactId.correlation_uuid === artifact.correlation_uuid &&
-            this.activeArtifactId.store_id === artifact.store_id
+            this.activeArtifactId.filename === artifact.filename
         )
     }
 
@@ -97,7 +97,7 @@ export class MapArtifactManagerService implements OnDestroy {
     }
 
     isMapArtifact(modality: Artifact['modality']): boolean {
-        return modality === 'MAP_LAYER_GEOJSON' || modality === 'MAP_LAYER_GEOTIFF'
+        return modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'
     }
 
     getLayerInfo(artifact: Artifact): MapArtifactLayer | undefined {
@@ -206,7 +206,7 @@ export class MapArtifactManagerService implements OnDestroy {
         artifact: Artifact,
         layerIds: string[],
         sourceId: string,
-        componentRef?: ComponentRef<GeojsonComponent | GeoTiffComponent>
+        componentRef?: ComponentRef<VectorComponent | RasterComponent>
     ): void {
         const current = this.layers$.value
         const idx = current.findIndex(l => this.same(l.artifact, artifact))
@@ -268,11 +268,11 @@ export class MapArtifactManagerService implements OnDestroy {
     }
 
     private same(a: Artifact, b: Artifact): boolean {
-        return a.correlation_uuid === b.correlation_uuid && a.store_id === b.store_id
+        return a.correlation_uuid === b.correlation_uuid && a.filename === b.filename
     }
 
     private layerKey(layer: MapArtifactLayer, index: number): string {
-        return layer.computationId || layer.artifact.correlation_uuid || layer.artifact.store_id || `layer-${index}`
+        return layer.computationId || layer.artifact.correlation_uuid || layer.artifact.filename || `layer-${index}`
     }
 
     private getPinnedIds(layers: MapArtifactLayer[]): Set<string> {
@@ -290,7 +290,7 @@ export class MapArtifactManagerService implements OnDestroy {
         return [...map.values()]
     }
 
-    private createMapComponent(data: ArtifactData, component: Type<GeojsonComponent | GeoTiffComponent>): void {
+    private createMapComponent(data: ArtifactData, component: Type<VectorComponent | RasterComponent>): void {
         if (!this.container) {
             console.warn('MapArtifactManagerService: no component container registered.')
             return

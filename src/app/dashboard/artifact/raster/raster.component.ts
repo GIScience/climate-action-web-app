@@ -1,15 +1,15 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core'
-import { MapArtifactManagerService } from '../../map/map-artifact-manager.service'
-import { MapService } from '../../map/map.service'
-import { Artifact, ArtifactEntity } from '../artifact.interface'
+import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
+import { MapService } from '@app/dashboard/map/map.service'
+import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.interface'
 
 @Component({
-    selector: 'app-geotiff',
+    selector: 'app-raster',
     imports: [],
-    templateUrl: './geotiff.component.html',
-    styleUrls: ['./geotiff.component.scss']
+    templateUrl: './raster.component.html',
+    styleUrls: ['./raster.component.scss']
 })
-export class GeoTiffComponent implements OnInit, OnDestroy {
+export class RasterComponent implements OnInit, OnDestroy {
     private mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
 
@@ -19,7 +19,7 @@ export class GeoTiffComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         if (!this.inputData?.artifact || !this.inputData.url) return
         try {
-            const layer = await this.mapService.addGeoTiffLayer(this.inputData.url, this.inputData.artifact.name)
+            const layer = await this.mapService.addRasterLayer(this.inputData.url, this.inputData.artifact.name)
 
             if (layer && this.inputData.artifact) {
                 this.geoTiffLayer = { id: layer.id, sourceId: layer.sourceId, name: layer.name }

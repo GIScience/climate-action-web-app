@@ -26,9 +26,8 @@ describe('PlotlyChartComponent', () => {
                 name: 'Test Chart',
                 modality: 'CHART_PLOTLY',
                 primary: true,
-                file_path: 'test.json',
                 correlation_uuid: '123',
-                store_id: '456',
+                filename: '456',
                 attachments: {}
             } as Artifact
         }

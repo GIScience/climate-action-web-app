@@ -1,12 +1,15 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
+import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
 import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
+import { cogProtocol } from '@geomatico/maplibre-cog-protocol'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
+import { fromUrl as geoTiffFromUrl } from 'geotiff'
 import maplibregl, {
     GeoJSONSource,
     IControl,
@@ -22,6 +25,7 @@ import { Collection } from 'ol'
 import { Extent } from 'ol/extent'
 import Feature from 'ol/Feature'
 import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
+import { PMTiles, Protocol } from 'pmtiles'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
@@ -32,7 +36,6 @@ import { MapFoWManagerService } from './map-fow-manager.service'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
-import { MapGeoTiffUtils } from './utils/map-geotiff.utils'
 import { MapGlobeUtils } from './utils/map-globe.utils'
 import { MapStyle, MapStyleSwitcherControl } from './utils/map-style-switcher.utils'
 
@@ -88,6 +91,39 @@ interface RasterLayer {
     visible?: boolean
 }
 
+// Shared paint/layout styles for vector layers (GeoJSON and PMTiles)
+const VECTOR_LAYER_STYLES = {
+    fill: {
+        paint: {
+            'fill-color': ['coalesce', ['get', 'color'], '#3388ff'] as maplibregl.ExpressionSpecification,
+            'fill-opacity': 0.8
+        }
+    },
+    outline: {
+        paint: {
+            'line-color': ['coalesce', ['get', 'color'], '#3388ff'] as maplibregl.ExpressionSpecification,
+            'line-width': 2
+        }
+    },
+    line: {
+        paint: {
+            'line-color': ['coalesce', ['get', 'color'], '#3388ff'] as maplibregl.ExpressionSpecification,
+            'line-width': 3,
+            'line-opacity': 0.8
+        },
+        layout: { 'line-cap': 'round' as const, 'line-join': 'round' as const }
+    },
+    point: {
+        paint: {
+            'circle-radius': 5,
+            'circle-color': ['coalesce', ['get', 'color'], '#3388ff'] as maplibregl.ExpressionSpecification,
+            'circle-stroke-color': '#000000',
+            'circle-stroke-width': 1,
+            'circle-opacity': 0.8
+        }
+    }
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -130,7 +166,7 @@ export class MapService {
     // Layer Management
     regionLayer: RasterLayer | undefined
     selectedRegionLayer: VectorLayerGroup | undefined
-    geojsonLayer: VectorLayerGroup | undefined
+    vectorLayer: VectorLayerGroup | undefined
 
     // Drawing & Measurement Tools
     terraDrawControl: MaplibreTerradrawControl | undefined
@@ -400,8 +436,8 @@ export class MapService {
                     layers: ['region-boundaries-fill']
                 })
                 showPointer = features.length > 0
-            } else if (this.geojsonLayer) {
-                const existingLayers = this.geojsonLayer.layerIds.filter(id => this.map!.getLayer(id))
+            } else if (this.vectorLayer) {
+                const existingLayers = this.vectorLayer.layerIds.filter((id: string) => this.map!.getLayer(id))
                 if (existingLayers.length > 0) {
                     const features = this.map.queryRenderedFeatures(e.point, { layers: existingLayers })
                     showPointer = features.length > 0
@@ -599,82 +635,110 @@ export class MapService {
         return extent
     }
 
+    async addPmtilesLayer(url: string, artifactName: string): Promise<VectorLayerGroup | undefined> {
+        if (!this.map) return undefined
+
+        const layerId = `pmtiles-${artifactName}-${Date.now()}`
+        const sourceId = `source-${layerId}`
+
+        // Register PMTiles protocol with MapLibre
+        const protocol = new Protocol()
+        maplibregl.addProtocol('pmtiles', protocol.tile)
+
+        const pmtiles = new PMTiles(url)
+        protocol.add(pmtiles)
+
+        // Get source-layer name from PMTiles metadata
+        const metadata = (await pmtiles.getMetadata()) as { vector_layers?: { id: string }[] }
+        const sourceLayer = metadata.vector_layers?.[0]?.id ?? artifactName
+
+        this.map.addSource(sourceId, {
+            type: 'vector',
+            url: `pmtiles://${url}`
+        })
+
+        return this.configureVectorLayers(layerId, sourceId, artifactName, { sourceLayer })
+    }
+
     addGeoJsonLayer(data: FeatureCollection, artifactName: string): VectorLayerGroup | undefined {
         if (!this.map) return undefined
 
         const layerId = `geojson-${artifactName}-${Date.now()}`
         const sourceId = `source-${layerId}`
+
+        this.map.addSource(sourceId, { type: 'geojson', data: data })
+
+        return this.configureVectorLayers(layerId, sourceId, artifactName)
+    }
+
+    configureVectorLayers(
+        layerId: string,
+        sourceId: string,
+        artifactName: string,
+        options?: { sourceLayer?: string }
+    ): VectorLayerGroup | undefined {
+        if (!this.map) return undefined
+
         const layerIds: string[] = []
 
-        this.map.addSource(sourceId, { type: 'geojson', data })
-
-        const features = data.features || []
-        const geomTypes = new Set(features.map((f: GeoJSONFeature) => f.geometry?.type))
+        // Filters that include Multi* geometry types for GeoJSON
+        const polygonFilter: maplibregl.FilterSpecification = [
+            'in',
+            ['geometry-type'],
+            ['literal', ['Polygon', 'MultiPolygon']]
+        ]
+        const lineFilter: maplibregl.FilterSpecification = [
+            'in',
+            ['geometry-type'],
+            ['literal', ['LineString', 'MultiLineString']]
+        ]
+        const pointFilter: maplibregl.FilterSpecification = [
+            'in',
+            ['geometry-type'],
+            ['literal', ['Point', 'MultiPoint']]
+        ]
 
         const layerConfigs = [
             {
-                check: geomTypes.has('Polygon') || geomTypes.has('MultiPolygon'),
-                layers: [
-                    {
-                        id: `${layerId}-fill`,
-                        type: 'fill' as const,
-                        filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
-                        paint: { 'fill-color': ['coalesce', ['get', 'color'], '#3388ff'], 'fill-opacity': 0.8 }
-                    },
-                    {
-                        id: `${layerId}-outline`,
-                        type: 'line' as const,
-                        filter: ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
-                        paint: { 'line-color': ['coalesce', ['get', 'color'], '#3388ff'], 'line-width': 2 }
-                    }
-                ]
+                id: `${layerId}-fill`,
+                type: 'fill' as const,
+                filter: polygonFilter,
+                ...VECTOR_LAYER_STYLES.fill
             },
             {
-                check: geomTypes.has('LineString') || geomTypes.has('MultiLineString'),
-                layers: [
-                    {
-                        id: `${layerId}-line`,
-                        type: 'line' as const,
-                        filter: ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]],
-                        paint: {
-                            'line-color': ['coalesce', ['get', 'color'], '#3388ff'],
-                            'line-width': 3,
-                            'line-opacity': 0.8
-                        },
-                        layout: { 'line-cap': 'round', 'line-join': 'round' }
-                    }
-                ]
+                id: `${layerId}-outline`,
+                type: 'line' as const,
+                filter: polygonFilter,
+                ...VECTOR_LAYER_STYLES.outline
             },
+
             {
-                check: geomTypes.has('Point') || geomTypes.has('MultiPoint'),
-                layers: [
-                    {
-                        id: `${layerId}-point`,
-                        type: 'circle' as const,
-                        filter: ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]],
-                        paint: {
-                            'circle-radius': 5,
-                            'circle-color': ['coalesce', ['get', 'color'], '#3388ff'],
-                            'circle-stroke-color': '#000000',
-                            'circle-stroke-width': 1,
-                            'circle-opacity': 0.8
-                        }
-                    }
-                ]
+                id: `${layerId}-line`,
+                type: 'line' as const,
+                filter: lineFilter,
+                ...VECTOR_LAYER_STYLES.line
+            },
+
+            {
+                id: `${layerId}-point`,
+                type: 'circle' as const,
+                filter: pointFilter,
+                ...VECTOR_LAYER_STYLES.point
             }
         ]
 
         layerConfigs.forEach(config => {
-            if (config.check) {
-                config.layers.forEach(layer => {
-                    this.map!.addLayer({ source: sourceId, ...layer } as maplibregl.LayerSpecification)
-                    layerIds.push(layer.id)
-                })
-            }
+            const layerSpec: maplibregl.LayerSpecification = {
+                source: sourceId,
+                ...(options?.sourceLayer && { 'source-layer': options.sourceLayer }),
+                ...config
+            } as maplibregl.LayerSpecification
+            this.map!.addLayer(layerSpec)
+            layerIds.push(config.id)
         })
 
         const layerGroup: VectorLayerGroup = { layerIds, sourceId, name: artifactName, baseLayerId: layerId }
-        this.geojsonLayer = layerGroup
+        this.vectorLayer = layerGroup
 
         MapGeoJsonUtils.setupGeoJsonInteractions(
             this.map,
@@ -691,14 +755,13 @@ export class MapService {
         return layerGroup
     }
 
-    async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
+    async addLegacyGeoTiffLayer(sourceURL: string, artifactName?: string) {
         if (!this.map) return undefined
 
         const layerId = `geotiff-${artifactName || 'layer'}-${Date.now()}`
         const sourceId = `source-${layerId}`
 
         try {
-            const { fromUrl: geoTiffFromUrl } = await import('geotiff')
             const tiff = await geoTiffFromUrl(sourceURL)
             const image = await tiff.getImage()
             const bbox = image.getBoundingBox()
@@ -753,17 +816,60 @@ export class MapService {
         }
     }
 
+    async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
+        if (!this.map) return undefined
+
+        maplibregl.addProtocol('cog', cogProtocol)
+
+        const layerId = `geotiff-${artifactName || 'layer'}-${Date.now()}`
+        const sourceId = `source-${layerId}`
+
+        this.map.addSource(sourceId, {
+            type: 'raster',
+            url: `cog://${sourceURL}`,
+            tileSize: 256
+        })
+
+        this.map.addLayer({
+            id: layerId,
+            source: sourceId,
+            type: 'raster',
+            paint: { 'raster-opacity': 0.8 }
+        })
+
+        this.layerSwitcherControl?.updateLayerControls()
+
+        return {
+            id: layerId,
+            sourceId,
+            name: artifactName || 'GeoTIFF Layer',
+            setOpacity: (opacity: number) => this.map?.setPaintProperty(layerId, 'raster-opacity', opacity),
+            setVisible: (visible: boolean) =>
+                this.map?.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none')
+        }
+    }
+
+    async addRasterLayer(sourceURL: string, artifactName?: string) {
+        const isWebMercator = await MapGeoTiffUtils.isWebMercator(sourceURL)
+
+        if (isWebMercator) {
+            return this.addGeoTiffLayer(sourceURL, artifactName)
+        } else {
+            return this.addLegacyGeoTiffLayer(sourceURL, artifactName)
+        }
+    }
+
     private removeManagedMapLayer(layer: MapArtifactLayer): void {
         if (!this.mapArtifactManager) return
 
         if (layer.layerIds && layer.sourceId) {
-            if (layer.artifact.modality === 'MAP_LAYER_GEOJSON') {
-                this.removeGeoJsonLayer({
+            if (layer.artifact.modality === 'VECTOR_MAP_LAYER') {
+                this.removeVectorLayer({
                     layerIds: layer.layerIds,
                     sourceId: layer.sourceId,
                     name: layer.artifact.name
                 })
-            } else if (layer.artifact.modality === 'MAP_LAYER_GEOTIFF' && layer.layerIds.length > 0) {
+            } else if (layer.artifact.modality === 'RASTER_MAP_LAYER' && layer.layerIds.length > 0) {
                 this.removeGeoTiffLayer(layer.layerIds[0], layer.sourceId)
             }
         }
@@ -772,7 +878,7 @@ export class MapService {
         this.layerSwitcherControl?.updateLayerControls()
     }
 
-    removeGeoJsonLayer(layerGroup: VectorLayerGroup): void {
+    removeVectorLayer(layerGroup: VectorLayerGroup): void {
         if (!this.map || !layerGroup) return
 
         const baseLayerId = this.getBaseLayerId(layerGroup)
@@ -787,8 +893,8 @@ export class MapService {
             this.map.removeSource(layerGroup.sourceId)
         }
 
-        if (this.geojsonLayer?.sourceId === layerGroup.sourceId) {
-            this.geojsonLayer = undefined
+        if (this.vectorLayer?.sourceId === layerGroup.sourceId) {
+            this.vectorLayer = undefined
         }
 
         if (baseLayerId) {

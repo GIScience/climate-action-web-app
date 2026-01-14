@@ -238,14 +238,14 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             }
         })
 
-        this.pluginService.computePlugin(this.plugin.plugin_id, computeRequest).subscribe({
+        this.pluginService.computePlugin(this.plugin.id, computeRequest).subscribe({
             next: async data => {
                 const compute: ComputationDatabaseEntity = {
                     correlation_uuid: data.correlation_uuid,
-                    pluginId: this.plugin.plugin_id,
+                    pluginId: this.plugin.id,
                     aoiName: aoiName,
                     status: 'PENDING' as ComputationRunState,
-                    timestamp: new Date()
+                    request_ts: new Date()
                 }
 
                 try {

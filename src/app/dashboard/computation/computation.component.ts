@@ -13,6 +13,7 @@ import {
 } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
+import { formatSourceText } from '@app/utils/source.utils'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -91,6 +92,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
     @ViewChild('descriptionDialog') descriptionDialog!: TemplateRef<{
         description: string
+        sources: ArtifactEntity['sources']
     }>
 
     private artifactFetchSubscription: Subscription | undefined
@@ -111,6 +113,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
     readonly PinOff = PinOff
     readonly X = X
     readonly DefaultTag = DefaultTag
+
+    formatSourceText = formatSourceText
 
     ngOnInit(): void {
         this.reportVisibilitySubscription = this.reportService.isVisible$.subscribe(isVisible => {
@@ -207,13 +211,13 @@ export class ComputationComponent implements OnInit, OnDestroy {
     private removeMapArtifact(artifact: ArtifactEntity): void {
         const layerInfo = this.mapArtifactManager.getLayerInfo(artifact)
         if (layerInfo?.layerIds && layerInfo.sourceId) {
-            if (artifact.modality === 'MAP_LAYER_GEOJSON') {
-                this.mapService.removeGeoJsonLayer({
+            if (artifact.modality === 'VECTOR_MAP_LAYER') {
+                this.mapService.removeVectorLayer({
                     layerIds: layerInfo.layerIds,
                     sourceId: layerInfo.sourceId,
                     name: artifact.name
                 })
-            } else if (artifact.modality === 'MAP_LAYER_GEOTIFF' && layerInfo.layerIds[0]) {
+            } else if (artifact.modality === 'RASTER_MAP_LAYER' && layerInfo.layerIds[0]) {
                 this.mapService.removeGeoTiffLayer(layerInfo.layerIds[0], layerInfo.sourceId)
             }
         }
@@ -267,7 +271,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
             }
         }
 
-        if (artifact.modality === 'MAP_LAYER_GEOJSON' || artifact.modality === 'MAP_LAYER_GEOTIFF') {
+        if (artifact.modality === 'VECTOR_MAP_LAYER' || artifact.modality === 'RASTER_MAP_LAYER') {
             this.artifactViewerService.isViewerVisible = false
             waitForMapRender(artifact)
         } else if (
@@ -301,7 +305,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
             correlation_uuid: this.computation.correlation_uuid,
             aoiName: this.computation.aoiName,
             geometry: this.computation.geometry,
-            timestamp: this.computation.timestamp,
+            request_ts: this.computation.request_ts,
             pluginId: this.computation.pluginId,
             pluginName: derivePluginNameFromId(this.computation.pluginId || '')
         }
@@ -313,7 +317,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
         event?.stopPropagation()
 
         const apiUrl = environment.climateActionApiUrl
-        const artifactUrl = `${apiUrl}/store/${artifact.correlation_uuid}/${artifact.store_id}`
+        const artifactUrl = `${apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`
 
         let filename = 'download'
         if (artifact.modality === 'CHART' || artifact.modality === 'CHART_PLOTLY') {
@@ -338,7 +342,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
         event?.stopPropagation()
 
         this.dialog.open(this.descriptionDialog, {
-            data: { description: artifact.description },
+            data: { description: artifact.description, sources: artifact.sources },
             autoFocus: false
         })
     }
@@ -509,6 +513,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
     }
 
     private isSameArtifact(a: ArtifactEntity, b: ArtifactEntity): boolean {
-        return a.correlation_uuid === b.correlation_uuid && a.store_id === b.store_id
+        return a.correlation_uuid === b.correlation_uuid && a.filename === b.filename
     }
 }

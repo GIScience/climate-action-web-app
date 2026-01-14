@@ -65,8 +65,8 @@ describe('ComputationComponent', () => {
 
         mockArtifactService = {
             getImage: jest.fn(),
-            geojson: new BehaviorSubject(null),
-            geotiff: new BehaviorSubject(null)
+            vector: new BehaviorSubject(null),
+            raster: new BehaviorSubject(null)
         }
         mockMapService = {
             initMap: jest.fn()
@@ -137,7 +137,7 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00')
+                request_ts: new Date('2023-09-27T16:42:52+01:00')
             }
         ] as ComputationDisplayEntity[])
 
@@ -164,7 +164,7 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00')
+                request_ts: new Date('2023-09-27T16:42:52+01:00')
             }
         ] as ComputationDisplayEntity[])
 
@@ -172,32 +172,44 @@ describe('ComputationComponent', () => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
                 return of({
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    request_ts: new Date('2023-09-27T16:42:52+01:00'),
                     params: {},
+                    aoi: {} as ComputationMetadata['aoi'],
                     plugin_info: {
-                        plugin_id: 'test_plugin',
-                        plugin_version: '1.0.0'
+                        id: 'test_plugin',
+                        version: '1.0.0'
                     },
                     artifacts: [
                         {
                             name: 'Image 1',
                             modality: 'IMAGE',
-                            file_path: 'test_image1.png',
                             summary: 'An image 1.',
                             description: 'The image 1 is under CC0 license.',
-                            store_id: 'image1',
-                            primary: true
+                            filename: 'image1',
+                            primary: true,
+                            rank: 1,
+                            sources: [],
+                            tags: [],
+                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                            attachments: {}
                         },
                         {
                             name: 'Image 2',
                             modality: 'IMAGE',
-                            file_path: 'test_image2.png',
                             summary: 'An image 2.',
                             description: 'The image 2 is under CC0 license.',
-                            store_id: 'image2',
-                            primary: false
+                            filename: 'image2',
+                            primary: false,
+                            rank: 1,
+                            sources: [],
+                            tags: [],
+                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                            attachments: {}
                         }
-                    ]
+                    ],
+                    status: 'SUCCESS',
+                    message: '',
+                    artifact_errors: {}
                 } as ComputationMetadata)
             }
             return of()
@@ -212,32 +224,35 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
                 params: {},
                 artifacts: [
                     {
                         name: 'Image 1',
                         modality: 'IMAGE',
-                        file_path: 'test_image1.png',
                         summary: 'An image 1.',
                         description: 'The image 1 is under CC0 license.',
-                        store_id: 'image1',
+                        filename: 'image1',
                         primary: true,
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         tags: [],
-                        attachments: {}
+                        attachments: {},
+                        rank: 1,
+                        sources: []
                     },
                     {
                         name: 'Image 2',
                         modality: 'IMAGE',
-                        file_path: 'test_image2.png',
+
                         summary: 'An image 2.',
                         description: 'The image 2 is under CC0 license.',
-                        store_id: 'image2',
+                        filename: 'image2',
                         primary: false,
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         tags: [],
-                        attachments: {}
+                        attachments: {},
+                        rank: 2,
+                        sources: []
                     }
                 ],
                 artifact_errors: {}
@@ -264,7 +279,7 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
                 artifacts: [
                     {
                         name: 'Analysis Result',
@@ -272,9 +287,10 @@ describe('ComputationComponent', () => {
                         tags: ['analysis', 'data'],
                         modality: 'IMAGE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image1.png',
-                        store_id: 'image1',
-                        attachments: {}
+                        filename: 'image1',
+                        attachments: {},
+                        rank: 1,
+                        sources: []
                     },
                     {
                         name: 'Primary No Tags',
@@ -282,9 +298,10 @@ describe('ComputationComponent', () => {
                         tags: [],
                         modality: 'IMAGE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image2.png',
-                        store_id: 'image2',
-                        attachments: {}
+                        filename: 'image2',
+                        attachments: {},
+                        rank: 2,
+                        sources: []
                     },
                     {
                         name: 'Visualization',
@@ -292,9 +309,10 @@ describe('ComputationComponent', () => {
                         tags: ['visualization'],
                         modality: 'CHART',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image3.png',
-                        store_id: 'image3',
-                        attachments: {}
+                        filename: 'image3',
+                        attachments: {},
+                        rank: 3,
+                        sources: []
                     },
                     {
                         name: 'Raw Data',
@@ -302,9 +320,10 @@ describe('ComputationComponent', () => {
                         tags: [],
                         modality: 'TABLE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image4.png',
-                        store_id: 'image4',
-                        attachments: {}
+                        filename: 'image4',
+                        attachments: {},
+                        rank: 4,
+                        sources: []
                     }
                 ],
                 params: {},
@@ -344,7 +363,7 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
                 artifacts: [
                     {
                         name: 'Primary Analysis',
@@ -352,9 +371,10 @@ describe('ComputationComponent', () => {
                         tags: ['analysis'],
                         modality: 'IMAGE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image1.png',
-                        store_id: 'image1',
-                        attachments: {}
+                        filename: 'image1',
+                        attachments: {},
+                        rank: 1,
+                        sources: []
                     },
                     {
                         name: 'Secondary Chart',
@@ -362,9 +382,10 @@ describe('ComputationComponent', () => {
                         tags: ['visualization'],
                         modality: 'CHART',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image2.png',
-                        store_id: 'image2',
-                        attachments: {}
+                        filename: 'image2',
+                        attachments: {},
+                        rank: 2,
+                        sources: []
                     }
                 ],
                 params: {},
@@ -400,7 +421,7 @@ describe('ComputationComponent', () => {
                 pluginId: 'test_plugin',
                 pluginName: 'Test Plugin',
                 status: 'SUCCESS',
-                timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
                 artifacts: [
                     {
                         name: 'Result 1',
@@ -408,9 +429,10 @@ describe('ComputationComponent', () => {
                         tags: [],
                         modality: 'IMAGE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image1.png',
-                        store_id: 'image1',
-                        attachments: {}
+                        filename: 'image1',
+                        attachments: {},
+                        rank: 1,
+                        sources: []
                     },
                     {
                         name: 'Result 2',
@@ -418,9 +440,10 @@ describe('ComputationComponent', () => {
                         tags: [],
                         modality: 'IMAGE',
                         correlation_uuid: 'test-uuid',
-                        file_path: 'test_image2.png',
-                        store_id: 'image2',
-                        attachments: {}
+                        filename: 'image2',
+                        attachments: {},
+                        rank: 2,
+                        sources: []
                     }
                 ],
                 params: {},
@@ -448,11 +471,12 @@ describe('ComputationComponent', () => {
             name: 'Test Image',
             modality: 'IMAGE',
             correlation_uuid: 'test-uuid',
-            store_id: 'sample-image',
-            file_path: 'sample-image.png',
+            filename: 'sample-image',
             primary: true,
             tags: [],
-            attachments: {}
+            attachments: {},
+            rank: 1,
+            sources: []
         }
 
         const fakeAnchor = document.createElement('a')

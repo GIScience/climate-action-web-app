@@ -356,7 +356,7 @@ export class StorageService {
         if (!isRealUser) {
             const activeComputations = this.getPluginRuns()
                 .filter(run => (run.state || 'ACTIVE') === 'ACTIVE')
-                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                .sort((a, b) => new Date(b.request_ts).getTime() - new Date(a.request_ts).getTime())
 
             return activeComputations.length > 0 ? activeComputations[0] : null
         }

@@ -3,45 +3,46 @@ import { TestBed } from '@angular/core/testing'
 import { BehaviorSubject } from 'rxjs'
 import { ArtifactData, ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { GeojsonComponent } from '../artifact/geojson/geojson.component'
+import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
 import { MapArtifactManagerService } from './map-artifact-manager.service'
 import type { MapService } from './map.service'
 
 describe('MapArtifactManagerService', () => {
     let service: MapArtifactManagerService
     let mockArtifactService: {
-        geojson: BehaviorSubject<ArtifactData | null>
-        geotiff: BehaviorSubject<ArtifactData | null>
+        vector: BehaviorSubject<ArtifactData | null>
+        raster: BehaviorSubject<ArtifactData | null>
     }
     let mockMapService: jest.Mocked<Partial<MapService>>
 
     const createMockArtifact = (overrides: Partial<ArtifactEntity> = {}): ArtifactEntity => ({
         name: 'test-artifact',
-        modality: 'MAP_LAYER_GEOJSON',
-        file_path: './test.geojson',
+        modality: 'VECTOR_MAP_LAYER',
+        primary: false,
+        tags: [],
         summary: 'Test artifact',
         description: 'Test description',
         correlation_uuid: `corr-${Math.random().toString(36).slice(2)}`,
-        store_id: `store-${Math.random().toString(36).slice(2)}`,
-        primary: false,
-        tags: [],
+        filename: `store-${Math.random().toString(36).slice(2)}`,
+        rank: 1,
+        sources: [],
         attachments: {},
         ...overrides
     })
 
-    const artifact1 = createMockArtifact({ correlation_uuid: 'corr-1', store_id: 'store-1' })
-    const artifact2 = createMockArtifact({ correlation_uuid: 'corr-2', store_id: 'store-2' })
-    const artifact3 = createMockArtifact({ correlation_uuid: 'corr-3', store_id: 'store-3' })
+    const artifact1 = createMockArtifact({ correlation_uuid: 'corr-1', filename: 'store-1' })
+    const artifact2 = createMockArtifact({ correlation_uuid: 'corr-2', filename: 'store-2' })
+    const artifact3 = createMockArtifact({ correlation_uuid: 'corr-3', filename: 'store-3' })
     const nonMapArtifact = createMockArtifact({
         modality: 'IMAGE',
         correlation_uuid: 'corr-img',
-        store_id: 'store-img'
+        filename: 'store-img'
     })
 
     beforeEach(() => {
         mockArtifactService = {
-            geojson: new BehaviorSubject<ArtifactData | null>(null),
-            geotiff: new BehaviorSubject<ArtifactData | null>(null)
+            vector: new BehaviorSubject<ArtifactData | null>(null),
+            raster: new BehaviorSubject<ArtifactData | null>(null)
         }
 
         mockMapService = {
@@ -110,7 +111,7 @@ describe('MapArtifactManagerService', () => {
 
         it('should destroy componentRef on removal', () => {
             service.addMapArtifact(artifact1)
-            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<GeojsonComponent>
+            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<VectorComponent>
             service.updateLayerInfo(artifact1, ['layer-1'], 'source-1', mockComponentRef)
 
             service.removeMapArtifact(artifact1)
@@ -139,7 +140,7 @@ describe('MapArtifactManagerService', () => {
 
         it('should preserve existing componentRef if not provided', () => {
             service.addMapArtifact(artifact1)
-            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<GeojsonComponent>
+            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<VectorComponent>
             service.updateLayerInfo(artifact1, ['layer-1'], 'source-1', mockComponentRef)
 
             service.updateLayerInfo(artifact1, ['layer-2'], 'source-2')

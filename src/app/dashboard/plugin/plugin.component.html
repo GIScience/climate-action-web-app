@@ -59,22 +59,32 @@
                         <div class="plugin-links-container" [@accordion]="isPurposeExpanded ? 'expanded' : 'collapsed'">
                             <div class="methodology-link__wrapper">
                                 <button
-                                    class="btn-light btn-small btn-withtext"
+                                    class="btn-light btn-small btn-withtext--after"
                                     (click)="openDialog(plugin)"
                                     (keyup.enter)="openDialog(plugin)"
                                     tabindex="0">
-                                    {{ 'plugin.methodology' | transloco }}
+                                    {{ 'plugin.methodology' | transloco }} »
                                 </button>
                             </div>
                             @if (plugin.authors.length > 0) {
                                 <div class="credits-link__wrapper">
                                     <button
-                                        class="btn-light btn-small btn-withtext"
+                                        class="btn-light btn-small btn-withtext--after"
                                         (click)="openCreditsDialog(plugin)"
                                         (keyup.enter)="openCreditsDialog(plugin)"
                                         tabindex="0">
-                                        {{ 'plugin.credits' | transloco }}
+                                        {{ 'plugin.credits' | transloco }} »
                                     </button>
+                                </div>
+                            }
+                            @if (plugin.repository) {
+                                <div class="repository-link__wrapper">
+                                    <a [href]="plugin.repository" target="_blank" rel="noopener noreferrer">
+                                        <button class="btn-light btn-small btn-withtext--before" tabindex="-1">
+                                            {{ 'plugin.repository' | transloco }}
+                                            <i-lucide [img]="ExternalLink" size="17" color="#666"></i-lucide>
+                                        </button>
+                                    </a>
                                 </div>
                             }
                         </div>
@@ -91,7 +101,7 @@
                                         [tp]="'plugin.loginToCompute' | transloco"
                                         [tpIsEnabled]="!user">
                                         <button
-                                            class="new-compute btn-primary btn-small btn-withtext"
+                                            class="new-compute btn-primary btn-small btn-withtext--after"
                                             (click)="enterComputeState()"
                                             [disabled]="!user">
                                             <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
@@ -108,7 +118,7 @@
                             <div class="plugin-compute__header">
                                 <h2>{{ 'plugin.computePanel' | transloco }}</h2>
                                 <button
-                                    class="new-compute btn-light btn-small btn-withtext"
+                                    class="new-compute btn-light btn-small btn-withtext--after"
                                     (click)="exitComputeState()"
                                     [disabled]="!user">
                                     <i-lucide [img]="CircleX" size="20"></i-lucide>
@@ -136,23 +146,20 @@
             <h2>{{ 'plugin.dialog.methodology' | transloco }}</h2>
             <markdown [data]="data.methodology" ngPreserveWhitespaces class="markdown"></markdown>
             @if (data.sources) {
-                <div>
+                <div class="plugin-sources-section">
                     <h3>{{ 'plugin.dialog.sources' | transloco }}</h3>
-                    <ul class="plugin-sources">
-                        @for (source of data.sources; track source) {
-                            <li class="plugin-sources">
-                                @if (source.title) {
-                                    <strong>{{ source.title }}</strong>
-                                }
-                                {{ processSourceText(source) }}{{ source.url ? ',' : '' }}
+                    <div class="plugin-sources">
+                        @for (source of sortSourcesByAuthor(data.sources); track source) {
+                            <p class="plugin-source-entry">
+                                {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
                                 @if (source.url) {
                                     <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
                                         source.url
                                     }}</a>
                                 }
-                            </li>
+                            </p>
                         }
-                    </ul>
+                    </div>
                 </div>
             }
         </ng-scrollbar>

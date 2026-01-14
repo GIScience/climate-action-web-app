@@ -31,8 +31,9 @@
         "loading": "Lade...",
         "readMore": "Weitere Informationen",
         "showLess": "Einklappen",
-        "methodology": "Methoden »",
-        "credits": "Autor:innen »",
+        "methodology": "Methoden",
+        "credits": "Autor:innen",
+        "repository": "Quellcode anzeigen",
         "computations": "Ergebnisse",
         "newComputation": "Neue Berechnung",
         "loginToCompute": "Bitte melde dich an, um eine Berechnung zu starten.",
@@ -117,7 +118,8 @@
     },
     "artifact": {
         "abstract": "Zusammenfassung",
-        "detailedDescription": "Detaillierte Beschreibung"
+        "detailedDescription": "Detaillierte Beschreibung",
+        "sources": "Quellen"
     },
     "report": {
         "title": "Report",

@@ -2,9 +2,6 @@
     <div class="legend-container">
         <h3 class="title">
             {{ legendData.title }}
-            @if (legendData.unit !== undefined) {
-                <span>({{ legendData.unit }})</span>
-            }
         </h3>
         <ng-scrollbar orientation="vertical">
             @if (legendData.legend_type === 'DISCRETE') {

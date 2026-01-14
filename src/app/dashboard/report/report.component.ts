@@ -74,18 +74,18 @@ export class ReportComponent implements OnInit {
 
     ngOnInit(): void {
         this.reportService.artifacts$.subscribe(artifacts => {
-            const previousArtifactIds = this.artifacts.map(a => a.store_id)
-            const currentArtifactIds = artifacts.map(a => a.store_id)
+            const previousArtifactIds = this.artifacts.map(a => a.filename)
+            const currentArtifactIds = artifacts.map(a => a.filename)
 
-            const addedArtifacts = artifacts.filter(a => !previousArtifactIds.includes(a.store_id))
+            const addedArtifacts = artifacts.filter(a => !previousArtifactIds.includes(a.filename))
             const removedArtifactIds = previousArtifactIds.filter(id => !currentArtifactIds.includes(id))
 
             this.artifacts = artifacts
 
             addedArtifacts.forEach(artifact => {
-                if (this.reportService.isMapArtifact(artifact.modality) && !this.mapServices.has(artifact.store_id)) {
+                if (this.reportService.isMapArtifact(artifact.modality) && !this.mapServices.has(artifact.filename)) {
                     const mapService = runInInjectionContext(this.injector, () => new MapService())
-                    this.mapServices.set(artifact.store_id, mapService)
+                    this.mapServices.set(artifact.filename, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)
                     if (artifactService) {
@@ -93,7 +93,7 @@ export class ReportComponent implements OnInit {
 
                         artifactService.legend.subscribe(legend => {
                             if (legend) {
-                                this.displayLegend(artifact.store_id, legend)
+                                this.displayLegend(artifact.filename, legend)
                             }
                         })
 
@@ -116,7 +116,7 @@ export class ReportComponent implements OnInit {
             if (!isVisible) {
                 this.artifacts.forEach(artifact => {
                     if (this.reportService.isMapArtifact(artifact.modality)) {
-                        this.removeLegend(artifact.store_id)
+                        this.removeLegend(artifact.filename)
                     }
                 })
             }
@@ -149,8 +149,8 @@ export class ReportComponent implements OnInit {
 
     removeReportItem(artifact: ArtifactEntity) {
         if (this.reportService.isMapArtifact(artifact.modality)) {
-            this.mapServices.delete(artifact.store_id)
-            this.removeLegend(artifact.store_id)
+            this.mapServices.delete(artifact.filename)
+            this.removeLegend(artifact.filename)
         }
         this.reportService.removeArtifact(artifact)
     }
@@ -158,7 +158,7 @@ export class ReportComponent implements OnInit {
     removeAllReportItems() {
         this.artifacts.forEach(artifact => {
             if (this.reportService.isMapArtifact(artifact.modality)) {
-                this.mapServices.delete(artifact.store_id)
+                this.mapServices.delete(artifact.filename)
             }
             this.reportService.removeArtifact(artifact)
         })

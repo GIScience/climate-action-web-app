@@ -14,27 +14,25 @@ export interface PluginAssets {
 }
 
 export interface Plugin {
+    id: string
+    version: string
     name: string
     authors: Array<PluginAuthor>
-    version: string
+    state?: 'experimental' | 'active' | 'hibernate' | 'archive' // Development state
     concerns: Array<Concern>
     teaser: string
+    repository: string
     purpose: string
     methodology: string
     sources: Array<Source> | null
-    demo_config: DemoConfig | null
     assets: PluginAssets
-    plugin_id: string
     operator_schema: JSONSchema7
+    demo_config: DemoConfig | null
     library_version: string
     status?: 'active' | 'unavailable' | 'releasing-soon'
-    state?: 'experimental' | 'active' | 'hibernate' | 'archive' // Development state
 }
 
-export interface PluginBaseInfo {
-    plugin_id: string
-    plugin_version: string
-}
+export type PluginBaseInfo = Pick<Plugin, 'id' | 'version'>
 
 export interface Concern {
     concern: 'ghg_emission' | 'mitigation' | 'adaption' | 'pedestrian' | 'cycling' | 'waste'

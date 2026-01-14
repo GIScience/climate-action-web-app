@@ -11,7 +11,7 @@ export interface ComputationParameters {
 
 export interface ComputationMetadata {
     correlation_uuid: string
-    timestamp: Date
+    request_ts: Date
     params: ComputationParameters
     aoi: Feature<MultiPolygon>
     artifacts: Artifact[]
@@ -21,13 +21,15 @@ export interface ComputationMetadata {
     artifact_errors: { [key: string]: string }
 }
 
-export interface ComputationDisplayEntity
-    extends Pick<ComputationMetadata, 'correlation_uuid' | 'timestamp' | 'params' | 'status' | 'artifact_errors'> {
+export interface ComputationDisplayEntity extends Pick<
+    ComputationMetadata,
+    'correlation_uuid' | 'request_ts' | 'params' | 'status' | 'artifact_errors'
+> {
     artifacts: ArtifactEntity[]
     aoiName?: string
     geometry?: ComputationMetadata['aoi']
     pluginName?: Plugin['name']
-    pluginId?: ComputationMetadata['plugin_info']['plugin_id']
+    pluginId?: ComputationMetadata['plugin_info']['id']
     isExpanded?: boolean
     keepInDOM?: boolean
     flags?: ComputationFlags
@@ -36,12 +38,12 @@ export interface ComputationDisplayEntity
 
 export type ComputationDatabaseEntity = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'timestamp' | 'status' | 'aoiName' | 'pluginId' | 'flags' | 'state'
+    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'flags' | 'state'
 >
 
 export type ComputationBasicInfo = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'aoiName' | 'geometry' | 'timestamp' | 'pluginId' | 'pluginName'
+    'correlation_uuid' | 'aoiName' | 'geometry' | 'request_ts' | 'pluginId' | 'pluginName'
 >
 
 export type ComputationID = Pick<ComputationMetadata, 'correlation_uuid'>

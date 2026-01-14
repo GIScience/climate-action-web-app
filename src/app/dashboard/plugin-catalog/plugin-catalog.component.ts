@@ -48,7 +48,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
     syncActiveCardWithRoute(): void {
         const currentUrl = this.router.url
-        this.activeCard = this.cards.find(card => currentUrl.includes(`plugin/${card.plugin_id}`))
+        this.activeCard = this.cards.find(card => currentUrl.includes(`plugin/${card.id}`))
     }
 
     sortCards() {
@@ -63,16 +63,16 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
             next: data => {
                 data.forEach(plugin => {
                     const pluginCard = {
-                        plugin_id: plugin.plugin_id,
+                        id: plugin.id,
                         name: plugin.name,
-                        icon: this.pluginService.getIconUrl(plugin.plugin_id),
+                        icon: this.pluginService.getIconUrl(plugin.id),
                         library_version: plugin.library_version,
                         version: plugin.version,
                         teaser: plugin.teaser,
                         status: plugin.status || 'active'
                     } as PluginCard
 
-                    const existingCard = this.cards.find(x => x.plugin_id === plugin.plugin_id)
+                    const existingCard = this.cards.find(x => x.id === plugin.id)
                     if (existingCard) {
                         Object.assign(existingCard, pluginCard)
                     } else {
@@ -84,10 +84,10 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
 
                 // const storedRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
                 // storedRuns.forEach(run => {
-                //     const existingCard = this.cards.find(x => x.plugin_id === run.pluginId)
+                //     const existingCard = this.cards.find(x => x.id === run.pluginId)
                 //     if (!existingCard) {
                 //         const offlineCard = {
-                //             plugin_id: run.pluginId,
+                //             id: run.pluginId,
                 //             name: derivePluginNameFromId(run.pluginId || ''),
                 //             icon: this.pluginService.getIconUrl(run.pluginId || ''),
                 //             library_version: 'N/A',
@@ -121,7 +121,7 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
         this.mapService.removeFocusedLayer()
         this.mapService.removeComputeLayers()
         this.mapArtifactManager.clearTransientArtifacts()
-        this.router.navigate(['dashboard', 'plugin', card.plugin_id]).then(() => {
+        this.router.navigate(['dashboard', 'plugin', card.id]).then(() => {
             this.activeCard = card
         })
     }

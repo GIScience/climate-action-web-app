@@ -21,10 +21,12 @@ describe('computations', () => {
                 'plugin_runs',
                 JSON.stringify([
                     {
+                        aoiName: 'Test Area',
                         correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                        flags: [],
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-12-17T08:55:23.807074Z',
+                        request_ts: '2024-12-17T08:55:23.807074Z',
+                        state: 'ACTIVE',
                         status: 'SUCCESS'
                     }
                 ])

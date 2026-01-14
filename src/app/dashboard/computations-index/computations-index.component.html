@@ -2,7 +2,7 @@
     @if (!showArchived && !isReportVisible) {
         <button
             (click)="openReport()"
-            class="toggle-archive btn-small btn-alt btn-withtext"
+            class="toggle-archive btn-small btn-alt btn-withtext--after"
             [tp]="'computationsIndex.createReport' | transloco"
             tpPlacement="bottom">
             <i-lucide [img]="Clipboard" size="20" color="#008080"></i-lucide>
@@ -10,7 +10,7 @@
         </button>
     }
     @if (isReportVisible) {
-        <button class="toggle-archive btn-small btn-alt btn-withtext" (click)="closeReport()">
+        <button class="toggle-archive btn-small btn-alt btn-withtext--after" (click)="closeReport()">
             <i-lucide [img]="CircleX" size="20" color="#008080"></i-lucide>
             {{ 'computationsIndex.exitReportBuilder' | transloco }}
         </button>
@@ -18,7 +18,7 @@
     @if (!showArchived) {
         <button
             (click)="toggleArchivedView()"
-            class="toggle-archive btn-small btn-alt btn-withtext"
+            class="toggle-archive btn-small btn-alt btn-withtext--after"
             [tp]="'computationsIndex.viewArchived' | transloco"
             tpPlacement="bottom">
             <i-lucide [img]="Archive" size="20" color="#008080"></i-lucide>
@@ -26,7 +26,7 @@
         </button>
     }
     @if (showArchived) {
-        <button (click)="toggleArchivedView()" class="toggle-archive btn-small btn-alt btn-withtext">
+        <button (click)="toggleArchivedView()" class="toggle-archive btn-small btn-alt btn-withtext--after">
             <i-lucide [img]="CircleArrowLeft" size="20" [tp]="'computationsIndex.backToAll' | transloco"></i-lucide>
             <span>{{ 'computationsIndex.backToAll' | transloco }}</span>
         </button>
@@ -79,7 +79,7 @@
                                             </div>
                                             <p class="card-subtitle m-0">
                                                 <i-lucide [img]="Clock" size="15"></i-lucide>
-                                                {{ formatTimestamp(scheduledRun.timestamp) }} •
+                                                {{ formatTimestamp(scheduledRun.request_ts) }} •
                                                 <i-lucide [img]="Hash" size="15"></i-lucide>
                                                 {{ formatUUID(scheduledRun.correlation_uuid) }}
                                             </p>
@@ -143,7 +143,7 @@
                                             </div>
                                             <p class="card-subtitle m-0">
                                                 <i-lucide [img]="Clock" size="15"></i-lucide>
-                                                {{ formatTimestamp(computation.timestamp) }} •
+                                                {{ formatTimestamp(computation.request_ts) }} •
                                                 <i-lucide [img]="Hash" size="15"></i-lucide
                                                 >{{ formatUUID(computation.correlation_uuid) }}
                                             </p>
@@ -202,7 +202,9 @@
                 @if (paginationInfo.hasMore || paginationInfo.loading) {
                     <div class="load-more-container">
                         @if (paginationInfo.hasMore && !paginationInfo.loading) {
-                            <button (click)="loadMoreRuns()" class="btn-alt btn-small btn-withtext load-more-btn">
+                            <button
+                                (click)="loadMoreRuns()"
+                                class="btn-alt btn-small btn-withtext--after load-more-btn">
                                 {{ 'computationsIndex.loadMore' | transloco }}
                             </button>
                         }
@@ -255,7 +257,7 @@
                                                 <h3>{{ archivedComputation.aoiName }}</h3>
                                                 <p class="card-subtitle m-0">
                                                     <i-lucide [img]="Clock" size="15"></i-lucide>
-                                                    {{ formatTimestamp(archivedComputation.timestamp) }} •
+                                                    {{ formatTimestamp(archivedComputation.request_ts) }} •
                                                     <i-lucide [img]="Hash" size="15"></i-lucide
                                                     >{{ formatUUID(archivedComputation.correlation_uuid) }}
                                                 </p>
@@ -279,7 +281,7 @@
                         @if (archivedPaginationInfo.hasMore && !archivedPaginationInfo.loading) {
                             <button
                                 (click)="loadMoreArchivedRuns()"
-                                class="btn-alt btn-small btn-withtext load-more-btn">
+                                class="btn-alt btn-small btn-withtext--after load-more-btn">
                                 {{ 'computationsIndex.loadMore' | transloco }}
                             </button>
                         }
@@ -299,7 +301,9 @@
         <div class="prompt-container">
             <span>{{ 'computationsIndex.login.prompt' | transloco }}</span
             ><br />
-            <a [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())" class="btn-alt btn-small btn-withtext"
+            <a
+                [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())"
+                class="btn-alt btn-small btn-withtext--after"
                 ><strong>{{ 'computationsIndex.login.action' | transloco }}</strong></a
             >
             {{ 'computationsIndex.login.suffix' | transloco }}

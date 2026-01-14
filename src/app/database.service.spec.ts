@@ -78,7 +78,7 @@ describe('DatabaseService', () => {
                 correlation_uuid: 'test-uuid',
                 pluginId: 'test-plugin',
                 status: 'PENDING',
-                timestamp: new Date(),
+                request_ts: new Date(),
                 flags: [],
                 aoiName: 'Test Area'
             })
@@ -94,7 +94,7 @@ describe('DatabaseService', () => {
                 correlation_uuid: 'test-uuid',
                 pluginId: 'test-plugin',
                 status: 'PENDING',
-                timestamp: new Date(),
+                request_ts: new Date(),
                 flags: [],
                 aoiName: 'Test Area'
             })
@@ -110,7 +110,7 @@ describe('DatabaseService', () => {
                 correlation_uuid: 'test-uuid',
                 pluginId: 'test-plugin',
                 status: 'PENDING',
-                timestamp: new Date(),
+                request_ts: new Date(),
                 flags: [],
                 aoiName: 'Test Area'
             })
@@ -221,18 +221,20 @@ describe('DatabaseService', () => {
                 {
                     correlation_uuid: 'test-uuid-1',
                     pluginId: 'test-plugin',
-                    timestamp: mockDocuments[0].timestamp,
+                    request_ts: mockDocuments[0].timestamp,
                     status: 'SUCCESS',
                     aoiName: 'Test Area 1',
-                    flags: undefined
+                    flags: undefined,
+                    state: undefined
                 },
                 {
                     correlation_uuid: 'test-uuid-2',
                     pluginId: 'test-plugin',
-                    timestamp: mockDocuments[1].timestamp,
+                    request_ts: mockDocuments[1].timestamp,
                     status: 'PENDING',
                     aoiName: 'Test Area 2',
-                    flags: undefined
+                    flags: undefined,
+                    state: undefined
                 }
             ])
             expect(result.hasMore).toBe(true)
@@ -275,10 +277,11 @@ describe('DatabaseService', () => {
                 {
                     correlation_uuid: 'test-uuid-3',
                     pluginId: 'test-plugin',
-                    timestamp: mockDocuments[0].timestamp,
+                    request_ts: mockDocuments[0].timestamp,
                     status: 'SUCCESS',
                     aoiName: 'Test Area 3',
-                    flags: undefined
+                    flags: undefined,
+                    state: undefined
                 }
             ])
             expect(result.hasMore).toBe(true)
@@ -338,7 +341,7 @@ describe('DatabaseService', () => {
                 {
                     correlation_uuid: 'test-uuid-1',
                     pluginId: 'test-plugin',
-                    timestamp: mockDocuments[0].timestamp,
+                    request_ts: mockDocuments[0].timestamp,
                     status: 'SUCCESS',
                     aoiName: 'Test Area 1',
                     flags: [],

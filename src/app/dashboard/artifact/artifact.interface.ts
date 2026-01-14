@@ -1,5 +1,6 @@
 import { HexColor } from '@app/types/color/color.type'
 import type { Data, Layout } from 'plotly.js-strict-dist'
+import { Source } from '@app/types/sources/sources.type'
 
 export interface DiscreteLegendData {
     [key: string]: HexColor
@@ -16,26 +17,27 @@ export interface ContinuousLegendData {
 
 export interface LegendObject {
     title?: string
-    unit?: string
     legend_type: 'CONTINUOUS' | 'DISCRETE'
     legend_data: ContinuousLegendData | DiscreteLegendData
 }
 
 export interface AttachmentsObject {
     legend?: LegendObject
+    display_filename?: string
 }
 
 export interface Artifact {
     name: string
-    modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'CHART_PLOTLY' | 'TABLE' | 'MAP_LAYER_GEOJSON' | 'MAP_LAYER_GEOTIFF'
+    modality: 'IMAGE' | 'MARKDOWN' | 'CHART' | 'CHART_PLOTLY' | 'TABLE' | 'VECTOR_MAP_LAYER' | 'RASTER_MAP_LAYER'
     primary: boolean
     tags: string[]
-    file_path: string
     summary?: string
     description?: string
     correlation_uuid: string
-    store_id: string
+    filename: string
+    sources: Array<Source>
     attachments: AttachmentsObject
+    rank: number
     isLoading?: boolean
 }
 
@@ -56,7 +58,7 @@ export interface PlotlyChartData {
     layout: Partial<Layout>
 }
 
-export type ActiveArtifactRef = Pick<Artifact, 'correlation_uuid' | 'store_id'>
+export type ActiveArtifactRef = Pick<Artifact, 'correlation_uuid' | 'filename'>
 
 export interface ArtifactData extends Artifact {
     url: string // Contains the presigned url for the artifact

@@ -3,7 +3,10 @@
         <div class="report-header">
             <h2>{{ 'report.title' | transloco }}</h2>
             <div class="report-controls">
-                <button (click)="exportToPDF()" class="export-btn btn-withtext" [disabled]="artifacts.length === 0">
+                <button
+                    (click)="exportToPDF()"
+                    class="export-btn btn-withtext--after"
+                    [disabled]="artifacts.length === 0">
                     <i-lucide [img]="FileDown" size="20"></i-lucide>
                     {{ 'report.exportToPDF' | transloco }}
                 </button>
@@ -38,7 +41,7 @@
             <ng-scrollbar>
                 <div class="report-contents">
                     @for (artifact of artifacts; track artifact) {
-                        <div class="report-item" #artifactContainer [attr.data-artifact-id]="artifact.store_id">
+                        <div class="report-item" #artifactContainer [attr.data-artifact-id]="artifact.filename">
                             <div class="report-item-header">
                                 <div class="report-item-info">
                                     <h3>{{ artifact.name }}</h3>
@@ -57,9 +60,9 @@
                             </div>
                             @if (reportService.isMapArtifact(artifact.modality)) {
                                 <div class="report-map-container">
-                                    <div [id]="'report-map-' + artifact.store_id" class="report-map"></div>
-                                    <div #legendContainer [id]="'report-map-legend-' + artifact.store_id"></div>
-                                    <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.store_id">
+                                    <div [id]="'report-map-' + artifact.filename" class="report-map"></div>
+                                    <div #legendContainer [id]="'report-map-legend-' + artifact.filename"></div>
+                                    <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.filename">
                                         {{ 'report.mapZoomNote' | transloco }}
                                     </div>
                                 </div>

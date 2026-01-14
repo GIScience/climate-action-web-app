@@ -72,8 +72,8 @@ describe('ComputationsIndexComponent', () => {
 
         mockArtifactService = {
             getImage: jest.fn(),
-            geojson: new BehaviorSubject(null),
-            geotiff: new BehaviorSubject(null)
+            vector: new BehaviorSubject(null),
+            raster: new BehaviorSubject(null)
         }
         mockMapService = {
             initMap: jest.fn(),
@@ -147,7 +147,7 @@ describe('ComputationsIndexComponent', () => {
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
-            timestamp: new Date('2023-09-27T16:42:52+01:00')
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationDisplayEntity
 
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
@@ -161,7 +161,7 @@ describe('ComputationsIndexComponent', () => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
                 return of({
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    request_ts: new Date('2023-09-27T16:42:52+01:00'),
                     params: {},
                     aoi: new GeoJSON().readFeature({
                         type: 'Feature',
@@ -188,11 +188,10 @@ describe('ComputationsIndexComponent', () => {
                             name: 'Image',
                             modality: 'IMAGE',
                             primary: true,
-                            file_path: 'test_image.png',
                             summary: 'An image.',
                             description: 'The image is under CC0 license.',
                             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                            store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                            filename: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
                             attachments: {}
                         }
                     ],
@@ -231,7 +230,7 @@ describe('ComputationsIndexComponent', () => {
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
-            timestamp: new Date('2023-09-27T16:42:52+01:00')
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationDisplayEntity
 
         component.currentRuns = [initialRun]
@@ -251,7 +250,7 @@ describe('ComputationsIndexComponent', () => {
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
-            timestamp: new Date('2023-09-27T16:42:52+01:00')
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationDisplayEntity
 
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
@@ -265,7 +264,7 @@ describe('ComputationsIndexComponent', () => {
             if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
                 return of({
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    timestamp: new Date('2023-09-27T16:42:52+01:00'),
+                    request_ts: new Date('2023-09-27T16:42:52+01:00'),
                     params: {},
                     aoi: new GeoJSON().readFeature({
                         type: 'Feature',
@@ -292,11 +291,10 @@ describe('ComputationsIndexComponent', () => {
                             name: 'Image',
                             modality: 'IMAGE',
                             primary: true,
-                            file_path: 'test_image.png',
                             summary: 'An image.',
                             description: 'The image is under CC0 license.',
                             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                            store_id: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
+                            filename: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
                             attachments: {}
                         }
                     ],
@@ -332,7 +330,7 @@ describe('ComputationsIndexComponent', () => {
             pluginId: 'test_plugin',
             pluginName: 'Test Plugin',
             status: 'SUCCESS',
-            timestamp: new Date('2023-09-27T16:42:52+01:00')
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
         } as ComputationDisplayEntity
 
         component.currentRuns = []
@@ -363,7 +361,7 @@ describe('ComputationsIndexComponent', () => {
             if (id === 'demo-uuid-123') {
                 return of({
                     correlation_uuid: 'demo-uuid-123',
-                    timestamp: new Date(),
+                    request_ts: new Date(),
                     params: {},
                     aoi: new GeoJSON().readFeature({
                         type: 'Feature',
@@ -405,7 +403,7 @@ describe('ComputationsIndexComponent', () => {
         const expectedCompute = {
             correlation_uuid: 'demo-uuid-123',
             pluginId: 'test_plugin',
-            timestamp: expect.any(Date),
+            request_ts: expect.any(Date),
             aoiName: 'Demo',
             status: 'SUCCESS',
             flags: ['DEMO']
@@ -422,7 +420,7 @@ describe('ComputationsIndexComponent', () => {
 
         const mockMetadata = {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-            timestamp: new Date('2023-09-27T16:42:52+01:00'),
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
             params: {},
             aoi: new GeoJSON().readFeature({
                 type: 'Feature',
@@ -443,8 +441,8 @@ describe('ComputationsIndexComponent', () => {
                 properties: { name: 'Imported AOI' }
             }) as Feature<MultiPolygon>,
             plugin_info: {
-                plugin_id: 'test_plugin',
-                plugin_version: '1.0.0'
+                id: 'test_plugin',
+                version: '1.0.0'
             },
             status: 'SUCCESS'
         }
@@ -458,7 +456,7 @@ describe('ComputationsIndexComponent', () => {
         const expectedComputation = {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             pluginId: 'test_plugin',
-            timestamp: mockMetadata.timestamp,
+            request_ts: mockMetadata.request_ts,
             status: 'SUCCESS',
             aoiName: 'Imported AOI',
             flags: ['IMPORTED']

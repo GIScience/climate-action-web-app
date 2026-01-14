@@ -203,6 +203,23 @@
         position: relative;
     }
 
+    app-markdown + .artifact-sources-section {
+        margin-top: 1.5rem;
+    }
+
+    .artifact-sources-section h3 {
+        margin-top: 0;
+    }
+
+    ul.artifact-sources {
+        list-style: unset;
+        padding: 0 2em;
+
+        li {
+            margin-bottom: 0.5em;
+        }
+    }
+
     button.close-dialog {
         background: #fff;
         border: none;
