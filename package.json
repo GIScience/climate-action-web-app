@@ -59,7 +59,7 @@
         "ng2-charts": "^5.0.4",
         "ngx-markdown": "20.1.0",
         "ngx-papaparse": "^8.0.0",
-        "ngx-scrollbar": "^18.0.0",
+        "ngx-scrollbar": "^19.0.0",
         "ngx-toastr": "^19.0.0",
         "ol": "^10.0.0",
         "plotly.js-strict-dist": "^3.0.1",
