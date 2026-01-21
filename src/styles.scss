@@ -1,6 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
 @use 'assets/styles/index';
 @use 'assets/styles/maplibre';
+@use 'ngx-scrollbar' as scrollbar;
 
 @import 'tippy.js/dist/tippy.css';
 @import 'tippy.js/themes/material.css';
@@ -29,4 +29,15 @@ body {
         line-height: 1.6;
         margin-bottom: 0;
     }
+}
+
+:root {
+    @include scrollbar.ng-scrollbar-overrides(
+        (
+            track-hover-thickness: 10px,
+            track-color: rgba(0, 0, 0, 0.05),
+            track-shape: 10px,
+            thumb-color: rgba(0, 0, 0, 0.3)
+        )
+    );
 }
