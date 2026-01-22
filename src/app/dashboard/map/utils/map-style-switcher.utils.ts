@@ -240,9 +240,9 @@ export class MapStyleSwitcherControl implements IControl {
         const groups: { [key: string]: string[] } = {}
         this.map
             .getStyle()
-            .layers.filter(l => l.id.match(/^(geojson|geotiff|pmtiles)-.*-\d+/))
+            .layers.filter(l => l.id.match(/^(geojson|geotiff|pmtiles)-.*-\d{13}/))
             .forEach(l => {
-                const base = l.id.match(/^((?:geojson|geotiff|pmtiles)-[^-]+-\d+)/)?.[1]
+                const base = l.id.match(/^((?:geojson|geotiff|pmtiles)-.*-\d{13})/)?.[1]
                 if (base) (groups[base] ??= []).push(l.id)
             })
 

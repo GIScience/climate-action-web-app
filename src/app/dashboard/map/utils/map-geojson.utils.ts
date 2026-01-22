@@ -122,8 +122,8 @@ export class MapGeoJsonUtils {
             const html = features
                 .map(f => {
                     const name = layerMap.get(f.layer.id)
-                    if (!name || seen.has(name)) return null
-                    seen.add(name)
+                    if (!name || seen.has(f.layer.id)) return null
+                    seen.add(f.layer.id)
                     const label = f.properties?.['label'] || f.properties?.['name'] || 'Feature'
                     return `<strong>${name}</strong>: ${label}`
                 })

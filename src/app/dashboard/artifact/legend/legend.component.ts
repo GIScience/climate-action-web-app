@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core'
 import { convertToTitleCase } from '@app/utils/artifact.utils'
 import { NgScrollbar } from 'ngx-scrollbar'
 import { LegendObject } from '../artifact.interface'
@@ -15,20 +15,16 @@ interface LegendItem {
     templateUrl: './legend.component.html',
     styleUrls: ['./legend.component.scss']
 })
-export class LegendComponent implements OnInit, AfterViewInit {
+export class LegendComponent implements AfterViewInit {
     @Input() legendData!: LegendObject
     @Input() artifactId?: string
     @ViewChild('ticksContainer') ticksContainer!: ElementRef
     @ViewChild('legendWrapper') legendWrapper!: ElementRef
-
-    ngOnInit(): void {
-        if (this.legendData.legend_type === 'CONTINUOUS') {
-            this.plotColormap(this.legendData.legend_data.cmap_name)
-        }
-    }
+    @ViewChild('legendCanvas') legendCanvas!: ElementRef<HTMLCanvasElement>
 
     ngAfterViewInit(): void {
         if (this.legendData.legend_type === 'CONTINUOUS') {
+            this.plotColormap(this.legendData.legend_data.cmap_name)
             this.setWrapperWidth()
         }
     }
@@ -72,28 +68,21 @@ export class LegendComponent implements OnInit, AfterViewInit {
         return item.name
     }
 
-    getCanvasId(name: string): string {
-        return this.artifactId ? `canvas_${name}_${this.artifactId}` : `canvas_${name}`
-    }
-
     plotColormap(name: string): void {
-        const canvasId = this.getCanvasId(name)
         const reverse = name.endsWith('_r')
 
         if (reverse) {
             name = name.substring(0, name.length - 2)
         }
 
-        setTimeout(() => {
-            const canvas = document.getElementById(canvasId) as HTMLCanvasElement
-            const ctx = canvas?.getContext('2d')
-            if (canvas && ctx) {
-                for (let y = 0; y <= canvas.height; y++) {
-                    const [r, g, b] = evaluate_cmap(y / canvas.height, name, reverse)
-                    ctx.fillStyle = `rgb(${r},${g},${b})`
-                    ctx.fillRect(0, canvas.height - y, canvas.width, 1)
-                }
+        const canvas = this.legendCanvas?.nativeElement
+        const ctx = canvas?.getContext('2d')
+        if (canvas && ctx) {
+            for (let y = 0; y <= canvas.height; y++) {
+                const [r, g, b] = evaluate_cmap(y / canvas.height, name, reverse)
+                ctx.fillStyle = `rgb(${r},${g},${b})`
+                ctx.fillRect(0, canvas.height - y, canvas.width, 1)
             }
-        }, 0)
+        }
     }
 }

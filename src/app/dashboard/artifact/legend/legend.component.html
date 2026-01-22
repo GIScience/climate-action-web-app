@@ -19,7 +19,7 @@
             @if (legendData.legend_type === 'CONTINUOUS') {
                 <div class="continuous-legend">
                     <div #legendWrapper class="vertical-legend-wrapper">
-                        <canvas [id]="getCanvasId(legendData.legend_data.cmap_name)" width="25" height="200"></canvas>
+                        <canvas #legendCanvas width="25" height="200"></canvas>
                         <div #ticksContainer class="ticks">
                             @for (item of continuousItems(); track trackByFn($index, item)) {
                                 <span [style.bottom]="item.position + '%'">

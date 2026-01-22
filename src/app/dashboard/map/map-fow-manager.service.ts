@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import mask from '@turf/mask'
+import union from '@turf/union'
 import type { Feature as GeoJSONFeature, MultiPolygon, Polygon, Position } from 'geojson'
 import type { GeoJSONSource, Map as MaplibreMap } from 'maplibre-gl'
 import type { Feature } from 'ol'
@@ -20,6 +21,8 @@ interface FoWGeometry {
 export class MapFoWManagerService {
     private readonly SOURCE_ID = 'fow-source'
     private readonly LAYER_ID = 'fow-layer'
+    private readonly OUTLINE_SOURCE_ID = 'fow-outline-source'
+    private readonly OUTLINE_LAYER_ID = 'fow-outline-layer'
 
     private geometries = new Map<string, FoWGeometry>()
     private map?: MaplibreMap
@@ -55,6 +58,8 @@ export class MapFoWManagerService {
         if (this.geometries.size === 0) {
             if (this.map.getLayer(this.LAYER_ID)) this.map.removeLayer(this.LAYER_ID)
             if (this.map.getSource(this.SOURCE_ID)) this.map.removeSource(this.SOURCE_ID)
+            if (this.map.getLayer(this.OUTLINE_LAYER_ID)) this.map.removeLayer(this.OUTLINE_LAYER_ID)
+            if (this.map.getSource(this.OUTLINE_SOURCE_ID)) this.map.removeSource(this.OUTLINE_SOURCE_ID)
             return
         }
 
@@ -92,46 +97,11 @@ export class MapFoWManagerService {
 
         if (polygons.length === 0) return
 
-        let fowFeature: GeoJSONFeature
-        if (polygons.length === 1) {
-            fowFeature = mask(polygons[0])
-        } else {
-            // Collect holes with deduplication and ensure clockwise orientation
-            const seen = new Set<string>()
-            const holes = polygons.flatMap(f => {
-                const rings =
-                    f.geometry.type === 'MultiPolygon'
-                        ? f.geometry.coordinates.map(p => p[0])
-                        : [f.geometry.coordinates[0]]
-
-                return rings
-                    .filter(ring => {
-                        const key = ring.map(([x, y]) => `${x.toFixed(6)},${y.toFixed(6)}`).join('|')
-                        if (seen.has(key)) return false
-                        seen.add(key)
-                        return true
-                    })
-                    .map(ring => this.ensureClockwise(ring))
-            })
-
-            fowFeature = {
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [
-                        [
-                            [-180, -90],
-                            [180, -90],
-                            [180, 90],
-                            [-180, 90],
-                            [-180, -90]
-                        ],
-                        ...holes
-                    ]
-                },
-                properties: {}
-            }
-        }
+        const combined =
+            polygons.length === 1
+                ? polygons[0]
+                : (union({ type: 'FeatureCollection', features: polygons }) ?? polygons[0])
+        const fowFeature = mask(combined)
 
         const source = this.map.getSource(this.SOURCE_ID) as GeoJSONSource | undefined
         if (source) {
@@ -151,14 +121,43 @@ export class MapFoWManagerService {
             })
         }
 
-        this.map.moveLayer(this.LAYER_ID)
-    }
-
-    private ensureClockwise(ring: Position[]): Position[] {
-        let area = 0
-        for (let i = 0; i < ring.length - 1; i++) {
-            area += (ring[i + 1][0] - ring[i][0]) * (ring[i + 1][1] + ring[i][1])
+        // Add outline layer for artifact boundaries
+        const outlineData: GeoJSONFeature<Polygon | MultiPolygon> = {
+            type: 'Feature',
+            geometry:
+                polygons.length === 1
+                    ? polygons[0].geometry
+                    : {
+                          type: 'MultiPolygon',
+                          coordinates: polygons.flatMap(p =>
+                              p.geometry.type === 'MultiPolygon' ? p.geometry.coordinates : [p.geometry.coordinates]
+                          )
+                      },
+            properties: {}
         }
-        return area > 0 ? ring : [...ring].reverse()
+
+        const outlineSource = this.map.getSource(this.OUTLINE_SOURCE_ID) as GeoJSONSource | undefined
+        if (outlineSource) {
+            outlineSource.setData(outlineData)
+        } else {
+            this.map.addSource(this.OUTLINE_SOURCE_ID, { type: 'geojson', data: outlineData })
+        }
+
+        if (!this.map.getLayer(this.OUTLINE_LAYER_ID)) {
+            this.map.addLayer({
+                id: this.OUTLINE_LAYER_ID,
+                type: 'line',
+                source: this.OUTLINE_SOURCE_ID,
+                paint: {
+                    'line-color': '#666',
+                    'line-width': 2,
+                    'line-opacity': 0.75,
+                    'line-dasharray': [4, 1]
+                }
+            })
+        }
+
+        this.map.moveLayer(this.LAYER_ID)
+        this.map.moveLayer(this.OUTLINE_LAYER_ID)
     }
 }

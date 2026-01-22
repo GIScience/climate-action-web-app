@@ -58,7 +58,6 @@ describe('LegendComponent', () => {
 
         const canvas = legendContainer.query(By.css('canvas'))
         expect(canvas).toBeTruthy()
-        expect(canvas.attributes['id']).toBe('canvas_seismic')
 
         const ticksContainer = legendContainer.query(By.css('.ticks'))
         const ticks = ticksContainer.queryAll(By.css('span'))
