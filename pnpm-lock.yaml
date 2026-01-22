@@ -68,6 +68,9 @@ importers:
       '@turf/mask':
         specifier: ^7.3.1
         version: 7.3.1
+      '@turf/union':
+        specifier: ^7.3.2
+        version: 7.3.2
       '@watergis/maplibre-gl-terradraw':
         specifier: ^1.4.0
         version: 1.10.0(maplibre-gl@5.15.0)(terra-draw@1.11.0)
@@ -2189,11 +2192,20 @@ packages:
   '@turf/helpers@7.3.1':
     resolution: {integrity: sha512-zkL34JVhi5XhsuMEO0MUTIIFEJ8yiW1InMu4hu/oRqamlY4mMoZql0viEmH6Dafh/p+zOl8OYvMJ3Vm3rFshgg==}
 
+  '@turf/helpers@7.3.2':
+    resolution: {integrity: sha512-5HFN42rgWjSobdTMxbuq+ZdXPcqp1IbMgFYULTLCplEQM3dXhsyRFe7DCss4Eiw12iW3q6Z5UeTNVfITsE5lgA==}
+
   '@turf/mask@7.3.1':
     resolution: {integrity: sha512-rSNS6wNuBiaUR1aU7tobgkzHpot5v9GKCn+n5gQ3ad7KWqwwqLWfcCPeyHBWkWEoEwc2yfPqikMQugZbmxrorg==}
 
   '@turf/meta@7.3.1':
     resolution: {integrity: sha512-NWsfOE5RVtWpLQNkfOF/RrYvLRPwwruxhZUV0UFIzHqfiRJ50aO9Y6uLY4bwCUe2TumLJQSR4yaoA72Rmr2mnQ==}
+
+  '@turf/meta@7.3.2':
+    resolution: {integrity: sha512-FIcIY+ZsAe9QV4fHciTXeuRz2TKIVaEjivkl4vMFCibdj7FUkWDofqOncbIre1xPrgktQeh20ZrmD+p0kf3n4Q==}
+
+  '@turf/union@7.3.2':
+    resolution: {integrity: sha512-farmJGdWwaof5m0NHRR0PZ23WyMAIbFuofePQ+BJmJchJTwEV2Ez2zKqPl2q5ZXaYhVNCWo+bYN2umOBIFjDig==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -8107,6 +8119,11 @@ snapshots:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
+  '@turf/helpers@7.3.2':
+    dependencies:
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
   '@turf/mask@7.3.1':
     dependencies:
       '@turf/clone': 7.3.1
@@ -8119,6 +8136,20 @@ snapshots:
     dependencies:
       '@turf/helpers': 7.3.1
       '@types/geojson': 7946.0.16
+
+  '@turf/meta@7.3.2':
+    dependencies:
+      '@turf/helpers': 7.3.2
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
+  '@turf/union@7.3.2':
+    dependencies:
+      '@turf/helpers': 7.3.2
+      '@turf/meta': 7.3.2
+      '@types/geojson': 7946.0.16
+      polyclip-ts: 0.16.8
+      tslib: 2.8.1
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
