@@ -131,6 +131,9 @@ importers:
       ol:
         specifier: ^10.0.0
         version: 10.7.0
+      plotly.js-locales:
+        specifier: 3.3.1
+        version: 3.3.1
       plotly.js-strict-dist:
         specifier: ^3.0.1
         version: 3.3.1
@@ -5066,6 +5069,9 @@ packages:
 
   pkg-types@2.2.0:
     resolution: {integrity: sha512-2SM/GZGAEkPp3KWORxQZns4M+WSeXbC2HEvmOIJe3Cmiv6ieAJvdVhDldtHqM5J1Y7MrR1XhkBT/rMlhh9FdqQ==}
+
+  plotly.js-locales@3.3.1:
+    resolution: {integrity: sha512-UG88vrCgPVeXQie+f2dCbv08n2bm5p0UoCObAZlSoX4jlgsvLl8Cl6TrYIgCESR8itSb7QKosk+THRkgqaE0/g==}
 
   plotly.js-strict-dist@3.3.1:
     resolution: {integrity: sha512-Nv1mPnnuDyyDf3hKAHW4WPDoOiuQ5eQyinv5pOKDCwcDVtxtOh2siKGcubvLyNarru3DX04zLxvilcfkFBVR7g==}
@@ -11656,6 +11662,8 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
     optional: true
+
+  plotly.js-locales@3.3.1: {}
 
   plotly.js-strict-dist@3.3.1: {}
 

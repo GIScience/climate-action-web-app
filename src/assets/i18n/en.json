@@ -121,6 +121,12 @@
         "detailedDescription": "Detailed Description",
         "sources": "Sources"
     },
+    "plotlyChart": {
+        "tooltip": {
+            "enterFullscreen": "Enter fullscreen",
+            "exitFullscreen": "Exit fullscreen"
+        }
+    },
     "report": {
         "title": "Report Builder",
         "exportToPDF": "Export to PDF",
