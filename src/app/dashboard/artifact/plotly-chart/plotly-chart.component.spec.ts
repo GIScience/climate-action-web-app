@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { TranslocoTestingModule } from '@jsverse/transloco'
 import { Artifact } from '../artifact.interface'
 import { PlotlyChartComponent } from './plotly-chart.component'
 
@@ -8,7 +9,10 @@ describe('PlotlyChartComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [PlotlyChartComponent]
+            imports: [
+                PlotlyChartComponent,
+                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+            ]
         }).compileComponents()
 
         fixture = TestBed.createComponent(PlotlyChartComponent)
