@@ -494,6 +494,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.id,
                     params: response.params,
+                    requested_params: response.requested_params,
                     artifact_errors: response.artifact_errors,
                     flags: run.flags
                 }
@@ -659,7 +660,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     viewParameters(computation: ComputationDisplayEntity, event?: Event) {
         event?.stopPropagation()
         this.dialog.open(this.parametersDialog, {
-            data: { parameters: JSON.stringify(computation.params) },
+            data: {
+                params: computation.params,
+                requestedParams: computation.requested_params
+            },
             autoFocus: false
         })
     }
@@ -770,9 +774,42 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         checkAndScheduleNext()
     }
 
-    getParameterEntries(params: string | object): [string, string][] {
+    getParameterEntries(params: string | object | null | undefined): { key: string; value: string }[] {
+        if (!params) return []
         const obj = typeof params === 'string' ? JSON.parse(params) : params
-        return Object.entries(obj)
+        if (!obj || typeof obj !== 'object') return []
+        return Object.entries(obj).map(([key, value]) => ({
+            key,
+            value: this.formatParameterValue(value)
+        }))
+    }
+
+    formatParameterValue(value: unknown): string {
+        if (value === null || value === undefined) {
+            return ''
+        }
+        if (Array.isArray(value)) {
+            return value.map(v => this.formatParameterValue(v)).join(', ')
+        }
+        switch (typeof value) {
+            case 'boolean':
+                return value ? 'Yes' : 'No'
+            case 'object':
+                return Object.entries(value as Record<string, unknown>)
+                    .map(([k, v]) => `${this.formatParameterName(k)}: ${this.formatParameterValue(v)}`)
+                    .join('; ')
+            default:
+                return String(value)
+        }
+    }
+
+    isUserRequestedParam(key: string, requestedParams?: ComputationParameters): boolean {
+        return !!requestedParams && key in requestedParams
+    }
+
+    hasUserRequestedParams(params?: ComputationParameters, requestedParams?: ComputationParameters): boolean {
+        if (!params || !requestedParams) return false
+        return Object.keys(params).some(key => key in requestedParams)
     }
 
     formatParameterName(name: string): string {

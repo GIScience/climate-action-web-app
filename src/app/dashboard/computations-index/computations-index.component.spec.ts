@@ -1,5 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing'
+import { MatDialog } from '@angular/material/dialog'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
@@ -26,6 +27,7 @@ describe('ComputationsIndexComponent', () => {
     let mockStorageService: Partial<StorageService>
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
+    let mockMatDialog: { open: jest.Mock; closeAll: jest.Mock }
 
     let pluginRuns$: BehaviorSubject<ComputationDisplayEntity[]>
 
@@ -83,6 +85,10 @@ describe('ComputationsIndexComponent', () => {
         }
 
         mockMapService.highlightAoI = jest.fn().mockReturnValue([0, 0, 1, 1])
+        mockMatDialog = {
+            open: jest.fn(),
+            closeAll: jest.fn()
+        }
 
         await TestBed.configureTestingModule({
             imports: [
@@ -97,6 +103,7 @@ describe('ComputationsIndexComponent', () => {
                 { provide: StorageService, useValue: mockStorageService },
                 { provide: ArtifactService, useValue: mockArtifactService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: MatDialog, useValue: mockMatDialog },
                 { provide: ToastrService, useClass: MockToastrService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
@@ -471,4 +478,52 @@ describe('ComputationsIndexComponent', () => {
 
         discardPeriodicTasks()
     }))
+
+    it('should open dialog with params and requested params', () => {
+        const computation = {
+            artifacts: [],
+            correlation_uuid: 'test-id',
+            request_ts: new Date('2024-01-01T00:00:00Z'),
+            status: 'SUCCESS',
+            artifact_errors: {},
+            params: { foo: 'bar' },
+            requested_params: { foo: 'bar' }
+        } as ComputationDisplayEntity
+
+        component.viewParameters(computation)
+
+        expect(mockMatDialog.open).toHaveBeenCalledWith(
+            component.parametersDialog,
+            expect.objectContaining({
+                data: {
+                    params: computation.params,
+                    requestedParams: computation.requested_params
+                },
+                autoFocus: false
+            })
+        )
+    })
+
+    it('should format values and handle nested structures', () => {
+        const entries = component.getParameterEntries({
+            enabled: true,
+            names: ['alpha', 'beta'],
+            config: { max_value: 3 }
+        })
+
+        expect(entries).toEqual([
+            { key: 'enabled', value: 'Yes' },
+            { key: 'names', value: 'alpha, beta' },
+            { key: 'config', value: 'Max Value: 3' }
+        ])
+    })
+
+    it('requested param helpers should detect requested params', () => {
+        const params = { foo: 1, bar: 2 }
+        const requested = { bar: 2 }
+
+        expect(component.hasUserRequestedParams(params, requested)).toBe(true)
+        expect(component.isUserRequestedParam('bar', requested)).toBe(true)
+        expect(component.isUserRequestedParam('foo', requested)).toBe(false)
+    })
 })

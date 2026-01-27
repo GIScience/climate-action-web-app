@@ -316,13 +316,23 @@
         <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
             <div class="parameters-dialog__content" scrollViewport>
                 <h3>{{ 'computationsIndex.parameters.title' | transloco }}</h3>
-                @if (getParameterEntries(data.parameters).length > 0) {
+                @if (hasUserRequestedParams(data.params, data.requestedParams)) {
+                    <p class="parameters-legend">
+                        <span class="user-defined-indicator"></span>
+                        {{ 'computationsIndex.parameters.userDefined' | transloco }}
+                    </p>
+                }
+                @let entries = getParameterEntries(data.params);
+                @if (entries.length > 0) {
                     <table class="parameters-table">
                         <tbody>
-                            @for (item of getParameterEntries(data.parameters); track item) {
-                                <tr>
-                                    <td class="parameter-name">{{ formatParameterName(item[0]) }}</td>
-                                    <td class="parameter-value">{{ item[1] }}</td>
+                            @for (entry of entries; track entry.key) {
+                                <tr
+                                    [ngClass]="{
+                                        'user-defined': isUserRequestedParam(entry.key, data.requestedParams)
+                                    }">
+                                    <td class="parameter-name">{{ formatParameterName(entry.key) }}</td>
+                                    <td class="parameter-value">{{ entry.value }}</td>
                                 </tr>
                             }
                         </tbody>
@@ -330,9 +340,6 @@
                 } @else {
                     <p class="no-params-message">{{ 'computationsIndex.parameters.noParams' | transloco }}</p>
                 }
-                <ng-template #noParams>
-                    <p class="no-params-message">{{ 'computationsIndex.parameters.noParams' | transloco }}</p>
-                </ng-template>
             </div>
         </ng-scrollbar>
         <button (click)="closeDialog()" class="close-dialog">

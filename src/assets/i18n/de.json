@@ -83,7 +83,8 @@
         "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
         "parameters": {
             "title": "Einstellungen",
-            "noParams": "Es wurden keine Einstellungsparameter angegeben."
+            "noParams": "Es wurden keine Einstellungsparameter angegeben.",
+            "userDefined": "Benutzerdefinierter Parameter"
         },
         "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
         "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden.",

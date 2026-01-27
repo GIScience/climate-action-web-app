@@ -442,6 +442,24 @@
         margin-top: 0;
     }
 
+    .parameters-legend {
+        align-items: center;
+        color: #666;
+        display: flex;
+        font-size: 12px;
+        gap: 8px;
+        margin-bottom: 15px;
+        margin-top: 0;
+
+        .user-defined-indicator {
+            background-color: #008080;
+            border-radius: 2px;
+            display: inline-block;
+            height: 12px;
+            width: 4px;
+        }
+    }
+
     .parameters-dialog__content {
         max-height: 50vh !important;
         max-width: 650px !important;
@@ -452,15 +470,31 @@
             border-collapse: collapse;
             width: 100%;
 
+            tr.user-defined {
+                td {
+                    background-color: rgba(0, 128, 128, 0.08);
+
+                    &.parameter-name {
+                        border-left: 4px solid #008080;
+                        color: #006666;
+                    }
+                }
+            }
+
             td {
                 border-bottom: 1px solid #ccc;
                 padding: 8px 12px;
 
                 &.parameter-name {
+                    border-left: 4px solid transparent;
                     border-right: 1px solid #ccc;
                     color: #666;
                     font-variation-settings: 'wght' 500;
                     width: 40%;
+                }
+
+                &.parameter-value {
+                    word-break: break-word;
                 }
             }
 
