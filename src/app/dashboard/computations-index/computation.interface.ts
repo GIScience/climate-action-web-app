@@ -13,6 +13,7 @@ export interface ComputationMetadata {
     correlation_uuid: string
     request_ts: Date
     params: ComputationParameters
+    requested_params?: ComputationParameters
     aoi: Feature<MultiPolygon>
     artifacts: Artifact[]
     plugin_info: PluginBaseInfo
@@ -23,7 +24,7 @@ export interface ComputationMetadata {
 
 export interface ComputationDisplayEntity extends Pick<
     ComputationMetadata,
-    'correlation_uuid' | 'request_ts' | 'params' | 'status' | 'artifact_errors'
+    'correlation_uuid' | 'request_ts' | 'params' | 'requested_params' | 'status' | 'artifact_errors'
 > {
     artifacts: ArtifactEntity[]
     aoiName?: string
