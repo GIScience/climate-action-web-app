@@ -188,31 +188,27 @@
 }
 
 .description-dialog {
-    padding: 20px;
+    padding: 20px 30px;
     position: relative;
 
-    h3 {
-        margin-bottom: 15px;
-        margin-top: 0;
+    mat-tab-group {
+        min-width: 500px;
+    }
+
+    .description-dialog__scrollbar {
+        max-height: 50vh;
     }
 
     .description-dialog__content {
-        max-height: 50vh !important;
-        max-width: 650px !important;
+        max-width: 650px;
         min-width: 500px;
+        padding-top: 15px;
         position: relative;
-    }
-
-    app-markdown + .artifact-sources-section {
-        margin-top: 1.5rem;
-    }
-
-    .artifact-sources-section h3 {
-        margin-top: 0;
     }
 
     ul.artifact-sources {
         list-style: unset;
+        margin: 0;
         padding: 0 2em;
 
         li {
@@ -228,7 +224,7 @@
         cursor: pointer;
         position: absolute;
         right: 0;
-        top: 10px;
+        top: 7.5px;
 
         &:hover {
             color: #333;

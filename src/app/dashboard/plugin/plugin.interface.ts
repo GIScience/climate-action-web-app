@@ -45,6 +45,7 @@ export interface ComputeRequest {
 
 export interface DemoConfig {
     aoi: MultiPolygon
+    name?: string
     params: Record<string, unknown>
 }
 

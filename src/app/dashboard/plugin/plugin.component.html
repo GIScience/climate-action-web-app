@@ -142,36 +142,44 @@
 
 <ng-template #pluginMethodologyDialog let-data>
     <div class="plugin-methodology-dialog">
-        <ng-scrollbar visibility="hover" orientation="vertical">
-            <h2>{{ 'plugin.dialog.methodology' | transloco }}</h2>
-            <markdown [data]="data.methodology" ngPreserveWhitespaces class="markdown"></markdown>
-            @if (data.sources) {
-                <div class="plugin-sources-section">
-                    <h3>{{ 'plugin.dialog.sources' | transloco }}</h3>
-                    <div class="plugin-sources">
-                        @for (source of sortSourcesByAuthor(data.sources); track source) {
-                            <p class="plugin-source-entry">
-                                {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
-                                @if (source.url) {
-                                    <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
-                                        source.url
-                                    }}</a>
-                                }
-                            </p>
-                        }
+        <mat-tab-group>
+            <mat-tab [label]="'plugin.dialog.methodology' | transloco">
+                <ng-scrollbar orientation="vertical" class="plugin-methodology-dialog__scrollbar">
+                    <div class="plugin-methodology-dialog__content">
+                        <markdown [data]="data.methodology" ngPreserveWhitespaces class="markdown"></markdown>
                     </div>
-                </div>
+                </ng-scrollbar>
+            </mat-tab>
+            @if (data.sources && data.sources.length > 0) {
+                <mat-tab [label]="'plugin.dialog.sources' | transloco">
+                    <ng-scrollbar orientation="vertical" class="plugin-methodology-dialog__scrollbar">
+                        <div class="plugin-methodology-dialog__content">
+                            <div class="plugin-sources">
+                                @for (source of sortSourcesByAuthor(data.sources); track source) {
+                                    <p class="plugin-source-entry">
+                                        {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
+                                        @if (source.url) {
+                                            <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
+                                                source.url
+                                            }}</a>
+                                        }
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    </ng-scrollbar>
+                </mat-tab>
             }
-        </ng-scrollbar>
+        </mat-tab-group>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="CircleX" size="25"></i-lucide>
+            <i-lucide [img]="X" size="25"></i-lucide>
         </button>
     </div>
 </ng-template>
 
 <ng-template #pluginCreditsDialog let-data>
     <div class="plugin-credits-dialog">
-        <ng-scrollbar visibility="hover" orientation="vertical">
+        <ng-scrollbar orientation="vertical">
             <h2>{{ 'plugin.dialog.credits' | transloco }}</h2>
             <ul class="plugin-authors">
                 @for (author of data.authors; track author) {
@@ -188,7 +196,7 @@
             </ul>
         </ng-scrollbar>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="CircleX" size="25"></i-lucide>
+            <i-lucide [img]="X" size="25"></i-lucide>
         </button>
     </div>
 </ng-template>

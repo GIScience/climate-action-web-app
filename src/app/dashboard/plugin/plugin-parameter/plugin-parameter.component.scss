@@ -3,7 +3,7 @@
         border: 1px solid #bbb;
         border-radius: 15px;
         margin-bottom: 15px;
-        padding: 10px;
+        padding: 15px 10px;
 
         h4 {
             margin-bottom: 5px;
@@ -63,7 +63,7 @@
         border-bottom: 2.5px solid;
         border-top: 2.5px solid;
         display: flex;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         margin-left: -10px;
         padding: 7.5px 10px;
         width: calc(100% + 20px);
@@ -91,44 +91,53 @@
     .selected-regions {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 5px;
+        gap: 10px;
 
         .region-item {
             align-items: center;
-            border: 2px solid #008080;
+            background: linear-gradient(135deg, #f0fdfa 0%, #e6f7f5 100%);
+            border: 1px solid rgba(0, 128, 128, 0.5);
             border-radius: 7.5px;
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 7.5px 5px 0;
-            padding: 2.5px 10px 5px;
+            display: inline-flex;
+            gap: 7.5px;
+            padding: 7.5px 12.5px;
+            position: relative;
+            transition: all 0.2s ease;
 
             .region-name {
-                display: inline-block;
+                font-size: 13px;
                 font-weight: 600;
-                margin-top: 2.5px;
-                max-width: 215px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
 
             input.region-name {
-                font-weight: 400;
-                margin-top: 2.5px;
-                padding: 5px;
+                background: #fff;
+                border: 1px solid rgba(0, 128, 128, 0.25);
+                border-radius: 4px;
+                font-size: 13px;
+                font-weight: 500;
+                padding: 4px 8px;
+                width: 140px;
+
+                &:focus {
+                    border-color: #008080;
+                    outline: none;
+                }
             }
 
             .region-area {
-                display: inline-block;
-                margin-left: 5px;
+                background-color: rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+                font-size: 12px;
+                padding: 2.5px 7.5px;
                 white-space: nowrap;
             }
 
             .deselect-region {
                 align-items: center;
-                background: #ddd;
-                border: none;
+                background: #eee;
+                border: 1px solid #aaa;
                 border-radius: 50%;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                 color: #666;
                 cursor: pointer;
                 display: flex;
@@ -136,21 +145,18 @@
                 font-weight: 600;
                 height: 22.5px;
                 justify-content: center;
-                margin-left: 5px;
-                margin-top: 2.5px;
+                position: absolute;
+                right: -10px;
+                top: -10px;
+                transition: all 0.15s ease;
                 width: 22.5px;
 
                 &:hover {
-                    background-color: rgba(156, 12, 5, 0.75);
-                    color: #fff;
+                    background: #fef2f2;
+                    border-color: #fecaca;
+                    color: #dc2626;
                 }
             }
-        }
-
-        .error-message {
-            color: rgba(156, 12, 5, 0.75);
-            font-size: 12px;
-            margin-left: 15px;
         }
     }
 

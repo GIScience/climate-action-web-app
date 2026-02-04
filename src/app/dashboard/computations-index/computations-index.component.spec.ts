@@ -352,7 +352,7 @@ describe('ComputationsIndexComponent', () => {
     }))
 
     it('should fetch a demo computation when no demos exist and the plugin is configured for demos', fakeAsync(() => {
-        component.demoConfig = true
+        component.hasDemoConfig = true
         component.demoRuns = []
         component.pluginId = 'test_plugin'
         component.currentRuns = []

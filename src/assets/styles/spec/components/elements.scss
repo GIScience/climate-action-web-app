@@ -190,3 +190,11 @@ i-lucide {
 .mat-mdc-dialog-container .mdc-dialog__surface {
     border-radius: 10px !important;
 }
+
+.mat-mdc-tab .mdc-tab-indicator__content--underline {
+    border-color: #008080 !important;
+}
+
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #008080 !important;
+}

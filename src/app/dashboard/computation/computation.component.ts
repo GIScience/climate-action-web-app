@@ -13,12 +13,13 @@ import {
 } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
+import { MatTabsModule } from '@angular/material/tabs'
 import { formatSourceText } from '@app/utils/source.utils'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { CircleX, ClipboardPlus, Download, LucideAngularModule, Pin, PinOff, ReceiptText, X } from 'lucide-angular'
+import { ClipboardPlus, Download, LucideAngularModule, Pin, PinOff, ReceiptText, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
@@ -44,6 +45,7 @@ enum DefaultTag {
         CommonModule,
         LucideAngularModule,
         MatIconModule,
+        MatTabsModule,
         TippyDirective,
         TranslocoModule,
         MarkdownComponent,
@@ -108,7 +110,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
     readonly ClipboardPlus = ClipboardPlus
     readonly Download = Download
     readonly ReceiptText = ReceiptText
-    readonly CircleX = CircleX
     readonly Pin = Pin
     readonly PinOff = PinOff
     readonly X = X
@@ -154,7 +155,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
             const added = this.mapArtifactManager.setTransientArtifact(
                 artifact,
                 this.computation.correlation_uuid,
-                this.computation.geometry
+                this.computation.geometry,
+                this.computation.aoiName
             )
             if (!added) {
                 this.showToast(
@@ -186,7 +188,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
         const added = this.mapArtifactManager.addMapArtifact(artifact, {
             pinned: true,
             computationGeometry: this.computation.geometry,
-            computationId: this.computation.correlation_uuid
+            computationId: this.computation.correlation_uuid,
+            aoiName: this.computation.aoiName
         })
         if (!added) return
 
