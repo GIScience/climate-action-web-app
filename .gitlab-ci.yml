@@ -119,6 +119,7 @@ build_staging:
             docker --config ~/ca_config \
                 buildx build \
                 --builder=kube \
+                --opt max-parallelism=2 \
                 --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
                 --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=min \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
