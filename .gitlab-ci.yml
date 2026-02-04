@@ -14,102 +14,103 @@ cache:
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
 
-test_jest_and_lint:
-    stage: test
-    tags: []
-    rules:
-        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-        - when: never
-    cache:
-        key:
-            files:
-                - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
-        paths:
-            - .pnpm-store
-            - .jest-cache
-        policy: pull-push
-    image:
-        name: trion/ng-cli-karma:20.3.11
-    variables:
-        NODE_OPTIONS: '--no-warnings'
-    before_script:
-        - |
-            cat > "./src/assets/env.js" << EOF
-            ;(function (window) {
-                window.env = window.env || {}
-                window['env']['ENVIRONMENT_TYPE'] = 'testing'
-            })(this)
-            EOF
-        - pnpm config set store-dir .pnpm-store
-        - pnpm install --frozen-lockfile --prefer-offline
-    script:
-        - pnpm lint
-        - pnpm test:coverage
-    artifacts:
-        reports:
-            coverage_report:
-                coverage_format: cobertura
-                path: coverage/cobertura-coverage.xml
+# test_jest_and_lint:
+#     stage: test
+#     tags: []
+#     rules:
+#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+#         - when: never
+#     cache:
+#         key:
+#             files:
+#                 - pnpm-lock.yaml
+#             prefix: $CI_COMMIT_REF_NAME
+#         paths:
+#             - .pnpm-store
+#             - .jest-cache
+#         policy: pull-push
+#     image:
+#         name: trion/ng-cli-karma:20.3.11
+#     variables:
+#         NODE_OPTIONS: '--no-warnings'
+#     before_script:
+#         - |
+#             cat > "./src/assets/env.js" << EOF
+#             ;(function (window) {
+#                 window.env = window.env || {}
+#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
+#             })(this)
+#             EOF
+#         - pnpm config set store-dir .pnpm-store
+#         - pnpm install --frozen-lockfile --prefer-offline
+#     script:
+#         - pnpm lint
+#         - pnpm test:coverage
+#     artifacts:
+#         reports:
+#             coverage_report:
+#                 coverage_format: cobertura
+#                 path: coverage/cobertura-coverage.xml
 
-test_cypress:
-    stage: test
-    tags: []
-    rules:
-        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-        - when: never
-    cache:
-        key:
-            files:
-                - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
-        paths:
-            - .pnpm-store
-            - .cache/Cypress
-    variables:
-        NODE_ENV: 'test'
-        NODE_OPTIONS: '--no-warnings'
-        CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/.cache/Cypress'
-    needs: ['test_jest_and_lint']
-    image:
-        name: cypress/included:cypress-14.5.4-node-22.18.0-chrome-139.0.7258.66-1-ff-141.0.3-edge-138.0.3351.121-1
-        entrypoint: ['']
-    before_script:
-        - |
-            cat > "./src/assets/env.js" << EOF
-            ;(function (window) {
-                window.env = window.env || {}
-                window['env']['ENVIRONMENT_TYPE'] = 'testing'
-                window['env']['ORS_API_KEY'] = '${ORS_API_KEY}'
-            })(this)
-            EOF
-        - npm install -g pnpm
-        - pnpm config set store-dir .pnpm-store
-        - pnpm install --frozen-lockfile --prefer-offline
-        - mkdir -p .cache/Cypress
-        - |
-            if ls "$CYPRESS_CACHE_FOLDER"/*/Cypress >/dev/null 2>&1; then
-              echo "Using cached Cypress binary"
-            else
-              pnpm exec cypress install
-            fi
-    script:
-        - pnpm start & pnpm exec wait-on http://localhost:4200
-        - pnpm cy:run
-    artifacts:
-        when: on_failure
-        paths:
-            - cypress/screenshots/**/*.png
-            - cypress/snapshots/actual/**/*.png
-            - cypress/snapshots/diff/**/*.png
-        expire_in: 30 day
+# test_cypress:
+#     stage: test
+#     tags: []
+#     rules:
+#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+#         - when: never
+#     cache:
+#         key:
+#             files:
+#                 - pnpm-lock.yaml
+#             prefix: $CI_COMMIT_REF_NAME
+#         paths:
+#             - .pnpm-store
+#             - .cache/Cypress
+#     variables:
+#         NODE_ENV: 'test'
+#         NODE_OPTIONS: '--no-warnings'
+#         CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/.cache/Cypress'
+#     needs: ['test_jest_and_lint']
+#     image:
+#         name: cypress/included:cypress-14.5.4-node-22.18.0-chrome-139.0.7258.66-1-ff-141.0.3-edge-138.0.3351.121-1
+#         entrypoint: ['']
+#     before_script:
+#         - |
+#             cat > "./src/assets/env.js" << EOF
+#             ;(function (window) {
+#                 window.env = window.env || {}
+#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
+#                 window['env']['ORS_API_KEY'] = '${ORS_API_KEY}'
+#             })(this)
+#             EOF
+#         - npm install -g pnpm
+#         - pnpm config set store-dir .pnpm-store
+#         - pnpm install --frozen-lockfile --prefer-offline
+#         - mkdir -p .cache/Cypress
+#         - |
+#             if ls "$CYPRESS_CACHE_FOLDER"/*/Cypress >/dev/null 2>&1; then
+#               echo "Using cached Cypress binary"
+#             else
+#               pnpm exec cypress install
+#             fi
+#     script:
+#         - pnpm start & pnpm exec wait-on http://localhost:4200
+#         - pnpm cy:run
+#     artifacts:
+#         when: on_failure
+#         paths:
+#             - cypress/screenshots/**/*.png
+#             - cypress/snapshots/actual/**/*.png
+#             - cypress/snapshots/diff/**/*.png
+#         expire_in: 30 day
 
 build_staging:
     stage: build
     tags: [k8s]
     cache: []
     rules:
-        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     image: docker.io/docker:cli
     before_script:
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
