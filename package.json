@@ -51,7 +51,7 @@
         "geotiff": "^2.1.4-beta.0",
         "jspdf": "^3.0.1",
         "lodash": "^4.17.21",
-        "lucide-angular": "^0.562.0",
+        "lucide-angular": "^0.563.0",
         "maplibre-gl": "^5.6.1",
         "maplibre-ui-translations": "^0.4.0",
         "marked": "^17.0.0",
