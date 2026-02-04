@@ -2,6 +2,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
+import { MatTabsModule } from '@angular/material/tabs'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
@@ -16,7 +17,8 @@ import {
     CloudOff,
     DiamondPlus,
     ExternalLink,
-    LucideAngularModule
+    LucideAngularModule,
+    X
 } from 'lucide-angular'
 import { MarkdownModule } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
@@ -35,6 +37,7 @@ import { PluginService } from './plugin.service'
     imports: [
         CommonModule,
         MarkdownModule,
+        MatTabsModule,
         ComputationsIndexComponent,
         PluginParameterComponent,
         TippyDirective,
@@ -93,6 +96,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     readonly ChevronsDown = ChevronsDown
     readonly DiamondPlus = DiamondPlus
     readonly CircleX = CircleX
+    readonly X = X
     readonly CloudOff = CloudOff
     readonly ExternalLink = ExternalLink
 

@@ -313,9 +313,9 @@
 
 <ng-template #parametersDialog let-data>
     <div class="parameters-dialog">
-        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-            <div class="parameters-dialog__content" scrollViewport>
-                <h3>{{ 'computationsIndex.parameters.title' | transloco }}</h3>
+        <h3>{{ 'computationsIndex.parameters.title' | transloco }}</h3>
+        <ng-scrollbar orientation="vertical" class="parameters-dialog__scrollbar">
+            <div class="parameters-dialog__content">
                 @if (hasUserRequestedParams(data.params, data.requestedParams)) {
                     <p class="parameters-legend">
                         <span class="user-defined-indicator"></span>
@@ -343,7 +343,7 @@
             </div>
         </ng-scrollbar>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="CircleX" size="30"></i-lucide>
+            <i-lucide [img]="X" size="25"></i-lucide>
         </button>
     </div>
 </ng-template>
@@ -351,10 +351,12 @@
 <ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
     <div class="artifact-errors-tooltip">
         <h3 class="tooltip-title">{{ 'computationsIndex.artifactErrors' | transloco }}</h3>
-        @for (error of getArtifactErrorEntries(artifactErrors); track error) {
-            <p class="error-item">
-                <strong>{{ error[0] }}:</strong> {{ error[1] }}
-            </p>
+        @if (artifactErrors) {
+            @for (error of getArtifactErrorEntries(artifactErrors); track error[0]) {
+                <p class="error-item">
+                    <strong>{{ error[0] }}:</strong> {{ error[1] }}
+                </p>
+            }
         }
     </div>
 </ng-template>

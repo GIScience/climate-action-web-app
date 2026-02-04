@@ -211,17 +211,20 @@
 }
 
 .plugin-methodology-dialog {
-    padding: 20px;
+    padding: 20px 30px;
     position: relative;
 
-    h2 {
-        margin-top: 0;
+    mat-tab-group {
+        min-width: 500px;
     }
 
-    .ng-scrollbar {
+    &__scrollbar {
         max-height: 50vh !important;
         max-width: 650px !important;
-        position: relative;
+    }
+
+    &__content {
+        padding: 15px 5px;
     }
 
     button.close-dialog {
@@ -231,8 +234,8 @@
         color: #666;
         cursor: pointer;
         position: absolute;
-        right: 5px;
-        top: 15px;
+        right: 0;
+        top: 7.5px;
     }
 
     table,
@@ -263,7 +266,7 @@
 .plugin-credits-dialog {
     max-height: 50vh !important;
     max-width: 650px !important;
-    padding: 20px;
+    padding: 20px 30px;
     position: relative;
 
     h2 {
@@ -278,7 +281,7 @@
         cursor: pointer;
         position: absolute;
         right: 5px;
-        top: 15px;
+        top: 17.5px;
     }
 
     ul.plugin-authors {

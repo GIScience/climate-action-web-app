@@ -2,6 +2,7 @@ import { GeoJSONSource, Map as MaplibreMap, MapMouseEvent, PointLike, Popup, typ
 
 interface HoverContext {
     layers: Map<string, string>
+    displayNameGetters?: Map<string, () => string>
     popup?: Popup
     hoverId?: string | number
     timeout?: number
@@ -22,17 +23,22 @@ export class MapGeoJsonUtils {
         layerId: string,
         artifactName: string,
         popup: Popup | undefined,
-        onPopupChange: (popup: Popup | undefined) => void
+        onPopupChange: (popup: Popup | undefined) => void,
+        getDisplayName?: () => string
     ): void {
         if (!map) return
 
         let ctx = this.contexts.get(map)
         if (!ctx) {
-            ctx = { layers: new Map(), onPopupChange }
+            ctx = { layers: new Map(), displayNameGetters: new Map(), onPopupChange }
             this.contexts.set(map, ctx)
         }
         ctx.onPopupChange = onPopupChange
         ctx.layers.set(layerId, artifactName)
+        if (getDisplayName) {
+            if (!ctx.displayNameGetters) ctx.displayNameGetters = new Map()
+            ctx.displayNameGetters.set(layerId, getDisplayName)
+        }
         if (!ctx.popup && popup) ctx.popup = popup
 
         this.ensureLayers(map)
@@ -50,7 +56,10 @@ export class MapGeoJsonUtils {
         const ctx = this.contexts.get(map)
         if (!ctx) return false
 
-        if (layerId) ctx.layers.delete(layerId)
+        if (layerId) {
+            ctx.layers.delete(layerId)
+            ctx.displayNameGetters?.delete(layerId)
+        }
         if (ctx.layers.size > 0) return true
 
         this.clearHover(map, ctx)
@@ -71,14 +80,14 @@ export class MapGeoJsonUtils {
         ]
 
         const layerIds: string[] = []
-        const layerMap = new Map<string, string>()
+        const layerMap = new Map<string, { name: string; baseId: string }>()
 
         for (const [baseId, name] of ctx.layers) {
             for (const suffix of LAYER_SUFFIXES) {
                 const id = baseId + suffix
                 if (map.getLayer(id)) {
                     layerIds.push(id)
-                    layerMap.set(id, name)
+                    layerMap.set(id, { name, baseId })
                 }
             }
         }
@@ -121,11 +130,17 @@ export class MapGeoJsonUtils {
             const seen = new Set<string>()
             const html = features
                 .map(f => {
-                    const name = layerMap.get(f.layer.id)
-                    if (!name || seen.has(f.layer.id)) return null
-                    seen.add(f.layer.id)
+                    const layerInfo = layerMap.get(f.layer.id)
+                    const baseLayerId = LAYER_SUFFIXES.reduce(
+                        (id, suffix) => (id.endsWith(suffix) ? id.slice(0, -suffix.length) : id),
+                        f.layer.id
+                    )
+                    if (!layerInfo || seen.has(baseLayerId)) return null
+                    seen.add(baseLayerId)
+                    const displayNameGetter = ctx.displayNameGetters?.get(layerInfo.baseId)
+                    const displayName = displayNameGetter ? displayNameGetter() : layerInfo.name
                     const label = f.properties?.['label'] || f.properties?.['name'] || 'Feature'
-                    return `<strong>${name}</strong>: ${label}`
+                    return `<strong>${displayName}</strong>: ${label}`
                 })
                 .filter(Boolean)
                 .join('<hr style="margin:8px 0;border:none;border-top:1px solid #ddd">')

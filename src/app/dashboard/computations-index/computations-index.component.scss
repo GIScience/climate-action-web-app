@@ -116,7 +116,7 @@
                 .ng-scrollbar {
                     max-height: 45vh;
                     min-height: 20vh;
-                    padding: 10px 0;
+                    padding: 10px 0 !important;
                 }
             }
         }
@@ -435,7 +435,7 @@
 }
 
 .parameters-dialog {
-    padding: 20px;
+    padding: 20px 30px;
     position: relative;
 
     h3 {
@@ -460,9 +460,12 @@
         }
     }
 
+    .parameters-dialog__scrollbar {
+        max-height: 50vh;
+    }
+
     .parameters-dialog__content {
-        max-height: 50vh !important;
-        max-width: 650px !important;
+        max-width: 650px;
         min-width: 500px;
         position: relative;
 
@@ -516,8 +519,8 @@
         color: #666;
         cursor: pointer;
         position: absolute;
-        right: 0;
-        top: 10px;
+        right: 5px;
+        top: 15px;
     }
 }
 

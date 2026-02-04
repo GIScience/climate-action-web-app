@@ -28,7 +28,8 @@ import {
     LoaderCircle,
     LucideAngularModule,
     Share2,
-    Trash2
+    Trash2,
+    X
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
@@ -38,6 +39,7 @@ import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
+import { DemoConfig } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
@@ -166,9 +168,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Clipboard = Clipboard
     readonly Trash2 = Trash2
     readonly Import = Import
+    readonly X = X
 
     @Input() pluginId: string = ''
-    @Input() demoConfig: boolean = true
+    @Input() hasDemoConfig: boolean = true
+    demoConfig: DemoConfig | null = null
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
         params: ComputationParameters
@@ -205,7 +209,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .getPluginDetails(this.pluginId)
             .pipe(take(1))
             .subscribe(({ demo_config }) => {
-                this.demoConfig = !!demo_config
+                this.hasDemoConfig = !!demo_config
+                this.demoConfig = demo_config
             })
 
         if (this.pluginService.computeState$) {
@@ -320,7 +325,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
             this.updateNewRuns(documents)
 
-            if (this.currentRuns.length === 0 && this.demoConfig) {
+            if (this.currentRuns.length === 0 && this.hasDemoConfig) {
                 this.checkAndFetchDemoComputation()
             }
 
@@ -901,7 +906,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 correlation_uuid: data.correlation_uuid,
                                 pluginId: this.pluginId,
                                 request_ts: new Date(),
-                                aoiName: 'Demo',
+                                aoiName: this.demoConfig?.name || 'Demo',
                                 status: stateInfo.state,
                                 flags: ['DEMO']
                             }
@@ -919,7 +924,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 correlation_uuid: data.correlation_uuid,
                                 pluginId: this.pluginId,
                                 request_ts: new Date(),
-                                aoiName: 'Demo',
+                                aoiName: this.demoConfig?.name || 'Demo',
                                 status: stateInfo.state,
                                 flags: ['DEMO']
                             }

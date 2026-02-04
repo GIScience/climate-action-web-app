@@ -1,11 +1,13 @@
 import { NgOptimizedImage } from '@angular/common'
-import { AfterViewInit, Component, inject } from '@angular/core'
+import { AfterViewInit, Component, inject, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatDateFnsModule } from '@angular/material-date-fns-adapter'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
+import { Title } from '@angular/platform-browser'
 import { RouterLink, RouterOutlet } from '@angular/router'
+import { environment } from '@environments/environment'
 import { TranslocoModule } from '@jsverse/transloco'
 import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
@@ -45,9 +47,10 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         TranslocoModule
     ]
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit {
     private dashboardService = inject(DashboardService)
     private tourEngine = inject(TourEngine)
+    private titleService = inject(Title)
 
     constructor() {
         void inject(MigrationService)
@@ -56,6 +59,13 @@ export class AppComponent implements AfterViewInit {
     title = 'Climate Action Navigator'
     name = 'HeiGIT'
     version: string = packageInfo.version
+
+    ngOnInit(): void {
+        if (environment.environmentType !== 'production') {
+            const prefix = environment.environmentType.toUpperCase()
+            this.titleService.setTitle(`[${prefix}] ${this.title}`)
+        }
+    }
 
     currentYear(): number {
         return new Date().getFullYear()

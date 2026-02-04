@@ -102,33 +102,39 @@
 
 <ng-template #descriptionDialog let-data>
     <div class="description-dialog">
-        <ng-scrollbar visibility="hover" orientation="vertical" externalViewport>
-            <div class="description-dialog__content" scrollViewport>
-                @if (data.description) {
-                    <h3>{{ 'artifact.detailedDescription' | transloco }}</h3>
-                    <app-markdown [rawMarkdown]="data.description"></app-markdown>
-                }
-                @if (data.sources && data.sources.length > 0) {
-                    <div class="artifact-sources-section">
-                        <h3>{{ 'artifact.sources' | transloco }}</h3>
-                        <ul class="artifact-sources">
-                            @for (source of data.sources; track source.ID) {
-                                <li>
-                                    {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
-                                    @if (source.url) {
-                                        <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
-                                            source.url
-                                        }}</a>
-                                    }
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                }
-            </div>
-        </ng-scrollbar>
+        <mat-tab-group>
+            @if (data.description) {
+                <mat-tab [label]="'artifact.detailedDescription' | transloco">
+                    <ng-scrollbar orientation="vertical" class="description-dialog__scrollbar">
+                        <div class="description-dialog__content">
+                            <app-markdown [rawMarkdown]="data.description"></app-markdown>
+                        </div>
+                    </ng-scrollbar>
+                </mat-tab>
+            }
+            @if (data.sources?.length) {
+                <mat-tab [label]="'artifact.sources' | transloco">
+                    <ng-scrollbar orientation="vertical" class="description-dialog__scrollbar">
+                        <div class="description-dialog__content">
+                            <ul class="artifact-sources">
+                                @for (source of data.sources; track source.ID) {
+                                    <li>
+                                        {{ formatSourceText(source) }}{{ source.url ? ',' : '' }}
+                                        @if (source.url) {
+                                            <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{
+                                                source.url
+                                            }}</a>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </ng-scrollbar>
+                </mat-tab>
+            }
+        </mat-tab-group>
         <button (click)="closeDescriptionDialog()" class="close-dialog">
-            <i-lucide [img]="CircleX" size="30"></i-lucide>
+            <i-lucide [img]="X" size="25"></i-lucide>
         </button>
     </div>
 </ng-template>

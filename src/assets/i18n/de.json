@@ -256,7 +256,7 @@
     "pluginParameter": {
         "areaSelection": "Auswahl einer Region",
         "searchOrZoomInstruction": "Wähle einen Ort auf der Karte. Nutze dazu das Mausrad oder suche einen Ort in der Suchleiste. Du kannst dann eine der folgenden Methoden nutzen, um das Berechnungsgebiet einzugrenzen.",
-        "boundary": "Administrative Grenze",
+        "boundary": "Admin.-Grenze",
         "circle": "Umkreis",
         "rectangle": "Rechteck",
         "polygon": "Polygon",

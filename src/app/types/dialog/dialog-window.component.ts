@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button'
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { FormlyField, FormlyFieldConfig } from '@ngx-formly/core'
-import { CircleX, LucideAngularModule } from 'lucide-angular'
+import { LucideAngularModule, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 @Component({
@@ -18,7 +18,7 @@ export class DialogWindowComponent {
     private translocoService = inject(TranslocoService)
     data = inject<FormlyFieldConfig>(MAT_DIALOG_DATA)
 
-    readonly CircleX = CircleX
+    readonly X = X
 
     closeDialog(): void {
         if (confirm(this.translocoService.translate('dialog.confirmClose'))) {

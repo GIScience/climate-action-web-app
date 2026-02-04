@@ -120,7 +120,7 @@
                                 [formControl]="areaLabelControl"
                                 [value]="areaLabelControl.value" />
                         }
-                        <span class="region-area">({{ region.get('area') }} km<sup>2</sup>)</span>
+                        <span class="region-area">{{ region.get('area') }} km<sup>2</sup></span>
                         <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
                     </div>
                 }

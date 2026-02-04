@@ -747,7 +747,14 @@ export class MapService {
             this.featureHoverOverlay,
             (overlay: Popup | undefined) => {
                 this.featureHoverOverlay = overlay
-            }
+            },
+            this.mapArtifactManager
+                ? () => {
+                      const layers = this.mapArtifactManager!.getActiveMapArtifacts()
+                      const matchingLayer = layers.find(l => l.layerIds?.some(id => id.startsWith(layerId)))
+                      return matchingLayer ? this.mapArtifactManager!.getDisplayName(matchingLayer) : artifactName
+                  }
+                : undefined
         )
 
         this.layerSwitcherControl?.updateLayerControls()

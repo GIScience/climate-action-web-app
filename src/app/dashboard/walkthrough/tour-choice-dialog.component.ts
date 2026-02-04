@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
-import { CircleX, LogIn, LucideAngularModule, Play } from 'lucide-angular'
+import { LogIn, LucideAngularModule, Play, X } from 'lucide-angular'
 import { AppwriteService } from '../../auth/appwrite.service'
 
 export enum TourChoice {
@@ -21,7 +21,7 @@ export class TourChoiceDialogComponent {
     dialogRef = inject<MatDialogRef<TourChoiceDialogComponent>>(MatDialogRef)
     private appwriteService = inject(AppwriteService)
 
-    readonly CircleX = CircleX
+    readonly X = X
     readonly LogIn = LogIn
     readonly Play = Play
 

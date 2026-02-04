@@ -258,7 +258,15 @@ export class MapStyleSwitcherControl implements IControl {
         keys.reverse().forEach(base => {
             const matchingLayer = activeLayers.find(layer => layer.layerIds?.some(id => groups[base].includes(id)))
 
-            const displayName = matchingLayer?.artifact.name ?? base.replace(/^(geojson|geotiff|pmtiles)-|-\d+$/g, '')
+            let displayName: string
+            if (matchingLayer) {
+                const shouldPrefix = activeLayers.length > 1 && matchingLayer.aoiName
+                displayName = shouldPrefix
+                    ? `${matchingLayer.aoiName}: ${matchingLayer.artifact.name}`
+                    : matchingLayer.artifact.name
+            } else {
+                displayName = base.replace(/^(geojson|geotiff|pmtiles)-|-\d+$/g, '')
+            }
 
             const container = Object.assign(document.createElement('div'), { className: 'map-layer' })
             if (matchingLayer && matchingLayer.pinned) {

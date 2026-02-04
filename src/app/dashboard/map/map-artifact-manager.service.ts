@@ -18,6 +18,7 @@ export interface MapArtifactLayer {
     pinned: boolean
     computationId?: string
     computationGeometry?: Feature<Geometry>
+    aoiName?: string
 }
 
 @Injectable({
@@ -104,6 +105,11 @@ export class MapArtifactManagerService implements OnDestroy {
         return this.layers$.value.find(l => this.same(l.artifact, artifact))
     }
 
+    getDisplayName(layer: MapArtifactLayer): string {
+        const shouldPrefix = this.layers$.value.length > 1 && layer.aoiName
+        return shouldPrefix ? `${layer.aoiName}: ${layer.artifact.name}` : layer.artifact.name
+    }
+
     isArtifactPersisted(artifact: Artifact): boolean {
         return this.getLayerInfo(artifact)?.pinned ?? false
     }
@@ -111,7 +117,8 @@ export class MapArtifactManagerService implements OnDestroy {
     setTransientArtifact(
         artifact: ArtifactEntity,
         computationId?: string,
-        computationGeometry?: Feature<Geometry>
+        computationGeometry?: Feature<Geometry>,
+        aoiName?: string
     ): boolean {
         if (!this.isMapArtifact(artifact.modality)) return false
 
@@ -127,10 +134,10 @@ export class MapArtifactManagerService implements OnDestroy {
                 transientsToRemove.forEach(l => l.componentRef?.destroy())
                 return false
             }
-            next = [...next, { artifact, pinned: false, computationId, computationGeometry }]
+            next = [...next, { artifact, pinned: false, computationId, computationGeometry, aoiName }]
         } else if (!existing.pinned && computationId) {
             const idx = next.findIndex(l => this.same(l.artifact, artifact))
-            if (idx !== -1) next[idx] = { ...next[idx], computationId, computationGeometry }
+            if (idx !== -1) next[idx] = { ...next[idx], computationId, computationGeometry, aoiName }
         }
 
         this.layers$.next(next)
@@ -141,7 +148,7 @@ export class MapArtifactManagerService implements OnDestroy {
 
     addMapArtifact(
         artifact: ArtifactEntity,
-        options: { pinned?: boolean; computationGeometry?: Feature<Geometry>; computationId?: string } = {}
+        options: { pinned?: boolean; computationGeometry?: Feature<Geometry>; computationId?: string; aoiName?: string } = {}
     ): boolean {
         if (!this.isMapArtifact(artifact.modality)) return false
 
@@ -174,7 +181,8 @@ export class MapArtifactManagerService implements OnDestroy {
             artifact,
             pinned,
             computationGeometry: options.computationGeometry,
-            computationId: options.computationId
+            computationId: options.computationId,
+            aoiName: options.aoiName
         }
 
         this.layers$.next([...updated, newLayer])
