@@ -1,15 +1,15 @@
-FROM node:22 AS build
+FROM node:22-alpine AS build
 
 WORKDIR /ca-web-app
 
 COPY package*.json pnpm-lock.yaml ./
-RUN npm install -g pnpm
+RUN corepack enable pnpm
 RUN pnpm install --frozen-lockfile
 
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
-RUN pnpm run build:prod
+RUN pnpm run build:prod -- --max-workers=2
 
 FROM nginx:1.29-alpine AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
