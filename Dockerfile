@@ -1,20 +1,7 @@
-FROM node:22-alpine AS build
+FROM nginx:1.29-alpine
 
-WORKDIR /ca-web-app
-
-COPY package*.json pnpm-lock.yaml ./
-RUN corepack enable pnpm
-RUN pnpm install --frozen-lockfile
-
-COPY src/ ./src/
-COPY angular.json ./angular.json
-COPY tsconfig*.json ./
-RUN GOMAXPROCS=2 pnpm run build:prod
-
-FROM nginx:1.29-alpine AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
+COPY dist/browser/ /usr/share/nginx/html/
 
 ENV ENVIRONMENT_TYPE=""
 ENV CLIMATE_ACTION_API_URL=""

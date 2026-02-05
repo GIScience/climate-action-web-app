@@ -4,5 +4,4 @@
 .gitignore
 .angular/**
 
-dist/**
 node_modules/**
