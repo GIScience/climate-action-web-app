@@ -1,6 +1,7 @@
+import { HttpClient } from '@angular/common/http'
 import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
-
+import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -12,6 +13,7 @@ import { MapService } from '../map/map.service'
     providedIn: 'root'
 })
 export class ReportService {
+    private http = inject(HttpClient)
     private injector = inject(EnvironmentInjector)
     private toastr = inject(ToastrService)
     private artifactViewerService = inject(ArtifactViewerService)
@@ -92,7 +94,13 @@ export class ReportService {
                                     artifactService.getVector(artifactInstance)
                                     artifactService.vector.subscribe(data => {
                                         if (data) {
-                                            //mapService.addGeoJsonLayer(data.url, artifactInstance.name)
+                                            if (data.url.endsWith('.geojson')) {
+                                                this.http.get<FeatureCollection>(data.url).subscribe(geojson => {
+                                                    mapService.addGeoJsonLayer(geojson, artifactInstance.name)
+                                                })
+                                            } else if (data.url.endsWith('.pmtiles')) {
+                                                mapService.addPmtilesLayer(data.url, artifactInstance.name)
+                                            }
                                         }
                                     })
                                 } else if (artifactInstance.modality === 'RASTER_MAP_LAYER') {
