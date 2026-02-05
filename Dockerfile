@@ -9,7 +9,7 @@ RUN pnpm install --frozen-lockfile
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
-RUN pnpm run build:prod
+RUN GOMAXPROCS=2 pnpm run build:prod
 
 FROM nginx:1.29-alpine AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
