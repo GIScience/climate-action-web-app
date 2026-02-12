@@ -74,7 +74,6 @@ The web app is [Dockerised](Dockerfile) with runtime configuration support.
 ### Building the Docker image
 
 ```shell
-pnpm run build:prod
 docker build . --tag repo.heigit.org/climate-action/web-app:{image_tag}
 ```
 
