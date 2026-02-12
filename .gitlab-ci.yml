@@ -116,16 +116,17 @@ build_staging:
         # - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
         - docker info
     script:
-        - |
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
-                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
-                --push \
-                .
+        # - |
+        #     docker --config ~/ca_config \
+        #         buildx build \
+        #         --builder=kube \
+        #         --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
+        #         --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
+        #         --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
+        #         --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
+        #         --push \
+        #         .
+        - docker build . --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging
 
 # build_release:
 #     stage: build
