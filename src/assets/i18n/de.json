@@ -68,6 +68,7 @@
             "done": "Fertig"
         },
         "actions": {
+            "menu": "Aktionen",
             "share": "Ergebnis teilen",
             "viewParameters": "Einstellungen anzeigen",
             "archive": "Ergebnis archivieren",

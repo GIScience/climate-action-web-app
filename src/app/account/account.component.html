@@ -14,43 +14,44 @@
         </div>
     }
     @if (user) {
-        <div class="account-menu">
-            <button class="profile-button" (click)="toggleAccountMenu()">
+        <div class="account-menu__wrapper">
+            <button #accountTrigger class="profile-button" (click)="toggleAccountMenu()">
                 {{ 'account.account' | transloco }}
                 <i-lucide [img]="CircleUserRound" size="33" color="#008080"></i-lucide>
             </button>
-            <div
-                class="account-menu__content"
-                [class.show]="accountMenuOpen"
-                (mouseleave)="closeAccountMenu()"
-                (mouseenter)="cancelAccountMenuClose()">
-                <div class="user-info">
-                    <div class="name">{{ user.name }}</div>
-                    <div class="email">{{ user.email }}</div>
+            <ng-template
+                [appDropdownMenu]="accountTrigger"
+                [dropdownOpen]="accountMenuOpen"
+                (dropdownClosed)="closeAccountMenu()">
+                <div class="account-menu">
+                    <div class="user-info">
+                        <div class="name">{{ user.name }}</div>
+                        <div class="email">{{ user.email }}</div>
+                    </div>
+                    <div class="divider"></div>
+                    <a [href]="getAppwriteUrl('/manage/profile')" class="account-menu__item" target="_blank">
+                        <i-lucide [img]="User" size="20"></i-lucide>
+                        {{ 'account.editProfile' | transloco }}
+                    </a>
+                    <a [href]="getAppwriteUrl('/manage/key')" class="account-menu__item" target="_blank">
+                        <i-lucide [img]="Percent" size="20"></i-lucide>
+                        {{ 'account.viewUsage' | transloco }}
+                    </a>
+                    <div class="divider"></div>
+                    <button class="account-menu__item" (click)="startTour()">
+                        <i-lucide [img]="Footprints" size="20"></i-lucide>
+                        {{ 'account.startWalkthrough' | transloco }}
+                    </button>
+                    <a href="mailto:climateactionnavigator@heigit.org" class="account-menu__item" target="_blank">
+                        <i-lucide [img]="LifeBuoy" size="20"></i-lucide>
+                        {{ 'account.support' | transloco }}
+                    </a>
+                    <button (click)="logout()" class="account-menu__item logout-button">
+                        <i-lucide [img]="Logout" size="20"></i-lucide>
+                        {{ 'account.logout' | transloco }}
+                    </button>
                 </div>
-                <div class="divider"></div>
-                <a [href]="getAppwriteUrl('/manage/profile')" class="account-menu__item" target="_blank">
-                    <i-lucide [img]="User" size="20"></i-lucide>
-                    {{ 'account.editProfile' | transloco }}
-                </a>
-                <a [href]="getAppwriteUrl('/manage/key')" class="account-menu__item" target="_blank">
-                    <i-lucide [img]="Percent" size="20"></i-lucide>
-                    {{ 'account.viewUsage' | transloco }}
-                </a>
-                <div class="divider"></div>
-                <button class="account-menu__item" (click)="startTour()">
-                    <i-lucide [img]="Footprints" size="20"></i-lucide>
-                    {{ 'account.startWalkthrough' | transloco }}
-                </button>
-                <a href="mailto:climateactionnavigator@heigit.org" class="account-menu__item" target="_blank">
-                    <i-lucide [img]="LifeBuoy" size="20"></i-lucide>
-                    {{ 'account.support' | transloco }}
-                </a>
-                <button (click)="logout()" class="account-menu__item logout-button">
-                    <i-lucide [img]="Logout" size="20"></i-lucide>
-                    {{ 'account.logout' | transloco }}
-                </button>
-            </div>
+            </ng-template>
         </div>
     }
 </div>
