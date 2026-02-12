@@ -121,6 +121,7 @@ build_staging:
         DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
         DOCKER_DRIVER: overlay2
     before_script:
+        - apk add --no-cache git
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
         # - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
     script:
