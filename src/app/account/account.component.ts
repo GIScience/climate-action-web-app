@@ -17,10 +17,11 @@ import { environment } from '../../environments/environment'
 import { AppwriteService } from '../auth/appwrite.service'
 import { DashboardService } from '../dashboard/dashboard.service'
 import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
+import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 
 @Component({
     selector: 'app-account',
-    imports: [LucideAngularModule, TranslocoModule],
+    imports: [LucideAngularModule, TranslocoModule, DropdownMenuDirective],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
 })
@@ -32,7 +33,6 @@ export class AccountComponent implements OnInit, OnDestroy {
     user: Models.User<Models.Preferences> | null = null
     accountMenuOpen = false
     private userSubscription: Subscription
-    private closeTimeout: ReturnType<typeof setTimeout> | null = null
     readonly environment = environment
 
     readonly CircleUserRound = CircleUserRound
@@ -56,9 +56,6 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.userSubscription.unsubscribe()
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-        }
     }
 
     async logout() {
@@ -79,32 +76,16 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
 
     async startTour() {
+        this.accountMenuOpen = false
         this.dashboardService.clearDashboardState()
         this.tourEngine.initializeTour()
     }
 
     toggleAccountMenu() {
         this.accountMenuOpen = !this.accountMenuOpen
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-            this.closeTimeout = null
-        }
     }
 
     closeAccountMenu() {
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-        }
-        this.closeTimeout = setTimeout(() => {
-            this.accountMenuOpen = false
-            this.closeTimeout = null
-        }, 500)
-    }
-
-    cancelAccountMenuClose() {
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-            this.closeTimeout = null
-        }
+        this.accountMenuOpen = false
     }
 }

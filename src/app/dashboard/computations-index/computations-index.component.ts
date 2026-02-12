@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { DatabaseService } from '@app/database.service'
+import { DropdownMenuDirective } from '@app/shared/dropdown-menu.directive'
 import { StorageService } from '@app/storage.service'
 import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -20,6 +21,7 @@ import {
     CircleX,
     Clipboard,
     Clock,
+    EllipsisVertical,
     FileWarning,
     Hash,
     Import,
@@ -82,7 +84,8 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
         FilterByCriteriaPipe,
         LucideAngularModule,
         ComputationComponent,
-        TranslocoModule
+        TranslocoModule,
+        DropdownMenuDirective
     ],
     animations: [
         trigger('expandCollapse', [
@@ -169,6 +172,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Trash2 = Trash2
     readonly Import = Import
     readonly X = X
+    readonly EllipsisVertical = EllipsisVertical
+
+    openMenuId: string | null = null
 
     @Input() pluginId: string = ''
     @Input() hasDemoConfig: boolean = true
@@ -617,8 +623,18 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
+    toggleActionsMenu(correlation_uuid: string, event: Event) {
+        event.stopPropagation()
+        this.openMenuId = this.openMenuId === correlation_uuid ? null : correlation_uuid
+    }
+
+    closeActionsMenu() {
+        this.openMenuId = null
+    }
+
     shareComputation(correlation_uuid: string, event: Event) {
         event.stopPropagation()
+        this.closeActionsMenu()
 
         const shareLink = this.shareService.getShareUrl(correlation_uuid)
 
@@ -664,6 +680,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     viewParameters(computation: ComputationDisplayEntity, event?: Event) {
         event?.stopPropagation()
+        this.closeActionsMenu()
         this.dialog.open(this.parametersDialog, {
             data: {
                 params: computation.params,
@@ -679,12 +696,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     archiveComputation(correlation_uuid: string, event?: Event): void {
         event?.stopPropagation()
+        this.closeActionsMenu()
         this.storageService.archiveComputation(correlation_uuid)
         this.removeComputationFromView(correlation_uuid)
     }
 
     deleteComputation(correlation_uuid: string, event?: Event): void {
         event?.stopPropagation()
+        this.closeActionsMenu()
 
         const confirmed = confirm(this.translocoService.translate('computationsIndex.deleteConfirmation'))
         if (!confirmed) return

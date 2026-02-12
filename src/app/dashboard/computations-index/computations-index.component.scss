@@ -145,7 +145,7 @@
             align-items: center;
             display: grid;
             grid-template-columns: 1fr 100px;
-            padding: 10px 0;
+            padding: 10px 10px 10px 5px;
         }
 
         .card-header {
@@ -180,13 +180,18 @@
             }
         }
 
+        &.menu-active {
+            position: relative;
+            z-index: 10;
+        }
+
         .parent-computation {
             align-items: center;
             border-radius: 10px;
             cursor: pointer;
             display: grid;
-            grid-template-columns: 30px 1fr 135px;
-            padding: 10px 0;
+            grid-template-columns: 30px 1fr auto;
+            padding: 10px 10px 10px 5px;
             transition: background-color 0.15s ease-in-out;
             width: 100%;
 
@@ -238,29 +243,18 @@
             }
 
             .computation-actions {
-                display: flex;
                 margin-left: auto;
-                margin-right: 5px;
+                position: relative;
                 visibility: hidden;
 
-                button {
-                    border-radius: 0;
-                    border-right-width: 0;
+                &.menu-open {
+                    visibility: visible;
+                }
 
-                    &:first-of-type {
-                        border-bottom-left-radius: 10px;
-                        border-top-left-radius: 10px;
-                    }
-
-                    &:last-of-type {
-                        border-bottom-right-radius: 10px;
-                        border-right-width: 1.5px;
-                        border-top-right-radius: 10px;
-                    }
-
-                    &.delete-computation {
-                        color: rgba(156, 12, 5, 0.75);
-                    }
+                .actions-menu-trigger {
+                    border-radius: 50%;
+                    height: 32px;
+                    width: 32px;
                 }
             }
         }

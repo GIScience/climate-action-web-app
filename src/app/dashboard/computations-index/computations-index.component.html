@@ -101,7 +101,12 @@
                                 computation of computations | filterByCriteria: pluginId;
                                 track trackByComputation($index, computation)
                             ) {
-                                <div class="computation" [ngClass]="{ 'computation-expanded': computation.isExpanded }">
+                                <div
+                                    class="computation"
+                                    [ngClass]="{
+                                        'computation-expanded': computation.isExpanded,
+                                        'menu-active': openMenuId === computation.correlation_uuid
+                                    }">
                                     <div
                                         [ngClass]="{
                                             'parent-computation': true,
@@ -149,37 +154,54 @@
                                             </p>
                                         </div>
                                         @if (!isReportVisible) {
-                                            <div class="computation-actions">
+                                            <div
+                                                class="computation-actions"
+                                                [class.menu-open]="openMenuId === computation.correlation_uuid">
                                                 <button
-                                                    (click)="shareComputation(computation.correlation_uuid, $event)"
-                                                    [attr.aria-label]="'computationsIndex.actions.share' | transloco"
-                                                    [tp]="'computationsIndex.actions.share' | transloco"
-                                                    class="btn-onlyicon btn-onlyicon--cta">
-                                                    <i-lucide [img]="Share2" size="18"></i-lucide>
+                                                    #menuTrigger
+                                                    (click)="toggleActionsMenu(computation.correlation_uuid, $event)"
+                                                    [attr.aria-label]="'computationsIndex.actions.menu' | transloco"
+                                                    class="actions-menu-trigger btn-onlyicon">
+                                                    <i-lucide [img]="EllipsisVertical" size="17.5"></i-lucide>
                                                 </button>
-                                                <button
-                                                    (click)="viewParameters(computation, $event)"
-                                                    [attr.aria-label]="
-                                                        'computationsIndex.actions.viewParameters' | transloco
-                                                    "
-                                                    [tp]="'computationsIndex.actions.viewParameters' | transloco"
-                                                    class="btn-onlyicon btn-onlyicon--cta">
-                                                    <i-lucide [img]="ListTodo" size="18"></i-lucide>
-                                                </button>
-                                                <button
-                                                    (click)="archiveComputation(computation.correlation_uuid, $event)"
-                                                    [attr.aria-label]="'computationsIndex.actions.archive' | transloco"
-                                                    [tp]="'computationsIndex.actions.archive' | transloco"
-                                                    class="archive-computation btn-onlyicon btn-onlyicon--cta">
-                                                    <i-lucide [img]="Archive" size="18"></i-lucide>
-                                                </button>
-                                                <button
-                                                    (click)="deleteComputation(computation.correlation_uuid, $event)"
-                                                    [attr.aria-label]="'computationsIndex.actions.delete' | transloco"
-                                                    [tp]="'computationsIndex.actions.delete' | transloco"
-                                                    class="delete-computation btn-onlyicon btn-onlyicon--cta">
-                                                    <i-lucide [img]="Trash2" size="18"></i-lucide>
-                                                </button>
+                                                <ng-template
+                                                    [appDropdownMenu]="menuTrigger"
+                                                    [dropdownOpen]="openMenuId === computation.correlation_uuid"
+                                                    (dropdownClosed)="closeActionsMenu()">
+                                                    <div class="actions-menu">
+                                                        <button
+                                                            (click)="
+                                                                shareComputation(computation.correlation_uuid, $event)
+                                                            "
+                                                            class="actions-menu__item">
+                                                            <i-lucide [img]="Share2" size="18"></i-lucide>
+                                                            {{ 'computationsIndex.actions.share' | transloco }}
+                                                        </button>
+                                                        <button
+                                                            (click)="viewParameters(computation, $event)"
+                                                            class="actions-menu__item">
+                                                            <i-lucide [img]="ListTodo" size="18"></i-lucide>
+                                                            {{ 'computationsIndex.actions.viewParameters' | transloco }}
+                                                        </button>
+                                                        <div class="actions-menu__divider"></div>
+                                                        <button
+                                                            (click)="
+                                                                archiveComputation(computation.correlation_uuid, $event)
+                                                            "
+                                                            class="actions-menu__item">
+                                                            <i-lucide [img]="Archive" size="18"></i-lucide>
+                                                            {{ 'computationsIndex.actions.archive' | transloco }}
+                                                        </button>
+                                                        <button
+                                                            (click)="
+                                                                deleteComputation(computation.correlation_uuid, $event)
+                                                            "
+                                                            class="actions-menu__item actions-menu__item--danger">
+                                                            <i-lucide [img]="Trash2" size="18"></i-lucide>
+                                                            {{ 'computationsIndex.actions.delete' | transloco }}
+                                                        </button>
+                                                    </div>
+                                                </ng-template>
                                             </div>
                                         }
                                         @if (newRuns.includes(computation.correlation_uuid)) {

@@ -3,12 +3,13 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { Languages, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
 import { take } from 'rxjs'
+import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 import { StorageService } from '../storage.service'
 import { SupportedLanguage } from '../types/language.types'
 
 @Component({
     selector: 'app-language',
-    imports: [TranslocoModule, LucideAngularModule],
+    imports: [TranslocoModule, LucideAngularModule, DropdownMenuDirective],
     templateUrl: './language.component.html',
     styleUrl: './language.component.scss'
 })
@@ -20,7 +21,6 @@ export class LanguageComponent {
     currentLang: SupportedLanguage
     private lastPersistedLanguage: SupportedLanguage | null = null
     languageMenuOpen = false
-    private closeTimeout: ReturnType<typeof setTimeout> | null = null
     readonly supportedLanguages = SupportedLanguage
     readonly Languages = Languages
 
@@ -43,10 +43,6 @@ export class LanguageComponent {
 
     toggleLanguageMenu() {
         this.languageMenuOpen = !this.languageMenuOpen
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-            this.closeTimeout = null
-        }
     }
 
     selectLanguage(lang: SupportedLanguage) {
@@ -69,20 +65,7 @@ export class LanguageComponent {
     }
 
     closeLanguageMenu() {
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-        }
-        this.closeTimeout = setTimeout(() => {
-            this.languageMenuOpen = false
-            this.closeTimeout = null
-        }, 500)
-    }
-
-    cancelLanguageMenuClose() {
-        if (this.closeTimeout) {
-            clearTimeout(this.closeTimeout)
-            this.closeTimeout = null
-        }
+        this.languageMenuOpen = false
     }
 
     private showGermanWarning() {

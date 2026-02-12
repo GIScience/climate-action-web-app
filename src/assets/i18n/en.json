@@ -68,6 +68,7 @@
             "done": "Done"
         },
         "actions": {
+            "menu": "Actions",
             "share": "Share Computation",
             "viewParameters": "View Parameters",
             "archive": "Archive Computation",
