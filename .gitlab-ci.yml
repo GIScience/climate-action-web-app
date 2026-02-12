@@ -115,8 +115,10 @@ build_staging:
         - name: docker:24.0.5-dind
           alias: thedockerhost
     variables:
-        DOCKER_HOST: tcp://thedockerhost:2375
-        DOCKER_TLS_CERTDIR: ""
+        DOCKER_HOST: tcp://thedockerhost:2376
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
         DOCKER_DRIVER: overlay2
     before_script:
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
