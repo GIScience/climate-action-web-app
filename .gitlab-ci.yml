@@ -112,8 +112,9 @@ build_staging:
         - if: $CI_PIPELINE_SOURCE == 'push'
     image: docker.io/docker:cli
     before_script:
-        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
-        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+        # - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+        # - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+        - docker info
     script:
         - |
             docker --config ~/ca_config \
