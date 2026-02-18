@@ -16,6 +16,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { ToastrService } from 'ngx-toastr'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
 import { LegendComponent } from '../artifact/legend/legend.component'
@@ -50,9 +51,11 @@ export class ReportComponent implements OnInit {
     private injector = inject(EnvironmentInjector)
     private ExportPDFService = inject(ExportPDFService)
     private translocoService = inject(TranslocoService)
+    private toastr = inject(ToastrService)
 
     artifacts: ArtifactEntity[] = []
     isVisible = false
+    isMapsLoading = false
     hasExported = false
     maxArtifacts = this.reportService.MAX_ARTIFACTS
 
@@ -108,6 +111,10 @@ export class ReportComponent implements OnInit {
                 }
                 this.removeLegend(id)
             })
+        })
+
+        this.reportService.isExportReady$.subscribe(ready => {
+            this.isMapsLoading = this.artifacts.length > 0 && !ready
         })
 
         this.reportService.isVisible$.subscribe(isVisible => {
@@ -178,6 +185,16 @@ export class ReportComponent implements OnInit {
 
     getComputationInfo(artifact: ArtifactEntity): ComputationBasicInfo | undefined {
         return this.reportService.getComputationInfoForArtifact(artifact)
+    }
+
+    handleExport() {
+        if (this.isMapsLoading) {
+            this.toastr.info(this.translocoService.translate('report.mapsRendering'), '', {
+                timeOut: 4000
+            })
+            return
+        }
+        this.exportToPDF()
     }
 
     async exportToPDF() {

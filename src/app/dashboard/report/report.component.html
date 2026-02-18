@@ -4,10 +4,17 @@
             <h2>{{ 'report.title' | transloco }}</h2>
             <div class="report-controls">
                 <button
-                    (click)="exportToPDF()"
+                    (click)="handleExport()"
                     class="export-btn btn-withtext--after"
-                    [disabled]="artifacts.length === 0">
-                    <i-lucide [img]="FileDown" size="20"></i-lucide>
+                    [class.is-loading]="isMapsLoading"
+                    [disabled]="artifacts.length === 0"
+                    [tp]="isMapsLoading ? ('report.mapsRendering' | transloco) : ''"
+                    tpPlacement="bottom">
+                    @if (isMapsLoading) {
+                        <span class="export-spinner"></span>
+                    } @else {
+                        <i-lucide [img]="FileDown" size="20"></i-lucide>
+                    }
                     {{ 'report.exportToPDF' | transloco }}
                 </button>
                 <div class="report-controls__clear-exit">

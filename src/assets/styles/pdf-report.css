@@ -37,11 +37,15 @@ body {
 }
 .map-image-container {
     margin: 10px 0;
+    position: relative;
     text-align: center;
 }
-.map-image-container img {
+.map-image-container > img {
     max-width: 100%;
     min-height: 175mm;
+}
+.pdf-legend-img {
+    min-height: auto !important;
 }
 app-artifact {
     display: block;
