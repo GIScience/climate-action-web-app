@@ -44,7 +44,9 @@ export class ExportPDFService {
             const { jsPDF, html2canvas } = await this.loadPdfLibraries()
 
             const imageCache: Record<string, string> = {}
+            const legendImageCache: Record<string, string> = {}
             await this.prepareArtifactImages(artifacts, artifactContainers, imageCache)
+            await this.captureLegendImages(artifacts, html2canvas, legendImageCache)
 
             const pdf = new jsPDF({
                 orientation: 'landscape',
@@ -52,7 +54,15 @@ export class ExportPDFService {
                 format: 'a4'
             })
 
-            await this.generatePdfPages(pdf, html2canvas, imageCache, artifacts, getComputationInfo, artifactContainers)
+            await this.generatePdfPages(
+                pdf,
+                html2canvas,
+                imageCache,
+                legendImageCache,
+                artifacts,
+                getComputationInfo,
+                artifactContainers
+            )
 
             pdf.save(`climate-action-navigator_report-${new Date().toISOString().split('T')[0]}.pdf`)
             this.toastr.clear()
@@ -66,6 +76,7 @@ export class ExportPDFService {
         pdf: jsPDF,
         html2canvas: Html2CanvasType,
         imageCache: Record<string, string>,
+        legendImageCache: Record<string, string>,
         artifacts: ArtifactEntity[],
         getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined,
         artifactContainers: QueryList<ElementRef>
@@ -92,7 +103,7 @@ export class ExportPDFService {
             const element = document.createElement('div')
             element.innerHTML = `
                 <div class="pdf-container">
-                    ${this.getPageContent(pageArtifacts, imageCache, getComputationInfo, artifactContainers)}
+                    ${this.getPageContent(pageArtifacts, imageCache, legendImageCache, getComputationInfo, artifactContainers)}
                 </div>
             `
 
@@ -149,6 +160,7 @@ export class ExportPDFService {
     private getPageContent(
         artifacts: ArtifactEntity[],
         imageCache: Record<string, string>,
+        legendImageCache: Record<string, string>,
         getComputationInfo: (artifact: ArtifactEntity) => ComputationBasicInfo | undefined,
         artifactContainers: QueryList<ElementRef>
     ): string {
@@ -172,7 +184,7 @@ export class ExportPDFService {
                         }
                     </div>
                     <div class="artifact-content">
-                        ${this.getArtifactContent(artifact, imageCache, artifactContainers)}
+                        ${this.getArtifactContent(artifact, imageCache, legendImageCache, artifactContainers)}
                     </div>
                 </div>
             `
@@ -266,6 +278,7 @@ export class ExportPDFService {
     private getArtifactContent(
         artifact: ArtifactEntity,
         imageCache: Record<string, string>,
+        legendImageCache: Record<string, string>,
         artifactContainers: QueryList<ElementRef>
     ) {
         const isMap = this.reportService.isMapArtifact(artifact.modality)
@@ -273,9 +286,13 @@ export class ExportPDFService {
 
         if (isMap || isImage) {
             if (imageCache[artifact.filename]) {
+                const legendImg = legendImageCache[artifact.filename]
+                    ? `<img class="pdf-legend-img" src="${legendImageCache[artifact.filename]}" alt="Legend" style="position:absolute;top:5px;right:5px;width:150px;height:auto;" />`
+                    : ''
                 return `
                     <div class="map-image-container">
                         <img src="${imageCache[artifact.filename]}" alt="${artifact.name}" />
+                        ${legendImg}
                     </div>
                 `
             }
@@ -293,5 +310,34 @@ export class ExportPDFService {
         }
 
         return `<p><em>There was an error rendering <strong>${artifact.name}</strong>, please try again.</em></p>`
+    }
+
+    private async captureLegendImages(
+        artifacts: ArtifactEntity[],
+        html2canvas: Html2CanvasType,
+        legendImageCache: Record<string, string>
+    ): Promise<void> {
+        const mapArtifacts = artifacts.filter(a => this.reportService.isMapArtifact(a.modality))
+
+        for (const artifact of mapArtifacts) {
+            const container = document.getElementById(`report-map-legend-${artifact.filename}`)
+            if (!container) continue
+
+            // ViewContainerRef.createComponent() inserts as a sibling
+            const appLegend = container.nextElementSibling
+            if (!appLegend || appLegend.tagName !== 'APP-LEGEND') continue
+
+            try {
+                const canvas = await html2canvas(appLegend as HTMLElement, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                })
+                legendImageCache[artifact.filename] = canvas.toDataURL('image/png')
+            } catch (error) {
+                console.warn(`Failed to capture legend for ${artifact.name}:`, error)
+            }
+        }
     }
 }

@@ -2,7 +2,9 @@ import { HttpClientModule } from '@angular/common/http'
 import { ElementRef, QueryList } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { SafeUrl } from '@angular/platform-browser'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { TranslocoTestingModule } from '@jsverse/transloco'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
@@ -18,6 +20,7 @@ import { ReportService } from './report.service'
 interface MockReportService {
     artifacts$: Observable<ArtifactEntity[]>
     isVisible$: Observable<boolean>
+    isExportReady$: Observable<boolean>
     MAX_ARTIFACTS: 10
     isMapArtifact: jest.MockedFunction<(modality: ArtifactEntity['modality']) => boolean>
     getServiceForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ArtifactService | undefined>
@@ -26,6 +29,7 @@ interface MockReportService {
     getComputationInfoForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ComputationBasicInfo | undefined>
     _artifactsSubject: BehaviorSubject<ArtifactEntity[]>
     _isVisibleSubject: BehaviorSubject<boolean>
+    _isExportReadySubject: BehaviorSubject<boolean>
 }
 
 interface MockExportPDFService {
@@ -86,6 +90,7 @@ describe('ReportComponent', () => {
     let reportService: jest.Mocked<MockReportService>
     let exportPDFService: jest.Mocked<MockExportPDFService>
     let pluginService: jest.Mocked<MockPluginService>
+    let toastr: MockToastrService
 
     const mockArtifact: ArtifactEntity = {
         filename: 'test-123',
@@ -121,10 +126,12 @@ describe('ReportComponent', () => {
     beforeEach(async () => {
         const artifactsSubject = new BehaviorSubject<ArtifactEntity[]>([])
         const isVisibleSubject = new BehaviorSubject<boolean>(false)
+        const isExportReadySubject = new BehaviorSubject<boolean>(false)
 
         reportService = {
             artifacts$: artifactsSubject.asObservable(),
             isVisible$: isVisibleSubject.asObservable(),
+            isExportReady$: isExportReadySubject.asObservable(),
             MAX_ARTIFACTS: 10,
             isMapArtifact: jest
                 .fn()
@@ -134,7 +141,8 @@ describe('ReportComponent', () => {
             closeReport: jest.fn(),
             getComputationInfoForArtifact: jest.fn().mockReturnValue(mockComputationInfo),
             _artifactsSubject: artifactsSubject,
-            _isVisibleSubject: isVisibleSubject
+            _isVisibleSubject: isVisibleSubject,
+            _isExportReadySubject: isExportReadySubject
         } as jest.Mocked<MockReportService>
 
         exportPDFService = {
@@ -147,18 +155,28 @@ describe('ReportComponent', () => {
             imports: [
                 ReportComponent,
                 HttpClientModule,
+                NoopAnimationsModule,
                 TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
             ],
             providers: [
                 { provide: ToastrService, useClass: MockToastrService },
                 { provide: ReportService, useValue: reportService },
                 { provide: ExportPDFService, useValue: exportPDFService },
-                { provide: PluginService, useValue: pluginService }
+                { provide: PluginService, useValue: pluginService },
+                provideTippyLoader(() => import('tippy.js')),
+                provideTippyConfig({
+                    defaultVariation: 'tooltip',
+                    variations: {
+                        tooltip: tooltipVariation,
+                        popper: popperVariation
+                    }
+                })
             ]
         }).compileComponents()
 
         fixture = TestBed.createComponent(ReportComponent)
         component = fixture.componentInstance
+        toastr = TestBed.inject(ToastrService) as unknown as MockToastrService
         fixture.detectChanges()
     })
 
@@ -240,6 +258,18 @@ describe('ReportComponent', () => {
             reportService._isVisibleSubject.next(false)
             expect(component.isVisible).toBe(false)
         })
+
+        it('should update map loading state from export readiness', () => {
+            reportService._isExportReadySubject.next(false)
+            expect(component.isMapsLoading).toBe(false)
+
+            reportService._artifactsSubject.next([mockMapArtifact])
+            reportService._isExportReadySubject.next(false)
+            expect(component.isMapsLoading).toBe(true)
+
+            reportService._isExportReadySubject.next(true)
+            expect(component.isMapsLoading).toBe(false)
+        })
     })
 
     describe('getComputationInfo', () => {
@@ -282,6 +312,42 @@ describe('ReportComponent', () => {
             const result = boundFunction(mockArtifact)
 
             expect(result).toEqual(mockComputationInfo)
+        })
+
+        it('should keep export button enabled while maps are loading', () => {
+            reportService._isVisibleSubject.next(true)
+            reportService._artifactsSubject.next([mockMapArtifact])
+            reportService._isExportReadySubject.next(false)
+            fixture.detectChanges()
+
+            const exportButton = fixture.nativeElement.querySelector('.export-btn') as HTMLButtonElement
+            expect(exportButton.disabled).toBe(false)
+        })
+    })
+
+    describe('handleExport', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        it('should show maps rendering toast and skip export when maps are loading', () => {
+            component.isMapsLoading = true
+            const exportSpy = jest.spyOn(component, 'exportToPDF')
+
+            component.handleExport()
+
+            expect(toastr.info).toHaveBeenCalled()
+            expect(exportSpy).not.toHaveBeenCalled()
+        })
+
+        it('should export when maps are ready', () => {
+            component.isMapsLoading = false
+            const exportSpy = jest.spyOn(component, 'exportToPDF').mockResolvedValue(undefined)
+
+            component.handleExport()
+
+            expect(toastr.info).not.toHaveBeenCalled()
+            expect(exportSpy).toHaveBeenCalled()
         })
     })
 })

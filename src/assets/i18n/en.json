@@ -141,7 +141,8 @@
         "maximumArtifactsAllowed": "Maximum of 4 results allowed in the report. Please remove an existing result first.",
         "exportingPdf": "Preparing PDF export, please wait...",
         "errorExportingPdf": "Error exporting PDF. Please try again.",
-        "confirmCloseWithoutExport": "Are you sure you want to close the Report Builder without exporting? It will not be saved."
+        "confirmCloseWithoutExport": "Are you sure you want to close the Report Builder without exporting? It will not be saved.",
+        "mapsRendering": "Maps are still rendering, please wait..."
     },
     "search": {
         "placeholder": "Search...",

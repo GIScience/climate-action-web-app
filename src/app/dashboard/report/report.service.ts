@@ -3,7 +3,7 @@ import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '
 import { TranslocoService } from '@jsverse/transloco'
 import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, combineLatest, map } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -33,7 +33,16 @@ export class ReportService {
     private collapseLeftColumnSubject = new BehaviorSubject<boolean>(false)
     collapseLeftColumn$ = this.collapseLeftColumnSubject.asObservable()
 
+    private loadingArtifactsSubject = new BehaviorSubject<Set<string>>(new Set())
+
+    isExportReady$ = combineLatest([this.artifactsSubject, this.loadingArtifactsSubject]).pipe(
+        map(([artifacts, loading]) => artifacts.length > 0 && loading.size === 0)
+    )
+
+    private loadingTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+
     readonly MAX_ARTIFACTS = 4
+    private readonly LOADING_TIMEOUT_MS = 10_000
 
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
         const artifactInstance = JSON.parse(JSON.stringify(artifact))
@@ -62,6 +71,8 @@ export class ReportService {
         this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
 
         if (this.isMapArtifact(artifactInstance.modality)) {
+            this.markArtifactLoading(artifactInstance.filename)
+
             setTimeout(() => {
                 const mapId = `report-map-${artifactInstance.filename}`
 
@@ -72,6 +83,16 @@ export class ReportService {
 
                     // @ts-ignore: Store map instance globally for PDF export
                     window[`maplibre_map_${artifactInstance.filename}`] = mapService.map
+
+                    const markReady = () => {
+                        if (mapService.map) {
+                            mapService.map.once('idle', () => {
+                                this.markArtifactReady(artifactInstance.filename)
+                            })
+                        } else {
+                            this.markArtifactReady(artifactInstance.filename)
+                        }
+                    }
 
                     const waitForMapLoad = () => {
                         if (mapService.map) {
@@ -97,9 +118,11 @@ export class ReportService {
                                             if (data.url.endsWith('.geojson')) {
                                                 this.http.get<FeatureCollection>(data.url).subscribe(geojson => {
                                                     mapService.addGeoJsonLayer(geojson, artifactInstance.name)
+                                                    markReady()
                                                 })
                                             } else if (data.url.endsWith('.pmtiles')) {
                                                 mapService.addPmtilesLayer(data.url, artifactInstance.name)
+                                                markReady()
                                             }
                                         }
                                     })
@@ -108,6 +131,7 @@ export class ReportService {
                                     artifactService.raster.subscribe(data => {
                                         if (data) {
                                             mapService.addRasterLayer(data.url, artifactInstance.name)
+                                            markReady()
                                         }
                                     })
                                 }
@@ -128,6 +152,7 @@ export class ReportService {
         if (index > -1) {
             this.artifacts.splice(index, 1)
             this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
+            this.markArtifactReady(artifact.filename)
         }
     }
 
@@ -149,6 +174,9 @@ export class ReportService {
         this.artifactsSubject.next([])
         this.isVisibleSubject.next(false)
         this.collapseLeftColumnSubject.next(false)
+        this.loadingTimeouts.forEach(timeout => clearTimeout(timeout))
+        this.loadingTimeouts.clear()
+        this.loadingArtifactsSubject.next(new Set())
     }
 
     collapseLeftColumn(collapse: boolean) {
@@ -157,5 +185,32 @@ export class ReportService {
 
     isMapArtifact(modality: ArtifactEntity['modality']): boolean {
         return modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'
+    }
+
+    private markArtifactLoading(filename: string) {
+        const current = this.loadingArtifactsSubject.value
+        const next = new Set(current)
+        next.add(filename)
+        this.loadingArtifactsSubject.next(next)
+
+        const timeout = setTimeout(() => {
+            this.markArtifactReady(filename)
+        }, this.LOADING_TIMEOUT_MS)
+        this.loadingTimeouts.set(filename, timeout)
+    }
+
+    private markArtifactReady(filename: string) {
+        const timeout = this.loadingTimeouts.get(filename)
+        if (timeout) {
+            clearTimeout(timeout)
+            this.loadingTimeouts.delete(filename)
+        }
+
+        const current = this.loadingArtifactsSubject.value
+        if (current.has(filename)) {
+            const next = new Set(current)
+            next.delete(filename)
+            this.loadingArtifactsSubject.next(next)
+        }
     }
 }

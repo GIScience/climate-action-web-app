@@ -141,7 +141,8 @@
         "maximumArtifactsAllowed": "Es sind nur vier Ergebnisse pro Report erlaubt. Bitte entferne zuerst ein Ergebnis aus dem Report, bevor du ein neues hinzufügst.",
         "exportingPdf": "Der PDF-Report wird vorbereitet, bitte habe einen Moment Geduld...",
         "errorExportingPdf": "Es gab einen Fehler beim Erzeugen des PDF-Reports. Bitte versuche es noch einmal.",
-        "confirmCloseWithoutExport": "Möchtest du den Report wirklich schließen, ohne zu exportieren? Der Report wird nicht gespeichert."
+        "confirmCloseWithoutExport": "Möchtest du den Report wirklich schließen, ohne zu exportieren? Der Report wird nicht gespeichert.",
+        "mapsRendering": "Karten werden noch gerendert, bitte warten..."
     },
     "search": {
         "placeholder": "Suche...",
