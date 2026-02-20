@@ -1,0 +1,10 @@
+[
+  {
+    "maintenanceType": "Scheduled maintenance",
+    "servicesAffected": "New computations and previous results",
+    "impact": "are unavailable. Maintenance is expected to be completed by Tue 24 Feb.",
+    "level": "error",
+    "messageDisplayStart": "2026-02-20T00:00:00Z",
+    "downtimeEnd": "2026-02-24T12:00:00Z"
+  }
+]
