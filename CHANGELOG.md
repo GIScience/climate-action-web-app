@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Lazy loading implemented for bigger libraries (Plotly, jsPDF) to reduce initial bundle size
+- Dynamically import components as necessary to chunk the application further
 - User defined paramaters are now highlighted when viewing Computation parameters
 
 ### Fixed

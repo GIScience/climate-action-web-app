@@ -19,7 +19,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
-import { LegendComponent } from '../artifact/legend/legend.component'
+import type { LegendComponent } from '../artifact/legend/legend.component'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
 import { MapService } from '../map/map.service'
 import { ExportPDFService } from './export-pdf.service'
@@ -133,11 +133,12 @@ export class ReportComponent implements OnInit {
     private displayLegend(artifactId: string, legendData: LegendObject): void {
         this.removeLegend(artifactId)
 
-        setTimeout(() => {
+        setTimeout(async () => {
             const container = this.legendContainers.find(
                 container => container.element.nativeElement.id === `report-map-legend-${artifactId}`
             )
             if (container) {
+                const { LegendComponent } = await import('../artifact/legend/legend.component')
                 const componentRef = container.createComponent(LegendComponent)
                 componentRef.instance.legendData = legendData
                 componentRef.instance.artifactId = artifactId

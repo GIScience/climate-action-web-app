@@ -18,11 +18,6 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { Artifact } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
-import { ChartComponent } from './chart/chart.component'
-import { ImageComponent } from './image/image.component'
-import { MarkdownComponent } from './markdown/markdown.component'
-import { PlotlyChartComponent } from './plotly-chart/plotly-chart.component'
-import { TableComponent } from './table/table.component'
 
 @Component({
     selector: 'app-artifact',
@@ -52,6 +47,8 @@ export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
     description: string | null = null
     showAccordion = false
     modality: string | null = null
+    private artifactRenderVersion = 0
+    private destroyed = false
 
     private getService(): ArtifactService {
         return this.artifactService || this.defaultArtifactService
@@ -108,31 +105,63 @@ export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const service = this.getService()
-        service.markdown.subscribe(v => {
-            if (!v) this.clearContainer()
-            else this.display(MarkdownComponent, 'url', v.url, v)
+        service.markdown.subscribe(async v => {
+            const renderVersion = this.beginArtifactRender()
+            if (!v) {
+                this.clearContainer()
+                return
+            }
+            const { MarkdownComponent } = await import('./markdown/markdown.component')
+            if (!this.isCurrentArtifactRender(renderVersion)) return
+            this.display(MarkdownComponent, 'url', v.url, v)
         })
-        service.image.subscribe(v => {
-            if (!v) this.clearContainer()
-            else this.display(ImageComponent, 'url', v.url, v)
+        service.image.subscribe(async v => {
+            const renderVersion = this.beginArtifactRender()
+            if (!v) {
+                this.clearContainer()
+                return
+            }
+            const { ImageComponent } = await import('./image/image.component')
+            if (!this.isCurrentArtifactRender(renderVersion)) return
+            this.display(ImageComponent, 'url', v.url, v)
         })
-        service.table.subscribe(v => {
-            if (!v) this.clearContainer()
-            else this.display(TableComponent, 'url', v.url, v)
+        service.table.subscribe(async v => {
+            const renderVersion = this.beginArtifactRender()
+            if (!v) {
+                this.clearContainer()
+                return
+            }
+            const { TableComponent } = await import('./table/table.component')
+            if (!this.isCurrentArtifactRender(renderVersion)) return
+            this.display(TableComponent, 'url', v.url, v)
         })
         service.vector.subscribe(v => {
+            this.beginArtifactRender()
             if (!v) this.clearContainer()
         })
         service.raster.subscribe(v => {
+            this.beginArtifactRender()
             if (!v) this.clearContainer()
         })
-        service.chart.subscribe(v => {
-            if (!v.data) this.clearContainer()
-            else this.display(ChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
+        service.chart.subscribe(async v => {
+            const renderVersion = this.beginArtifactRender()
+            if (!v.data) {
+                this.clearContainer()
+                return
+            }
+            const { ChartComponent } = await import('./chart/chart.component')
+            if (!this.isCurrentArtifactRender(renderVersion)) return
+            this.display(ChartComponent, 'inputData', { data: v.data, artifact: v }, v.artifact)
         })
-        service.plotlyChart.subscribe(v => {
-            if (!v.data) this.clearContainer()
-            else this.display(PlotlyChartComponent, 'inputData', { data: v.data, artifact: v.artifact }, v.artifact)
+        service.plotlyChart.subscribe(async v => {
+            const renderVersion = this.beginArtifactRender()
+            if (!v.data) {
+                this.clearContainer()
+                return
+            }
+            const { PlotlyChartComponent } = await import('./plotly-chart/plotly-chart.component')
+            if (!this.isCurrentArtifactRender(renderVersion)) return
+            this.display(PlotlyChartComponent, 'inputData', { data: v.data, artifact: v.artifact }, v.artifact)
         })
     }
 
@@ -144,6 +173,8 @@ export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.destroyed = true
+        this.beginArtifactRender()
         if (this.enableMapHost && this.mapArtifactContainer) {
             this.mapArtifactManager.clearComponentContainer(this.mapArtifactContainer)
         }
@@ -151,6 +182,15 @@ export class ArtifactComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private detectChanges(): void {
         this.changeDetector.detectChanges()
+    }
+
+    private beginArtifactRender(): number {
+        this.artifactRenderVersion += 1
+        return this.artifactRenderVersion
+    }
+
+    private isCurrentArtifactRender(version: number): boolean {
+        return !this.destroyed && version === this.artifactRenderVersion
     }
 
     private clearContainer(): void {

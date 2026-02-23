@@ -3,7 +3,7 @@ import { convertToTitleCase } from '@app/utils/artifact.utils'
 import { NgScrollbar } from 'ngx-scrollbar'
 import { LegendObject } from '../artifact.interface'
 
-declare function evaluate_cmap(value: number, name: string, reverse?: boolean): [number, number, number]
+const colormapsModule = import('../../../../assets/scripts/js-colormaps.js')
 
 interface LegendItem {
     name: string
@@ -68,7 +68,7 @@ export class LegendComponent implements AfterViewInit {
         return item.name
     }
 
-    plotColormap(name: string): void {
+    async plotColormap(name: string): Promise<void> {
         const reverse = name.endsWith('_r')
 
         if (reverse) {
@@ -78,6 +78,7 @@ export class LegendComponent implements AfterViewInit {
         const canvas = this.legendCanvas?.nativeElement
         const ctx = canvas?.getContext('2d')
         if (canvas && ctx) {
+            const { evaluate_cmap } = await colormapsModule
             for (let y = 0; y <= canvas.height; y++) {
                 const [r, g, b] = evaluate_cmap(y / canvas.height, name, reverse)
                 ctx.fillStyle = `rgb(${r},${g},${b})`

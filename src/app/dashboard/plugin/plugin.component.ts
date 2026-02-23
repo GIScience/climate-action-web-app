@@ -20,7 +20,7 @@ import {
     LucideAngularModule,
     X
 } from 'lucide-angular'
-import { MarkdownModule } from 'ngx-markdown'
+import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { Observable, Subscription, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
@@ -34,6 +34,7 @@ import { PluginService } from './plugin.service'
     selector: 'app-plugin',
     templateUrl: './plugin.component.html',
     styleUrls: ['./plugin.component.scss'],
+    providers: [provideMarkdown()],
     imports: [
         CommonModule,
         MarkdownModule,

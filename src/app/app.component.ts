@@ -13,7 +13,6 @@ import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { LucideAngularModule } from 'lucide-angular'
-import { MarkdownModule } from 'ngx-markdown'
 import { default as packageInfo } from '../../package.json'
 import { AccountComponent } from './account/account.component'
 import { DashboardService } from './dashboard/dashboard.service'
@@ -42,7 +41,6 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         LanguageComponent,
         FormlyModule,
         FormlyMatDatepickerModule,
-        MarkdownModule,
         LucideAngularModule,
         TranslocoModule
     ]

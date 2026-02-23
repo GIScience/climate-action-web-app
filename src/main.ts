@@ -22,9 +22,7 @@ import {
 } from '@app/app.validation-messages'
 import { AuthInterceptor } from '@app/auth/auth.interceptor'
 import { DashboardComponent } from '@app/dashboard/dashboard.component'
-import { LandingComponent } from '@app/dashboard/landing/landing.component'
 import { MapService } from '@app/dashboard/map/map.service'
-import { PluginComponent } from '@app/dashboard/plugin/plugin.component'
 import { PageNotFoundComponent } from '@app/page-not-found/page-not-found.component'
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { SUPPORTED_LANGUAGES, SupportedLanguage, isValidLanguage } from '@app/types/language.types'
@@ -38,7 +36,6 @@ import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { enUS } from 'date-fns/locale'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
-import { MarkdownModule } from 'ngx-markdown'
 import { provideToastr } from 'ngx-toastr'
 import { environment } from './environments/environment'
 import { TranslocoHttpLoader } from './transloco-loader'
@@ -93,11 +90,11 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: LandingComponent
+                loadComponent: () => import('@app/dashboard/landing/landing.component').then(m => m.LandingComponent)
             },
             {
                 path: 'plugin/:name',
-                component: PluginComponent
+                loadComponent: () => import('@app/dashboard/plugin/plugin.component').then(m => m.PluginComponent)
             }
         ]
     },
@@ -138,7 +135,6 @@ bootstrapApplication(AppComponent, {
             }),
             FormlyMaterialModule,
             FormlyMatDatepickerModule,
-            MarkdownModule.forRoot(),
             LucideAngularModule.pick({ CircleUserRound })
         ),
         provideDateFnsAdapter({

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { TranslocoService } from '@jsverse/transloco'
-import { Driver, driver } from 'driver.js'
+import type { Driver } from 'driver.js'
 import { firstValueFrom, take } from 'rxjs'
 import { AppwriteService } from '../../auth/appwrite.service'
 import { StorageService } from '../../storage.service'
@@ -129,10 +129,10 @@ export class TourEngine {
                     }>('walkthrough.tourEngine', {}, lang)
                     .pipe(take(1))
             )
-            this.configureDriver(translations)
+            await this.configureDriver(translations)
         } catch (error) {
             console.warn(`Failed to load tour translations for lang ${lang}`, error)
-            this.configureDriver({
+            await this.configureDriver({
                 prevButton: this.translocoService.translate('walkthrough.tourEngine.prevButton', {}, lang),
                 closeButton: this.translocoService.translate('walkthrough.tourEngine.closeButton', {}, lang),
                 exitConfirmation: this.translocoService.translate('walkthrough.tourEngine.exitConfirmation', {}, lang)
@@ -140,7 +140,8 @@ export class TourEngine {
         }
     }
 
-    private configureDriver(translations: { prevButton: string; closeButton: string; exitConfirmation: string }) {
+    private async configureDriver(translations: { prevButton: string; closeButton: string; exitConfirmation: string }) {
+        const { driver } = await import('driver.js')
         const exitConfirmation = translations.exitConfirmation
 
         this.driverObj = driver({

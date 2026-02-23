@@ -1,4 +1,4 @@
-import { fromUrl as geoTiffFromUrl, type GeoTIFF as GeoTIFFClass, type TypedArray } from 'geotiff'
+import type { GeoTIFF as GeoTIFFClass, TypedArray } from 'geotiff'
 
 export class MapGeoTiffUtils {
     private static readonly WEB_MERCATOR_CODES = [3857, 900913]
@@ -70,6 +70,7 @@ export class MapGeoTiffUtils {
 
     static async isWebMercator(url: string): Promise<boolean> {
         try {
+            const { fromUrl: geoTiffFromUrl } = await import('geotiff')
             const tiff = await geoTiffFromUrl(url)
             const image = await tiff.getImage()
             const geoKeys = image.getGeoKeys()
