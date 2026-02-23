@@ -4,12 +4,9 @@ import { NavigationEnd, Router } from '@angular/router'
 import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
 import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
-import { cogProtocol } from '@geomatico/maplibre-cog-protocol'
 import { TranslocoService } from '@jsverse/transloco'
-import area from '@turf/area'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
-import { fromUrl as geoTiffFromUrl } from 'geotiff'
 import maplibregl, {
     GeoJSONSource,
     IControl,
@@ -25,7 +22,6 @@ import { Collection } from 'ol'
 import { Extent } from 'ol/extent'
 import Feature from 'ol/Feature'
 import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
-import { PMTiles, Protocol } from 'pmtiles'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
@@ -642,6 +638,7 @@ export class MapService {
         const sourceId = `source-${layerId}`
 
         // Register PMTiles protocol with MapLibre
+        const { PMTiles, Protocol } = await import('pmtiles')
         const protocol = new Protocol()
         maplibregl.addProtocol('pmtiles', protocol.tile)
 
@@ -769,6 +766,7 @@ export class MapService {
         const sourceId = `source-${layerId}`
 
         try {
+            const { fromUrl: geoTiffFromUrl } = await import('geotiff')
             const tiff = await geoTiffFromUrl(sourceURL)
             const image = await tiff.getImage()
             const bbox = image.getBoundingBox()
@@ -829,6 +827,7 @@ export class MapService {
     async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
         if (!this.map) return undefined
 
+        const { cogProtocol } = await import('@geomatico/maplibre-cog-protocol')
         maplibregl.addProtocol('cog', cogProtocol)
 
         const layerId = `geotiff-${artifactName || 'layer'}-${Date.now()}`
@@ -1011,7 +1010,7 @@ export class MapService {
         const ogcApiUrl = `https://maps.heigit.org/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
 
         this.http.get<GeoJSONFeature>(ogcApiUrl, { headers: { Accept: 'application/geo+json' } }).subscribe({
-            next: feature => {
+            next: async feature => {
                 if (!feature?.geometry) return
 
                 this.selectedOlFeatures.clear()
@@ -1029,6 +1028,7 @@ export class MapService {
 
                 // Calculate area after feature is created
                 if (feature.geometry) {
+                    const { default: area } = await import('@turf/area')
                     processedFeature.properties!['area'] = Number(
                         (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
                     )
