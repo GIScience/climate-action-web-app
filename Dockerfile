@@ -1,7 +1,20 @@
-FROM nginx:1.29-alpine
+FROM node:22 AS build
 
+WORKDIR /ca-web-app
+
+COPY package*.json pnpm-lock.yaml ./
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
+
+COPY src/ ./src/
+COPY angular.json ./angular.json
+COPY tsconfig*.json ./
+RUN pnpm run build:prod
+
+FROM nginx:1.29-alpine AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
-COPY dist/browser/ /usr/share/nginx/html/
+
+COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
 
 ENV ENVIRONMENT_TYPE=""
 ENV CLIMATE_ACTION_API_URL=""
