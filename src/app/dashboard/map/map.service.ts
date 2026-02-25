@@ -5,6 +5,7 @@ import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
 import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
+import { colorful, graybeard } from '@versatiles/style'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
 import maplibregl, {
@@ -1149,19 +1150,20 @@ export class MapService {
         }
     }
 
-    private getStyleFor(style: BasemapStyleName): string | StyleSpecification {
+    private getStyleFor(style: BasemapStyleName): StyleSpecification {
+        const baseUrl = 'https://tiles.versatiles.org'
         switch (style) {
             case BasemapStyleName.Colorful:
-                return 'assets/map-schema/colorful/style.json'
+                return colorful({ baseUrl }) as StyleSpecification
             case BasemapStyleName.Graybeard:
-                return 'assets/map-schema/graybeard/style.json'
+                return graybeard({ baseUrl }) as StyleSpecification
             case BasemapStyleName.EsriWorldImagery:
                 return this.createRasterStyle()
         }
     }
 
     private getMapStyles(): MapStyle[] {
-        return ALL_BASEMAPS.map(title => ({ title, uri: this.getStyleFor(title) }))
+        return ALL_BASEMAPS.map(title => ({ title, style: this.getStyleFor(title) }))
     }
 
     private addLayerSwitcher(): void {

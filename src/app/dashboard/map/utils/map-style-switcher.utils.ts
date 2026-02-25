@@ -1,19 +1,20 @@
 import { TranslocoService } from '@jsverse/transloco'
-import { ControlPosition, IControl, Map, StyleSpecification } from 'maplibre-gl'
+import { ControlPosition, IControl, Map as MaplibreMap, StyleSpecification } from 'maplibre-gl'
 import { Subscription } from 'rxjs'
 import type { Artifact, ArtifactEntity } from '../../artifact/artifact.interface'
 import type { MapArtifactLayer } from '../map-artifact-manager.service'
 
 export interface MapStyle {
     title: string
-    uri: string | StyleSpecification
+    style: StyleSpecification
 }
 
 export class MapStyleSwitcherControl implements IControl {
-    private map?: Map
+    private map?: MaplibreMap
     private controlContainer?: HTMLDivElement
     private mapStyleContainer?: HTMLDivElement
     private layerControlsContainer?: HTMLDivElement
+    private styleMap = new Map<string, StyleSpecification>()
     private isExpanded: boolean = true
     private readonly styleDataListener = () => this.updateMapLabelsLanguage()
     private baseMapsHeading?: HTMLHeadingElement
@@ -46,7 +47,7 @@ export class MapStyleSwitcherControl implements IControl {
         this.isArtifactActive = isArtifactActive
     }
 
-    onAdd(map: Map): HTMLElement {
+    onAdd(map: MaplibreMap): HTMLElement {
         this.map = map
         const container = this.createContainer()
         this.setupTranslations()
@@ -61,6 +62,7 @@ export class MapStyleSwitcherControl implements IControl {
         if (this.map) {
             this.map.off('styledata', this.styleDataListener)
         }
+        this.styleMap.clear()
         this.controlContainer?.remove()
         this.map = undefined
     }
@@ -132,6 +134,7 @@ export class MapStyleSwitcherControl implements IControl {
         this.baseMapsHeading = document.createElement('h3')
         container.appendChild(this.baseMapsHeading)
         this.styles.forEach(style => {
+            this.styleMap.set(style.title, style.style)
             const button = Object.assign(document.createElement('button'), {
                 type: 'button',
                 innerText: style.title,
@@ -139,7 +142,6 @@ export class MapStyleSwitcherControl implements IControl {
                     style.title.replace(/[^a-z0-9-]/gi, '_') + (style.title === this.defaultStyle ? ' active' : ''),
                 onclick: () => this.handleStyleChange(button)
             })
-            button.dataset['uri'] = typeof style.uri === 'string' ? style.uri : JSON.stringify(style.uri)
             button.dataset['title'] = style.title
             container.appendChild(button)
         })
@@ -148,8 +150,9 @@ export class MapStyleSwitcherControl implements IControl {
 
     private handleStyleChange(button: HTMLButtonElement): void {
         if (button.classList.contains('active')) return
-        const styleUri = button.dataset['uri']!
-        const style = styleUri.startsWith('assets/') ? styleUri : JSON.parse(styleUri)
+        const title = button.dataset['title']!
+        const style = this.styleMap.get(title)
+        if (!style) return
 
         this.map!.setStyle(style, {
             transformStyle: (previousStyle, nextStyle) => {
@@ -202,23 +205,30 @@ export class MapStyleSwitcherControl implements IControl {
 
         const currentLang = this.translocoService.getActiveLang()
         const langSuffix = currentLang === 'en' ? '_en' : currentLang === 'de' ? '_de' : '_en'
+        const localizedField = `name${langSuffix}`
         const currentStyle = this.map.getStyle()
 
-        if (!currentStyle || !currentStyle.layers) return
+        if (!currentStyle?.layers || !this.isVectorStyleActive()) return
 
-        const isVectorStyle = this.isVectorStyleActive()
-        if (!isVectorStyle) return
+        const localizedExpression = [
+            'case',
+            ['to-boolean', ['get', localizedField]],
+            ['get', localizedField],
+            ['get', 'name']
+        ]
 
         currentStyle.layers.forEach(layer => {
-            if ('layout' in layer && layer.layout && 'text-field' in layer.layout) {
-                const textField = layer.layout['text-field']
-                if (typeof textField === 'string') {
-                    if (textField === '{name}') {
-                        this.map!.setLayoutProperty(layer.id, 'text-field', `{name${langSuffix}}`)
-                    } else if (textField.match(/^{name_(en|de)}$/)) {
-                        this.map!.setLayoutProperty(layer.id, 'text-field', `{name${langSuffix}}`)
-                    }
-                }
+            if (!('layout' in layer) || !layer.layout) return
+            const textField = (layer.layout as Record<string, unknown>)['text-field']
+            if (!Array.isArray(textField)) return
+
+            const isGetName =
+                textField[0] === 'get' && typeof textField[1] === 'string' && /^name(_en|_de)?$/.test(textField[1])
+            const isCaseName =
+                textField[0] === 'case' && Array.isArray(textField.at(-1)) && textField.at(-1)[1] === 'name'
+
+            if (isGetName || isCaseName) {
+                this.map!.setLayoutProperty(layer.id, 'text-field', localizedExpression)
             }
         })
     }
@@ -227,11 +237,8 @@ export class MapStyleSwitcherControl implements IControl {
         if (!this.mapStyleContainer) return false
         const activeButton = this.mapStyleContainer.querySelector('.active') as HTMLButtonElement
         if (!activeButton) return false
-        const styleUri = activeButton.dataset['uri']
-        return (
-            styleUri !== undefined &&
-            (styleUri.includes('colorful/style.json') || styleUri.includes('graybeard/style.json'))
-        )
+        const title = activeButton.dataset['title']
+        return title !== undefined && title !== 'ESRI World Imagery'
     }
 
     updateLayerControls(): void {
