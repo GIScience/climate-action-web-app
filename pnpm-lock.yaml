@@ -68,6 +68,9 @@ importers:
       '@turf/mask':
         specifier: ^7.3.1
         version: 7.3.3
+      '@versatiles/style':
+        specifier: ^5.9.4
+        version: 5.9.4
       '@watergis/maplibre-gl-terradraw':
         specifier: ^1.4.0
         version: 1.11.1(maplibre-gl@5.17.0)(terra-draw@1.11.0)
@@ -2623,6 +2626,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@versatiles/style@5.9.4':
+    resolution: {integrity: sha512-0qqnv92wCxh8Tu+fUnEK5vQVbzrVeAGpOXtE8V6+fSIoKvt7kQNdImiRU2byWJ1Z7GNxrDtl/FUFhEICinl+DA==}
+
   '@vitejs/plugin-basic-ssl@2.1.0':
     resolution: {integrity: sha512-dOxxrhgyDIEUADhb/8OlV9JIqYLgos03YorAueTIeOUskLJSEsfwCByjbu98ctXitUN3znXKp0bYD/WHSudCeA==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -2822,6 +2828,10 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  balanced-match@3.0.1:
+    resolution: {integrity: sha512-vjtV3hiLqYDNRoiAv0zC4QaGAMPomEoq83PRmYIofPswwZurCeWR5LByXm7SyoL0Zh5+2z0+HC7jG8gSZJUh0w==}
+    engines: {node: '>= 16'}
+
   base64-arraybuffer@1.0.2:
     resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
     engines: {node: '>= 0.6.0'}
@@ -2864,6 +2874,10 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
+
+  brace-expansion@4.0.1:
+    resolution: {integrity: sha512-YClrbvTCXGe70pU2JiEiPLYXO9gQkyxYeKpJIQHVS/gOs6EWMQP2RYBwjFLNT322Ji8TOC3IMPfsYCedNpzKfA==}
+    engines: {node: '>= 18'}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -8613,6 +8627,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
+  '@versatiles/style@5.9.4':
+    dependencies:
+      brace-expansion: 4.0.1
+
   '@vitejs/plugin-basic-ssl@2.1.0(vite@7.1.11(@types/node@24.10.9)(jiti@1.21.7)(less@4.2.2)(sass@1.90.0)(terser@5.39.0))':
     dependencies:
       vite: 7.1.11(@types/node@24.10.9)(jiti@1.21.7)(less@4.2.2)(sass@1.97.3)(terser@5.39.0)
@@ -8821,6 +8839,8 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
+  balanced-match@3.0.1: {}
+
   base64-arraybuffer@1.0.2: {}
 
   base64-js@1.5.1: {}
@@ -8878,6 +8898,10 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
+
+  brace-expansion@4.0.1:
+    dependencies:
+      balanced-match: 3.0.1
 
   braces@3.0.3:
     dependencies:

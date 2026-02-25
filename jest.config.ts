@@ -17,7 +17,7 @@ const config: Config = {
     },
 
     transformIgnorePatterns: [
-        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|@jsverse|rxjs|@kurkle|chart\\.js|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|ngx-markdown|ngx-toastr|marked|rbush|quickselect))'
+        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|@jsverse|rxjs|@kurkle|chart\\.js|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|ngx-markdown|ngx-toastr|marked|rbush|quickselect|@versatiles))'
     ],
 
     transform: {
