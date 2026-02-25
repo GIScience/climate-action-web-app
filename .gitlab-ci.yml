@@ -122,7 +122,14 @@ build_staging:
         - apk add --no-cache git
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
     script:
-        - docker build . --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging
+        - |
+            docker --config ~/ca_config \
+                build \
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
+                .
+        - docker --config ~/ca_config push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging
+        - docker --config ~/ca_config push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel
 
 build_release:
     stage: build
@@ -143,11 +150,12 @@ build_release:
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
     script:
         - |
-            docker build \
+            docker --config ~/ca_config \
+                build \
                 --platform=linux/amd64 \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
                 .
-        - docker push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
+        - docker --config ~/ca_config push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
 
 deploy_staging:
     stage: deploy
