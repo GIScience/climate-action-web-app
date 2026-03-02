@@ -72,7 +72,7 @@ test_cypress:
         CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/.cache/Cypress'
     needs: ['test_jest_and_lint']
     image:
-        name: cypress/included:cypress-14.5.4-node-22.18.0-chrome-139.0.7258.66-1-ff-141.0.3-edge-138.0.3351.121-1
+        name: cypress/included:cypress-15.11.0-node-24.14.0-chrome-145.0.7632.116-1-ff-148.0-edge-145.0.3800.70-1
         entrypoint: ['']
     before_script:
         - |
