@@ -75,8 +75,8 @@ importers:
         specifier: ^1.4.0
         version: 1.12.1(maplibre-gl@5.19.0)(terra-draw@1.11.0)
       appwrite:
-        specifier: ^19.0.0
-        version: 19.0.0
+        specifier: ^22.0.0
+        version: 22.4.1
       chart.js:
         specifier: 4.5.0
         version: 4.5.0
@@ -2771,8 +2771,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  appwrite@19.0.0:
-    resolution: {integrity: sha512-guamzST6Fvn/lvuBMLJGzJGL+N+o313j53qyfKM1ZHfcDd1ADnSONgm9DZihRFYBaWtU7s1bwkphkBJWSUwurQ==}
+  appwrite@22.4.1:
+    resolution: {integrity: sha512-NlEgUvSo7A1m+TEHZ8zlWUIuCDtNg3VN6Mbxd6r+1618CiWokig630FpeKQ9/WD5Io92QxuTV/dVzBLPlQghqg==}
 
   arch@2.2.0:
     resolution: {integrity: sha512-Of/R0wqp83cgHozfIYLbBMnej79U/SVGOOyuB3VVFv1NRM/PSFMK12x9KVtiYzJqmnU5WR2qp0Z5rHb7sWGnFQ==}
@@ -4426,6 +4426,9 @@ packages:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
     hasBin: true
+
+  json-bigint@1.0.0:
+    resolution: {integrity: sha512-SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==}
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -8825,7 +8828,9 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  appwrite@19.0.0: {}
+  appwrite@22.4.1:
+    dependencies:
+      json-bigint: 1.0.0
 
   arch@2.2.0: {}
 
@@ -10912,6 +10917,10 @@ snapshots:
       - utf-8-validate
 
   jsesc@3.1.0: {}
+
+  json-bigint@1.0.0:
+    dependencies:
+      bignumber.js: 9.3.1
 
   json-buffer@3.0.1: {}
 
