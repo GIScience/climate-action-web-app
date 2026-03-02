@@ -109,7 +109,7 @@ build_staging:
     tags: []
     cache: []
     rules:
-        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+        - if: $CI_PIPELINE_SOURCE == 'push'
     image: docker.io/docker:29.2.1-cli
     services:
         - name: docker:29.2.1-dind
