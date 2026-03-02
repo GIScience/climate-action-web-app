@@ -12,6 +12,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Lazy loading implemented for bigger libraries (Plotly, jsPDF) to reduce initial bundle size
 - Dynamically import components as necessary to chunk the application further
 - User defined paramaters are now highlighted when viewing Computation parameters
+- Demo computations are now displayed with a badge in the list ([#441](https://gitlab.heigit.org/climate-action/web-app/-/issues/441))
 
 ### Fixed
 

@@ -81,6 +81,7 @@
             "suffix": "to proceed."
         },
         "imported": "Imported Computation",
+        "demo": "Demo",
         "artifactErrors": "Some results could not be computed.",
         "parameters": {
             "title": "Computation Parameters",

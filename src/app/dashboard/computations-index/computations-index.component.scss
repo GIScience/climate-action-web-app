@@ -283,6 +283,16 @@
         }
     }
 
+    .demo-badge {
+        border: 1.5px solid #1f88bc;
+        border-radius: 5px;
+        color: #1f88bc;
+        font-size: 11px;
+        font-variation-settings: 'wght' 600;
+        padding: 1px 5px;
+        text-transform: uppercase;
+    }
+
     .computation-status {
         align-items: center;
         border-radius: 15px;
