@@ -76,6 +76,9 @@
                                         <div class="card-header">
                                             <div class="card-title">
                                                 <h3>{{ scheduledRun.aoiName }}</h3>
+                                                @if (scheduledRun.flags?.includes('DEMO')) {
+                                                    <span class="demo-badge">DEMO</span>
+                                                }
                                             </div>
                                             <p class="card-subtitle m-0">
                                                 <i-lucide [img]="Clock" size="15"></i-lucide>
@@ -144,6 +147,9 @@
                                                         class="imported-computation"
                                                         [tp]="'computationsIndex.imported' | transloco"
                                                         tpPlacement="right"></i-lucide>
+                                                }
+                                                @if (computation.flags?.includes('DEMO')) {
+                                                    <span class="demo-badge">DEMO</span>
                                                 }
                                             </div>
                                             <p class="card-subtitle m-0">

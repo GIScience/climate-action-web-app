@@ -81,6 +81,7 @@
             "suffix": "um fortzufahren."
         },
         "imported": "Ergebnis importiert",
+        "demo": "Demo",
         "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
         "parameters": {
             "title": "Einstellungen",
