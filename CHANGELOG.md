@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project mostly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.0.3...main)
+## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.1.0...main)
+
+## [3.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.1.0) - 2026-03-03
 
 ### Added
 
@@ -19,6 +21,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Define and use a cache for Jest in dev and pipeline
 - Fix longer artifacts getting clipped in the viewer without a scrollbar ([#431](https://gitlab.heigit.org/climate-action/web-app/-/issues/431))
 - Legends are now included in the PDF export ([#423](https://gitlab.heigit.org/climate-action/web-app/-/issues/423))
+
+### Changed
+
+- Adapt to updated backend library (Climatoology v7)
 
 ## [3.0.3](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.0.3) - 2025-12-16
 
