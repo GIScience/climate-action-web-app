@@ -3,14 +3,6 @@ stages:
     - build
     - deploy
 
-cache:
-    key:
-        files:
-            - pnpm-lock.yaml
-        prefix: $CI_COMMIT_REF_NAME
-    paths:
-        - .pnpm-store
-
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
 
@@ -24,7 +16,6 @@ test_jest_and_lint:
         key:
             files:
                 - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
         paths:
             - .pnpm-store
             - .jest-cache
@@ -43,6 +34,7 @@ test_jest_and_lint:
             EOF
         - pnpm config set store-dir .pnpm-store
         - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
     script:
         - pnpm lint
         - pnpm test:coverage
@@ -62,7 +54,6 @@ test_cypress:
         key:
             files:
                 - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
         paths:
             - .pnpm-store
             - .cache/Cypress
@@ -86,6 +77,7 @@ test_cypress:
         - npm install -g pnpm
         - pnpm config set store-dir .pnpm-store
         - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
         - mkdir -p .cache/Cypress
         - |
             if ls "$CYPRESS_CACHE_FOLDER"/*/Cypress >/dev/null 2>&1; then
@@ -102,7 +94,7 @@ test_cypress:
             - cypress/screenshots/**/*.png
             - cypress/snapshots/actual/**/*.png
             - cypress/snapshots/diff/**/*.png
-        expire_in: 30 day
+        expire_in: 7 day
 
 build_staging:
     stage: build

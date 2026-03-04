@@ -6,3 +6,16 @@
 
 dist/**
 node_modules/**
+
+.pnpm-store
+.cache
+.jest-cache
+coverage
+cypress
+.gitlab
+.gitlab-ci.yml
+Dockerfile
+.dockerignore
+*.log
+README.md
+CHANGELOG.md
