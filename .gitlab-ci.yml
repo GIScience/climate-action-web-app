@@ -16,7 +16,6 @@ test_jest_and_lint:
         key:
             files:
                 - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
         paths:
             - .pnpm-store
             - .jest-cache
@@ -54,7 +53,6 @@ test_cypress:
         key:
             files:
                 - pnpm-lock.yaml
-            prefix: $CI_COMMIT_REF_NAME
         paths:
             - .pnpm-store
             - .cache/Cypress
