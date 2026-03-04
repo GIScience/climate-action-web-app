@@ -3,14 +3,6 @@ stages:
     - build
     - deploy
 
-cache:
-    key:
-        files:
-            - pnpm-lock.yaml
-        prefix: $CI_COMMIT_REF_NAME
-    paths:
-        - .pnpm-store
-
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
 
