@@ -800,7 +800,7 @@ export class MapService {
                 id: layerId,
                 source: sourceId,
                 type: 'raster',
-                paint: { 'raster-opacity': 0.8, 'raster-resampling': 'linear' }
+                paint: { 'raster-opacity': 0.8, 'raster-resampling': 'nearest' }
             })
 
             this.layerSwitcherControl?.updateLayerControls()
@@ -844,7 +844,7 @@ export class MapService {
             id: layerId,
             source: sourceId,
             type: 'raster',
-            paint: { 'raster-opacity': 0.8 }
+            paint: { 'raster-opacity': 0.8, 'raster-resampling': 'nearest' }
         })
 
         this.layerSwitcherControl?.updateLayerControls()
