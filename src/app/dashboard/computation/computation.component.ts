@@ -15,7 +15,6 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatTabsModule } from '@angular/material/tabs'
 import { formatSourceText } from '@app/utils/source.utils'
-import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -310,7 +309,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
             geometry: this.computation.geometry,
             request_ts: this.computation.request_ts,
             pluginId: this.computation.pluginId,
-            pluginName: derivePluginNameFromId(this.computation.pluginId || '')
+            pluginName: this.pluginService.getPluginNameById(this.computation.pluginId || '')
         }
 
         this.reportService.addArtifact(artifact, computationBasicInfo)

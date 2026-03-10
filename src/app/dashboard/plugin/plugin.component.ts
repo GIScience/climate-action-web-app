@@ -6,7 +6,6 @@ import { MatTabsModule } from '@angular/material/tabs'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
-import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
@@ -146,7 +145,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                     catchError(error => {
                         this.loading = false
                         if (error.status === 404) {
-                            const displayName = derivePluginNameFromId(pluginId)
+                            const displayName = this.pluginService.getPluginNameById(pluginId)
 
                             const plugin: Plugin = {
                                 name: displayName,
