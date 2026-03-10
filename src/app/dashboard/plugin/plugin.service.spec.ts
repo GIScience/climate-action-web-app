@@ -142,10 +142,6 @@ describe('PluginService', () => {
         localStorage.clear()
     })
 
-    it('should be created', () => {
-        expect(service).toBeTruthy()
-    })
-
     it('should get plugin list', () => {
         httpClientSpy.get.mockReturnValue(of<Plugin[]>([test_plugin, test_plugin]))
 
@@ -154,6 +150,18 @@ describe('PluginService', () => {
         })
 
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1)
+    })
+
+    it('should populate plugin name cache when getPlugins is called', () => {
+        httpClientSpy.get.mockReturnValue(of<Plugin[]>([test_plugin]))
+
+        service.getPlugins().subscribe()
+
+        expect(service.getPluginNameById('blueprint_plugin')).toBe('Test 1')
+    })
+
+    it('should fall back to derivePluginNameFromId for uncached plugins', () => {
+        expect(service.getPluginNameById('carbon_footprint_calculator')).toBe('Carbon Footprint Calculator')
     })
 
     it('should get single plugin', () => {

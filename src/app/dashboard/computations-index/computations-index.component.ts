@@ -8,7 +8,6 @@ import { AppwriteService } from '@app/auth/appwrite.service'
 import { DatabaseService } from '@app/database.service'
 import { DropdownMenuDirective } from '@app/shared/dropdown-menu.directive'
 import { StorageService } from '@app/storage.service'
-import { derivePluginNameFromId } from '@app/utils/string.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
@@ -472,7 +471,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.newRuns.push(run.correlation_uuid)
             }
             this.toastr.success(
-                `<strong>${derivePluginNameFromId(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
+                `<strong>${this.pluginService.getPluginNameById(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
                 '',
                 {
                     timeOut: 7000,
@@ -481,7 +480,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             )
         } else if (newStatus === 'FAILURE') {
             this.toastr.error(
-                `Error while computing <strong>${derivePluginNameFromId(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${message ? ' - ' + message : ''}.`,
+                `Error while computing <strong>${this.pluginService.getPluginNameById(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${message ? ' - ' + message : ''}.`,
                 '',
                 {
                     disableTimeOut: true,

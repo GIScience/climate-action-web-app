@@ -7,6 +7,7 @@ import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, Observable, Subject, map, of, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, tap, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
+import { derivePluginNameFromId } from '../../utils/string.utils'
 import { ComputationRunState, ComputationRunStateInfo } from '../common/status.types'
 import {
     ComputationDatabaseEntity,
@@ -32,6 +33,7 @@ export class PluginService {
 
     private catalogToggleInput!: HTMLInputElement
 
+    private pluginNameCache = new Map<string, string>()
     private metadataCache = new Map<string, { data: ComputationMetadata; timestamp: number }>()
     private readonly METADATA_CACHE_TTL = 60 * 60 * 1000
 
@@ -40,7 +42,15 @@ export class PluginService {
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http.get<Plugin[]>(`${this.apiUrl}/plugin`)
+        return this.http.get<Plugin[]>(`${this.apiUrl}/plugin`).pipe(
+            tap(plugins => {
+                plugins.forEach(p => this.pluginNameCache.set(p.id, p.name))
+            })
+        )
+    }
+
+    getPluginNameById(pluginId: string): string {
+        return this.pluginNameCache.get(pluginId) || derivePluginNameFromId(pluginId)
     }
 
     getPluginDetails(pluginName: string): Observable<Plugin> {

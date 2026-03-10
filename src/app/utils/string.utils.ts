@@ -1,4 +1,5 @@
-// TODO: Converts a plugin ID (e.g. 'carbon_footprint_calculator') to a display name (e.g. 'Carbon Footprint Calculator'), to be removed when API is updated
+// Fallback: converts a plugin ID (e.g. 'plugin_blueprint') to a display name (e.g. 'Plugin Blueprint')
+// Used by PluginService.getPluginNameById() when the plugin name cache is not yet populated
 export function derivePluginNameFromId(pluginName: string): string {
     return pluginName
         .split('_')
