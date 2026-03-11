@@ -8,9 +8,24 @@
                 <div class="discrete-legend">
                     <ul>
                         @for (item of discreteItems(); track trackByFn($index, item)) {
-                            <li>
-                                <span [style.backgroundColor]="item.color" class="legend-color-box"></span>
-                                {{ item.name }}
+                            <li [class.dimmed]="!item.visible">
+                                @if (onHiddenCategoriesChange) {
+                                    <input
+                                        type="checkbox"
+                                        [id]="getCategoryInputId(item.name)"
+                                        [checked]="item.visible"
+                                        (change)="toggleCategory(item.name)"
+                                        class="legend-checkbox" />
+                                    <label
+                                        [for]="getCategoryInputId(item.name)"
+                                        style="--legend-color: {{ item.color }}"
+                                        >{{ item.displayName }}</label
+                                    >
+                                } @else {
+                                    <span style="--legend-color: {{ item.color }}" class="static-legend-item">
+                                        {{ item.displayName }}
+                                    </span>
+                                }
                             </li>
                         }
                     </ul>
@@ -23,7 +38,7 @@
                         <div #ticksContainer class="ticks">
                             @for (item of continuousItems(); track trackByFn($index, item)) {
                                 <span [style.bottom]="item.position + '%'">
-                                    {{ item.name }}
+                                    {{ item.displayName }}
                                 </span>
                             }
                         </div>

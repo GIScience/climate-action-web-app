@@ -971,6 +971,29 @@ export const mockGeoJsonComputationJinrongjie = () => {
                             legend_type: 'CONTINUOUS'
                         }
                     }
+                },
+                {
+                    name: 'Detour Factor',
+                    primary: true,
+                    tags: [],
+                    filename: 'sample_vector_detourfactors-jinrongjie.geojson',
+                    summary: 'Can I reach my surroundings without big detours?',
+                    description: 'Detour factors measure how directly you can walk to surrounding locations.',
+                    sources: [],
+                    modality: 'VECTOR_MAP_LAYER',
+                    attachments: {
+                        legend: {
+                            title: null,
+                            legend_data: {
+                                Unreachable: '#990404',
+                                'High Detour': '#e75a13',
+                                'Medium Detour': '#eea321'
+                            },
+                            legend_type: 'DISCRETE'
+                        }
+                    },
+                    correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                    rank: 6
                 }
             ],
             plugin_info: {
@@ -1216,6 +1239,15 @@ export const mockGeoTiff = () => {
             fixture: 'sample_raster_blueprint.tiff'
         }
     ).as('getGeoTiff')
+}
+
+export const mockGeoJsonDetourFactorsJinrongjie = () => {
+    cy.intercept(
+        `${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/sample_vector_detourfactors-jinrongjie.geojson`,
+        {
+            fixture: 'sample_vector_detourfactors-jinrongjie.geojson'
+        }
+    ).as('getGeoJsonDetourFactorsJinrongjie')
 }
 
 export const mockGeoJsonJinrongjie = () => {

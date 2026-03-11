@@ -1,6 +1,7 @@
 import {
     mockGeoJsonComputationJinrongjie,
     mockGeoJsonComputationWestChangan,
+    mockGeoJsonDetourFactorsJinrongjie,
     mockGeoJsonJinrongjie,
     mockGeoJsonWestChangan,
     mockGeoTiff,
@@ -193,10 +194,6 @@ describe('mapService', () => {
         mockGeoJsonJinrongjie()
         mockGeoJsonWestChangan()
 
-        beforeCompareSnapshots(
-            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
-        )
-
         cy.window().then(win => {
             win.localStorage.setItem(
                 'plugin_runs',
@@ -231,7 +228,7 @@ describe('mapService', () => {
 
         cy.get('.parent-computation').eq(0).click()
         cy.get('.child-computation').eq(0).realHover()
-        cy.get('.child-computation').eq(0).get('.layer-pin-btn').click()
+        cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
 
         cy.wait('@getGeoJsonJinrongjie')
         cy.waitForRenderComplete()
@@ -239,7 +236,7 @@ describe('mapService', () => {
         cy.get('.parent-computation').eq(1).click()
         cy.wait(500)
         cy.get('.child-computation').eq(0).realHover()
-        cy.get('.child-computation').eq(0).get('.layer-pin-btn').click()
+        cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
 
         cy.wait('@getGeoJsonWestChangan')
         cy.waitForRenderComplete()
@@ -248,6 +245,49 @@ describe('mapService', () => {
         cy.get('.maplibregl-layer-controls .map-layer').should('have.length', 2)
 
         // TODO: add snapshot comparison
+    })
+
+    it('should display checkboxes for each category in case of vector artifacts with discrete legend ', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+        mockGeoJsonComputationJinrongjie()
+        mockGeoJsonDetourFactorsJinrongjie()
+
+        cy.window().then(win => {
+            win.localStorage.setItem(
+                'plugin_runs',
+                JSON.stringify([
+                    {
+                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2024-08-07T12:43:08.373768',
+                        status: 'SUCCESS'
+                    }
+                ])
+            )
+        })
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.wait('@getGeoJsonComputationJinrongjie')
+
+        cy.get('.parent-computation').eq(0).click()
+        cy.get('.child-computation').eq(1).click()
+
+        cy.wait('@getGeoJsonDetourFactorsJinrongjie')
+        cy.waitForRenderComplete()
+
+        cy.get('.discrete-legend ul li').should('have.length', 3)
+        cy.get('.discrete-legend ul li').eq(0).get('input').should('be.checked')
+
+        // TODO: add snapshot comparison, persistance of 'checked' during rebuild (pinning), ID collisions (same artifact filename)
     })
 
     it('should display tooltips from a geojson layer ', () => {

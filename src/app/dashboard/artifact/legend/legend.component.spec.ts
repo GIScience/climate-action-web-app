@@ -34,11 +34,9 @@ describe('LegendComponent', () => {
         const expectedNames = ['Black B', 'Green C', 'Red A']
 
         legendItems.forEach((item, index) => {
-            const colorBox = item.query(By.css('.legend-color-box')).nativeElement
-            colorBox.style.backgroundColor = expectedColors[index]
-            const [r, g, b] = expectedColors[index].match(/\w\w/g)?.map(x => parseInt(x, 16)) || []
-            expect(colorBox.style.backgroundColor).toBe(`rgb(${r}, ${g}, ${b})`)
-            expect(item.nativeElement.textContent.trim()).toContain(expectedNames[index])
+            const staticItem = item.query(By.css('.static-legend-item')).nativeElement
+            expect(staticItem.style.getPropertyValue('--legend-color')).toBe(expectedColors[index])
+            expect(staticItem.textContent.trim()).toContain(expectedNames[index])
         })
     })
 
@@ -92,4 +90,105 @@ describe('LegendComponent', () => {
         expect(title.textContent.trim()).toBe('Test Title')
     })
 
+    it('should render checkboxes when onHiddenCategoriesChange is provided', () => {
+        component.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { forest: '#00ff00', water: '#0000ff' }
+        }
+        component.onHiddenCategoriesChange = jest.fn()
+        fixture.detectChanges()
+
+        const checkboxes = fixture.debugElement.queryAll(By.css('.legend-checkbox'))
+        expect(checkboxes.length).toBe(2)
+        checkboxes.forEach(cb => {
+            expect(cb.nativeElement.checked).toBe(true)
+        })
+    })
+
+    it('should call onHiddenCategoriesChange with hidden categories when a checkbox is toggled', () => {
+        const toggleSpy = jest.fn()
+        component.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { forest: '#00ff00', water: '#0000ff', urban: '#888888' }
+        }
+        component.onHiddenCategoriesChange = toggleSpy
+        fixture.detectChanges()
+
+        const checkboxes = fixture.debugElement.queryAll(By.css('.legend-checkbox'))
+        // Uncheck 'water' (second item)
+        checkboxes[1].nativeElement.click()
+        fixture.detectChanges()
+
+        expect(toggleSpy).toHaveBeenCalledWith(['water'])
+    })
+
+    it('should add dimmed class to unchecked items', () => {
+        component.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { forest: '#00ff00', water: '#0000ff' }
+        }
+        component.onHiddenCategoriesChange = jest.fn()
+        fixture.detectChanges()
+
+        const checkboxes = fixture.debugElement.queryAll(By.css('.legend-checkbox'))
+        // Uncheck 'forest' (first item)
+        checkboxes[0].nativeElement.click()
+        fixture.detectChanges()
+
+        const items = fixture.debugElement.queryAll(By.css('li'))
+        expect(items[0].nativeElement.classList.contains('dimmed')).toBe(true)
+        expect(items[1].nativeElement.classList.contains('dimmed')).toBe(false)
+    })
+
+    it('should generate legend-scoped checkbox ids from artifact id', () => {
+        const firstFixture = TestBed.createComponent(LegendComponent)
+        firstFixture.componentInstance.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { 'urban area': '#ff0000' }
+        }
+        firstFixture.componentInstance.artifactId = 'artifact-1'
+        firstFixture.componentInstance.onHiddenCategoriesChange = () => {}
+        firstFixture.detectChanges()
+
+        const secondFixture = TestBed.createComponent(LegendComponent)
+        secondFixture.componentInstance.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { 'urban area': '#00ff00' }
+        }
+        secondFixture.componentInstance.artifactId = 'artifact-2'
+        secondFixture.componentInstance.onHiddenCategoriesChange = () => {}
+        secondFixture.detectChanges()
+
+        const firstInput: HTMLInputElement = firstFixture.debugElement.query(By.css('.legend-checkbox')).nativeElement
+        const firstLabel: HTMLLabelElement = firstFixture.debugElement.query(By.css('label')).nativeElement
+        const secondInput: HTMLInputElement = secondFixture.debugElement.query(By.css('.legend-checkbox')).nativeElement
+        const secondLabel: HTMLLabelElement = secondFixture.debugElement.query(By.css('label')).nativeElement
+
+        expect(firstInput.id).toBe(firstLabel.htmlFor)
+        expect(secondInput.id).toBe(secondLabel.htmlFor)
+        expect(firstInput.id).not.toBe(secondInput.id)
+    })
+
+    it('should generate unique checkbox ids even without artifact id', () => {
+        const firstFixture = TestBed.createComponent(LegendComponent)
+        firstFixture.componentInstance.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { 'urban area': '#ff0000' }
+        }
+        firstFixture.componentInstance.onHiddenCategoriesChange = () => {}
+        firstFixture.detectChanges()
+
+        const secondFixture = TestBed.createComponent(LegendComponent)
+        secondFixture.componentInstance.legendData = {
+            legend_type: 'DISCRETE',
+            legend_data: { 'urban area': '#00ff00' }
+        }
+        secondFixture.componentInstance.onHiddenCategoriesChange = () => {}
+        secondFixture.detectChanges()
+
+        const firstInput: HTMLInputElement = firstFixture.debugElement.query(By.css('.legend-checkbox')).nativeElement
+        const secondInput: HTMLInputElement = secondFixture.debugElement.query(By.css('.legend-checkbox')).nativeElement
+
+        expect(firstInput.id).not.toBe(secondInput.id)
+    })
 })

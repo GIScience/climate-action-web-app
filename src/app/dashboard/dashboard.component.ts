@@ -17,7 +17,6 @@ import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
 import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
 import { LegendObject } from './artifact/artifact.interface'
-import { ArtifactService } from './artifact/artifact.service'
 import { MapArtifactLayer, MapArtifactManagerService } from './map/map-artifact-manager.service'
 import { MapComponent } from './map/map.component'
 import { MapService } from './map/map.service'
@@ -51,7 +50,6 @@ interface MaintenanceAnnouncement {
     ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-    artifactService = inject(ArtifactService)
     artifactViewerService = inject(ArtifactViewerService)
     reportService = inject(ReportService)
     mapService = inject(MapService)
@@ -62,12 +60,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
-    legendSubscription!: Subscription
     mapArtifactsSubscription!: Subscription
     leftColumnCollapsed = false
     isReportVisible = false
     private collapseTimeout?: number
     private legendRenderVersion = 0
+    private renderedLegendKey = ''
 
     readonly PanelLeftClose = PanelLeftClose
     readonly PanelLeftOpen = PanelLeftOpen
@@ -75,17 +73,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.mapArtifactsSubscription = this.mapArtifactManager.activeMapArtifacts$.subscribe(activeArtifacts => {
             this.updateLegends(activeArtifacts)
-        })
-
-        this.legendSubscription = this.artifactService.legend.subscribe(legend => {
-            if (this.mapArtifactManager.getActiveMapArtifacts().length === 0) {
-                const renderVersion = this.beginLegendRender()
-                if (legend) {
-                    void this.displayLegend(legend, renderVersion)
-                } else {
-                    this.removeLegendContainer()
-                }
-            }
         })
 
         this.reportService.collapseLeftColumn$.subscribe(collapse => {
@@ -126,13 +113,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
     }
 
-    private async displayLegend(legendData: LegendObject, renderVersion: number): Promise<void> {
-        if (this.legendContainer) {
-            const { LegendComponent } = await import('./artifact/legend/legend.component')
-            if (!this.isCurrentLegendRender(renderVersion)) return
-            const componentRef = this.legendContainer.createComponent(LegendComponent)
-            componentRef.instance.legendData = legendData
+    private async createLegend(
+        legendData: LegendObject,
+        layer: MapArtifactLayer,
+        renderVersion: number
+    ): Promise<void> {
+        if (!this.legendContainer) return
+
+        const { LegendComponent } = await import('./artifact/legend/legend.component')
+        if (!this.isCurrentLegendRender(renderVersion)) return
+
+        const componentRef = this.legendContainer.createComponent(LegendComponent)
+        componentRef.instance.artifactId = layer.artifact.correlation_uuid
+
+        if (legendData.legend_type === 'DISCRETE' && layer.artifact.modality === 'VECTOR_MAP_LAYER') {
+            const persistedHiddenCategories = this.mapArtifactManager.getHiddenCategories(layer.artifact)
+            if (persistedHiddenCategories?.length) {
+                persistedHiddenCategories.forEach(category =>
+                    componentRef.instance.categoryVisibility.set(category, false)
+                )
+            }
+
+            componentRef.instance.onHiddenCategoriesChange = (hiddenCategories: string[] | null) => {
+                this.mapArtifactManager.setHiddenCategories(layer.artifact, hiddenCategories)
+            }
+
+            if (persistedHiddenCategories?.length) {
+                const currentLayer = this.mapArtifactManager.getLayerInfo(layer.artifact)
+                if (currentLayer?.layerIds?.length) {
+                    this.mapService.filterVectorLayerByCategories(currentLayer.layerIds, persistedHiddenCategories)
+                }
+            }
         }
+
+        componentRef.instance.legendData = legendData
     }
 
     private removeLegendContainer(): void {
@@ -142,24 +156,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     private updateLegends(activeArtifacts: MapArtifactLayer[]): void {
+        const legendLayers = activeArtifacts.filter(l => l.artifact.attachments?.legend)
+        const key = legendLayers.map(l => `${l.artifact.correlation_uuid}|${l.artifact.filename}`).join('||')
+
+        if (key === this.renderedLegendKey) return
+        this.renderedLegendKey = key
+
         const renderVersion = this.beginLegendRender()
         this.removeLegendContainer()
-        activeArtifacts.forEach(layer => {
-            if (layer.artifact.attachments?.legend) {
-                const legendData = { ...layer.artifact.attachments.legend }
-                legendData.title = legendData.title || layer.artifact.name
-                void this.displayLegendWithTitle(legendData, renderVersion)
-            }
-        })
-    }
+        legendLayers.forEach(layer => {
+            const legend = layer.artifact.attachments?.legend
+            if (!legend) return
 
-    private async displayLegendWithTitle(legendData: LegendObject, renderVersion: number): Promise<void> {
-        if (this.legendContainer) {
-            const { LegendComponent } = await import('./artifact/legend/legend.component')
-            if (!this.isCurrentLegendRender(renderVersion)) return
-            const componentRef = this.legendContainer.createComponent(LegendComponent)
-            componentRef.instance.legendData = legendData
-        }
+            const legendData = { ...legend }
+            legendData.title = legendData.title || layer.artifact.name
+            void this.createLegend(legendData, layer, renderVersion)
+        })
     }
 
     private beginLegendRender(): number {
@@ -207,12 +219,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.legendSubscription) {
-            this.legendSubscription.unsubscribe()
-        }
         if (this.mapArtifactsSubscription) {
             this.mapArtifactsSubscription.unsubscribe()
         }
+        this.renderedLegendKey = ''
         this.beginLegendRender()
         this.removeLegendContainer()
     }

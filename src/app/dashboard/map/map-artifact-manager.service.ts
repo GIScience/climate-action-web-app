@@ -19,6 +19,7 @@ export interface MapArtifactLayer {
     computationId?: string
     computationGeometry?: GeoJSONFeature
     aoiName?: string
+    hiddenCategories?: string[]
 }
 
 @Injectable({
@@ -278,6 +279,29 @@ export class MapArtifactManagerService implements OnDestroy {
         this.layers$.next([])
         current.forEach(l => l.componentRef?.destroy())
         this.updateFogOfWar()
+    }
+
+    setHiddenCategories(artifact: Artifact, hiddenCategories: string[] | null): void {
+        const current = this.layers$.value
+        const idx = current.findIndex(l => this.same(l.artifact, artifact))
+        if (idx === -1) return
+
+        const updated = [...current]
+        updated[idx] = {
+            ...current[idx],
+            hiddenCategories: hiddenCategories?.length ? [...hiddenCategories] : undefined
+        }
+        this.layers$.next(updated)
+
+        const layerIds = updated[idx].layerIds
+        if (layerIds?.length) {
+            this.mapService?.filterVectorLayerByCategories(layerIds, hiddenCategories?.length ? hiddenCategories : null)
+        }
+    }
+
+    getHiddenCategories(artifact: Artifact): string[] | null {
+        const layer = this.getLayerInfo(artifact)
+        return layer?.hiddenCategories ?? null
     }
 
     private same(a: Artifact, b: Artifact): boolean {
