@@ -63,7 +63,7 @@ describe('Search', () => {
     })
 
     it('features of the focused suggestion and the clicked suggestion should be the same', () => {
-        cy.get('.search-locations').type('Währing')
+        cy.get('.search-locations').type('Berlin')
         cy.wait('@openRouteServiceRequest', { timeout: 10000 })
         cy.get('.location-suggestion__item').first().trigger('mouseover')
 

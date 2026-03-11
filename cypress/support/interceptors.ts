@@ -1,9 +1,5 @@
 import { cypressEnvironment } from './cypress-environment'
 
-export const interceptORS = () => {
-    cy.intercept('GET', 'https://api.openrouteservice.org/geocode/autocomplete?*').as('openRouteServiceRequest')
-}
-
 export const mockPluginsList = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/plugin`, {
         body: [
@@ -1247,4 +1243,433 @@ export const mockSimpleGeoJson = () => {
             fixture: 'simple_vector_blueprint.geojson'
         }
     ).as('getSimpleGeoJson')
+}
+
+export const interceptORS = () => {
+    cy.intercept('https://api.openrouteservice.org/geocode/autocomplete?*', {
+        body: {
+            geocoding: {
+                version: '0.2',
+                attribution: 'https://openrouteservice.org/terms-of-service/#attribution-geocode',
+                query: {
+                    text: 'Berlin',
+                    parser: 'pelias',
+                    parsed_text: {
+                        subject: 'Berlin',
+                        locality: 'Berlin'
+                    },
+                    size: 10,
+                    layers: [
+                        'address',
+                        'venue',
+                        'neighbourhood',
+                        'locality',
+                        'borough',
+                        'localadmin',
+                        'county',
+                        'macrocounty'
+                    ],
+                    private: false,
+                    lang: {
+                        name: 'English',
+                        iso6391: 'en',
+                        iso6393: 'eng',
+                        via: 'header',
+                        defaulted: false
+                    },
+                    querySize: 20
+                },
+                engine: {
+                    name: 'Pelias',
+                    author: 'Mapzen',
+                    version: '1.0'
+                },
+                timestamp: 1773219199600
+            },
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.407032, 52.524932]
+                    },
+                    properties: {
+                        id: '101909779',
+                        gid: 'whosonfirst:locality:101909779',
+                        layer: 'locality',
+                        source: 'whosonfirst',
+                        source_id: '101909779',
+                        name: 'Berlin',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Berlin',
+                        region_gid: 'whosonfirst:region:85682499',
+                        region_a: 'BE',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694153',
+                        locality: 'Berlin',
+                        locality_gid: 'whosonfirst:locality:101909779',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Berlin, Germany',
+                        addendum: {
+                            concordances: {
+                                'gp:id': 667027,
+                                'wd:id': 'Q64',
+                                'gn:id': 6547383,
+                                'qs:id': 630199
+                            }
+                        }
+                    },
+                    bbox: [13.088333, 52.338242, 13.760469, 52.674917]
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.41377, 52.5233]
+                    },
+                    properties: {
+                        id: '6547383',
+                        gid: 'geonames:locality:6547383',
+                        layer: 'locality',
+                        source: 'geonames',
+                        source_id: '6547383',
+                        name: 'Berlin',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Berlin',
+                        region_gid: 'whosonfirst:region:85682499',
+                        region_a: 'BE',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694153',
+                        locality: 'Berlin',
+                        locality_gid: 'geonames:locality:6547383',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Berlin, Germany',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'ADM3'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.58228, 52.44254]
+                    },
+                    properties: {
+                        id: '2885657',
+                        gid: 'geonames:neighbourhood:2885657',
+                        layer: 'neighbourhood',
+                        source: 'geonames',
+                        source_id: '2885657',
+                        name: 'Berlin Köpenick',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Berlin',
+                        region_gid: 'whosonfirst:region:85682499',
+                        region_a: 'BE',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694153',
+                        locality: 'Berlin',
+                        locality_gid: 'whosonfirst:locality:101909779',
+                        borough: 'Treptow-Kopenick',
+                        borough_gid: 'whosonfirst:borough:1108815559',
+                        neighbourhood: 'Kopenick',
+                        neighbourhood_gid: 'whosonfirst:neighbourhood:420784377',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Berlin Köpenick, Berlin, Germany',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'PPLX'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.44469, 52.49376]
+                    },
+                    properties: {
+                        id: '7290255',
+                        gid: 'geonames:neighbourhood:7290255',
+                        layer: 'neighbourhood',
+                        source: 'geonames',
+                        source_id: '7290255',
+                        name: 'Alt-Treptow',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Berlin',
+                        region_gid: 'whosonfirst:region:85682499',
+                        region_a: 'BE',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694153',
+                        locality: 'Berlin',
+                        locality_gid: 'whosonfirst:locality:101909779',
+                        borough: 'Treptow-Kopenick',
+                        borough_gid: 'whosonfirst:borough:1108815559',
+                        neighbourhood: 'Alt-Treptow',
+                        neighbourhood_gid: 'whosonfirst:neighbourhood:85928793',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Alt-Treptow, Berlin, Germany',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'PPLX'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.576713, 52.678721]
+                    },
+                    properties: {
+                        id: '101758637',
+                        gid: 'whosonfirst:locality:101758637',
+                        layer: 'locality',
+                        source: 'whosonfirst',
+                        source_id: '101758637',
+                        name: 'Bernau bei Berlin',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Brandenburg',
+                        region_gid: 'whosonfirst:region:85682553',
+                        region_a: 'BB',
+                        county: 'Barnim',
+                        county_gid: 'whosonfirst:county:102063973',
+                        localadmin: 'Bernau bei Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694207',
+                        locality: 'Bernau bei Berlin',
+                        locality_gid: 'whosonfirst:locality:101758637',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Bernau bei Berlin, BB, Germany',
+                        addendum: {
+                            concordances: {
+                                'gn:id': 2950096,
+                                'gp:id': 638275,
+                                'qs_pg:id': 385768,
+                                'wd:id': 'Q9300',
+                                'wk:page': 'Bernau bei Berlin',
+                                'qs:id': 104039
+                            }
+                        }
+                    },
+                    bbox: [13.467358, 52.608694, 13.668668, 52.757101]
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [-88.129117, 42.973476]
+                    },
+                    properties: {
+                        id: '101733503',
+                        gid: 'whosonfirst:locality:101733503',
+                        layer: 'locality',
+                        source: 'whosonfirst',
+                        source_id: '101733503',
+                        name: 'New Berlin',
+                        accuracy: 'centroid',
+                        country: 'United States',
+                        country_gid: 'whosonfirst:country:85633793',
+                        country_a: 'USA',
+                        region: 'Wisconsin',
+                        region_gid: 'whosonfirst:region:85688517',
+                        region_a: 'WI',
+                        county: 'Waukesha County',
+                        county_gid: 'whosonfirst:county:102081741',
+                        localadmin: 'New Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:404492511',
+                        locality: 'New Berlin',
+                        locality_gid: 'whosonfirst:locality:101733503',
+                        continent: 'North America',
+                        continent_gid: 'whosonfirst:continent:102191575',
+                        label: 'New Berlin, WI, USA',
+                        addendum: {
+                            concordances: {
+                                'fct:id': '08c8b28e-8f76-11e1-848f-cfd5bf3ef515',
+                                'fips:code': '5556375',
+                                'gn:id': 5264381,
+                                'gp:id': 2458030,
+                                'qs_pg:id': 825897,
+                                'uscensus:geoid': 5556375,
+                                'wd:id': 'Q1005623',
+                                'wk:page': 'New Berlin, Wisconsin'
+                            }
+                        }
+                    },
+                    bbox: [-88.188994, 42.922858, -88.067252, 43.017325]
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [-88.12914, 42.97259]
+                    },
+                    properties: {
+                        id: '5264390',
+                        gid: 'geonames:locality:5264390',
+                        layer: 'locality',
+                        source: 'geonames',
+                        source_id: '5264390',
+                        name: 'City of New Berlin',
+                        accuracy: 'centroid',
+                        country: 'United States',
+                        country_gid: 'whosonfirst:country:85633793',
+                        country_a: 'USA',
+                        region: 'Wisconsin',
+                        region_gid: 'whosonfirst:region:85688517',
+                        region_a: 'WI',
+                        county: 'Waukesha County',
+                        county_gid: 'whosonfirst:county:102081741',
+                        county_a: 'WK',
+                        localadmin: 'New Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:404492511',
+                        locality: 'City of New Berlin',
+                        locality_gid: 'geonames:locality:5264390',
+                        continent: 'North America',
+                        continent_gid: 'whosonfirst:continent:102191575',
+                        label: 'City of New Berlin, WI, USA',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'ADM3'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.58708, 52.67982]
+                    },
+                    properties: {
+                        id: '2950096',
+                        gid: 'geonames:locality:2950096',
+                        layer: 'locality',
+                        source: 'geonames',
+                        source_id: '2950096',
+                        name: 'Bernau bei Berlin',
+                        accuracy: 'centroid',
+                        country: 'Germany',
+                        country_gid: 'whosonfirst:country:85633111',
+                        country_a: 'DEU',
+                        region: 'Brandenburg',
+                        region_gid: 'whosonfirst:region:85682553',
+                        region_a: 'BB',
+                        county: 'Barnim',
+                        county_gid: 'whosonfirst:county:102063973',
+                        county_a: 'BR',
+                        localadmin: 'Bernau bei Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:1377694207',
+                        locality: 'Bernau bei Berlin',
+                        locality_gid: 'geonames:locality:2950096',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Bernau bei Berlin, BB, Germany',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'PPL'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [-72.77582, 41.61139]
+                    },
+                    properties: {
+                        id: '5282251',
+                        gid: 'geonames:locality:5282251',
+                        layer: 'locality',
+                        source: 'geonames',
+                        source_id: '5282251',
+                        name: 'Town of Berlin',
+                        accuracy: 'centroid',
+                        country: 'United States',
+                        country_gid: 'whosonfirst:country:85633793',
+                        country_a: 'USA',
+                        region: 'Connecticut',
+                        region_gid: 'whosonfirst:region:85688629',
+                        region_a: 'CT',
+                        county: 'Hartford County',
+                        county_gid: 'whosonfirst:county:102085381',
+                        county_a: 'HA',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:404495869',
+                        locality: 'Town of Berlin',
+                        locality_gid: 'geonames:locality:5282251',
+                        continent: 'North America',
+                        continent_gid: 'whosonfirst:continent:102191575',
+                        label: 'Town of Berlin, CT, USA',
+                        addendum: {
+                            geonames: {
+                                feature_code: 'ADM3'
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [-72.782292, 41.61178]
+                    },
+                    properties: {
+                        id: '404495869',
+                        gid: 'whosonfirst:localadmin:404495869',
+                        layer: 'localadmin',
+                        source: 'whosonfirst',
+                        source_id: '404495869',
+                        name: 'Berlin',
+                        accuracy: 'centroid',
+                        country: 'United States',
+                        country_gid: 'whosonfirst:country:85633793',
+                        country_a: 'USA',
+                        region: 'Connecticut',
+                        region_gid: 'whosonfirst:region:85688629',
+                        region_a: 'CT',
+                        county: 'Hartford County',
+                        county_gid: 'whosonfirst:county:102085381',
+                        localadmin: 'Berlin',
+                        localadmin_gid: 'whosonfirst:localadmin:404495869',
+                        continent: 'North America',
+                        continent_gid: 'whosonfirst:continent:102191575',
+                        label: 'Berlin, CT, USA',
+                        addendum: {
+                            concordances: {
+                                'uscensus:geoid': 900304300
+                            }
+                        }
+                    },
+                    bbox: [-72.840244, 41.554195, -72.711134, 41.652706]
+                }
+            ],
+            bbox: [-88.188994, 41.554195, 13.760469, 52.757101]
+        }
+    }).as('openRouteServiceRequest')
 }
