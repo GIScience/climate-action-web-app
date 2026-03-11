@@ -1,17 +1,14 @@
 import { Injectable, inject } from '@angular/core'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
+import distance from '@turf/distance'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import { Feature as GeoJSONFeature } from 'geojson'
 import { IControl, LngLatLike, Map, Popup } from 'maplibre-gl'
-import Feature from 'ol/Feature'
-import { Geometry } from 'ol/geom'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 
 export interface DrawingFeature {
     geoJsonFeature: GeoJSONFeature
-    olFeature: Feature<Geometry>
 }
 
 export type DrawMode = 'polygon' | 'circle' | 'rectangle' | null
@@ -23,6 +20,8 @@ export class MapDrawingService {
     private translocoService = inject(TranslocoService)
 
     private readonly SQM_TO_SQKM_FACTOR = 1e-6
+    private formatRadius = (radius: number) =>
+        radius >= 1000 ? `${(radius / 1000).toFixed(2)} km` : `${radius.toFixed(0)} m`
     private readonly DRAW_MODES = { Polygon: 'polygon', Circle: 'circle', Box: 'rectangle' } as const
     private readonly TYPE_MAP = { circle: 'Circle', rectangle: 'Box', polygon: 'Polygon' } as const
     private readonly TOOLTIP_OFFSET: [number, number] = [0, -15]
@@ -192,30 +191,6 @@ export class MapDrawingService {
             area: Number((area({ type: 'Feature', geometry, properties: {} }) * this.SQM_TO_SQKM_FACTOR).toFixed(2))
         }
 
-        const mercatorCoords = geometry.coordinates
-            .flat(2)
-            .map(([lng, lat]) => MapConvertMeasureUtils.lngLatToMercator(lng, lat))
-        const extent = [
-            Math.min(...mercatorCoords.map(c => c[0])),
-            Math.min(...mercatorCoords.map(c => c[1])),
-            Math.max(...mercatorCoords.map(c => c[0])),
-            Math.max(...mercatorCoords.map(c => c[1]))
-        ]
-
-        const olFeature = {
-            get: (key: string) => properties[key as keyof typeof properties],
-            set: () => {},
-            getGeometry: () => ({
-                getType: () => 'MultiPolygon',
-                getCoordinates: () =>
-                    geometry.coordinates.map(p =>
-                        p.map(r => r.map(([lng, lat]) => MapConvertMeasureUtils.lngLatToMercator(lng, lat)))
-                    ),
-                getExtent: () => extent
-            }),
-            getProperties: () => properties
-        } as unknown as Feature<Geometry>
-
         const geoJsonFeature: GeoJSONFeature = {
             type: 'Feature',
             geometry: geometry,
@@ -223,7 +198,7 @@ export class MapDrawingService {
         }
 
         const currentFeatures = this.drawnFeatures.value
-        this.drawnFeatures.next([...currentFeatures, { geoJsonFeature, olFeature }])
+        this.drawnFeatures.next([...currentFeatures, { geoJsonFeature }])
 
         terraDraw.setMode('static')
         this.stopDrawing()
@@ -275,12 +250,12 @@ export class MapDrawingService {
             [coords[0][0], coords[0][0], coords[0][1], coords[0][1]]
         )
         const center: [number, number] = [(bounds[0] + bounds[1]) / 2, (bounds[2] + bounds[3]) / 2]
-        const radius = MapConvertMeasureUtils.calculateDistance(center, coords[0])
+        const radius = distance(center, coords[0], { units: 'meters' })
         const areaInSqMeters = Math.PI * Math.pow(radius, 2)
         const areaInSqKm = areaInSqMeters * this.SQM_TO_SQKM_FACTOR
         const radiusLabel = this.translocoService.translate('map.drawing.radius')
         const areaLabel = this.translocoService.translate('map.drawing.area')
-        const radiusText = `${radiusLabel}: ${MapConvertMeasureUtils.formatRadius(radius)}`
+        const radiusText = `${radiusLabel}: ${this.formatRadius(radius)}`
         const areaText = `${areaLabel}: ${areaInSqKm.toFixed(2)} km²`
         const tooltipText = `${radiusText}\n${areaText}`
 
@@ -301,16 +276,16 @@ export class MapDrawingService {
 
         const areaInSqMeters = area(feature)
         const areaInSqKm = areaInSqMeters * this.SQM_TO_SQKM_FACTOR
-        const width = MapConvertMeasureUtils.calculateDistance(topLeft, topRight)
-        const height = MapConvertMeasureUtils.calculateDistance(topLeft, bottomLeft)
+        const width = distance(topLeft, topRight, { units: 'meters' })
+        const height = distance(topLeft, bottomLeft, { units: 'meters' })
 
         const widthLabel = this.translocoService.translate('map.drawing.width')
         const heightLabel = this.translocoService.translate('map.drawing.height')
         const areaLabel = this.translocoService.translate('map.drawing.area')
 
         const tooltipText = [
-            `${widthLabel}: ${MapConvertMeasureUtils.formatRadius(width)}`,
-            `${heightLabel}: ${MapConvertMeasureUtils.formatRadius(height)}`,
+            `${widthLabel}: ${this.formatRadius(width)}`,
+            `${heightLabel}: ${this.formatRadius(height)}`,
             `${areaLabel}: ${areaInSqKm.toFixed(2)} km²`
         ].join('\n')
 

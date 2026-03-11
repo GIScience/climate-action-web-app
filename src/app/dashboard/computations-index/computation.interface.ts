@@ -1,5 +1,4 @@
-import { Feature } from 'ol'
-import { MultiPolygon } from 'ol/geom'
+import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationFlags, ComputationItemState, ComputationRunState } from '../common/status.types'
 import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
@@ -14,7 +13,7 @@ export interface ComputationMetadata {
     request_ts: Date
     params: ComputationParameters
     requested_params?: ComputationParameters
-    aoi: Feature<MultiPolygon>
+    aoi: GeoJSONFeature<MultiPolygon>
     artifacts: Artifact[]
     plugin_info: PluginBaseInfo
     status: ComputationRunState

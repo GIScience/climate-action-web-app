@@ -5,6 +5,7 @@ import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
 import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
+import bbox from '@turf/bbox'
 import { colorful, graybeard } from '@versatiles/style'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
@@ -19,10 +20,6 @@ import maplibregl, {
     StyleSpecification
 } from 'maplibre-gl'
 import { updateMaplibreLocale } from 'maplibre-ui-translations'
-import { Collection } from 'ol'
-import { Extent } from 'ol/extent'
-import Feature from 'ol/Feature'
-import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
@@ -31,7 +28,6 @@ import { MapArtifactLayer, MapArtifactManagerService } from './map-artifact-mana
 import { MapDrawingService } from './map-drawing.service'
 import { MapFoWManagerService } from './map-fow-manager.service'
 import { MapControlsUtils } from './utils/map-controls.utils'
-import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
 import { MapGlobeUtils } from './utils/map-globe.utils'
 import { MapStyle, MapStyleSwitcherControl } from './utils/map-style-switcher.utils'
@@ -73,6 +69,8 @@ export interface AutocompleteFeature extends GeoJSONFeature<GeoJSONPoint> {
     }
     bbox?: BBox
 }
+
+export type Extent = [number, number, number, number]
 
 interface VectorLayerGroup {
     layerIds: string[]
@@ -157,8 +155,8 @@ export class MapService {
     markerFeatures: AutocompleteFeature[] = []
 
     // Feature Selection
-    selectedOlFeatures: Collection<Feature<Geometry>> = new Collection([])
-    selectedGeoJSONFeatures: GeoJSONFeature[] = [] // Track GeoJSON features for MapLibre
+    selectedFeatures: GeoJSONFeature[] = []
+    selectedFeatures$ = new BehaviorSubject<GeoJSONFeature[]>([])
 
     // Layer Management
     regionLayer: RasterLayer | undefined
@@ -193,17 +191,12 @@ export class MapService {
 
         if (this.mapDrawingService?.drawnFeatures$) {
             this.mapDrawingService.drawnFeatures$.subscribe(drawnFeatures => {
-                this.selectedOlFeatures.clear()
-                this.selectedGeoJSONFeatures = []
-
-                drawnFeatures.forEach(({ geoJsonFeature, olFeature }) => {
-                    this.selectedOlFeatures.push(olFeature)
-                    this.selectedGeoJSONFeatures.push(geoJsonFeature)
-                })
+                this.selectedFeatures = drawnFeatures.map(({ geoJsonFeature }) => geoJsonFeature)
+                this.selectedFeatures$.next(this.selectedFeatures)
 
                 if (this.selectedRegionLayer && this.map) {
                     const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
-                    source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
+                    source?.setData({ type: 'FeatureCollection', features: this.selectedFeatures })
                 }
             })
         }
@@ -544,13 +537,10 @@ export class MapService {
     fitToExtent(extent: Extent, options?: maplibregl.FitBoundsOptions) {
         if (!this.map || !extent || extent.length !== 4) return
 
-        // Convert extent from EPSG:3857 to EPSG:4326
-        const wgs84Extent = MapConvertMeasureUtils.transformExtentToWgs84(extent)
-
         // Create bounds from extent [minLng, minLat, maxLng, maxLat]
         const bounds = new LngLatBounds(
-            [wgs84Extent[0], wgs84Extent[1]], // southwest
-            [wgs84Extent[2], wgs84Extent[3]] // northeast
+            [extent[0], extent[1]], // southwest
+            [extent[2], extent[3]] // northeast
         )
 
         // Default options with padding
@@ -585,10 +575,9 @@ export class MapService {
                 }
             }
         }
-        // Handle extent array [minX, minY, maxX, maxY] in EPSG:3857
+        // Handle extent array [minX, minY, maxX, maxY] in WGS84
         else if (Array.isArray(target) && target.length === 4) {
-            const wgs84Extent = MapConvertMeasureUtils.transformExtentToWgs84(target)
-            bounds = new LngLatBounds([wgs84Extent[0], wgs84Extent[1]], [wgs84Extent[2], wgs84Extent[3]])
+            bounds = new LngLatBounds([target[0], target[1]], [target[2], target[3]])
         }
         // Handle LngLatLike (coordinate pair)
         else if (
@@ -617,13 +606,10 @@ export class MapService {
         }
     }
 
-    highlightAoI(feature: Feature<Geometry>): Extent | null {
-        if (!feature) return null
+    highlightAoI(feature: GeoJSONFeature): Extent | null {
+        if (!feature?.geometry) return null
 
-        const geometry = feature?.getGeometry?.() as OLMultiPolygon | OLPolygon | null
-        if (!geometry) return null
-
-        const extent = geometry.getExtent()
+        const extent = bbox(feature) as Extent
         if (!extent?.length) return null
 
         this.fowManager.clearByType('focused')
@@ -946,9 +932,9 @@ export class MapService {
                 this.map!.setLayoutProperty(layerId, 'visibility', 'none')
             )
 
-            if (this.selectedOlFeatures.getLength() > 0) {
-                this.selectedOlFeatures.clear()
-                this.selectedGeoJSONFeatures = []
+            if (this.selectedFeatures.length > 0) {
+                this.selectedFeatures = []
+                this.selectedFeatures$.next(this.selectedFeatures)
                 const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
                 source?.setData({ type: 'FeatureCollection', features: [] })
             }
@@ -962,7 +948,7 @@ export class MapService {
         this.fowManager.clearByType('focused')
     }
 
-    updateFoWGeometries(geometries: Feature<Geometry>[], type: 'pinned'): void {
+    updateFoWGeometries(geometries: GeoJSONFeature[], type: 'pinned'): void {
         this.fowManager.clearByType(type)
         geometries.forEach((geom, index) => {
             this.fowManager.addGeometry(`${type}-${index}`, geom, type)
@@ -1014,8 +1000,7 @@ export class MapService {
             next: async feature => {
                 if (!feature?.geometry) return
 
-                this.selectedOlFeatures.clear()
-                this.selectedGeoJSONFeatures = []
+                this.selectedFeatures = []
 
                 const processedFeature: GeoJSONFeature = {
                     type: 'Feature',
@@ -1035,17 +1020,8 @@ export class MapService {
                     )
                 }
 
-                // Add OpenLayers compatibility wrapper
-                this.selectedOlFeatures.push({
-                    get: (key: string) => processedFeature.properties![key],
-                    set: (key: string, value: string | number | boolean | null | undefined) => {
-                        processedFeature.properties![key] = value
-                    },
-                    getGeometry: () => processedFeature.geometry,
-                    getProperties: () => processedFeature.properties
-                } as unknown as Feature)
-
-                this.selectedGeoJSONFeatures = [processedFeature]
+                this.selectedFeatures.push(processedFeature)
+                this.selectedFeatures$.next(this.selectedFeatures)
 
                 if (this.selectedRegionLayer) {
                     const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
@@ -1057,22 +1033,16 @@ export class MapService {
     }
 
     getSelectedRegion(): GeoJSONFeature | null {
-        return this.selectedGeoJSONFeatures.length > 0 ? this.selectedGeoJSONFeatures[0] : null
+        return this.selectedFeatures.length > 0 ? this.selectedFeatures[0] : null
     }
 
-    removeSelectedRegion(feature: Feature): void {
-        this.selectedOlFeatures.remove(feature)
-
-        const featureId = feature.get('id')
-        if (featureId) {
-            this.selectedGeoJSONFeatures = this.selectedGeoJSONFeatures.filter(
-                geoJsonFeature => geoJsonFeature.properties?.['id'] !== featureId
-            )
-        }
+    removeSelectedRegion(feature: GeoJSONFeature): void {
+        this.selectedFeatures = this.selectedFeatures.filter(f => f !== feature)
+        this.selectedFeatures$.next(this.selectedFeatures)
 
         if (this.selectedRegionLayer && this.map) {
             const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
-            source?.setData({ type: 'FeatureCollection', features: this.selectedGeoJSONFeatures })
+            source?.setData({ type: 'FeatureCollection', features: this.selectedFeatures })
         }
     }
 
@@ -1093,8 +1063,8 @@ export class MapService {
             this.mapDrawingService.clearDrawnFeatures()
         }
 
-        this.selectedOlFeatures.clear()
-        this.selectedGeoJSONFeatures = []
+        this.selectedFeatures = []
+        this.selectedFeatures$.next(this.selectedFeatures)
 
         if (this.selectedRegionLayer && this.map) {
             const source = this.map.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
@@ -1173,7 +1143,7 @@ export class MapService {
 
         const initialExpanded = !this.storageService.getLayerSwitcherCollapsed()
 
-        this.layerSwitcherControl = MapControlsUtils.createLayerSwitcherControl(
+        this.layerSwitcherControl = new MapStyleSwitcherControl(
             styles,
             this.currentBasemapStyle,
             this.translocoService,

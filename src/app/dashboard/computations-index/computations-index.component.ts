@@ -500,7 +500,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     artifacts: [],
                     status: response.status,
                     request_ts: response.request_ts,
-                    aoiName: response.aoi?.get('name'),
+                    aoiName: response.aoi?.properties?.['name'] as string | undefined,
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.id,
                     params: response.params,
@@ -592,7 +592,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             setTimeout(() => (computation.isExpanded = true), 0)
             this.activeComputation = computation
 
-            if (computation && computation.geometry) {
+            if (computation?.geometry) {
                 const extent = this.mapService.highlightAoI(computation.geometry)
 
                 if (extent) {
@@ -863,7 +863,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     pluginId: response.plugin_info?.id,
                     request_ts: response.request_ts,
                     status: 'SUCCESS',
-                    aoiName: response.aoi?.get('name'),
+                    aoiName: response.aoi?.properties?.['name'] as string | undefined,
                     flags: ['IMPORTED']
                 }
 

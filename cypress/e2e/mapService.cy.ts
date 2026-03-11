@@ -385,7 +385,7 @@ describe('mapService', () => {
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
             const selectedFeature = mapService.getSelectedRegion()
-            currentSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
+            currentSelectedFeaturesCount = mapService.selectedFeatures.length
 
             expect(selectedFeature).to.exist
             expect(selectedFeature.geometry.type).to.be.equal('MultiPolygon')
@@ -415,7 +415,7 @@ describe('mapService', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            newSelectedFeaturesCount = mapService.selectedOlFeatures.getLength()
+            newSelectedFeaturesCount = mapService.selectedFeatures.length
 
             expect(newSelectedFeaturesCount).to.not.equal(currentSelectedFeaturesCount)
         })
@@ -467,10 +467,10 @@ describe('mapService', () => {
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            expect(mapService.selectedGeoJSONFeatures).to.have.length.greaterThan(0)
+            expect(mapService.selectedFeatures).to.have.length.greaterThan(0)
 
-            if (mapService.selectedGeoJSONFeatures.length > 0) {
-                const feature = mapService.selectedGeoJSONFeatures[0]
+            if (mapService.selectedFeatures.length > 0) {
+                const feature = mapService.selectedFeatures[0]
                 expect(feature.geometry.type).to.be.equal('MultiPolygon')
             }
         })

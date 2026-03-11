@@ -2,11 +2,7 @@ import { Injectable } from '@angular/core'
 import mask from '@turf/mask'
 import type { Feature as GeoJSONFeature, MultiPolygon, Polygon, Position } from 'geojson'
 import type { GeoJSONSource, Map as MaplibreMap } from 'maplibre-gl'
-import type { Feature } from 'ol'
-import type { Coordinate } from 'ol/coordinate'
-import { Geometry, MultiPolygon as OLMultiPolygon, Polygon as OLPolygon } from 'ol/geom'
 import { union as polyclipUnion } from 'polyclip-ts'
-import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
 
 type PolyclipRing = [number, number][]
 type PolyclipPolygon = PolyclipRing[]
@@ -14,7 +10,7 @@ type PolyclipPolygon = PolyclipRing[]
 export type FoWGeometryType = 'focused' | 'pinned'
 
 interface FoWGeometry {
-    geometry: Feature<Geometry>
+    geometry: GeoJSONFeature
     type: FoWGeometryType
 }
 
@@ -39,7 +35,7 @@ export class MapFoWManagerService {
         }
     }
 
-    addGeometry(id: string, geometry: Feature<Geometry>, type: FoWGeometryType): void {
+    addGeometry(id: string, geometry: GeoJSONFeature, type: FoWGeometryType): void {
         this.geometries.set(id, { geometry, type })
         this.updateMapLayers()
     }
@@ -68,24 +64,10 @@ export class MapFoWManagerService {
 
         const polygons: GeoJSONFeature<Polygon | MultiPolygon>[] = []
 
-        for (const { geometry: olFeature } of this.geometries.values()) {
-            const geom = olFeature?.getGeometry?.() as OLMultiPolygon | OLPolygon | null
-            if (!geom) continue
-
-            const coords = geom.getCoordinates()
-
-            const geometry: Polygon | MultiPolygon =
-                geom instanceof OLMultiPolygon
-                    ? { type: 'MultiPolygon', coordinates: coords as Coordinate[][][] }
-                    : { type: 'Polygon', coordinates: coords as Coordinate[][] }
-
-            const wgs84Geometry = MapConvertMeasureUtils.transformGeometryToWgs84(geometry)
-
-            polygons.push({
-                type: 'Feature',
-                geometry: wgs84Geometry,
-                properties: {}
-            })
+        for (const { geometry: feat } of this.geometries.values()) {
+            if (feat?.geometry?.type === 'Polygon' || feat?.geometry?.type === 'MultiPolygon') {
+                polygons.push(feat as GeoJSONFeature<Polygon | MultiPolygon>)
+            }
         }
 
         if (polygons.length === 0) return

@@ -16,7 +16,7 @@ const LAYER_SUFFIXES = ['-fill', '-outline', '-line', '-point']
 const LAYER_IDS = ['hover-highlight-fill', 'hover-highlight-line', 'hover-highlight-point']
 
 export class MapGeoJsonUtils {
-    private static contexts = new WeakMap<MaplibreMap, HoverContext>()
+    private static contexts = new Map<MaplibreMap, HoverContext>()
 
     static setupGeoJsonInteractions(
         map: MaplibreMap,

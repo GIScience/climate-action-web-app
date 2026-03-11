@@ -1,8 +1,6 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { jest } from '@jest/globals'
-import { Feature } from 'ol'
-import { MultiPolygon } from 'ol/geom'
 import { of } from 'rxjs'
 import { StorageService } from '../../storage.service'
 import { ComputationID } from '../computations-index/computation.interface'
@@ -205,7 +203,8 @@ describe('PluginService', () => {
         httpClientSpy.get.mockReturnValue(of(test_computation))
 
         service.getComputationMetadata('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6').subscribe(computations => {
-            expect(computations.aoi).toBeInstanceOf(Feature<MultiPolygon>)
+            expect(computations.aoi).toBeDefined()
+            expect(computations.aoi.properties?.['name']).toBe('Test AOI')
         })
 
         expect(httpClientSpy.get).toHaveBeenCalledTimes(1)

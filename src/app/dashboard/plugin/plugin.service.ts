@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { environment } from '@environments/environment'
-import { Feature } from 'ol'
-import GeoJSON from 'ol/format/GeoJSON'
-import { MultiPolygon } from 'ol/geom'
+import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { BehaviorSubject, Observable, Subject, map, of, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, tap, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
@@ -75,7 +73,6 @@ export class PluginService {
             return of(cached.data)
         }
 
-        const gj = new GeoJSON()
         const requestTimeout = 5000
         const maxRetries = 3
         return this.http.get<ComputationMetadata>(`${this.apiUrl}/store/${id}/metadata`).pipe(
@@ -98,11 +95,7 @@ export class PluginService {
                 return throwError(() => error)
             }),
             map((metadata: ComputationMetadata) => {
-                const feat = gj.readFeature(metadata.aoi, {
-                    featureProjection: 'EPSG:3857'
-                }) as Feature<MultiPolygon>
-                feat.set('renderStyle', 'AOI')
-                metadata.aoi = feat
+                metadata.aoi = metadata.aoi as unknown as GeoJSONFeature<MultiPolygon>
                 return metadata
             }),
             tap(metadata => {
