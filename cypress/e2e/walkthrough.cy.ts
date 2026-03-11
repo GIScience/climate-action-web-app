@@ -1,4 +1,5 @@
 import {
+    interceptWalkthroughORS,
     mockComputationRunState,
     mockPluginHiWalk,
     mockPluginHiWalkComputation,
@@ -13,6 +14,7 @@ describe('walkthrough', () => {
         mockComputationRunState()
         mockPostPluginRun()
         mockPluginHiWalkComputation()
+        interceptWalkthroughORS()
 
         cy.visit('/')
 
@@ -33,6 +35,8 @@ describe('walkthrough', () => {
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '2 of 10')
 
         cy.get('.driver-popover-next-btn').click()
+
+        cy.wait('@openRouteServiceWalkthroughRequest')
 
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '3 of 10')
 

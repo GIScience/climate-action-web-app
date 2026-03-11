@@ -1245,7 +1245,7 @@ export const mockSimpleGeoJson = () => {
     ).as('getSimpleGeoJson')
 }
 
-export const interceptORS = () => {
+export const interceptSearchORS = () => {
     cy.intercept('https://api.openrouteservice.org/geocode/autocomplete?*', {
         body: {
             geocoding: {
@@ -1671,5 +1671,96 @@ export const interceptORS = () => {
             ],
             bbox: [-88.188994, 41.554195, 13.760469, 52.757101]
         }
-    }).as('openRouteServiceRequest')
+    }).as('openRouteServiceSearchRequest')
+}
+
+export const interceptWalkthroughORS = () => {
+    cy.intercept('https://api.openrouteservice.org/geocode/autocomplete?*', {
+        body: {
+            geocoding: {
+                version: '0.2',
+                attribution: 'https://openrouteservice.org/terms-of-service/#attribution-geocode',
+                query: {
+                    text: 'Ventotene',
+                    parser: 'pelias',
+                    parsed_text: {
+                        subject: 'Ventotene',
+                        locality: 'Ventotene'
+                    },
+                    size: 10,
+                    layers: [
+                        'address',
+                        'venue',
+                        'neighbourhood',
+                        'locality',
+                        'borough',
+                        'localadmin',
+                        'county',
+                        'macrocounty'
+                    ],
+                    private: false,
+                    lang: {
+                        name: 'English',
+                        iso6391: 'en',
+                        iso6393: 'eng',
+                        via: 'header',
+                        defaulted: false
+                    },
+                    querySize: 20
+                },
+                engine: {
+                    name: 'Pelias',
+                    author: 'Mapzen',
+                    version: '1.0'
+                },
+                timestamp: 1773225877895
+            },
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [13.430873, 40.796962]
+                    },
+                    properties: {
+                        id: '101802469',
+                        gid: 'whosonfirst:locality:101802469',
+                        layer: 'locality',
+                        source: 'whosonfirst',
+                        source_id: '101802469',
+                        name: 'Ventotene',
+                        accuracy: 'centroid',
+                        country: 'Italy',
+                        country_gid: 'whosonfirst:country:85633253',
+                        country_a: 'ITA',
+                        macroregion: 'Lazio',
+                        macroregion_gid: 'whosonfirst:macroregion:404227517',
+                        region: 'Latina',
+                        region_gid: 'whosonfirst:region:85685467',
+                        region_a: 'LT',
+                        localadmin: 'Ventotene',
+                        localadmin_gid: 'whosonfirst:localadmin:404461861',
+                        locality: 'Ventotene',
+                        locality_gid: 'whosonfirst:locality:101802469',
+                        continent: 'Europe',
+                        continent_gid: 'whosonfirst:continent:102191581',
+                        label: 'Ventotene, LT, Italy',
+                        addendum: {
+                            concordances: {
+                                'fct:id': '12b99f9c-8f76-11e1-848f-cfd5bf3ef515',
+                                'gn:id': 3164577,
+                                'gp:id': 725755,
+                                'qs_pg:id': 347497,
+                                'wd:id': 'Q128230',
+                                'qs:id': 1031268
+                            }
+                        }
+                    },
+                    bbox: [13.4277562668, 40.7941657683, 13.4349264985, 40.8041050708]
+                }
+            ],
+            bbox: [12.52571, 40.7710999, 13.558462, 41.947441]
+        }
+    }).as('openRouteServiceWalkthroughRequest')
 }
