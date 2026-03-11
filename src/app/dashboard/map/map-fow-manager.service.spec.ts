@@ -1,7 +1,5 @@
 import { TestBed } from '@angular/core/testing'
-import type { Feature } from 'ol'
-import type { Geometry } from 'ol/geom'
-import { Polygon as OLPolygon } from 'ol/geom'
+import type { Feature as GeoJSONFeature } from 'geojson'
 import { MapFoWManagerService } from './map-fow-manager.service'
 
 describe('MapFoWManagerService', () => {
@@ -18,12 +16,11 @@ describe('MapFoWManagerService', () => {
         moveLayer: jest.Mock
     }
 
-    const createMockFeature = (coordinates: number[][][]): Feature<Geometry> => {
-        const geometry = new OLPolygon(coordinates)
-        return {
-            getGeometry: () => geometry
-        } as unknown as Feature<Geometry>
-    }
+    const createMockFeature = (coordinates: number[][][]): GeoJSONFeature => ({
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates },
+        properties: {}
+    })
 
     const simplePolygonCoords = [
         [

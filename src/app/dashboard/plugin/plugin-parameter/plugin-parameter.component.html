@@ -44,28 +44,20 @@
 
         @if (
             !areaSelected ||
-            (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) ||
-            (areaSelected &&
-                this.mapService.selectedOlFeatures.getLength() === 1 &&
-                this.mapService.selectedOlFeatures.item(0).get('area') > 500)
+            (areaSelected && this.mapService.selectedFeatures.length > 1) ||
+            (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500)
         ) {
             <div
                 class="area-selection-message"
                 [ngClass]="{
                     'message--info': !areaSelected,
-                    'message--blocked': areaSelected && this.mapService.selectedOlFeatures.getLength() > 1,
+                    'message--blocked': areaSelected && this.mapService.selectedFeatures.length > 1,
                     'message--warning':
-                        areaSelected &&
-                        this.mapService.selectedOlFeatures.getLength() === 1 &&
-                        this.mapService.selectedOlFeatures.item(0).get('area') > 500
+                        areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
                 }">
                 <i-lucide
                     [img]="
-                        !areaSelected
-                            ? Info
-                            : this.mapService.selectedOlFeatures.getLength() > 1
-                              ? TriangleAlert
-                              : CircleAlert
+                        !areaSelected ? Info : this.mapService.selectedFeatures.length > 1 ? TriangleAlert : CircleAlert
                     "
                     size="20"></i-lucide>
                 <span>
@@ -88,14 +80,10 @@
                     @if (!areaSelected && currentSelectionMode === 'Polygon') {
                         {{ 'pluginParameter.clickMultiplePoints' | transloco }}
                     }
-                    @if (areaSelected && this.mapService.selectedOlFeatures.getLength() > 1) {
+                    @if (areaSelected && this.mapService.selectedFeatures.length > 1) {
                         {{ 'pluginParameter.multipleAreasSelected' | transloco }}
                     }
-                    @if (
-                        areaSelected &&
-                        this.mapService.selectedOlFeatures.getLength() === 1 &&
-                        this.mapService.selectedOlFeatures.item(0).get('area') > 500
-                    ) {
+                    @if (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500) {
                         {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
                             'pluginParameter.processingMayTakeLonger' | transloco
                         }}
@@ -106,10 +94,10 @@
 
         @if (areaSelected) {
             <div class="selected-regions">
-                @for (region of this.mapService.selectedOlFeatures.getArray(); track region) {
+                @for (region of this.mapService.selectedFeatures; track region) {
                     <div class="region-item">
                         @if (currentSelectionMode === 'Boundary') {
-                            <span class="region-name">{{ region.get('name') }}</span>
+                            <span class="region-name">{{ region.properties?.['name'] }}</span>
                         }
                         @if (currentSelectionMode !== 'Boundary') {
                             <input
@@ -120,7 +108,7 @@
                                 [formControl]="areaLabelControl"
                                 [value]="areaLabelControl.value" />
                         }
-                        <span class="region-area">{{ region.get('area') }} km<sup>2</sup></span>
+                        <span class="region-area">{{ region.properties?.['area'] }} km<sup>2</sup></span>
                         <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
                     </div>
                 }

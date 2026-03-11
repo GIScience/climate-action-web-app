@@ -22,6 +22,7 @@ import { FormlyFieldConfig, FormlyForm, FormlyFormOptions } from '@ngx-formly/co
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
+import type { Feature as GeoJSONFeature } from 'geojson'
 import { JSONSchema7 } from 'json-schema'
 import {
     CircleAlert,
@@ -39,8 +40,7 @@ import {
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import Feature from 'ol/Feature'
-import { Subscription, fromEventPattern } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
 @Component({
     selector: 'app-plugin-parameter',
@@ -95,11 +95,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     areaLabelControl = new FormControl('')
 
     constructor() {
-        const highlightedFeaturesObservable = fromEventPattern(handler =>
-            this.mapService.selectedOlFeatures.on('change:length', handler)
-        )
-
-        this.highlightedFeaturesSubscription = highlightedFeaturesObservable.subscribe(() => {
+        this.highlightedFeaturesSubscription = this.mapService.selectedFeatures$.subscribe(() => {
             this.toggleFormState()
         })
 
@@ -135,7 +131,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     resetForm(): void {
         this.form.reset()
-        this.mapService.selectedOlFeatures.clear()
         this.mapService.clearDrawnFeatures()
         this.areaLabelControl.setValue('')
         if (this.currentSelectionMode !== 'Boundary') {
@@ -147,7 +142,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     toggleFormState(): void {
-        if (this.mapService.selectedOlFeatures.getLength() > 0) {
+        if (this.mapService.selectedFeatures.length > 0) {
             this.form.enable()
             this.areaSelected = true
         } else {
@@ -316,8 +311,12 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         })
     }
 
+    getSelectedArea(): number {
+        return (this.mapService.selectedFeatures[0]?.properties?.['area'] as number) ?? 0
+    }
+
     hasValidAreaSelection(): boolean {
-        const hasValidArea = this.mapService.selectedOlFeatures.getLength() === 1
+        const hasValidArea = this.mapService.selectedFeatures.length === 1
 
         if (this.currentSelectionMode !== 'Boundary') {
             return hasValidArea && this.areaLabelControl.valid
@@ -345,7 +344,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    removeSelectedRegion(region: Feature): void {
+    removeSelectedRegion(region: GeoJSONFeature): void {
         this.mapService.removeSelectedRegion(region)
         if (this.currentSelectionMode !== 'Boundary') {
             this.mapService.clearDrawnFeatures()

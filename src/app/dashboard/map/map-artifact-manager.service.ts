@@ -1,14 +1,14 @@
 import { ComponentRef, Injectable, OnDestroy, Type, ViewContainerRef, inject } from '@angular/core'
+import { RasterComponent } from '@app/dashboard/artifact/raster/raster.component'
+import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
+import bbox from '@turf/bbox'
+import type { Feature as GeoJSONFeature } from 'geojson'
 import { LngLatBounds, Map as MapLibreMap } from 'maplibre-gl'
-import type Feature from 'ol/Feature'
-import type { Geometry } from 'ol/geom'
 import { BehaviorSubject, Subscription } from 'rxjs'
 import { Artifact, ArtifactData, ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
-import { RasterComponent } from '@app/dashboard/artifact/raster/raster.component'
 import type { MapService } from './map.service'
-import { MapConvertMeasureUtils } from './utils/map-convert-measure.utils'
+import { type Extent } from './map.service'
 
 export interface MapArtifactLayer {
     artifact: ArtifactEntity
@@ -17,7 +17,7 @@ export interface MapArtifactLayer {
     componentRef?: ComponentRef<VectorComponent | RasterComponent>
     pinned: boolean
     computationId?: string
-    computationGeometry?: Feature<Geometry>
+    computationGeometry?: GeoJSONFeature
     aoiName?: string
 }
 
@@ -117,7 +117,7 @@ export class MapArtifactManagerService implements OnDestroy {
     setTransientArtifact(
         artifact: ArtifactEntity,
         computationId?: string,
-        computationGeometry?: Feature<Geometry>,
+        computationGeometry?: GeoJSONFeature,
         aoiName?: string
     ): boolean {
         if (!this.isMapArtifact(artifact.modality)) return false
@@ -148,7 +148,12 @@ export class MapArtifactManagerService implements OnDestroy {
 
     addMapArtifact(
         artifact: ArtifactEntity,
-        options: { pinned?: boolean; computationGeometry?: Feature<Geometry>; computationId?: string; aoiName?: string } = {}
+        options: {
+            pinned?: boolean
+            computationGeometry?: GeoJSONFeature
+            computationId?: string
+            aoiName?: string
+        } = {}
     ): boolean {
         if (!this.isMapArtifact(artifact.modality)) return false
 
@@ -287,8 +292,8 @@ export class MapArtifactManagerService implements OnDestroy {
         return new Set(layers.filter(l => l.pinned).map((l, i) => this.layerKey(l, i)))
     }
 
-    private gatherUniqueGeometries(layers: MapArtifactLayer[]): Feature<Geometry>[] {
-        const map = new Map<string, Feature<Geometry>>()
+    private gatherUniqueGeometries(layers: MapArtifactLayer[]): GeoJSONFeature[] {
+        const map = new Map<string, GeoJSONFeature>()
         layers.forEach((l, i) => {
             const key = this.layerKey(l, i)
             if (l.computationGeometry && !map.has(key)) {
@@ -346,13 +351,10 @@ export class MapArtifactManagerService implements OnDestroy {
 
         const bounds = geometries
             .map(g => {
-                const geom = g.getGeometry?.()
-                if (!geom) return null
-                const ext = geom.getExtent()
-                const wgs = MapConvertMeasureUtils.transformExtentToWgs84(ext)
-                return [wgs[0], wgs[1], wgs[2], wgs[3]] as [number, number, number, number]
+                if (!g?.geometry) return null
+                return bbox(g) as Extent
             })
-            .filter(Boolean) as [number, number, number, number][]
+            .filter(Boolean) as Extent[]
 
         if (bounds.length === 0) return
 

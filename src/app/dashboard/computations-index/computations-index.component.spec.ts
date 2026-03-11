@@ -7,9 +7,6 @@ import { RouterModule } from '@angular/router'
 import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { Feature } from 'ol'
-import GeoJSON from 'ol/format/GeoJSON'
-import { MultiPolygon } from 'ol/geom'
 import { BehaviorSubject, of } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
@@ -171,7 +168,7 @@ describe('ComputationsIndexComponent', () => {
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                     request_ts: new Date('2023-09-27T16:42:52+01:00'),
                     params: {},
-                    aoi: new GeoJSON().readFeature({
+                    aoi: {
                         type: 'Feature',
                         geometry: {
                             type: 'MultiPolygon',
@@ -190,7 +187,7 @@ describe('ComputationsIndexComponent', () => {
                         properties: {
                             name: 'Test AOI'
                         }
-                    }) as Feature<MultiPolygon>,
+                    },
                     artifacts: [
                         {
                             name: 'Image',
@@ -274,7 +271,7 @@ describe('ComputationsIndexComponent', () => {
                     correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                     request_ts: new Date('2023-09-27T16:42:52+01:00'),
                     params: {},
-                    aoi: new GeoJSON().readFeature({
+                    aoi: {
                         type: 'Feature',
                         geometry: {
                             type: 'MultiPolygon',
@@ -293,7 +290,7 @@ describe('ComputationsIndexComponent', () => {
                         properties: {
                             name: 'Test AOI'
                         }
-                    }) as Feature<MultiPolygon>,
+                    },
                     artifacts: [
                         {
                             name: 'Image',
@@ -371,7 +368,7 @@ describe('ComputationsIndexComponent', () => {
                     correlation_uuid: 'demo-uuid-123',
                     request_ts: new Date(),
                     params: {},
-                    aoi: new GeoJSON().readFeature({
+                    aoi: {
                         type: 'Feature',
                         geometry: {
                             type: 'MultiPolygon',
@@ -390,7 +387,7 @@ describe('ComputationsIndexComponent', () => {
                         properties: {
                             name: 'Demo'
                         }
-                    }) as Feature<MultiPolygon>,
+                    },
                     artifacts: [],
                     plugin_info: {
                         plugin_id: 'test_plugin',
@@ -430,7 +427,7 @@ describe('ComputationsIndexComponent', () => {
             correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
             request_ts: new Date('2023-09-27T16:42:52+01:00'),
             params: {},
-            aoi: new GeoJSON().readFeature({
+            aoi: {
                 type: 'Feature',
                 geometry: {
                     type: 'MultiPolygon',
@@ -447,7 +444,7 @@ describe('ComputationsIndexComponent', () => {
                     ]
                 },
                 properties: { name: 'Imported AOI' }
-            }) as Feature<MultiPolygon>,
+            },
             plugin_info: {
                 id: 'test_plugin',
                 version: '1.0.0'
