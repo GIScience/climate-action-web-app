@@ -20,14 +20,6 @@
         line-height: 2;
     }
 
-    .legend-color-box {
-        display: inline-block;
-        height: 20px;
-        margin-right: 8px;
-        vertical-align: middle;
-        width: 20px;
-    }
-
     .discrete-legend {
         padding-right: 5px;
 
@@ -36,12 +28,74 @@
             padding: 0;
 
             li {
+                span,
+                label {
+                    align-items: center;
+                    column-gap: 7.5px;
+                    display: grid;
+                    grid-template-columns: 20px 1fr;
+                    line-height: 1.25rem;
+                    margin-bottom: 7.5px;
+                }
+            }
+        }
+
+        .static-legend-item,
+        input.legend-checkbox + label {
+            &:before {
+                background: var(--legend-color);
+                content: '';
+                display: inline-block;
+                height: 20px;
+                margin-right: 8px;
+                vertical-align: text-top;
+                width: 20px;
+            }
+        }
+
+        input.legend-checkbox {
+            opacity: 0;
+            position: absolute;
+
+            & + label {
                 align-items: center;
-                column-gap: 7.5px;
-                display: grid;
-                grid-template-columns: 20px 1fr;
-                line-height: 1.25rem;
-                margin-bottom: 7.5px;
+                cursor: pointer;
+                display: flex;
+                position: relative;
+                transition:
+                    opacity 0.15s ease-in-out,
+                    color 0.15s ease-in-out;
+                user-select: none;
+
+                &:before {
+                    border-radius: 2.5px;
+                }
+
+                &:hover {
+                    color: #008080;
+                }
+            }
+
+            &:not(:checked) + label {
+                opacity: 0.4;
+            }
+
+            &:checked + label:after {
+                background: white;
+                box-shadow:
+                    2px 0 0 white,
+                    4px 0 0 white,
+                    4px -2px 0 white,
+                    4px -4px 0 white,
+                    4px -6px 0 white,
+                    4px -8px 0 white;
+                content: '';
+                height: 2px;
+                left: 5px;
+                position: absolute;
+                top: 50%;
+                transform: rotate(45deg);
+                width: 2px;
             }
         }
     }

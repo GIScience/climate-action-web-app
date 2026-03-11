@@ -25,12 +25,23 @@ export class MapFoWManagerService {
 
     private geometries = new Map<string, FoWGeometry>()
     private map?: MaplibreMap
+    private primaryMap?: MaplibreMap
 
-    setMap(map: MaplibreMap): void {
+    setMap(map: MaplibreMap, isPrimary: boolean = false): void {
+        if (isPrimary) {
+            this.primaryMap = map
+        }
         this.map = map
         this.map.on('style.load', () => this.updateMapLayers())
 
         if (this.map.isStyleLoaded()) {
+            this.updateMapLayers()
+        }
+    }
+
+    restorePrimaryMap(): void {
+        if (this.primaryMap && this.primaryMap !== this.map) {
+            this.map = this.primaryMap
             this.updateMapLayers()
         }
     }

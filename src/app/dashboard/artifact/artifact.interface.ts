@@ -1,6 +1,6 @@
 import { HexColor } from '@app/types/color/color.type'
-import type { Data, Layout } from 'plotly.js-strict-dist'
 import { Source } from '@app/types/sources/sources.type'
+import type { Data, Layout } from 'plotly.js-strict-dist'
 
 export interface DiscreteLegendData {
     [key: string]: HexColor
@@ -19,6 +19,18 @@ export interface LegendObject {
     title?: string
     legend_type: 'CONTINUOUS' | 'DISCRETE'
     legend_data: ContinuousLegendData | DiscreteLegendData
+}
+
+export interface DiscreteLegendItem {
+    name: string
+    displayName: string
+    color: HexColor
+    visible: boolean
+}
+
+export interface ContinuousLegendItem {
+    displayName: string
+    position: number
 }
 
 export interface AttachmentsObject {

@@ -8,6 +8,8 @@ import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.servic
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
+import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
+import { MapFoWManagerService } from '../map/map-fow-manager.service'
 import { MapService } from '../map/map.service'
 @Injectable({
     providedIn: 'root'
@@ -18,7 +20,8 @@ export class ReportService {
     private toastr = inject(ToastrService)
     private artifactViewerService = inject(ArtifactViewerService)
     private translocoService = inject(TranslocoService)
-
+    private mapArtifactManager = inject(MapArtifactManagerService)
+    private fowManager = inject(MapFoWManagerService)
     private artifacts: {
         artifact: ArtifactEntity
         service: ArtifactService
@@ -61,6 +64,7 @@ export class ReportService {
         }
 
         this.artifactViewerService.closeArtifactViewer()
+        this.mapArtifactManager.clearAll()
 
         const artifactService = runInInjectionContext(this.injector, () => new ArtifactService())
         this.artifacts.push({
@@ -177,6 +181,7 @@ export class ReportService {
         this.loadingTimeouts.forEach(timeout => clearTimeout(timeout))
         this.loadingTimeouts.clear()
         this.loadingArtifactsSubject.next(new Set())
+        this.fowManager.restorePrimaryMap()
     }
 
     collapseLeftColumn(collapse: boolean) {

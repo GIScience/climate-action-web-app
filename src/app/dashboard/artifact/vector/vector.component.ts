@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core'
-import type { FeatureCollection } from 'geojson'
-import { from, Subscription } from 'rxjs'
+import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.interface'
 import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
 import { MapService } from '@app/dashboard/map/map.service'
 import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
-import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.interface'
+import type { FeatureCollection } from 'geojson'
+import { from, Subscription } from 'rxjs'
 
 @Component({
     selector: 'app-vector',

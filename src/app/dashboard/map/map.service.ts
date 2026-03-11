@@ -232,7 +232,7 @@ export class MapService {
         updateMaplibreLocale(this.map, this.translocoService.getActiveLang())
 
         // Initialize FoW manager with the map
-        this.fowManager.setMap(this.map)
+        this.fowManager.setMap(this.map, !isReportMap)
 
         if (this.mapArtifactManager) {
             this.mapArtifactManager.setMapInstance(this.map, this)
@@ -1074,6 +1074,36 @@ export class MapService {
                     features: []
                 })
             }
+        }
+    }
+
+    filterVectorLayerByCategories(layerIds: string[], hiddenCategories: string[] | null): void {
+        if (!this.map) return
+
+        // Re-apply each layer's original geometry-type filter alongside the category filter, since setFilter replaces the entire filter.
+        const originalGeometryFilters: Record<string, maplibregl.ExpressionSpecification> = {
+            '-fill': ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+            '-outline': ['in', ['geometry-type'], ['literal', ['Polygon', 'MultiPolygon']]],
+            '-line': ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]],
+            '-point': ['in', ['geometry-type'], ['literal', ['Point', 'MultiPoint']]]
+        }
+
+        const categoryExclusionFilter: maplibregl.ExpressionSpecification | null =
+            hiddenCategories !== null
+                ? ['!', ['in', ['downcase', ['get', 'label']], ['literal', hiddenCategories.map(c => c.toLowerCase())]]]
+                : null
+
+        for (const layerId of layerIds) {
+            if (!this.map.getLayer(layerId)) continue
+
+            const suffix = Object.keys(originalGeometryFilters).find(s => layerId.endsWith(s))
+            if (!suffix) continue
+
+            const baseFilter = originalGeometryFilters[suffix]
+            const filter: maplibregl.ExpressionSpecification = categoryExclusionFilter
+                ? ['all', baseFilter, categoryExclusionFilter]
+                : baseFilter
+            this.map.setFilter(layerId, filter)
         }
     }
 

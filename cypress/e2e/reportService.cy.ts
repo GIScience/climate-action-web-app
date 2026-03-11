@@ -1,5 +1,7 @@
 import {
     mockBlueprintTable,
+    mockGeoJsonComputationJinrongjie,
+    mockGeoJsonJinrongjie,
     mockPluginBlueprint,
     mockPluginBlueprintComputation,
     mockPluginsList
@@ -66,5 +68,126 @@ describe('report builder', () => {
         cy.get('.report-header').find('.close-btn').click()
 
         cy.get('.report-window').should('not.exist')
+    })
+
+    it('ensure active map artifact is cleared upon report instantiation', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+        mockGeoJsonComputationJinrongjie()
+        mockGeoJsonJinrongjie()
+
+        cy.window().then(win => {
+            win.localStorage.setItem(
+                'plugin_runs',
+                JSON.stringify([
+                    {
+                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2023-09-27T16:42:52+01:00',
+                        status: 'SUCCESS'
+                    }
+                ])
+            )
+        })
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.wait('@getGeoJsonComputationJinrongjie')
+
+        cy.get('.computations-index-content').should('exist')
+
+        cy.get('.parent-computation').eq(0).click()
+
+        cy.get('.child-computation').eq(0).click()
+
+        cy.wait('@getGeoJsonJinrongjie')
+
+        const layerPrefix = 'geojson-Connectivity-'
+        cy.window().should(win => {
+            const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map
+            const layerIds = map.getStyle().layers.map((l: { id: string }) => l.id)
+            expect(layerIds.some((id: string) => id.startsWith(layerPrefix))).to.be.true
+        })
+
+        cy.get('.maplibregl-layer-controls .map-layer .map-layer-header').should('contain', 'Connectivity')
+
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).find('.add-to-report-btn').click()
+
+        cy.window().should(win => {
+            const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map
+            const layerIds = map.getStyle().layers.map((l: { id: string }) => l.id)
+            expect(layerIds.some((id: string) => id.startsWith(layerPrefix))).to.be.false
+        })
+
+        cy.get('.maplibregl-layer-controls').should('have.css', 'display', 'none')
+    })
+
+    it('ensure fow is cleared on computation collapse, after having added an artifact to the report', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+        mockGeoJsonComputationJinrongjie()
+        mockGeoJsonJinrongjie()
+
+        cy.window().then(win => {
+            win.localStorage.setItem(
+                'plugin_runs',
+                JSON.stringify([
+                    {
+                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                        pluginId: 'plugin_blueprint',
+                        pluginName: 'Plugin Blueprint',
+                        timestamp: '2023-09-27T16:42:52+01:00',
+                        status: 'SUCCESS'
+                    }
+                ])
+            )
+        })
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.wait('@getGeoJsonComputationJinrongjie')
+
+        cy.get('.computations-index-content').should('exist')
+
+        cy.get('.parent-computation').eq(0).click()
+
+        cy.window().should(win => {
+            const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map
+            const layerIds = map.getStyle().layers.map((l: { id: string }) => l.id)
+            expect(layerIds.some((id: string) => id.startsWith('fow-layer'))).to.be.true
+        })
+
+        cy.get('.child-computation').eq(0).click()
+
+        cy.wait('@getGeoJsonJinrongjie')
+
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).find('.add-to-report-btn').click()
+
+        cy.get('.report-controls').find('.remove-all-btn').click()
+
+        cy.get('.report-header').find('.close-btn').click()
+
+        cy.get('.parent-computation').eq(0).click()
+
+        cy.window().should(win => {
+            const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map
+            const layerIds = map.getStyle().layers.map((l: { id: string }) => l.id)
+            expect(layerIds.some((id: string) => id.startsWith('fow-layer'))).to.be.false
+        })
     })
 })
