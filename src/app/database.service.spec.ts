@@ -209,7 +209,7 @@ describe('DatabaseService', () => {
 
             expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
                 'climate_action',
-                'dashboard_data',
+                'staging-dashboard_data',
                 expect.arrayContaining([
                     expect.stringContaining('"method":"equal"'),
                     expect.stringContaining('"method":"limit"'),
@@ -265,7 +265,7 @@ describe('DatabaseService', () => {
 
             expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
                 'climate_action',
-                'dashboard_data',
+                'staging-dashboard_data',
                 expect.arrayContaining([
                     expect.stringContaining('"method":"equal"'),
                     expect.stringContaining('"method":"limit"'),
@@ -330,7 +330,7 @@ describe('DatabaseService', () => {
 
             expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
                 'climate_action',
-                'dashboard_data',
+                'staging-dashboard_data',
                 expect.arrayContaining([
                     expect.stringContaining('"method":"equal"'),
                     expect.stringContaining('"method":"limit"'),

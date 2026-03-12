@@ -7,4 +7,5 @@
     window['env']['APPWRITE_PROJECT_ID'] = '${APPWRITE_PROJECT_ID}'
     window['env']['APPWRITE_ENDPOINT'] = '${APPWRITE_ENDPOINT}'
     window['env']['APPWRITE_WEBSITE_URL'] = '${APPWRITE_WEBSITE_URL}'
+    window['env']['APPWRITE_RUNS_COLLECTION_ID'] = '${APPWRITE_RUNS_COLLECTION_ID}'
 })(this)

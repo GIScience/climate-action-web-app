@@ -5,6 +5,7 @@ export interface Environment {
     appwriteProjectId: string
     appwriteEndpoint: string
     appwriteWebsiteUrl: string
+    appwriteRunsCollectionId: string
 }
 
 export type EnvironmentType = 'testing' | 'development' | 'staging' | 'production'
@@ -18,6 +19,7 @@ declare global {
             APPWRITE_PROJECT_ID?: string
             APPWRITE_ENDPOINT?: string
             APPWRITE_WEBSITE_URL?: string
+            APPWRITE_RUNS_COLLECTION_ID?: string
         }
     }
 }
