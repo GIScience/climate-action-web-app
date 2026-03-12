@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
+import { environment } from '../environments/environment'
 import { AppwriteService } from './auth/appwrite.service'
 import { ComputationItemState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
@@ -39,7 +40,7 @@ export class DatabaseService {
     private appwriteService = inject(AppwriteService)
 
     private readonly DATABASE_ID = 'climate_action'
-    private readonly RUNS_COLLECTION_ID = 'dashboard_data'
+    private readonly RUNS_COLLECTION_ID = environment.appwriteRunsCollectionId
     // @ts-ignore: Suppress TypeScript error for test environment detection
     private isTestEnvironment = typeof jest !== 'undefined' || typeof Cypress !== 'undefined'
 
