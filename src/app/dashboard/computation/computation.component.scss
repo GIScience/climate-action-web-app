@@ -36,8 +36,18 @@
 }
 
 .child-computations-wrapper {
-    overflow: hidden;
-    transition: max-height 0.25s ease-in-out;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 250ms ease-in-out;
+
+    &.expanded {
+        grid-template-rows: 1fr;
+    }
+
+    > .grid-inner {
+        min-height: 0;
+        overflow: hidden;
+    }
 
     ul.child-computations {
         background-color: rgba(255, 255, 255, 0.75);
