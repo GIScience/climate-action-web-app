@@ -20,7 +20,7 @@ export class TourStepsService {
 
     getFullTourSteps(): ExtendedDriveStep[] {
         return [
-            this.getChoosePluginStep(),
+            this.getChoosePluginStep('full'),
             this.getNewComputationStep(),
             this.getSearchAreaStep(),
             this.getSelectBoundaryStep(),
@@ -35,7 +35,7 @@ export class TourStepsService {
 
     getGuestTourSteps(): ExtendedDriveStep[] {
         return [
-            this.getChoosePluginStep(),
+            this.getChoosePluginStep('guest'),
             this.getOpenComputationStep('guest'),
             this.getViewFirstResultStep(),
             this.getExploreResultStep(),
@@ -44,18 +44,21 @@ export class TourStepsService {
         ]
     }
 
-    private getChoosePluginStep(): ExtendedDriveStep {
+    private getChoosePluginStep(tourType: 'guest' | 'full'): ExtendedDriveStep {
         return {
             element: () =>
                 this.fetchElementWithText('.plugin-card', 'hiWalk') ||
-                document.querySelector('.plugin-card:nth-child(3)'),
+                document.querySelector('.plugin-card:nth-child(4)'),
             popover: {
                 title: this.translocoService.translate('walkthrough.tourSteps.choosePlugin.title'),
                 description: this.translocoService.translate('walkthrough.tourSteps.choosePlugin.description'),
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
-                    this.waitForClickAndElement('.plugin-card', '.new-compute')
+                    this.waitForClickAndElement(
+                        '.plugin-card',
+                        tourType === 'guest' ? '.parent-computation' : '.new-compute'
+                    )
                 }
             },
             onNextClicked: () => {
@@ -229,7 +232,7 @@ export class TourStepsService {
                 side: 'right',
                 align: 'center',
                 onPopoverRender: () => {
-                    this.waitForClickAndElement('li.child-computation .computation-content', '.artifact-header')
+                    this.waitForClickAndElement('li.child-computation .computation-content')
                 }
             },
             onNextClicked: () => {
@@ -245,23 +248,15 @@ export class TourStepsService {
 
     private getExploreResultStep(): ExtendedDriveStep {
         return {
-            element: '.artifact-container .artifact-window-controls',
+            element: '.child-computations .artifact-actions',
             popover: {
                 title: this.translocoService.translate('walkthrough.tourSteps.exploreResult.title'),
                 description: this.translocoService.translate('walkthrough.tourSteps.exploreResult.description'),
                 side: 'top',
-                align: 'end',
-                onPopoverRender: () => {
-                    this.waitForArtifactOpen()
-                }
+                align: 'end'
             },
             onNextClicked: () => {
-                const minimiseBtn = document.querySelector(
-                    '.artifact-container .artifact-window-controls button.minimise-btn'
-                ) as HTMLElement
-                if (minimiseBtn) {
-                    minimiseBtn.click()
-                }
+                this.nextStepCallback()
             }
         }
     }
@@ -311,11 +306,32 @@ export class TourStepsService {
         this.nextStepCallback = callback
     }
 
+    showPopoverLoadingState() {
+        const popover = document.querySelector('.driver-popover')
+        if (!popover) return
+
+        popover.classList.add('driver-popover--loading')
+
+        if (!popover.querySelector('.driver-popover-loading-indicator')) {
+            const indicator = document.createElement('div')
+            indicator.className = 'driver-popover-loading-indicator'
+            indicator.innerHTML = '<div class="driver-popover-spinner"></div>'
+
+            const footer = popover.querySelector('.driver-popover-footer')
+            if (footer) {
+                footer.before(indicator)
+            } else {
+                popover.appendChild(indicator)
+            }
+        }
+    }
+
     private waitForClickAndInitSearch() {
         const clickHandler = (event: Event) => {
             const target = event.target as Element
             if (target && target.closest('button.new-compute')) {
                 document.removeEventListener('click', clickHandler)
+                this.showPopoverLoadingState()
                 this.prefillSearch()
                 const waitForSuggestions = () => {
                     const firstSuggestion = document.querySelector('.location-suggestion__item:first-child')
@@ -349,20 +365,6 @@ export class TourStepsService {
         poll()
     }
 
-    private waitForArtifactOpen() {
-        const artifactOpenBtn = document.querySelector('.artifact-container')
-        if (artifactOpenBtn) {
-            const clickHandler = () => {
-                artifactOpenBtn.removeEventListener('click', clickHandler)
-                setTimeout(() => {
-                    this.nextStepCallback()
-                }, 500)
-            }
-            artifactOpenBtn.addEventListener('click', clickHandler)
-            this.activeEventHandlers.push(() => artifactOpenBtn.removeEventListener('click', clickHandler))
-        }
-    }
-
     private fetchElementWithText(selector: string, text: string): HTMLElement {
         const elements = document.querySelectorAll(selector)
         return Array.prototype.filter.call(elements, element => {
@@ -376,6 +378,7 @@ export class TourStepsService {
             if (target && target.closest(clickSelector)) {
                 document.removeEventListener('click', clickHandler)
                 if (elementToWaitFor) {
+                    this.showPopoverLoadingState()
                     const poll = () => {
                         const element = document.querySelector(elementToWaitFor)
                         if (element) {
