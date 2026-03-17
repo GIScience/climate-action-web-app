@@ -321,23 +321,12 @@ export class ComputationComponent implements OnInit, OnDestroy {
         const apiUrl = environment.climateActionApiUrl
         const artifactUrl = `${apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`
 
-        let filename = 'download'
-        if (artifact.modality === 'CHART' || artifact.modality === 'CHART_PLOTLY') {
-            filename = 'data.json'
-        } else {
-            filename = this.getFileName(artifactUrl)
-        }
-
         const a = document.createElement('a')
         a.href = artifactUrl
-        a.download = filename
+        a.download = artifact.filename
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
-    }
-
-    private getFileName(url: string): string {
-        return url.split('/').pop() || 'download'
     }
 
     viewDescription(artifact: ArtifactEntity, event?: Event): void {
