@@ -106,7 +106,10 @@ export class TourEngine {
 
         this.currentSteps = steps
         this.driverObj.setSteps(steps)
-        this.tourStepsService.setNextStepCallback(() => this.driverObj?.moveNext())
+        this.tourStepsService.setNextStepCallback(() => {
+            this.tourStepsService.cleanupEventHandlers()
+            this.driverObj?.moveNext()
+        })
         this.driverObj.drive()
     }
 
@@ -179,6 +182,7 @@ export class TourEngine {
                 if (!instance.hasNextStep()) {
                     instance.destroy()
                 } else {
+                    this.tourStepsService.showPopoverLoadingState()
                     const currentStepIndex = instance.getActiveIndex()
                     if (currentStepIndex !== undefined && currentStepIndex < this.currentSteps.length) {
                         this.currentSteps[currentStepIndex]?.onNextClicked?.()
