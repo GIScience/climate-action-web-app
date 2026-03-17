@@ -1,4 +1,4 @@
-import { AnimationEvent, animate, state, style, transition, trigger } from '@angular/animations'
+import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule } from '@angular/common'
 import {
     Component,
@@ -51,23 +51,6 @@ enum DefaultTag {
         NgScrollbarModule
     ],
     animations: [
-        trigger('expandCollapse', [
-            state(
-                'collapsed',
-                style({
-                    maxHeight: '0',
-                    visibility: 'hidden'
-                })
-            ),
-            state(
-                'expanded',
-                style({
-                    maxHeight: '1000px',
-                    visibility: 'visible'
-                })
-            ),
-            transition('expanded <=> collapsed', [animate('250ms ease-in-out')])
-        ]),
         trigger('fadeIn', [
             state('in', style({ opacity: 1 })),
             transition(':enter', [style({ opacity: 0 }), animate('250ms ease-in')])
@@ -128,14 +111,14 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.reportVisibilitySubscription?.unsubscribe()
     }
 
-    onAnimationStart(event: AnimationEvent, computation: ComputationDisplayEntity) {
-        if (event.toState === 'collapsed') {
+    onCollapseTransitionStart(event: TransitionEvent, computation: ComputationDisplayEntity) {
+        if (event.propertyName === 'grid-template-rows' && !computation.isExpanded) {
             this.mapArtifactManager.clearTransientArtifacts(computation.correlation_uuid)
         }
     }
 
-    onAnimationEvent(event: AnimationEvent, computation: ComputationDisplayEntity) {
-        if (event.toState === 'collapsed') {
+    onCollapseTransitionEnd(event: TransitionEvent, computation: ComputationDisplayEntity) {
+        if (event.propertyName === 'grid-template-rows' && !computation.isExpanded) {
             computation.keepInDOM = false
         }
     }

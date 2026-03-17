@@ -1,103 +1,105 @@
 <div
-    [@expandCollapse]="computation.isExpanded ? 'expanded' : 'collapsed'"
     class="child-computations-wrapper"
+    [class.expanded]="computation.isExpanded"
     [ngClass]="{ 'report-active': isReportVisible }"
-    (@expandCollapse.start)="onAnimationStart($event, computation)"
-    (@expandCollapse.done)="onAnimationEvent($event, computation)">
-    @if ((computation.isExpanded || computation.keepInDOM) && shouldShowFilters) {
-        <div class="tag-filters">
-            @for (tag of availableTags; track tag) {
-                <button class="tag-pill" [class.active]="selectedTag === tag" (click)="selectTag(tag)">
-                    <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
-                    <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>
-                </button>
-            }
-        </div>
-    }
+    (transitionstart)="onCollapseTransitionStart($event, computation)"
+    (transitionend)="onCollapseTransitionEnd($event, computation)">
+    <div class="grid-inner">
+        @if ((computation.isExpanded || computation.keepInDOM) && shouldShowFilters) {
+            <div class="tag-filters">
+                @for (tag of availableTags; track tag) {
+                    <button class="tag-pill" [class.active]="selectedTag === tag" (click)="selectTag(tag)">
+                        <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
+                        <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>
+                    </button>
+                }
+            </div>
+        }
 
-    @if (computation.isExpanded || computation.keepInDOM) {
-        <ul class="child-computations">
-            @for (artifact of filteredArtifacts; track artifact; let i = $index) {
-                <li
-                    class="child-computation"
-                    [ngClass]="{
-                        'child-computation-highlight': activeArtifact === artifact,
-                        loading: artifact.isLoading
-                    }"
-                    tp="{{ artifact.summary }}"
-                    tpPlacement="right"
-                    tabindex="0">
-                    <div
-                        class="computation-content"
-                        (click)="viewArtifact(artifact)"
-                        (keyup.enter)="viewArtifact(artifact)"
+        @if (computation.isExpanded || computation.keepInDOM) {
+            <ul class="child-computations">
+                @for (artifact of filteredArtifacts; track artifact; let i = $index) {
+                    <li
+                        class="child-computation"
+                        [ngClass]="{
+                            'child-computation-highlight': activeArtifact === artifact,
+                            loading: artifact.isLoading
+                        }"
+                        tp="{{ artifact.summary }}"
+                        tpPlacement="right"
                         tabindex="0">
-                        <mat-icon
-                            aria-hidden="false"
-                            aria-label="Computation"
-                            fontIcon="{{ artifact.icon }}"></mat-icon>
-                        <div>{{ artifact.name }}</div>
-                    </div>
-                    <div class="artifact-actions">
-                        @if (artifact.description || artifact.sources.length) {
-                            <button
-                                class="description-btn btn-onlyicon"
-                                (click)="viewDescription(artifact, $event)"
-                                [tp]="'computation.viewDescription' | transloco"
-                                tpPlacement="bottom">
-                                <i-lucide [img]="ReceiptText" size="17"></i-lucide>
-                            </button>
-                        }
-                        <button
-                            class="download-btn btn-onlyicon"
-                            (click)="downloadContent(artifact, $event)"
-                            [tp]="'artifactViewer.download' | transloco"
-                            tpPlacement="bottom">
-                            <i-lucide [img]="Download" size="17"></i-lucide>
-                        </button>
-                        @let mapState = getMapButtonState(artifact);
-                        @if (mapState) {
-                            <button
-                                class="btn-onlyicon"
-                                [ngClass]="{
-                                    'layer-pin-btn': mapState === 'pin',
-                                    'layer-unpin-btn': mapState === 'unpin',
-                                    'layer-disabled-btn': mapState === 'disabled'
-                                }"
-                                (click)="toggleMapArtifact(artifact, $event)"
-                                [tp]="getMapButtonTooltip(artifact)"
-                                tpPlacement="bottom">
-                                <i-lucide [img]="mapState === 'unpin' ? PinOff : Pin" size="17"></i-lucide>
-                            </button>
-                        }
-                        <button
-                            class="add-to-report-btn"
-                            [ngClass]="{
-                                'btn-onlyicon': !isReportVisible,
-                                'btn-small btn-alt btn-withtext--after': isReportVisible
-                            }"
-                            (click)="addToReport(artifact)"
-                            [tp]="'computation.addToReport' | transloco"
-                            tpPlacement="bottom">
-                            <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
-                            @if (isReportVisible) {
-                                <span>{{ 'computation.add' | transloco }}</span>
+                        <div
+                            class="computation-content"
+                            (click)="viewArtifact(artifact)"
+                            (keyup.enter)="viewArtifact(artifact)"
+                            tabindex="0">
+                            <mat-icon
+                                aria-hidden="false"
+                                aria-label="Computation"
+                                fontIcon="{{ artifact.icon }}"></mat-icon>
+                            <div>{{ artifact.name }}</div>
+                        </div>
+                        <div class="artifact-actions">
+                            @if (artifact.description || artifact.sources.length) {
+                                <button
+                                    class="description-btn btn-onlyicon"
+                                    (click)="viewDescription(artifact, $event)"
+                                    [tp]="'computation.viewDescription' | transloco"
+                                    tpPlacement="bottom">
+                                    <i-lucide [img]="ReceiptText" size="17"></i-lucide>
+                                </button>
                             }
-                        </button>
-                    </div>
-                    @if (artifact.isLoading) {
-                        <div class="loading-circle"></div>
-                    }
-                </li>
-            }
-        </ul>
-    }
+                            <button
+                                class="download-btn btn-onlyicon"
+                                (click)="downloadContent(artifact, $event)"
+                                [tp]="'artifactViewer.download' | transloco"
+                                tpPlacement="bottom">
+                                <i-lucide [img]="Download" size="17"></i-lucide>
+                            </button>
+                            @let mapState = getMapButtonState(artifact);
+                            @if (mapState) {
+                                <button
+                                    class="btn-onlyicon"
+                                    [ngClass]="{
+                                        'layer-pin-btn': mapState === 'pin',
+                                        'layer-unpin-btn': mapState === 'unpin',
+                                        'layer-disabled-btn': mapState === 'disabled'
+                                    }"
+                                    (click)="toggleMapArtifact(artifact, $event)"
+                                    [tp]="getMapButtonTooltip(artifact)"
+                                    tpPlacement="bottom">
+                                    <i-lucide [img]="mapState === 'unpin' ? PinOff : Pin" size="17"></i-lucide>
+                                </button>
+                            }
+                            <button
+                                class="add-to-report-btn"
+                                [ngClass]="{
+                                    'btn-onlyicon': !isReportVisible,
+                                    'btn-small btn-alt btn-withtext--after': isReportVisible
+                                }"
+                                (click)="addToReport(artifact)"
+                                [tp]="'computation.addToReport' | transloco"
+                                tpPlacement="bottom">
+                                <i-lucide [img]="ClipboardPlus" size="17"></i-lucide>
+                                @if (isReportVisible) {
+                                    <span>{{ 'computation.add' | transloco }}</span>
+                                }
+                            </button>
+                        </div>
+                        @if (artifact.isLoading) {
+                            <div class="loading-circle"></div>
+                        }
+                    </li>
+                }
+            </ul>
+        }
 
-    @if (computation.artifacts.length === 0) {
-        <div class="no-results-message">
-            {{ 'computation.noResults' | transloco }}
-        </div>
-    }
+        @if (computation.artifacts.length === 0) {
+            <div class="no-results-message">
+                {{ 'computation.noResults' | transloco }}
+            </div>
+        }
+    </div>
 </div>
 
 <ng-template #descriptionDialog let-data>
