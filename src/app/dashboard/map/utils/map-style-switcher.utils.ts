@@ -1,5 +1,5 @@
 import { TranslocoService } from '@jsverse/transloco'
-import { ControlPosition, IControl, Map as MaplibreMap, StyleSpecification } from 'maplibre-gl'
+import { ControlPosition, IControl, LayerSpecification, Map as MaplibreMap, StyleSpecification } from 'maplibre-gl'
 import { Subscription } from 'rxjs'
 import type { Artifact, ArtifactEntity } from '../../artifact/artifact.interface'
 import type { MapArtifactLayer } from '../map-artifact-manager.service'
@@ -15,6 +15,7 @@ export class MapStyleSwitcherControl implements IControl {
     private mapStyleContainer?: HTMLDivElement
     private layerControlsContainer?: HTMLDivElement
     private styleMap = new Map<string, StyleSpecification>()
+    private baseLayerIds = new Set<string>()
     private isExpanded: boolean = true
     private readonly styleDataListener = () => this.updateMapLabelsLanguage()
     private baseMapsHeading?: HTMLHeadingElement
@@ -40,6 +41,7 @@ export class MapStyleSwitcherControl implements IControl {
         isArtifactActive?: (artifact: Artifact) => boolean
     ) {
         this.isExpanded = initialExpanded
+        styles.forEach(s => s.style.layers?.forEach(l => this.baseLayerIds.add(l.id)))
         this.getActiveLayers = getActiveLayers
         this.removeMapLayer = removeMapLayer
         this.promoteToPin = promoteToPin
@@ -160,28 +162,42 @@ export class MapStyleSwitcherControl implements IControl {
                     return nextStyle || {}
                 }
 
-                const customLayers = (previousStyle.layers || []).filter(
-                    layer =>
-                        /^(custom-|geojson-|geotiff-|pmtiles-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-|unified-border-)/.test(
-                            layer.id
-                        ) || layer.id === 'markers'
-                )
+                const nextLayerMap = new Map((nextStyle.layers || []).map(l => [l.id, l]))
 
-                const layers = (nextStyle.layers || []).concat(customLayers)
-
-                const sources = { ...(nextStyle.sources || {}) }
-                Object.entries(previousStyle.sources || {}).forEach(([key, value]) => {
-                    if (
-                        /^(custom-|source-geojson-|source-geotiff-|source-pmtiles-|region-|selected-|focused-|hover-highlight|pinned-artifacts-|unified-fow-)/.test(
-                            key
-                        ) ||
-                        key === 'markers'
-                    )
-                        sources[key] = value
+                // Step through the current layer ordering:
+                // - Base layers present in next style (e.g. Vector Base Layer) → swap in-place
+                // - Custom layers → keep at their z-position
+                // - Old base layers not in next style (e.g. Raster Base Layer) → drop
+                const walkedLayers = (previousStyle.layers || []).flatMap(layer => {
+                    const replacement = nextLayerMap.get(layer.id)
+                    if (replacement) {
+                        nextLayerMap.delete(layer.id)
+                        // Only swap paint; keep current layout (preserves localized labels etc.)
+                        return [{ ...layer, paint: replacement.paint } as LayerSpecification]
+                    }
+                    return this.baseLayerIds.has(layer.id) ? [] : [layer]
                 })
+
+                // Unmatched new base layers go at the bottom so custom layers render on top
+                const layers: LayerSpecification[] = [...nextLayerMap.values(), ...walkedLayers]
+
+                // New base sources + only previous sources still referenced by a layer in the result
+                const referencedSources = new Set(
+                    layers.map(l => ('source' in l ? l.source : undefined)).filter(Boolean)
+                )
+                const sources = { ...(nextStyle.sources || {}) }
+                for (const [id, source] of Object.entries(previousStyle.sources || {})) {
+                    if (referencedSources.has(id) && !sources[id]) {
+                        sources[id] = source
+                    }
+                }
 
                 return {
                     ...nextStyle,
+                    // Preserve projection — setProjection(undefined) crashes MapLibre's
+                    // diff when globe is active, forcing a full style rebuild.
+                    // TODO: Remove once https://github.com/maplibre/maplibre-gl-js/issues/7314 is fixed
+                    projection: previousStyle.projection,
                     sources,
                     layers
                 }
