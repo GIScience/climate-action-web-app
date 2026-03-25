@@ -159,6 +159,7 @@ export class MapService {
     selectedFeatures$ = new BehaviorSubject<GeoJSONFeature[]>([])
 
     // Layer Management
+    private layersInitialized = false
     regionLayer: RasterLayer | undefined
     selectedRegionLayer: VectorLayerGroup | undefined
     vectorLayer: VectorLayerGroup | undefined
@@ -268,6 +269,8 @@ export class MapService {
             if (!isReportMap) {
                 MapGlobeUtils.setupGlobeProjection(this.map!)
             }
+
+            if (this.layersInitialized) return
 
             this.setupLayers()
 
@@ -410,6 +413,8 @@ export class MapService {
             layerIds: [layers.selectedRegions.fillLayerId, layers.selectedRegions.outlineLayerId],
             name: 'Selected Regions'
         }
+
+        this.layersInitialized = true
     }
 
     private setupEventHandlers() {
