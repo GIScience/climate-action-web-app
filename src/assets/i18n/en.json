@@ -111,6 +111,11 @@
             "layerUnpinnedTitle": "Layer Unpinned",
             "mapLayerLimitMessage": "Maximum of 2 map layers can be displayed simultaneously. Remove or unpin a layer to add another.",
             "mapLayerLimitTitle": "Map Layer Limit"
+        },
+        "tags": {
+            "all": "all",
+            "main": "main",
+            "untagged": "untagged"
         }
     },
     "artifactViewer": {

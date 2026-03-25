@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule, NgClass } from '@angular/common'
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core'
+import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
@@ -8,6 +8,8 @@ import { AppwriteService } from '@app/auth/appwrite.service'
 import { DatabaseService } from '@app/database.service'
 import { DropdownMenuDirective } from '@app/shared/dropdown-menu.directive'
 import { StorageService } from '@app/storage.service'
+import { SupportedLanguage } from '@app/types/language.types'
+import { getDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
@@ -142,7 +144,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     newRuns: string[] = []
     demoRuns: string[] = []
     importedRuns: string[] = []
-    currentLocale = navigator.language
     isReportVisible = false
 
     paginationInfo: { hasMore: boolean; loading: boolean; total?: number } = {
@@ -228,12 +229,21 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     formatTimestamp(timestamp: Date | string) {
-        return format(
+        const date =
             typeof timestamp === 'string'
                 ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z')
-                : timestamp,
-            'MMM d, yyyy h:mm a'
-        )
+                : timestamp
+        const lang = this.translocoService.getActiveLang()
+        return format(date, this.getDatePattern(lang), { locale: getDateFnsLocale(lang) })
+    }
+
+    private getDatePattern(lang: string): string {
+        switch (lang) {
+            case SupportedLanguage.DE:
+                return 'd. MMM yyyy, HH:mm'
+            default:
+                return 'd MMM yyyy, h:mm a'
+        }
     }
 
     formatUUID(correlation_uuid: string): string {

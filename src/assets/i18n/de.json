@@ -111,6 +111,11 @@
             "layerUnpinnedTitle": "Ebene gelöst",
             "mapLayerLimitMessage": "Es können maximal 2 Kartenebenen gleichzeitig angezeigt werden. Entferne oder löse eine Ebene, um eine andere anzuzeigen.",
             "mapLayerLimitTitle": "Kartenebenen-Limit"
+        },
+        "tags": {
+            "all": "alle",
+            "main": "primär",
+            "untagged": "ohne kategorie"
         }
     },
     "artifactViewer": {
