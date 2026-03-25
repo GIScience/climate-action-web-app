@@ -16,6 +16,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Plugin Name should now reflect correctly in all places (for e.g. toasts) ([#442](https://gitlab.heigit.org/climate-action/web-app/-/issues/442))
 - Raster resampling has been set to nearest neighbour, and thus sharper/accurate rendering of GeoTIFFs
 - Longer list of artifacts do not get clipped anymore ([#454](https://gitlab.heigit.org/climate-action/web-app/-/issues/454))
+- Timestamp formatting matches the selected language's locale ([#457](https://gitlab.heigit.org/climate-action/web-app/-/issues/457))
 
 ## [3.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.1.0) - 2026-03-03
 

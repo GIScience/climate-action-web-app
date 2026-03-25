@@ -32,11 +32,11 @@ import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 
-enum DefaultTag {
-    ALL = 'all',
-    MAIN = 'main',
-    UNTAGGED = 'untagged'
-}
+const DEFAULT_TAGS = {
+    ALL: 'all',
+    MAIN: 'main',
+    UNTAGGED: 'untagged'
+} as const
 
 @Component({
     selector: 'app-computation',
@@ -95,8 +95,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
     readonly Pin = Pin
     readonly PinOff = PinOff
     readonly X = X
-    readonly DefaultTag = DefaultTag
-
     formatSourceText = formatSourceText
 
     ngOnInit(): void {
@@ -363,19 +361,19 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.availableTags = []
 
         if (hasMixedPrimarySecondary) {
-            this.availableTags.push(DefaultTag.MAIN)
-            this.tagCounts.set(DefaultTag.MAIN, mainCount)
+            this.availableTags.push(DEFAULT_TAGS.MAIN)
+            this.tagCounts.set(DEFAULT_TAGS.MAIN, mainCount)
         }
 
         this.availableTags.push(...regularTags)
 
         if (untaggedCount > 0) {
-            this.availableTags.push(DefaultTag.UNTAGGED)
-            this.tagCounts.set(DefaultTag.UNTAGGED, untaggedCount)
+            this.availableTags.push(DEFAULT_TAGS.UNTAGGED)
+            this.tagCounts.set(DEFAULT_TAGS.UNTAGGED, untaggedCount)
         }
 
-        this.availableTags.push(DefaultTag.ALL)
-        this.tagCounts.set(DefaultTag.ALL, this.computation.artifacts.length)
+        this.availableTags.push(DEFAULT_TAGS.ALL)
+        this.tagCounts.set(DEFAULT_TAGS.ALL, this.computation.artifacts.length)
 
         if (this.availableTags.length > 0) {
             this.selectedTag = this.availableTags[0]
@@ -390,7 +388,9 @@ export class ComputationComponent implements OnInit, OnDestroy {
     }
 
     getTagDisplayName(tag: string): string {
-        return tag
+        const key = `computation.tags.${tag}`
+        const translated = this.translocoService.translate(key)
+        return translated !== key ? translated : tag
     }
 
     private filterArtifacts(): void {
@@ -400,13 +400,13 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         switch (this.selectedTag) {
-            case DefaultTag.ALL:
+            case DEFAULT_TAGS.ALL:
                 this.filteredArtifacts = this.computation.artifacts.slice()
                 break
-            case DefaultTag.MAIN:
+            case DEFAULT_TAGS.MAIN:
                 this.filteredArtifacts = this.computation.artifacts.filter(artifact => artifact.primary === true)
                 break
-            case DefaultTag.UNTAGGED:
+            case DEFAULT_TAGS.UNTAGGED:
                 this.filteredArtifacts = this.computation.artifacts.filter(
                     artifact => (!artifact.tags || artifact.tags.length === 0) && !artifact.primary
                 )

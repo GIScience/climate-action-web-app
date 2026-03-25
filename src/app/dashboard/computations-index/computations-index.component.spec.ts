@@ -121,7 +121,7 @@ describe('ComputationsIndexComponent', () => {
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
 
-        component.formatTimestamp = jest.fn().mockReturnValue('Jan 1, 2023 12:00 PM')
+        component.formatTimestamp = jest.fn().mockReturnValue('1 Jan 2023, 12:00 PM')
 
         fixture.detectChanges()
         tick()

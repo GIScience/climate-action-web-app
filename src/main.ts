@@ -27,14 +27,14 @@ import { PageNotFoundComponent } from '@app/page-not-found/page-not-found.compon
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { SUPPORTED_LANGUAGES, SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { ObjectTypeComponent } from '@app/types/object/object.type'
+import { reactiveDateFnsLocale, updateActiveDateFnsLocale } from '@app/utils/locale.utils'
 import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
-import { provideTransloco } from '@jsverse/transloco'
+import { TranslocoService, provideTransloco } from '@jsverse/transloco'
 import { provideTranslocoMessageformat } from '@jsverse/transloco-messageformat'
 import { popperVariation, provideTippyConfig, provideTippyLoader } from '@ngneat/helipopper/config'
 import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
-import { enUS } from 'date-fns/locale'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { provideToastr } from 'ngx-toastr'
 import { environment } from './environments/environment'
@@ -148,7 +148,14 @@ bootstrapApplication(AppComponent, {
                 monthYearA11yLabel: 'LLLL yyyy'
             }
         }),
-        { provide: MAT_DATE_LOCALE, useValue: enUS },
+        {
+            provide: MAT_DATE_LOCALE,
+            deps: [TranslocoService],
+            useFactory: (transloco: TranslocoService) => {
+                updateActiveDateFnsLocale(transloco.getActiveLang())
+                return reactiveDateFnsLocale
+            }
+        },
         {
             provide: RouteReuseStrategy,
             useClass: CustomRouteReuseStrategy

@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core'
+import { DateAdapter } from '@angular/material/core'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { Languages, LucideAngularModule } from 'lucide-angular'
 import { ToastrService } from 'ngx-toastr'
@@ -6,6 +7,7 @@ import { take } from 'rxjs'
 import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 import { StorageService } from '../storage.service'
 import { SupportedLanguage } from '../types/language.types'
+import { getDateFnsLocale, updateActiveDateFnsLocale } from '../utils/locale.utils'
 
 @Component({
     selector: 'app-language',
@@ -16,6 +18,7 @@ import { SupportedLanguage } from '../types/language.types'
 export class LanguageComponent {
     private translocoService = inject(TranslocoService)
     private storageService = inject(StorageService)
+    private dateAdapter = inject(DateAdapter)
     private toastr = inject(ToastrService)
 
     currentLang: SupportedLanguage
@@ -55,6 +58,8 @@ export class LanguageComponent {
 
         this.translocoService.setActiveLang(lang)
         this.storageService.saveLanguagePreference(lang)
+        updateActiveDateFnsLocale(lang)
+        this.dateAdapter.setLocale(getDateFnsLocale(lang))
         this.currentLang = lang
         this.lastPersistedLanguage = lang
         this.languageMenuOpen = false
