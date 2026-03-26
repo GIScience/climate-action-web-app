@@ -7,5 +7,6 @@ export const environment: Environment = {
     appwriteProjectId: window.env?.APPWRITE_PROJECT_ID || '',
     appwriteEndpoint: window.env?.APPWRITE_ENDPOINT || 'https://staging.api.account.heigit.org',
     appwriteWebsiteUrl: window.env?.APPWRITE_WEBSITE_URL || 'https://staging.account.heigit.org',
-    appwriteRunsCollectionId: window.env?.APPWRITE_RUNS_COLLECTION_ID || 'staging-dashboard_data'
+    appwriteRunsCollectionId: window.env?.APPWRITE_RUNS_COLLECTION_ID || 'staging-dashboard_data',
+    npointDocId: window.env?.NPOINT_DOC_ID || ''
 }

@@ -4,7 +4,8 @@ describe('External Requests', () => {
         'https://tiles.versatiles.org',
         'https://api.openrouteservice.org',
         'https://*.heigit.org',
-        'https://server.arcgisonline.com'
+        'https://server.arcgisonline.com',
+        'https://npoint.io'
     ]
 
     const cypressInternalPatterns = [

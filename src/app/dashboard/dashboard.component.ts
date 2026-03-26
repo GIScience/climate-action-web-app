@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     private fetchMaintenanceAnn(): void {
-        this.http.get<MaintenanceAnnouncement[]>('/maintenance-log.json').subscribe({
+        this.http.get<MaintenanceAnnouncement[]>(`https://api.npoint.io/${window.env?.NPOINT_DOC_ID || ''}`).subscribe({
             next: (announcements: MaintenanceAnnouncement[]) => {
                 this.processMaintenanceAnn(announcements)
             },

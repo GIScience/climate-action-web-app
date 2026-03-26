@@ -100,6 +100,12 @@ docker image push repo.heigit.org/climate-action/web-app:{image_tag}
 
 **Note**: The same Docker image can be used for all environments (development, staging, production - if compatible) by simply changing the environment variables at runtime.
 
+## Maintenance Announcements
+
+Maintenance announcements are logged in a [NPoint](https://npoint.io/) JSON document. The document ID is stored in the `NPOINT_DOC_ID` environment variable.
+
+To update the maintenance announcements, simply append to the document at NPoint, and the changes will be reflected in the web app.
+
 ## Tests
 
 Run `pnpm test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
