@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.2.0...main)
 
+### Fixed
+
+- "Missing translation" warnings on language switch that crashed the console
+
 ## [3.2.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.2.0) - 2026-03-26
 
 ### Added
