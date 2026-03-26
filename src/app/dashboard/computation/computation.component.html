@@ -9,7 +9,9 @@
             <div class="tag-filters">
                 @for (tag of availableTags; track tag) {
                     <button class="tag-pill" [class.active]="selectedTag === tag" (click)="selectTag(tag)">
-                        <span class="tag-name">{{ getTagDisplayName(tag) }}</span>
+                        <span class="tag-name">{{
+                            isDefaultTag(tag) ? ('computation.tags.' + tag | transloco) : tag
+                        }}</span>
                         <span class="tag-count">({{ tagCounts.get(tag) || 0 }})</span>
                     </button>
                 }
@@ -66,7 +68,14 @@
                                         'layer-disabled-btn': mapState === 'disabled'
                                     }"
                                     (click)="toggleMapArtifact(artifact, $event)"
-                                    [tp]="getMapButtonTooltip(artifact)"
+                                    [tp]="
+                                        (mapState === 'unpin'
+                                            ? 'computation.tooltip.unpinLayer'
+                                            : mapState === 'pin'
+                                              ? 'computation.tooltip.pinLayer'
+                                              : 'computation.tooltip.pinLimitReached'
+                                        ) | transloco
+                                    "
                                     tpPlacement="bottom">
                                     <i-lucide [img]="mapState === 'unpin' ? PinOff : Pin" size="17"></i-lucide>
                                 </button>

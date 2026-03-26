@@ -387,10 +387,8 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.filterArtifacts()
     }
 
-    getTagDisplayName(tag: string): string {
-        const key = `computation.tags.${tag}`
-        const translated = this.translocoService.translate(key)
-        return translated !== key ? translated : tag
+    isDefaultTag(tag: string): boolean {
+        return (Object.values(DEFAULT_TAGS) as string[]).includes(tag)
     }
 
     private filterArtifacts(): void {
@@ -431,20 +429,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
         }
 
         return 'pin'
-    }
-
-    getMapButtonTooltip(artifact: ArtifactEntity): string {
-        const state = this.getMapButtonState(artifact)
-        switch (state) {
-            case 'unpin':
-                return this.translocoService.translate('computation.tooltip.unpinLayer')
-            case 'pin':
-                return this.translocoService.translate('computation.tooltip.pinLayer')
-            case 'disabled':
-                return this.translocoService.translate('computation.tooltip.pinLimitReached')
-            default:
-                return ''
-        }
     }
 
     toggleMapArtifact(artifact: ArtifactEntity, event: Event): void {
