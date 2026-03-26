@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project mostly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.1.0...main)
+## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.2.0...main)
+
+## [3.2.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.2.0) - 2026-03-26
 
 ### Added
 
@@ -18,6 +20,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Longer list of artifacts do not get clipped anymore ([#454](https://gitlab.heigit.org/climate-action/web-app/-/issues/454))
 - Timestamp formatting matches the selected language's locale ([#457](https://gitlab.heigit.org/climate-action/web-app/-/issues/457))
 - Maintenance Announcements path now uses an external service (NPoint) to host the JSON document
+
+### Removed
+
+- Removed all OpenLayers dependencies and patterns
 
 ## [3.1.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.1.0) - 2026-03-03
 
