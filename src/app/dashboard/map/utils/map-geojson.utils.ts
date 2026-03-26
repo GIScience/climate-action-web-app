@@ -139,7 +139,7 @@ export class MapGeoJsonUtils {
                     seen.add(baseLayerId)
                     const displayNameGetter = ctx.displayNameGetters?.get(layerInfo.baseId)
                     const displayName = displayNameGetter ? displayNameGetter() : layerInfo.name
-                    const label = f.properties?.['label'] || f.properties?.['name'] || 'Feature'
+                    const label = f.properties?.['label'] ?? f.properties?.['name'] ?? 'Feature'
                     return `<strong>${displayName}</strong>: ${label}`
                 })
                 .filter(Boolean)
