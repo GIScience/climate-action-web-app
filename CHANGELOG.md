@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.2.1...main)
 
+### Fixed
+
+- Legend category toggles still activate after returning from report instantiation
+
 ## [3.2.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.2.1) - 2026-03-26
 
 ### Fixed

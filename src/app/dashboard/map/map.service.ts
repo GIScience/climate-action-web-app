@@ -235,7 +235,7 @@ export class MapService {
         // Initialize FoW manager with the map
         this.fowManager.setMap(this.map, !isReportMap)
 
-        if (this.mapArtifactManager) {
+        if (!isReportMap && this.mapArtifactManager) {
             this.mapArtifactManager.setMapInstance(this.map, this)
         }
 

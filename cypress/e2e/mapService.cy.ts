@@ -287,7 +287,7 @@ describe('mapService', () => {
         cy.get('.discrete-legend ul li').should('have.length', 3)
         cy.get('.discrete-legend ul li').eq(0).get('input').should('be.checked')
 
-        // TODO: add snapshot comparison, persistance of 'checked' during rebuild (pinning), ID collisions (same artifact filename)
+        // TODO: add snapshot comparison, persistance of 'checked' during rebuild (pinning), ID collisions (same artifact filename), toggles still activating after returning from report instantiation
     })
 
     it('should display tooltips from a geojson layer ', () => {
