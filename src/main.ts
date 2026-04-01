@@ -36,6 +36,7 @@ import { FormlyModule } from '@ngx-formly/core'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { provideToastr } from 'ngx-toastr'
 import { environment } from './environments/environment'
 import { TranslocoHttpLoader } from './transloco-loader'
@@ -177,6 +178,7 @@ bootstrapApplication(AppComponent, {
             }
         }),
         provideAnimations(),
+        provideCharts(withDefaultRegisterables()),
         provideToastr({
             positionClass: 'toast-bottom-center',
             extendedTimeOut: 0,
