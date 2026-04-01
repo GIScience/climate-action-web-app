@@ -86,7 +86,7 @@ test_cypress:
               pnpm exec cypress install
             fi
     script:
-        - pnpm start & pnpm exec wait-on http://localhost:4200
+        - pnpm start &
         - pnpm cy:run
     artifacts:
         when: on_failure
