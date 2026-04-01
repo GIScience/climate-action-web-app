@@ -772,7 +772,7 @@ export class MapService {
                 width,
                 height,
                 MapGeoTiffUtils.getFirstRaster(rasters),
-                colorMap,
+                colorMap as number[],
                 nodataValue
             )
 
