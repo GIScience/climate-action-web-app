@@ -81,8 +81,8 @@ importers:
         specifier: ^1.4.0
         version: 1.12.2(maplibre-gl@5.21.1)(terra-draw@1.11.0)
       appwrite:
-        specifier: ^22.0.0
-        version: 22.4.1
+        specifier: ^24.0.0
+        version: 24.1.1
       chart.js:
         specifier: 4.5.0
         version: 4.5.0
@@ -2750,8 +2750,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  appwrite@22.4.1:
-    resolution: {integrity: sha512-NlEgUvSo7A1m+TEHZ8zlWUIuCDtNg3VN6Mbxd6r+1618CiWokig630FpeKQ9/WD5Io92QxuTV/dVzBLPlQghqg==}
+  appwrite@24.1.1:
+    resolution: {integrity: sha512-6dTKZe059GWyrH1AObfC0KR20vmQ9+wUo3iCRmM4lFofTRMrSzjCEcblpNERXHVKrLlzsr1T4kQweQEgrp89yQ==}
 
   arch@2.2.0:
     resolution: {integrity: sha512-Of/R0wqp83cgHozfIYLbBMnej79U/SVGOOyuB3VVFv1NRM/PSFMK12x9KVtiYzJqmnU5WR2qp0Z5rHb7sWGnFQ==}
@@ -8722,7 +8722,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  appwrite@22.4.1:
+  appwrite@24.1.1:
     dependencies:
       json-bigint: 1.0.0
 
