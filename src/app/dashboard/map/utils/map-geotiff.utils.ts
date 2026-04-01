@@ -36,7 +36,7 @@ export class MapGeoTiffUtils {
         width: number,
         height: number,
         raster: TypedArray,
-        colorMap: number[],
+        colorMap: number[] | TypedArray | undefined,
         nodata?: number | null
     ): HTMLCanvasElement {
         const canvas = Object.assign(document.createElement('canvas'), { width, height })

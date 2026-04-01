@@ -87,7 +87,7 @@ test_cypress:
             fi
     script:
         - pnpm start &
-        - sleep 30
+        - until (echo >/dev/tcp/127.0.0.1/4200) 2>/dev/null; do sleep 1; done
         - pnpm cy:run
     artifacts:
         when: on_failure
