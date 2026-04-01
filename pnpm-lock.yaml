@@ -117,8 +117,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       ng2-charts:
-        specifier: ^5.0.4
-        version: 5.0.4(@angular/cdk@20.2.14(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(@angular/platform-browser@20.3.18(@angular/animations@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(chart.js@4.5.0)(rxjs@7.8.2)
+        specifier: ^9.0.0
+        version: 9.0.0(@angular/cdk@20.2.14(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(@angular/platform-browser@20.3.18(@angular/animations@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(chart.js@4.5.0)(rxjs@7.8.2)
       ngx-markdown:
         specifier: 20.1.0
         version: 20.1.0(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(@angular/platform-browser@20.3.18(@angular/animations@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(marked@17.0.1)(rxjs@7.8.2)(zone.js@0.16.1)
@@ -4764,13 +4764,13 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng2-charts@5.0.4:
-    resolution: {integrity: sha512-AnOZ2KSRw7QjiMMNtXz9tdnO+XrIKP/2MX1TfqEEo2fwFU5c8LFJIYqmkMPkIzAEm/U9y/1psA5TDNmxxjEdgA==}
+  ng2-charts@9.0.0:
+    resolution: {integrity: sha512-oG4VLbwDmWtSCaBoiuoi14LZR2DrOgG5WKtGm12eAQHrA32l0dc0XwKurY/dilc9bgKAiJgL/qy2hy/rcb8yog==}
     peerDependencies:
-      '@angular/cdk': '>=16.0.0'
-      '@angular/common': '>=16.0.0'
-      '@angular/core': '>=16.0.0'
-      '@angular/platform-browser': '>=16.0.0'
+      '@angular/cdk': '>=20.0.0'
+      '@angular/common': '>=20.0.0'
+      '@angular/core': '>=20.0.0'
+      '@angular/platform-browser': '>=20.0.0'
       chart.js: ^3.4.0 || ^4.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
@@ -11248,7 +11248,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng2-charts@5.0.4(@angular/cdk@20.2.14(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(@angular/platform-browser@20.3.18(@angular/animations@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(chart.js@4.5.0)(rxjs@7.8.2):
+  ng2-charts@9.0.0(@angular/cdk@20.2.14(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(@angular/platform-browser@20.3.18(@angular/animations@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1)))(chart.js@4.5.0)(rxjs@7.8.2):
     dependencies:
       '@angular/cdk': 20.2.14(@angular/common@20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2)
       '@angular/common': 20.3.18(@angular/core@20.3.18(@angular/compiler@20.3.18)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2)

@@ -1,5 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
-import { NgChartsModule } from 'ng2-charts'
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { ChartData } from '../artifact.interface'
 import { ChartComponent } from './chart.component'
 
@@ -51,7 +51,8 @@ describe('ChartComponent', () => {
         HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue(mockContext)
 
         TestBed.configureTestingModule({
-            imports: [NgChartsModule, ChartComponent]
+            imports: [ChartComponent],
+            providers: [provideCharts(withDefaultRegisterables())]
         }).compileComponents()
 
         fixture = TestBed.createComponent(ChartComponent)
