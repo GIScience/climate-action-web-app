@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.2.1...main)
 
+### Added
+
+- Computations can now be requested in supported languages other than English
+
 ### Fixed
 
 - Legend category toggles still activate after returning from report instantiation

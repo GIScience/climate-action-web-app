@@ -30,6 +30,7 @@ import {
     Loader,
     LoaderCircle,
     LucideAngularModule,
+    MessageSquareWarning,
     Share2,
     Trash2,
     X
@@ -168,6 +169,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     readonly Loader = Loader
     readonly LoaderCircle = LoaderCircle
     readonly FileWarning = FileWarning
+    readonly MessageSquareWarning = MessageSquareWarning
     readonly Clipboard = Clipboard
     readonly Trash2 = Trash2
     readonly Import = Import
@@ -179,6 +181,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     @Input() pluginId: string = ''
     @Input() hasDemoConfig: boolean = true
     demoConfig: DemoConfig | null = null
+    pluginLanguage: SupportedLanguage = SupportedLanguage.EN
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
         params: ComputationParameters
@@ -214,9 +217,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.pluginService
             .getPluginDetails(this.pluginId)
             .pipe(take(1))
-            .subscribe(({ demo_config }) => {
+            .subscribe(({ demo_config, language }) => {
                 this.hasDemoConfig = !!demo_config
                 this.demoConfig = demo_config
+                this.pluginLanguage = language ?? SupportedLanguage.EN
             })
 
         if (this.pluginService.computeState$) {
@@ -510,6 +514,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     artifacts: [],
                     status: response.status,
                     request_ts: response.request_ts,
+                    language: response.language,
                     aoiName: response.aoi?.properties?.['name'] as string | undefined,
                     geometry: response.aoi,
                     pluginId: response.plugin_info?.id,
@@ -991,6 +996,32 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             return []
         }
         return Object.entries(artifactErrors)
+    }
+
+    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
+        const computationLanguage = computation.language ?? SupportedLanguage.EN
+        const currentLanguage = this.translocoService.getActiveLang() as SupportedLanguage
+        const pluginLanguage = this.pluginLanguage ?? SupportedLanguage.EN
+
+        if (computationLanguage === currentLanguage) {
+            return null
+        }
+
+        const getLanguageLabel = (language: SupportedLanguage): string => {
+            const displayNames = new Intl.DisplayNames([currentLanguage], { type: 'language' })
+            return displayNames.of(language) ?? language
+        }
+
+        const translationKey =
+            pluginLanguage === currentLanguage
+                ? 'computationsIndex.languageMismatch'
+                : 'computationsIndex.languageMismatchPluginOnly'
+
+        return this.translocoService.translate(translationKey, {
+            language: getLanguageLabel(computationLanguage),
+            currentLanguage: getLanguageLabel(currentLanguage),
+            pluginLanguage: getLanguageLabel(pluginLanguage)
+        })
     }
 
     // trackBy helpers to reduce DOM churn in lists

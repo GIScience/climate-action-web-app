@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
+import { TranslocoService } from '@jsverse/transloco'
 import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
-import { BehaviorSubject, Observable, Subject, map, of, throwError } from 'rxjs'
+import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, tap, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
 import { derivePluginNameFromId } from '../../utils/string.utils'
@@ -20,6 +21,7 @@ import { ComputeState, Plugin } from './plugin.interface'
 export class PluginService {
     private http = inject(HttpClient)
     private storageService = inject(StorageService)
+    private translocoService = inject(TranslocoService)
 
     private apiUrl = environment.climateActionApiUrl
 
@@ -40,11 +42,15 @@ export class PluginService {
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http.get<Plugin[]>(`${this.apiUrl}/plugin`).pipe(
-            tap(plugins => {
-                plugins.forEach(p => this.pluginNameCache.set(p.id, p.name))
+        return this.http
+            .get<Plugin[]>(`${this.apiUrl}/plugin`, {
+                params: { lang: this.translocoService.getActiveLang() }
             })
-        )
+            .pipe(
+                tap(plugins => {
+                    plugins.forEach(p => this.pluginNameCache.set(p.id, p.name))
+                })
+            )
     }
 
     getPluginNameById(pluginId: string): string {
@@ -52,15 +58,21 @@ export class PluginService {
     }
 
     getPluginDetails(pluginName: string): Observable<Plugin> {
-        return this.http.get<Plugin>(`${this.apiUrl}/plugin/${pluginName}`)
+        return this.http.get<Plugin>(`${this.apiUrl}/plugin/${pluginName}`, {
+            params: { lang: this.translocoService.getActiveLang() }
+        })
     }
 
     computePlugin(pluginId: string, params: object): Observable<ComputationID> {
-        return this.http.post<ComputationID>(`${this.apiUrl}/plugin/${pluginId}`, params)
+        return this.http.post<ComputationID>(`${this.apiUrl}/plugin/${pluginId}`, params, {
+            params: { lang: this.translocoService.getActiveLang() }
+        })
     }
 
     computeDemo(pluginId: string): Observable<ComputationID> {
-        return this.http.get<ComputationID>(`${this.apiUrl}/plugin/${pluginId}/demo`)
+        return this.http.get<ComputationID>(`${this.apiUrl}/plugin/${pluginId}/demo`, {
+            params: { lang: this.translocoService.getActiveLang() }
+        })
     }
 
     getComputationRunState(id: string): Observable<ComputationRunStateInfo> {

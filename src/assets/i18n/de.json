@@ -83,6 +83,8 @@
         "imported": "Ergebnis importiert",
         "demo": "Demo",
         "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
+        "languageMismatch": "Diese Berechnung wurde auf {{ language }} erstellt. Fordere eine neue Berechnung an, wenn du sie auf {{ currentLanguage }} benötigst.",
+        "languageMismatchPluginOnly": "Diese Berechnung wurde auf {{ language }} erstellt. Dieses Analysewerkzeug ist derzeit nicht auf {{ currentLanguage }} verfügbar.",
         "parameters": {
             "title": "Einstellungen",
             "noParams": "Es wurden keine Einstellungsparameter angegeben.",
@@ -177,11 +179,6 @@
             "version": "Version: {{ version }}",
             "iconsByIcons8": "Icons von Icons8",
             "reportMapProblem": "Ein Problem auf der Karte melden"
-        },
-        "language": {
-            "english": "English",
-            "german": "Deutsch",
-            "otherLangComputationWarning": "Die Ergebnisdarstellung ist zur Zeit noch nicht auf Deutsch, sondern nur auf Englisch verfügbar."
         }
     },
     "walkthrough": {

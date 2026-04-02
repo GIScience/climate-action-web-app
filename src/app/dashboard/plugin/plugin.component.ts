@@ -21,7 +21,7 @@ import {
 } from 'lucide-angular'
 import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { Observable, Subscription, catchError, map, of, switchMap, tap, throwError } from 'rxjs'
+import { Observable, Subscription, catchError, combineLatest, map, of, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { ReportService } from '../report/report.service'
@@ -125,8 +125,8 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     }
 
     private loadPluginDetails() {
-        this.pluginObs$ = this.route.paramMap.pipe(
-            map(params => params.get('name')),
+        this.pluginObs$ = combineLatest([this.route.paramMap, this.translocoService.langChanges$]).pipe(
+            map(([params]) => params.get('name')),
             switchMap(pluginId => {
                 if (!pluginId || pluginId == '') {
                     throw Error(`Plugin ${pluginId} does not exist`)
