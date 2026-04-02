@@ -1,25 +1,36 @@
 import { CommonModule } from '@angular/common'
-import {
-    ChangeDetectorRef,
-    Component,
-    Input,
-    OnChanges,
-    OnDestroy,
-    OnInit,
-    ViewEncapsulation,
-    inject
-} from '@angular/core'
+import { Component, Input, NgZone, OnChanges, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
+import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
+import { MAT_DATE_LOCALE } from '@angular/material/core'
+import {
+    constValidationMessage,
+    exclusiveMaximumValidationMessage,
+    exclusiveMinimumValidationMessage,
+    maxItemsValidationMessage,
+    maxLengthValidationMessage,
+    maxValidationMessage,
+    minItemsValidationMessage,
+    minLengthValidationMessage,
+    minValidationMessage,
+    multipleOfValidationMessage,
+    typeValidationMessage
+} from '@app/app.validation-messages'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationRunState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
 import { MapService } from '@app/dashboard/map/map.service'
 import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
+import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
+import { ObjectTypeComponent } from '@app/types/object/object.type'
+import { reactiveDateFnsLocale, updateActiveDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
-import { FormlyFieldConfig, FormlyForm, FormlyFormOptions } from '@ngx-formly/core'
+import { FormlyFieldConfig, FormlyForm, FormlyFormOptions, provideFormlyCore } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
+import { withFormlyMaterial } from '@ngx-formly/material'
+import { withFormlyFieldDatepicker } from '@ngx-formly/material/datepicker'
 import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
 import type { Feature as GeoJSONFeature } from 'geojson'
@@ -56,13 +67,61 @@ import { FormlyModel } from './plugin-parameter.interface'
         TippyDirective,
         TranslocoModule
     ],
+    providers: [
+        provideFormlyCore([
+            {
+                validationMessages: [
+                    { name: 'required', message: 'This field is required' },
+                    { name: 'type', message: typeValidationMessage },
+                    { name: 'minLength', message: minLengthValidationMessage },
+                    { name: 'maxLength', message: maxLengthValidationMessage },
+                    { name: 'min', message: minValidationMessage },
+                    { name: 'max', message: maxValidationMessage },
+                    { name: 'multipleOf', message: multipleOfValidationMessage },
+                    { name: 'exclusiveMinimum', message: exclusiveMinimumValidationMessage },
+                    { name: 'exclusiveMaximum', message: exclusiveMaximumValidationMessage },
+                    { name: 'minItems', message: minItemsValidationMessage },
+                    { name: 'maxItems', message: maxItemsValidationMessage },
+                    { name: 'uniqueItems', message: 'should NOT have duplicate items' },
+                    { name: 'const', message: constValidationMessage },
+                    { name: 'enum', message: `must be equal to one of the allowed values` },
+                    { name: 'date', message: 'not a valid date' }
+                ],
+                types: [
+                    { name: 'object', component: ObjectTypeComponent },
+                    { name: 'dialog', component: OptionalAttributesTypeComponent, wrappers: [] }
+                ]
+            },
+            ...withFormlyMaterial(),
+            withFormlyFieldDatepicker()
+        ]),
+        provideDateFnsAdapter({
+            parse: {
+                dateInput: 'yyyy-MM-dd'
+            },
+            display: {
+                dateInput: 'PP',
+                monthYearLabel: 'LLL yyyy',
+                dateA11yLabel: 'PP',
+                monthYearA11yLabel: 'LLLL yyyy'
+            }
+        }),
+        {
+            provide: MAT_DATE_LOCALE,
+            deps: [TranslocoService],
+            useFactory: (transloco: TranslocoService) => {
+                updateActiveDateFnsLocale(transloco.getActiveLang())
+                return reactiveDateFnsLocale
+            }
+        }
+    ],
     encapsulation: ViewEncapsulation.None
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private pluginService = inject(PluginService)
     private toastr = inject(ToastrService)
     mapService = inject(MapService)
-    private cdr = inject(ChangeDetectorRef)
+    private ngZone = inject(NgZone)
     private formlyJsonschema = inject(FormlyJsonschema)
     private appwriteService = inject(AppwriteService)
     private translocoService = inject(TranslocoService)
@@ -96,7 +155,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     constructor() {
         this.highlightedFeaturesSubscription = this.mapService.selectedFeatures$.subscribe(() => {
-            this.toggleFormState()
+            this.ngZone.run(() => {
+                this.toggleFormState()
+            })
         })
 
         this.appwriteService._user.subscribe(user => {
@@ -142,14 +203,17 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     toggleFormState(): void {
-        if (this.mapService.selectedFeatures.length > 0) {
+        this.areaSelected = this.mapService.selectedFeatures.length > 0
+
+        if (this.areaSelected === this.form.enabled) {
+            return
+        }
+
+        if (this.areaSelected) {
             this.form.enable()
-            this.areaSelected = true
         } else {
             this.form.disable()
-            this.areaSelected = false
         }
-        this.cdr.detectChanges()
     }
 
     parseFieldsFromSchema(schema: JSONSchema7): FormlyFieldConfig[] {
@@ -172,6 +236,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 }
             })
 
+            // Within object groups, keep required fields visible and move optional ones
+            // behind the "optional attributes" dialog when at least one exists
             if (optionalSubgroup.length > 0) {
                 splittedFieldGroup.push({
                     type: 'dialog',
@@ -191,6 +257,23 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             return field
         }
 
+        // For object fields with a key, render them as dialogs in the parent form,
+        // keeping their label and description for the dialog trigger
+        function separateGroupedParameters(field: FormlyFieldConfig): FormlyFieldConfig {
+            const originalFieldGroup = field.fieldGroup
+            field.type = 'dialog'
+            field.fieldGroup = [
+                {
+                    props: {
+                        label: field.props?.label,
+                        description: field.props?.description
+                    },
+                    fieldGroup: originalFieldGroup
+                }
+            ]
+            return field
+        }
+
         if (schema.examples && Array.isArray(schema.examples)) {
             field.props = field.props || {}
             field.props.placeholder = String(schema.examples[0])
@@ -204,6 +287,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         field = separateOptionalParameters(field, schema)
 
+        if (field.type === 'object' && field.key) {
+            field = separateGroupedParameters(field)
+        }
         return field
     }
 

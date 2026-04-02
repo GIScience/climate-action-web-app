@@ -1,4 +1,4 @@
-import { Component, DoCheck, inject } from '@angular/core'
+import { Component, DoCheck, ViewContainerRef, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
 import { FieldType } from '@ngx-formly/core'
@@ -12,6 +12,7 @@ import { DialogWindowComponent } from './dialog-window.component'
 })
 export class OptionalAttributesTypeComponent extends FieldType implements DoCheck {
     private dialog = inject(MatDialog)
+    private viewContainerRef = inject(ViewContainerRef)
 
     isDisabled = false
 
@@ -28,7 +29,8 @@ export class OptionalAttributesTypeComponent extends FieldType implements DoChec
             data: this.field.fieldGroup?.[0],
             autoFocus: false,
             maxHeight: '90vh',
-            disableClose: true
+            disableClose: true,
+            viewContainerRef: this.viewContainerRef
         })
     }
 }
