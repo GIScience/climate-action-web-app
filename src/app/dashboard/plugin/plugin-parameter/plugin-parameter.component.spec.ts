@@ -661,96 +661,100 @@ describe('PluginParameterComponent', () => {
                 },
                 fieldGroup: [
                     {
-                        type: 'object',
-                        props: {
-                            label: 'Test Title',
-                            description: 'Test description.'
-                        },
+                        type: 'dialog',
                         fieldGroup: [
                             {
-                                type: 'string',
                                 props: {
-                                    label: 'String for Good',
-                                    description: 'A good string.',
-                                    placeholder: 'John Doe'
+                                    label: 'Test Title',
+                                    description: 'Test description.'
                                 },
-                                key: 'good',
-                                defaultValue: '',
-                                validators: {
-                                    type: {
-                                        schemaType: ['string']
-                                    }
-                                },
-                                templateOptions: {
-                                    label: 'String for Good',
-                                    description: 'A good string.',
-                                    placeholder: 'John Doe'
-                                },
-                                parsers: [null],
-                                expressions: {}
-                            },
-                            {
-                                type: 'dialog',
                                 fieldGroup: [
                                     {
+                                        type: 'string',
                                         props: {
-                                            label: 'pluginParameter.optionalAttributes',
-                                            description: 'pluginParameter.editAdditionalParameters'
+                                            label: 'String for Good',
+                                            description: 'A good string.',
+                                            placeholder: 'John Doe'
                                         },
+                                        key: 'good',
+                                        defaultValue: '',
+                                        validators: {
+                                            type: {
+                                                schemaType: ['string']
+                                            }
+                                        },
+                                        templateOptions: {
+                                            label: 'String for Good',
+                                            description: 'A good string.',
+                                            placeholder: 'John Doe'
+                                        },
+                                        parsers: [null],
+                                        expressions: {}
+                                    },
+                                    {
+                                        type: 'dialog',
                                         fieldGroup: [
                                             {
-                                                type: 'number',
                                                 props: {
-                                                    label: 'Mediocre Float',
-                                                    description: 'A mediocre float.',
-                                                    min: 0.5,
-                                                    max: 4.0,
-                                                    placeholder: '2.1'
+                                                    label: 'pluginParameter.optionalAttributes',
+                                                    description: 'pluginParameter.editAdditionalParameters'
                                                 },
-                                                key: 'mediocre',
-                                                defaultValue: 2.1,
-                                                validators: {
-                                                    type: {
-                                                        schemaType: ['number']
+                                                fieldGroup: [
+                                                    {
+                                                        type: 'number',
+                                                        props: {
+                                                            label: 'Mediocre Float',
+                                                            description: 'A mediocre float.',
+                                                            min: 0.5,
+                                                            max: 4.0,
+                                                            placeholder: '2.1'
+                                                        },
+                                                        key: 'mediocre',
+                                                        defaultValue: 2.1,
+                                                        validators: {
+                                                            type: {
+                                                                schemaType: ['number']
+                                                            }
+                                                        },
+                                                        templateOptions: {
+                                                            label: 'Mediocre Float',
+                                                            description: 'A mediocre float.',
+                                                            min: 0.5,
+                                                            max: 4.0,
+                                                            placeholder: '2.1'
+                                                        },
+                                                        parsers: [null]
+                                                    },
+                                                    {
+                                                        type: 'enum',
+                                                        props: {
+                                                            label: 'Bad Selection',
+                                                            description: 'A bad selection.',
+                                                            multiple: false,
+                                                            options: [
+                                                                { value: 'Option 1', label: 'Option 1' },
+                                                                { value: 'Option 2', label: 'Option 2' }
+                                                            ]
+                                                        },
+                                                        key: 'bad',
+                                                        defaultValue: 'Option 2',
+                                                        validators: {
+                                                            type: {
+                                                                schemaType: ['string']
+                                                            }
+                                                        },
+                                                        templateOptions: {
+                                                            label: 'Bad Selection',
+                                                            description: 'A bad selection.',
+                                                            multiple: false,
+                                                            options: [
+                                                                { value: 'Option 1', label: 'Option 1' },
+                                                                { value: 'Option 2', label: 'Option 2' }
+                                                            ]
+                                                        },
+                                                        parsers: [null]
                                                     }
-                                                },
-                                                templateOptions: {
-                                                    label: 'Mediocre Float',
-                                                    description: 'A mediocre float.',
-                                                    min: 0.5,
-                                                    max: 4.0,
-                                                    placeholder: '2.1'
-                                                },
-                                                parsers: [null]
-                                            },
-                                            {
-                                                type: 'enum',
-                                                props: {
-                                                    label: 'Bad Selection',
-                                                    description: 'A bad selection.',
-                                                    multiple: false,
-                                                    options: [
-                                                        { value: 'Option 1', label: 'Option 1' },
-                                                        { value: 'Option 2', label: 'Option 2' }
-                                                    ]
-                                                },
-                                                key: 'bad',
-                                                defaultValue: 'Option 2',
-                                                validators: {
-                                                    type: {
-                                                        schemaType: ['string']
-                                                    }
-                                                },
-                                                templateOptions: {
-                                                    label: 'Bad Selection',
-                                                    description: 'A bad selection.',
-                                                    multiple: false,
-                                                    options: [
-                                                        { value: 'Option 1', label: 'Option 1' },
-                                                        { value: 'Option 2', label: 'Option 2' }
-                                                    ]
-                                                },
-                                                parsers: [null]
+                                                ]
                                             }
                                         ]
                                     }
@@ -763,6 +767,10 @@ describe('PluginParameterComponent', () => {
                             type: {
                                 schemaType: ['object']
                             }
+                        },
+                        props: {
+                            label: 'Test Title',
+                            description: 'Test description.'
                         },
                         templateOptions: {
                             label: 'Test Title',

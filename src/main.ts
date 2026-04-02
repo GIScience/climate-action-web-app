@@ -1,40 +1,19 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { importProvidersFrom } from '@angular/core'
-import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
-import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy, Routes, provideRouter } from '@angular/router'
 import { AppComponent } from '@app/app.component'
 import { CustomRouteReuseStrategy } from '@app/app.ext'
-import {
-    constValidationMessage,
-    exclusiveMaximumValidationMessage,
-    exclusiveMinimumValidationMessage,
-    maxItemsValidationMessage,
-    maxLengthValidationMessage,
-    maxValidationMessage,
-    minItemsValidationMessage,
-    minLengthValidationMessage,
-    minValidationMessage,
-    multipleOfValidationMessage,
-    typeValidationMessage
-} from '@app/app.validation-messages'
 import { AuthInterceptor } from '@app/auth/auth.interceptor'
 import { DashboardComponent } from '@app/dashboard/dashboard.component'
 import { MapService } from '@app/dashboard/map/map.service'
 import { PageNotFoundComponent } from '@app/page-not-found/page-not-found.component'
-import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { SUPPORTED_LANGUAGES, SupportedLanguage, isValidLanguage } from '@app/types/language.types'
-import { ObjectTypeComponent } from '@app/types/object/object.type'
-import { reactiveDateFnsLocale, updateActiveDateFnsLocale } from '@app/utils/locale.utils'
 import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
-import { TranslocoService, provideTransloco } from '@jsverse/transloco'
+import { provideTransloco } from '@jsverse/transloco'
 import { provideTranslocoMessageformat } from '@jsverse/transloco-messageformat'
 import { popperVariation, provideTippyConfig, provideTippyLoader } from '@ngneat/helipopper/config'
-import { FormlyModule } from '@ngx-formly/core'
-import { FormlyMaterialModule } from '@ngx-formly/material'
-import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { provideToastr } from 'ngx-toastr'
@@ -108,55 +87,7 @@ const routes: Routes = [
 bootstrapApplication(AppComponent, {
     providers: [
         provideRouter(routes),
-        importProvidersFrom(
-            BrowserModule,
-            BrowserAnimationsModule,
-            FormlyModule.forRoot({
-                validationMessages: [
-                    { name: 'required', message: 'This field is required' },
-                    { name: 'type', message: typeValidationMessage },
-                    { name: 'minLength', message: minLengthValidationMessage },
-                    { name: 'maxLength', message: maxLengthValidationMessage },
-                    { name: 'min', message: minValidationMessage },
-                    { name: 'max', message: maxValidationMessage },
-                    { name: 'multipleOf', message: multipleOfValidationMessage },
-                    { name: 'exclusiveMinimum', message: exclusiveMinimumValidationMessage },
-                    { name: 'exclusiveMaximum', message: exclusiveMaximumValidationMessage },
-                    { name: 'minItems', message: minItemsValidationMessage },
-                    { name: 'maxItems', message: maxItemsValidationMessage },
-                    { name: 'uniqueItems', message: 'should NOT have duplicate items' },
-                    { name: 'const', message: constValidationMessage },
-                    { name: 'enum', message: `must be equal to one of the allowed values` },
-                    { name: 'date', message: 'not a valid date' }
-                ],
-                types: [
-                    { name: 'object', component: ObjectTypeComponent },
-                    { name: 'dialog', component: OptionalAttributesTypeComponent, wrappers: [] }
-                ]
-            }),
-            FormlyMaterialModule,
-            FormlyMatDatepickerModule,
-            LucideAngularModule.pick({ CircleUserRound })
-        ),
-        provideDateFnsAdapter({
-            parse: {
-                dateInput: 'yyyy-MM-dd'
-            },
-            display: {
-                dateInput: 'PP',
-                monthYearLabel: 'LLL yyyy',
-                dateA11yLabel: 'PP',
-                monthYearA11yLabel: 'LLLL yyyy'
-            }
-        }),
-        {
-            provide: MAT_DATE_LOCALE,
-            deps: [TranslocoService],
-            useFactory: (transloco: TranslocoService) => {
-                updateActiveDateFnsLocale(transloco.getActiveLang())
-                return reactiveDateFnsLocale
-            }
-        },
+        importProvidersFrom(BrowserModule, BrowserAnimationsModule, LucideAngularModule.pick({ CircleUserRound })),
         {
             provide: RouteReuseStrategy,
             useClass: CustomRouteReuseStrategy
