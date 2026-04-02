@@ -1,9 +1,7 @@
 import { Component, inject } from '@angular/core'
 import { DateAdapter } from '@angular/material/core'
-import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import { TranslocoService } from '@jsverse/transloco'
 import { Languages, LucideAngularModule } from 'lucide-angular'
-import { ToastrService } from 'ngx-toastr'
-import { take } from 'rxjs'
 import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 import { StorageService } from '../storage.service'
 import { SupportedLanguage } from '../types/language.types'
@@ -11,7 +9,7 @@ import { getDateFnsLocale, updateActiveDateFnsLocale } from '../utils/locale.uti
 
 @Component({
     selector: 'app-language',
-    imports: [TranslocoModule, LucideAngularModule, DropdownMenuDirective],
+    imports: [LucideAngularModule, DropdownMenuDirective],
     templateUrl: './language.component.html',
     styleUrl: './language.component.scss'
 })
@@ -19,10 +17,8 @@ export class LanguageComponent {
     private translocoService = inject(TranslocoService)
     private storageService = inject(StorageService)
     private dateAdapter = inject(DateAdapter)
-    private toastr = inject(ToastrService)
 
     currentLang: SupportedLanguage
-    private lastPersistedLanguage: SupportedLanguage | null = null
     languageMenuOpen = false
     readonly supportedLanguages = SupportedLanguage
     readonly Languages = Languages
@@ -32,15 +28,9 @@ export class LanguageComponent {
         const activeLanguage = this.translocoService.getActiveLang() as SupportedLanguage
 
         this.currentLang = storedPreference ?? activeLanguage
-        this.lastPersistedLanguage = storedPreference
 
         if (!storedPreference) {
             this.storageService.saveLanguagePreference(this.currentLang)
-            this.lastPersistedLanguage = this.currentLang
-
-            if (this.currentLang === SupportedLanguage.DE) {
-                this.showGermanWarning()
-            }
         }
     }
 
@@ -54,31 +44,20 @@ export class LanguageComponent {
             return
         }
 
-        const previouslyPersisted = this.lastPersistedLanguage
-
         this.translocoService.setActiveLang(lang)
         this.storageService.saveLanguagePreference(lang)
         updateActiveDateFnsLocale(lang)
         this.dateAdapter.setLocale(getDateFnsLocale(lang))
         this.currentLang = lang
-        this.lastPersistedLanguage = lang
         this.languageMenuOpen = false
-
-        if (lang === SupportedLanguage.DE && previouslyPersisted !== SupportedLanguage.DE) {
-            this.showGermanWarning()
-        }
     }
 
     closeLanguageMenu() {
         this.languageMenuOpen = false
     }
 
-    private showGermanWarning() {
-        this.translocoService
-            .selectTranslate('app.language.otherLangComputationWarning')
-            .pipe(take(1))
-            .subscribe(message => {
-                this.toastr.info(message, '', { disableTimeOut: true })
-            })
+    getLanguageLabel(language: SupportedLanguage): string {
+        const displayNames = new Intl.DisplayNames([language], { type: 'language' })
+        return displayNames.of(language) ?? language
     }
 }

@@ -1,3 +1,4 @@
+import { SupportedLanguage } from '@app/types/language.types'
 import { Source } from '@app/types/sources/sources.type'
 import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { JSONSchema7 } from 'json-schema'
@@ -28,6 +29,7 @@ export interface Plugin {
     operator_schema: JSONSchema7
     demo_config: DemoConfig | null
     library_version: string
+    language?: SupportedLanguage
     status?: 'active' | 'unavailable' | 'releasing-soon'
 }
 

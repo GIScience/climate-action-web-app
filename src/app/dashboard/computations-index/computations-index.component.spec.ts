@@ -4,12 +4,13 @@ import { MatDialog } from '@angular/material/dialog'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
-import { TranslocoTestingModule } from '@jsverse/transloco'
+import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
+import { SupportedLanguage } from '../../types/language.types'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
@@ -25,6 +26,7 @@ describe('ComputationsIndexComponent', () => {
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
     let mockMatDialog: { open: jest.Mock; closeAll: jest.Mock }
+    let translocoService: TranslocoService
 
     let pluginRuns$: BehaviorSubject<ComputationDisplayEntity[]>
 
@@ -113,6 +115,8 @@ describe('ComputationsIndexComponent', () => {
                 })
             ]
         }).compileComponents()
+
+        translocoService = TestBed.inject(TranslocoService)
     })
 
     beforeEach(fakeAsync(() => {
@@ -120,6 +124,7 @@ describe('ComputationsIndexComponent', () => {
 
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
+        translocoService.setActiveLang('en')
 
         component.formatTimestamp = jest.fn().mockReturnValue('1 Jan 2023, 12:00 PM')
 
@@ -326,6 +331,202 @@ describe('ComputationsIndexComponent', () => {
         expect(artifactErrorsIcon).toBeTruthy()
 
         tick(2000)
+        discardPeriodicTasks()
+    }))
+
+    it('should display a language mismatch icon when computation language differs from active language', fakeAsync(() => {
+        const testRun = {
+            aoiName: 'Test AOI',
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'SUCCESS',
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
+        } as ComputationDisplayEntity
+
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getPluginRunsPaginated = jest.fn().mockResolvedValue({
+            documents: [testRun],
+            total: 1,
+            hasMore: false
+        })
+
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(
+            of({
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
+                language: 'de',
+                params: {},
+                aoi: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'MultiPolygon',
+                        coordinates: [
+                            [
+                                [
+                                    [0, 0],
+                                    [1, 0],
+                                    [1, 1],
+                                    [0, 1],
+                                    [0, 0]
+                                ]
+                            ]
+                        ]
+                    },
+                    properties: {
+                        name: 'Test AOI'
+                    }
+                },
+                artifacts: [],
+                plugin_info: {
+                    id: 'test_plugin',
+                    version: '1.0.0'
+                },
+                status: 'SUCCESS',
+                message: '',
+                artifact_errors: {}
+            })
+        )
+
+        component.currentRuns = [testRun]
+        component.initializeSuccessfulRuns()
+        tick()
+        fixture.detectChanges()
+
+        const languageMismatchIcon = fixture.debugElement.query(By.css('.language-mismatch'))
+        expect(languageMismatchIcon).toBeTruthy()
+
+        discardPeriodicTasks()
+    }))
+
+    it('should not display a language mismatch icon when computation language matches active language', fakeAsync(() => {
+        const testRun = {
+            aoiName: 'Test AOI',
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'SUCCESS',
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
+        } as ComputationDisplayEntity
+
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getPluginRunsPaginated = jest.fn().mockResolvedValue({
+            documents: [testRun],
+            total: 1,
+            hasMore: false
+        })
+
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(
+            of({
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
+                language: SupportedLanguage.EN,
+                params: {},
+                aoi: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'MultiPolygon',
+                        coordinates: [
+                            [
+                                [
+                                    [0, 0],
+                                    [1, 0],
+                                    [1, 1],
+                                    [0, 1],
+                                    [0, 0]
+                                ]
+                            ]
+                        ]
+                    },
+                    properties: {
+                        name: 'Test AOI'
+                    }
+                },
+                artifacts: [],
+                plugin_info: {
+                    id: 'test_plugin',
+                    version: '1.0.0'
+                },
+                status: 'SUCCESS',
+                message: '',
+                artifact_errors: {}
+            })
+        )
+
+        component.currentRuns = [testRun]
+        component.initializeSuccessfulRuns()
+        tick()
+        fixture.detectChanges()
+
+        const languageMismatchIcon = fixture.debugElement.query(By.css('.language-mismatch'))
+        expect(languageMismatchIcon).toBeFalsy()
+
+        discardPeriodicTasks()
+    }))
+
+    it('should treat missing computation language as english and display a mismatch icon', fakeAsync(() => {
+        translocoService.setActiveLang(SupportedLanguage.DE)
+
+        const testRun = {
+            aoiName: 'Test AOI',
+            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+            pluginId: 'test_plugin',
+            pluginName: 'Test Plugin',
+            status: 'SUCCESS',
+            request_ts: new Date('2023-09-27T16:42:52+01:00')
+        } as ComputationDisplayEntity
+
+        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([testRun])
+        mockStorageService.getPluginRunsPaginated = jest.fn().mockResolvedValue({
+            documents: [testRun],
+            total: 1,
+            hasMore: false
+        })
+
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(
+            of({
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
+                params: {},
+                aoi: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'MultiPolygon',
+                        coordinates: [
+                            [
+                                [
+                                    [0, 0],
+                                    [1, 0],
+                                    [1, 1],
+                                    [0, 1],
+                                    [0, 0]
+                                ]
+                            ]
+                        ]
+                    },
+                    properties: {
+                        name: 'Test AOI'
+                    }
+                },
+                artifacts: [],
+                plugin_info: {
+                    id: 'test_plugin',
+                    version: '1.0.0'
+                },
+                status: 'SUCCESS',
+                message: '',
+                artifact_errors: {}
+            })
+        )
+
+        component.currentRuns = [testRun]
+        component.initializeSuccessfulRuns()
+        tick()
+        fixture.detectChanges()
+
+        const languageMismatchIcon = fixture.debugElement.query(By.css('.language-mismatch'))
+        expect(languageMismatchIcon).toBeTruthy()
+
         discardPeriodicTasks()
     }))
 

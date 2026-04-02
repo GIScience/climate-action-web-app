@@ -83,6 +83,8 @@
         "imported": "Imported Computation",
         "demo": "Demo",
         "artifactErrors": "Some results could not be computed.",
+        "languageMismatch": "This computation was generated in {{ language }}. Request a new computation if you need it in {{ currentLanguage }}.",
+        "languageMismatchPluginOnly": "This computation was generated in {{ language }}. This Assessment Tool is not available in {{ currentLanguage }} currently.",
         "parameters": {
             "title": "Computation Parameters",
             "noParams": "This computation used no parameters.",
@@ -177,11 +179,6 @@
             "version": "Version: {{ version }}",
             "iconsByIcons8": "Icons by Icons8",
             "reportMapProblem": "Report a problem with the map"
-        },
-        "language": {
-            "english": "English",
-            "german": "Deutsch",
-            "otherLangComputationWarning": "Computations are available only in English at the moment."
         }
     },
     "walkthrough": {

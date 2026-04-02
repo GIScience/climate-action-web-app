@@ -13,13 +13,13 @@
                     class="language-menu__item"
                     [class.active]="currentLang === supportedLanguages.EN"
                     (click)="selectLanguage(supportedLanguages.EN)">
-                    EN - {{ 'app.language.english' | transloco }}
+                    EN - {{ getLanguageLabel(supportedLanguages.EN) }}
                 </button>
                 <button
                     class="language-menu__item"
                     [class.active]="currentLang === supportedLanguages.DE"
                     (click)="selectLanguage(supportedLanguages.DE)">
-                    DE - {{ 'app.language.german' | transloco }}
+                    DE - {{ getLanguageLabel(supportedLanguages.DE) }}
                 </button>
             </div>
         </ng-template>

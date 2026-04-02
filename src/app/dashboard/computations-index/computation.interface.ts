@@ -1,3 +1,4 @@
+import { SupportedLanguage } from '@app/types/language.types'
 import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationFlags, ComputationItemState, ComputationRunState } from '../common/status.types'
@@ -11,6 +12,7 @@ export interface ComputationParameters {
 export interface ComputationMetadata {
     correlation_uuid: string
     request_ts: Date
+    language?: SupportedLanguage
     params: ComputationParameters
     requested_params?: ComputationParameters
     aoi: GeoJSONFeature<MultiPolygon>
@@ -23,7 +25,7 @@ export interface ComputationMetadata {
 
 export interface ComputationDisplayEntity extends Pick<
     ComputationMetadata,
-    'correlation_uuid' | 'request_ts' | 'params' | 'requested_params' | 'status' | 'artifact_errors'
+    'correlation_uuid' | 'request_ts' | 'language' | 'params' | 'requested_params' | 'status' | 'artifact_errors'
 > {
     artifacts: ArtifactEntity[]
     aoiName?: string

@@ -139,6 +139,16 @@
                                                         [tpData]="computation.artifact_errors"
                                                         tpPlacement="right"></i-lucide>
                                                 }
+                                                @let languageMismatchTooltip = getLanguageMismatchTooltip(computation);
+                                                @if (languageMismatchTooltip) {
+                                                    <i-lucide
+                                                        [img]="MessageSquareWarning"
+                                                        size="18"
+                                                        color="#9a6700"
+                                                        class="language-mismatch"
+                                                        [tp]="languageMismatchTooltip"
+                                                        tpPlacement="right"></i-lucide>
+                                                }
                                                 @if (computation.flags?.includes('IMPORTED')) {
                                                     <i-lucide
                                                         [img]="Import"

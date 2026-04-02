@@ -1,7 +1,7 @@
 import { cypressEnvironment } from './cypress-environment'
 
 export const mockPluginsList = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin`, {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin?lang=en`, {
         body: [
             {
                 name: 'Plugin Blueprint',
@@ -115,7 +115,7 @@ export const mockPluginsList = () => {
 }
 
 export const mockPluginsListWithoutBlueprint = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin`, {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin?lang=en`, {
         body: [
             {
                 name: 'hiWalk',
@@ -342,7 +342,7 @@ export const mockPluginsListWithoutBlueprint = () => {
 }
 
 export const mockPluginBlueprint = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint`, {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=en`, {
         body: {
             name: 'Plugin Blueprint',
             authors: [
@@ -503,7 +503,7 @@ export const mockPluginBlueprint = () => {
 }
 
 export const mockPluginHiWalk = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/hiwalk`, {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/hiwalk?lang=en`, {
         body: {
             name: 'hiWalk',
             authors: [
@@ -579,7 +579,7 @@ export const mockPluginHiWalk = () => {
 }
 
 export const mockPostPluginRun = () => {
-    cy.intercept('POST', `${cypressEnvironment.apiBasePath}/plugin/hiwalk`, {
+    cy.intercept('POST', `${cypressEnvironment.apiBasePath}/plugin/hiwalk?lang=en`, {
         body: {
             correlation_uuid: '8d81bea0-7183-4083-aae0-b751f9813de5'
         },
@@ -727,7 +727,7 @@ export const mockPluginHiWalkComputation = () => {
 }
 
 export const mockPluginBlueprint404 = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint`, {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=en`, {
         statusCode: 404
     }).as('getPluginBlueprint404')
 }

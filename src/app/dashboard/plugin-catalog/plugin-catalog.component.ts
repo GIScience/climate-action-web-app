@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { NavigationEnd, Router } from '@angular/router'
-import { TranslocoModule } from '@jsverse/transloco'
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { Subscription, skip } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
@@ -17,12 +18,15 @@ import { PluginCard } from './plugin-catalog.interface'
     styleUrls: ['./plugin-catalog.component.scss'],
     imports: [CommonModule, MatIconModule, TippyDirective, NgScrollbarModule, TranslocoModule]
 })
-export class PluginCatalogComponent implements AfterViewInit, OnInit {
+export class PluginCatalogComponent implements AfterViewInit, OnInit, OnDestroy {
     private router = inject(Router)
     private pluginService = inject(PluginService)
+    private translocoService = inject(TranslocoService)
     private artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
+
+    private langChangeSubscription: Subscription | undefined
 
     @ViewChild('catalogToggle', { static: true }) catalogToggle!: ElementRef<HTMLInputElement>
 
@@ -35,6 +39,14 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit {
             this.pluginService.setCatalogToggleInput(this.catalogToggle.nativeElement)
             this.loadPlugins()
         }
+
+        this.langChangeSubscription = this.translocoService.langChanges$.pipe(skip(1)).subscribe(() => {
+            this.loadPlugins()
+        })
+    }
+
+    ngOnDestroy(): void {
+        this.langChangeSubscription?.unsubscribe()
     }
 
     ngOnInit(): void {
