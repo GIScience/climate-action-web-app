@@ -109,6 +109,8 @@ To update the maintenance announcements, simply append to the document at NPoint
 ## Tests
 
 Run `pnpm test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
+For the cypress tests to succeed you will need a running instance of your app (see 4. under [Installation](#Installation)).
+Additionally, for interactive cypress runs using `cy:open` you need to make sure your test-browser is set to English.
 
 ## References
 

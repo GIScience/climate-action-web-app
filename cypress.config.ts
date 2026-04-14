@@ -19,6 +19,7 @@ export default defineConfig({
             configureVisualRegression(on)
             on('before:browser:launch', (browser, launchOptions) => {
                 if (browser.name === 'chrome' || browser.name === 'chromium') {
+                    launchOptions.preferences['default'].intl = { accept_languages: 'en' }
                     launchOptions.args.push(
                         '--disable-dev-shm-usage',
                         '--disable-blink-features=AutomationControlled',
