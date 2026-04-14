@@ -8,7 +8,6 @@ variables:
 
 test_jest_and_lint:
     stage: test
-    tags: []
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
         - when: never
@@ -46,7 +45,6 @@ test_jest_and_lint:
 
 test_cypress:
     stage: test
-    tags: []
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
         - when: never
@@ -87,7 +85,7 @@ test_cypress:
             fi
     script:
         - pnpm start &
-        - until (echo >/dev/tcp/127.0.0.1/4200) 2>/dev/null; do sleep 1; done
+        - pnpm wait-on http://localhost:4200
         - pnpm cy:run
     artifacts:
         when: on_failure
@@ -99,7 +97,6 @@ test_cypress:
 
 build_staging:
     stage: build
-    tags: []
     cache: []
     rules:
         - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
@@ -127,7 +124,6 @@ build_staging:
 
 build_release:
     stage: build
-    tags: []
     cache: []
     rules:
         - if: $CI_COMMIT_TAG

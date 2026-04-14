@@ -105,7 +105,8 @@
         "prettier-plugin-css-order": "^2.1.2",
         "sass": "^1.83.4",
         "tippy.js": "^6.3.7",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "wait-on": "^9.0.5"
     },
     "overrides": {
         "rollup": "npm:@rollup/wasm-node"
