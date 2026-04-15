@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Computations can now be requested in supported languages other than English
+- Allow the use of x-mark-important to force a parameter one level up
 
 ### Fixed
 

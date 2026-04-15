@@ -887,4 +887,113 @@ describe('PluginParameterComponent', () => {
             }
         ])
     })
+    it('should not put an important parameter into a dialogue', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                optional_one: {
+                    type: 'boolean',
+                    default: true,
+                    // @ts-ignore custom parameter that can be provided by the plugin devs but is not part of the official schema
+                    'x-mark-important': true
+                },
+                optional_two: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_three: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_four: {
+                    type: 'boolean',
+                    default: true
+                }
+            },
+            required: [],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'boolean',
+                        key: 'optional_one',
+                        props: {},
+                        templateOptions: {},
+                        validators: {
+                            type: {
+                                schemaType: ['boolean']
+                            }
+                        },
+                        defaultValue: true
+                    },
+                    {
+                        type: 'dialog',
+                        fieldGroup: [
+                            {
+                                props: {
+                                    label: 'pluginParameter.optionalAttributes',
+                                    description: 'pluginParameter.editAdditionalParameters'
+                                },
+                                fieldGroup: [
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_two',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    },
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_three',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    },
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_four',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
 })
