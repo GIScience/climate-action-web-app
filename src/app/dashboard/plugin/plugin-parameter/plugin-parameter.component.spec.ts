@@ -121,76 +121,6 @@ describe('PluginParameterComponent', () => {
         ])
     })
 
-    it('should correctly parse optional boolean field', () => {
-        const schema: JSONSchema7 = {
-            properties: {
-                bool_showcase: {
-                    default: true,
-                    description: 'A required boolean parameter.',
-                    examples: [true],
-                    title: 'Boolean Input',
-                    type: 'boolean'
-                }
-            },
-            title: 'ComputeInput',
-            type: 'object'
-        }
-
-        const parsed_fields = component.parseFieldsFromSchema(schema)
-        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
-        expect(testing_json).toEqual([
-            {
-                type: 'object',
-                props: {
-                    label: 'ComputeInput'
-                },
-                validators: {
-                    type: {
-                        schemaType: ['object']
-                    }
-                },
-                fieldGroup: [
-                    {
-                        type: 'dialog',
-                        fieldGroup: [
-                            {
-                                props: {
-                                    label: 'pluginParameter.optionalAttributes',
-                                    description: 'pluginParameter.editAdditionalParameters'
-                                },
-                                fieldGroup: [
-                                    {
-                                        type: 'boolean',
-                                        props: {
-                                            label: 'Boolean Input',
-                                            description: 'A required boolean parameter.',
-                                            placeholder: 'true'
-                                        },
-                                        key: 'bool_showcase',
-                                        validators: {
-                                            type: {
-                                                schemaType: ['boolean']
-                                            }
-                                        },
-                                        templateOptions: {
-                                            label: 'Boolean Input',
-                                            description: 'A required boolean parameter.',
-                                            placeholder: 'true'
-                                        },
-                                        defaultValue: true
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                templateOptions: {
-                    label: 'ComputeInput'
-                }
-            }
-        ])
-    })
-
     it('should correctly parse integer fields', () => {
         const schema: JSONSchema7 = {
             properties: {
@@ -692,71 +622,58 @@ describe('PluginParameterComponent', () => {
                                         expressions: {}
                                     },
                                     {
-                                        type: 'dialog',
-                                        fieldGroup: [
-                                            {
-                                                props: {
-                                                    label: 'pluginParameter.optionalAttributes',
-                                                    description: 'pluginParameter.editAdditionalParameters'
-                                                },
-                                                fieldGroup: [
-                                                    {
-                                                        type: 'number',
-                                                        props: {
-                                                            label: 'Mediocre Float',
-                                                            description: 'A mediocre float.',
-                                                            min: 0.5,
-                                                            max: 4.0,
-                                                            placeholder: '2.1'
-                                                        },
-                                                        key: 'mediocre',
-                                                        defaultValue: 2.1,
-                                                        validators: {
-                                                            type: {
-                                                                schemaType: ['number']
-                                                            }
-                                                        },
-                                                        templateOptions: {
-                                                            label: 'Mediocre Float',
-                                                            description: 'A mediocre float.',
-                                                            min: 0.5,
-                                                            max: 4.0,
-                                                            placeholder: '2.1'
-                                                        },
-                                                        parsers: [null]
-                                                    },
-                                                    {
-                                                        type: 'enum',
-                                                        props: {
-                                                            label: 'Bad Selection',
-                                                            description: 'A bad selection.',
-                                                            multiple: false,
-                                                            options: [
-                                                                { value: 'Option 1', label: 'Option 1' },
-                                                                { value: 'Option 2', label: 'Option 2' }
-                                                            ]
-                                                        },
-                                                        key: 'bad',
-                                                        defaultValue: 'Option 2',
-                                                        validators: {
-                                                            type: {
-                                                                schemaType: ['string']
-                                                            }
-                                                        },
-                                                        templateOptions: {
-                                                            label: 'Bad Selection',
-                                                            description: 'A bad selection.',
-                                                            multiple: false,
-                                                            options: [
-                                                                { value: 'Option 1', label: 'Option 1' },
-                                                                { value: 'Option 2', label: 'Option 2' }
-                                                            ]
-                                                        },
-                                                        parsers: [null]
-                                                    }
-                                                ]
+                                        type: 'number',
+                                        props: {
+                                            label: 'Mediocre Float',
+                                            description: 'A mediocre float.',
+                                            min: 0.5,
+                                            max: 4.0,
+                                            placeholder: '2.1'
+                                        },
+                                        key: 'mediocre',
+                                        defaultValue: 2.1,
+                                        validators: {
+                                            type: {
+                                                schemaType: ['number']
                                             }
-                                        ]
+                                        },
+                                        templateOptions: {
+                                            label: 'Mediocre Float',
+                                            description: 'A mediocre float.',
+                                            min: 0.5,
+                                            max: 4.0,
+                                            placeholder: '2.1'
+                                        },
+                                        parsers: [null]
+                                    },
+                                    {
+                                        type: 'enum',
+                                        props: {
+                                            label: 'Bad Selection',
+                                            description: 'A bad selection.',
+                                            multiple: false,
+                                            options: [
+                                                { value: 'Option 1', label: 'Option 1' },
+                                                { value: 'Option 2', label: 'Option 2' }
+                                            ]
+                                        },
+                                        key: 'bad',
+                                        defaultValue: 'Option 2',
+                                        validators: {
+                                            type: {
+                                                schemaType: ['string']
+                                            }
+                                        },
+                                        templateOptions: {
+                                            label: 'Bad Selection',
+                                            description: 'A bad selection.',
+                                            multiple: false,
+                                            options: [
+                                                { value: 'Option 1', label: 'Option 1' },
+                                                { value: 'Option 2', label: 'Option 2' }
+                                            ]
+                                        },
+                                        parsers: [null]
                                     }
                                 ]
                             }
@@ -777,6 +694,191 @@ describe('PluginParameterComponent', () => {
                             description: 'Test description.'
                         },
                         expressions: {}
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+    it('should not put less than 4 optional attributes in a dialogue', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                optional_one: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_two: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_three: {
+                    type: 'boolean',
+                    default: true
+                }
+            },
+            required: [],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'boolean',
+                        key: 'optional_one',
+                        props: {},
+                        templateOptions: {},
+                        validators: {
+                            type: {
+                                schemaType: ['boolean']
+                            }
+                        },
+                        defaultValue: true
+                    },
+                    {
+                        type: 'boolean',
+                        key: 'optional_two',
+                        props: {},
+                        templateOptions: {},
+                        validators: {
+                            type: {
+                                schemaType: ['boolean']
+                            }
+                        },
+                        defaultValue: true
+                    },
+                    {
+                        type: 'boolean',
+                        key: 'optional_three',
+                        props: {},
+                        templateOptions: {},
+                        validators: {
+                            type: {
+                                schemaType: ['boolean']
+                            }
+                        },
+                        defaultValue: true
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+    it('should put more than 3 optional attributes in a dialogue', () => {
+        const schema: JSONSchema7 = {
+            properties: {
+                optional_one: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_two: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_three: {
+                    type: 'boolean',
+                    default: true
+                },
+                optional_four: {
+                    type: 'boolean',
+                    default: true
+                }
+            },
+            required: [],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'dialog',
+                        fieldGroup: [
+                            {
+                                props: {
+                                    label: 'pluginParameter.optionalAttributes',
+                                    description: 'pluginParameter.editAdditionalParameters'
+                                },
+                                fieldGroup: [
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_one',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    },
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_two',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    },
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_three',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    },
+                                    {
+                                        type: 'boolean',
+                                        key: 'optional_four',
+                                        props: {},
+                                        templateOptions: {},
+                                        validators: {
+                                            type: {
+                                                schemaType: ['boolean']
+                                            }
+                                        },
+                                        defaultValue: true
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 templateOptions: {
