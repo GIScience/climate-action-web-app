@@ -34,7 +34,7 @@ import { withFormlyFieldDatepicker } from '@ngx-formly/material/datepicker'
 import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
 import type { Feature as GeoJSONFeature } from 'geojson'
-import { JSONSchema7 } from 'json-schema'
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import {
     CircleAlert,
     CircleDot,
@@ -233,7 +233,13 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             const optionalSubgroup: FormlyFieldConfig[] = []
 
             field.fieldGroup.forEach((parsedField: FormlyFieldConfig) => {
-                if (schema.required?.includes(String(parsedField.key))) {
+                let fieldSchema: JSONSchema7Definition = {}
+                if (schema.properties && typeof parsedField.key === 'string') {
+                    fieldSchema = schema.properties[parsedField.key]
+                }
+                // @ts-ignore custom parameter that can be provided by the plugin devs but is not part of the official schema
+                const forcePrimary: boolean = fieldSchema['x-mark-important']
+                if (schema.required?.includes(String(parsedField.key)) || forcePrimary) {
                     splittedFieldGroup.push(parsedField)
                 } else {
                     optionalSubgroup.push(parsedField)
