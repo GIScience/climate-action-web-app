@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, Input, NgZone, OnChanges, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core'
+import { Component, inject, Input, NgZone, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
 import { MAT_DATE_LOCALE } from '@angular/material/core'
@@ -53,6 +53,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Subscription } from 'rxjs'
 import { FormlyModel } from './plugin-parameter.interface'
+
 @Component({
     selector: 'app-plugin-parameter',
     templateUrl: './plugin-parameter.component.html',
@@ -223,7 +224,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private custom_field_transformer(field: FormlyFieldConfig, schema: JSONSchema7): FormlyFieldConfig {
         function separateOptionalParameters(field: FormlyFieldConfig, schema: JSONSchema7): FormlyFieldConfig {
-            if (!field.fieldGroup) return field
+            // Within object groups, keep required fields visible and move optional ones
+            // behind the "optional attributes" dialog subgroup when at least four exist
+            const max_optional_parameters = 3
+            if (!field.fieldGroup || field.fieldGroup.length <= max_optional_parameters) return field
 
             const splittedFieldGroup: FormlyFieldConfig[] = []
             const optionalSubgroup: FormlyFieldConfig[] = []
@@ -236,8 +240,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 }
             })
 
-            // Within object groups, keep required fields visible and move optional ones
-            // behind the "optional attributes" dialog when at least one exists
             if (optionalSubgroup.length > 0) {
                 splittedFieldGroup.push({
                     type: 'dialog',

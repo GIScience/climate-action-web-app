@@ -16,6 +16,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Legend category toggles still activate after returning from report instantiation
 - Plugin parameter groups (mapping input) appear in dedicated dialogs, with required and optional fields separated ([#458](https://gitlab.heigit.org/climate-action/web-app/-/issues/458))
 
+### Changed
+
+- Collapse-out optional plugin-parameters into a dialogue only if they exceed 3
+
 ## [3.2.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.2.1) - 2026-03-26
 
 ### Fixed
