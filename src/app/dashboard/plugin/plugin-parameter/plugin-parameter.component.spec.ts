@@ -519,6 +519,129 @@ describe('PluginParameterComponent', () => {
         ])
     })
 
+    it('should correctly parse (multi-)select fields with translations', () => {
+        const schema: JSONSchema7 = {
+            $defs: {
+                Option: {
+                    enum: ['Option 1', 'Option 2', 'NonTranslatedOption'],
+                    title: 'Option',
+                    type: 'string',
+                    // @ts-ignore Custom tag to enable translation of select fields
+                    'x-translation': { 'Option 1': 'Option Eins', 'Option 2': 'Option Zwei' }
+                }
+            },
+            properties: {
+                select: {
+                    $ref: '#/$defs/Option',
+                    description: 'Testbeschreibung.',
+                    examples: ['Option 2'],
+                    title: 'Testüberschrift'
+                },
+                multi_select: {
+                    description: 'Testbeschreibung.',
+                    examples: [['Option 2']],
+                    items: {
+                        $ref: '#/$defs/Option'
+                    },
+                    title: 'Testüberschrift',
+                    type: 'array',
+                    uniqueItems: true
+                }
+            },
+            required: ['select', 'multi_select'],
+            title: 'ComputeInput',
+            type: 'object'
+        }
+
+        const parsed_fields = component.parseFieldsFromSchema(schema)
+        const testing_json = JSON.parse(JSON.stringify(parsed_fields))
+        expect(testing_json).toEqual([
+            {
+                type: 'object',
+                props: {
+                    label: 'ComputeInput'
+                },
+                validators: {
+                    type: {
+                        schemaType: ['object']
+                    }
+                },
+                fieldGroup: [
+                    {
+                        type: 'enum',
+                        props: {
+                            label: 'Testüberschrift',
+                            description: 'Testbeschreibung.',
+                            multiple: false,
+                            options: [
+                                { value: 'Option 1', label: 'Option Eins' },
+                                { value: 'Option 2', label: 'Option Zwei' },
+                                { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
+                            ]
+                        },
+                        key: 'select',
+                        defaultValue: '',
+                        validators: {
+                            type: {
+                                schemaType: ['string']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Testüberschrift',
+                            description: 'Testbeschreibung.',
+                            multiple: false,
+                            options: [
+                                { value: 'Option 1', label: 'Option Eins' },
+                                { value: 'Option 2', label: 'Option Zwei' },
+                                { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
+                            ]
+                        },
+                        parsers: [null],
+                        expressions: {}
+                    },
+                    {
+                        type: 'enum',
+                        props: {
+                            label: 'Testüberschrift',
+                            description: 'Testbeschreibung.',
+                            multiple: true,
+                            uniqueItems: true,
+                            options: [
+                                { value: 'Option 1', label: 'Option Eins' },
+                                { value: 'Option 2', label: 'Option Zwei' },
+                                { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
+                            ],
+                            placeholder: 'Option 2'
+                        },
+                        key: 'multi_select',
+                        defaultValue: [],
+                        validators: {
+                            type: {
+                                schemaType: ['array']
+                            }
+                        },
+                        templateOptions: {
+                            label: 'Testüberschrift',
+                            description: 'Testbeschreibung.',
+                            multiple: true,
+                            options: [
+                                { value: 'Option 1', label: 'Option Eins' },
+                                { value: 'Option 2', label: 'Option Zwei' },
+                                { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
+                            ],
+                            placeholder: 'Option 2',
+                            uniqueItems: true
+                        },
+                        expressions: {}
+                    }
+                ],
+                templateOptions: {
+                    label: 'ComputeInput'
+                }
+            }
+        ])
+    })
+
     it('should correctly parse mapping fields', () => {
         const schema: JSONSchema7 = {
             $defs: {
