@@ -52,7 +52,7 @@ import {
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Subscription } from 'rxjs'
-import { FormlyModel } from './plugin-parameter.interface'
+import { EnumOption, FormlyModel } from './plugin-parameter.interface'
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -291,6 +291,23 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             field.type = 'datepicker'
             field.parsers = [v => (v instanceof Date ? format(v, 'yyyy-MM-dd') : v)]
             field.validators = { date: (control: AbstractControl) => isValid(new Date(control.value)) }
+        }
+
+        if (field.type == 'enum') {
+            let translations: { [key: string]: string } | undefined
+            if (schema.type == 'array') {
+                // @ts-ignore Custom tag to enable translation of select fields
+                translations = schema.items['x-translation']
+            } else {
+                // @ts-ignore Custom tag to enable translation of select fields
+                translations = schema['x-translation']
+            }
+            if (translations && field.props && field.props.options) {
+                field.props.options = (field.props.options as Array<EnumOption>).map((option: EnumOption) => {
+                    option.label = translations[option.label] || option.label
+                    return option
+                })
+            }
         }
 
         field = separateOptionalParameters(field, schema)
