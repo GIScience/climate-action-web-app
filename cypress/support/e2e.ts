@@ -1,3 +1,4 @@
+import 'cypress-fail-fast'
 import 'cypress-real-events'
 import { addCompareSnapshotCommand } from 'cypress-visual-regression/dist/command'
 import { cypressEnvironment } from './cypress-environment'
