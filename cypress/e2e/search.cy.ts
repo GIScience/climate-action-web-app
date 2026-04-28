@@ -67,28 +67,31 @@ describe('Search', () => {
         cy.wait('@openRouteServiceSearchRequest')
         cy.get('.location-suggestion__item').first().trigger('mouseover')
 
-        let focusedCoordinates = null
-        let clickedCoordinates = null
+        let focusedCoordinates: number[] | null = null
+        let clickedCoordinates: number[] | null = null
+
+        cy.window().should(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            expect(mapService.markerFeatures.length).to.be.greaterThan(0)
+        })
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            if (mapService.markerFeatures.length > 0) {
-                const feature = mapService.markerFeatures[0]
-                focusedCoordinates = feature.geometry.coordinates
-            }
+            const feature = mapService.markerFeatures[0]
+            focusedCoordinates = [...feature.geometry.coordinates]
         })
 
         cy.get('.location-suggestion__item').first().click()
 
-        cy.wait(500)
+        cy.window().should(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            expect(mapService.markerFeatures.length).to.be.greaterThan(0)
+        })
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            if (mapService.markerFeatures.length > 0) {
-                const feature = mapService.markerFeatures[0]
-                clickedCoordinates = feature.geometry.coordinates
-            }
-
+            const feature = mapService.markerFeatures[0]
+            clickedCoordinates = [...feature.geometry.coordinates]
             expect(focusedCoordinates).to.deep.equal(clickedCoordinates)
         })
     })
