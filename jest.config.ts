@@ -8,6 +8,7 @@ const config: Config = {
     coverageDirectory: 'coverage',
     cache: true,
     cacheDirectory: '<rootDir>/.jest-cache',
+    bail: true,
 
     moduleNameMapper: {
         '^@app/(.*)$': '<rootDir>/src/app/$1',

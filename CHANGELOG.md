@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.3.0...main)
 
+### Fixed
+
+- Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461)
+
 ## [3.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.3.0) - 2026-04-23
 
 ### Added

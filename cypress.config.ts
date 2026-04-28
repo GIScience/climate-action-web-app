@@ -1,4 +1,5 @@
 import { defineConfig } from 'cypress'
+import cypressFailFast from 'cypress-fail-fast/plugin'
 import { configureVisualRegression } from 'cypress-visual-regression'
 
 export default defineConfig({
@@ -41,6 +42,7 @@ export default defineConfig({
 
                 return launchOptions
             })
+            cypressFailFast(on, config)
             return config
         }
     }
