@@ -18,7 +18,6 @@ export class LegendComponent implements AfterViewInit {
     @Input() artifactId?: string
     @Input() onHiddenCategoriesChange?: (hiddenCategories: string[] | null) => void
     @ViewChild('ticksContainer') ticksContainer!: ElementRef
-    @ViewChild('legendWrapper') legendWrapper!: ElementRef
     @ViewChild('legendCanvas') legendCanvas!: ElementRef<HTMLCanvasElement>
 
     private readonly legendInstanceId = LegendComponent.nextLegendInstanceId++
@@ -27,27 +26,6 @@ export class LegendComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         if (this.legendData.legend_type === 'CONTINUOUS') {
             this.plotColormap(this.legendData.legend_data.cmap_name)
-            this.setWrapperWidth()
-        }
-    }
-
-    setWrapperWidth(): void {
-        if (!this.ticksContainer || !this.legendWrapper) {
-            return
-        }
-
-        const spans = this.ticksContainer.nativeElement.querySelectorAll('span')
-        let maxWidth = 0
-
-        spans.forEach((span: HTMLSpanElement) => {
-            const width = span.offsetWidth
-            if (width > maxWidth) {
-                maxWidth = width
-            }
-        })
-
-        if (this.legendWrapper) {
-            this.legendWrapper.nativeElement.style.width = `${maxWidth + 30}px`
         }
     }
 
