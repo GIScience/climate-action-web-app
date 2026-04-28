@@ -58,7 +58,7 @@ describe('LegendComponent', () => {
         expect(canvas).toBeTruthy()
 
         const ticksContainer = legendContainer.query(By.css('.ticks'))
-        const ticks = ticksContainer.queryAll(By.css('span'))
+        const ticks = ticksContainer.queryAll(By.css('div'))
         expect(ticks.length).toBe(3)
 
         const expectedTicks = [

@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461)
+- Labels for continuous legends can now wrap up to 2 lines ([#465](https://gitlab.heigit.org/climate-action/web-app/-/issues/465))
 
 ## [3.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.3.0) - 2026-04-23
 

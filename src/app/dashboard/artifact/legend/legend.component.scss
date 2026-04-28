@@ -101,14 +101,11 @@
     }
 
     .continuous-legend {
+        line-height: 0;
+        margin-bottom: 10px;
+        margin-top: 25px;
         position: relative;
-
-        .vertical-legend-wrapper {
-            line-height: 0;
-            margin-bottom: 10px;
-            margin-top: 15px;
-            position: relative;
-        }
+        width: 200px;
 
         .ticks {
             bottom: 0;
@@ -117,9 +114,12 @@
             position: absolute;
             top: 5px;
 
-            span {
+            div {
+                align-items: end;
+                column-gap: 5px;
+                display: grid;
+                grid-template-columns: 10px 1fr;
                 position: absolute;
-                white-space: nowrap;
 
                 &:before {
                     border-bottom: 10px solid #111111;
@@ -128,10 +128,19 @@
                     content: '';
                     display: inline-block;
                     height: 0;
-                    margin-right: 2px;
-                    margin-top: 5px;
                     transform: rotate(-90deg);
                     width: 0;
+                }
+
+                span {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    line-height: 16px;
+                    margin-bottom: -2px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    -webkit-box-orient: vertical;
+                    width: 135px;
                 }
             }
         }
