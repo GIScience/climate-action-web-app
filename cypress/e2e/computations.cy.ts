@@ -76,17 +76,18 @@ describe('computations', () => {
     it('should generate a share link', () => {
         setupTest()
 
+        cy.window().then(win => {
+            cy.stub(win.navigator.clipboard, 'writeText').as('writeText')
+        })
+
         cy.get('.parent-computation').eq(0).realHover()
         cy.get('.parent-computation .computation-actions').find('button').first().click()
+        cy.get('.actions-menu__item').contains('Share').click()
 
-        // check content in clipboard
-        cy.window().then(win => {
-            win.navigator.clipboard.readText().then(text => {
-                expect(text).to.eq(
-                    'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
-                )
-            })
-        })
+        cy.get('@writeText').should(
+            'have.been.calledOnceWith',
+            'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
+        )
     })
 
     it('should import a computation when visiting the share link', () => {
