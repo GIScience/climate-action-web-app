@@ -612,13 +612,13 @@ export class MapService {
     }
 
     highlightAoI(feature: GeoJSONFeature): Extent | null {
-        if (!feature?.geometry) return null
+        if (!feature?.geometry || !this.map) return null
 
         const extent = bbox(feature) as Extent
         if (!extent?.length) return null
 
-        this.fowManager.clearByType('focused')
-        this.fowManager.addGeometry('focused-computation', feature, 'focused')
+        this.fowManager.clearByType(this.map, 'focused')
+        this.fowManager.addGeometry(this.map, 'focused-computation', feature, 'focused')
 
         return extent
     }
@@ -950,18 +950,21 @@ export class MapService {
     }
 
     removeFocusedLayer(): void {
-        this.fowManager.clearByType('focused')
+        if (!this.map) return
+        this.fowManager.clearByType(this.map, 'focused')
     }
 
     updateFoWGeometries(geometries: GeoJSONFeature[], type: 'pinned'): void {
-        this.fowManager.clearByType(type)
+        if (!this.map) return
+        this.fowManager.clearByType(this.map, type)
         geometries.forEach((geom, index) => {
-            this.fowManager.addGeometry(`${type}-${index}`, geom, type)
+            this.fowManager.addGeometry(this.map!, `${type}-${index}`, geom, type)
         })
     }
 
     clearFoWByType(type: 'pinned'): void {
-        this.fowManager.clearByType(type)
+        if (!this.map) return
+        this.fowManager.clearByType(this.map, type)
     }
 
     enableComputeLayers() {
