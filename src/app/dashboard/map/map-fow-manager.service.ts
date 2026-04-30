@@ -23,59 +23,69 @@ export class MapFoWManagerService {
     private readonly OUTLINE_SOURCE_ID = 'fow-outline-source'
     private readonly OUTLINE_LAYER_ID = 'fow-outline-layer'
 
-    private geometries = new Map<string, FoWGeometry>()
-    private map?: MaplibreMap
+    private geometriesByMap = new WeakMap<MaplibreMap, Map<string, FoWGeometry>>()
     private primaryMap?: MaplibreMap
 
     setMap(map: MaplibreMap, isPrimary: boolean = false): void {
         if (isPrimary) {
             this.primaryMap = map
         }
-        this.map = map
-        this.map.on('style.load', () => this.updateMapLayers())
+        if (!this.geometriesByMap.has(map)) {
+            this.geometriesByMap.set(map, new Map())
+        }
+        map.on('style.load', () => this.updateMapLayers(map))
 
-        if (this.map.isStyleLoaded()) {
-            this.updateMapLayers()
+        if (map.isStyleLoaded()) {
+            this.updateMapLayers(map)
         }
     }
 
     restorePrimaryMap(): void {
-        if (this.primaryMap && this.primaryMap !== this.map) {
-            this.map = this.primaryMap
-            this.updateMapLayers()
+        if (this.primaryMap) {
+            this.updateMapLayers(this.primaryMap)
         }
     }
 
-    addGeometry(id: string, geometry: GeoJSONFeature, type: FoWGeometryType): void {
-        this.geometries.set(id, { geometry, type })
-        this.updateMapLayers()
+    addGeometry(map: MaplibreMap, id: string, geometry: GeoJSONFeature, type: FoWGeometryType): void {
+        this.getGeometries(map).set(id, { geometry, type })
+        this.updateMapLayers(map)
     }
 
-    clearByType(type: FoWGeometryType): void {
+    clearByType(map: MaplibreMap, type: FoWGeometryType): void {
+        const geometries = this.getGeometries(map)
         let changed = false
-        for (const [id, geom] of this.geometries) {
+        for (const [id, geom] of geometries) {
             if (geom.type === type) {
-                this.geometries.delete(id)
+                geometries.delete(id)
                 changed = true
             }
         }
-        if (changed) this.updateMapLayers()
+        if (changed) this.updateMapLayers(map)
     }
 
-    private updateMapLayers(): void {
-        if (!this.map) return
+    private getGeometries(map: MaplibreMap): Map<string, FoWGeometry> {
+        let geometries = this.geometriesByMap.get(map)
+        if (!geometries) {
+            geometries = new Map<string, FoWGeometry>()
+            this.geometriesByMap.set(map, geometries)
+        }
+        return geometries
+    }
 
-        if (this.geometries.size === 0) {
-            if (this.map.getLayer(this.LAYER_ID)) this.map.removeLayer(this.LAYER_ID)
-            if (this.map.getSource(this.SOURCE_ID)) this.map.removeSource(this.SOURCE_ID)
-            if (this.map.getLayer(this.OUTLINE_LAYER_ID)) this.map.removeLayer(this.OUTLINE_LAYER_ID)
-            if (this.map.getSource(this.OUTLINE_SOURCE_ID)) this.map.removeSource(this.OUTLINE_SOURCE_ID)
+    private updateMapLayers(map: MaplibreMap): void {
+        const geometries = this.getGeometries(map)
+
+        if (geometries.size === 0) {
+            if (map.getLayer(this.LAYER_ID)) map.removeLayer(this.LAYER_ID)
+            if (map.getSource(this.SOURCE_ID)) map.removeSource(this.SOURCE_ID)
+            if (map.getLayer(this.OUTLINE_LAYER_ID)) map.removeLayer(this.OUTLINE_LAYER_ID)
+            if (map.getSource(this.OUTLINE_SOURCE_ID)) map.removeSource(this.OUTLINE_SOURCE_ID)
             return
         }
 
         const polygons: GeoJSONFeature<Polygon | MultiPolygon>[] = []
 
-        for (const { geometry: feat } of this.geometries.values()) {
+        for (const { geometry: feat } of geometries.values()) {
             if (feat?.geometry?.type === 'Polygon' || feat?.geometry?.type === 'MultiPolygon') {
                 polygons.push(feat as GeoJSONFeature<Polygon | MultiPolygon>)
             }
@@ -133,15 +143,15 @@ export class MapFoWManagerService {
             }
         }
 
-        const source = this.map.getSource(this.SOURCE_ID) as GeoJSONSource | undefined
+        const source = map.getSource(this.SOURCE_ID) as GeoJSONSource | undefined
         if (source) {
             source.setData(fowFeature)
         } else {
-            this.map.addSource(this.SOURCE_ID, { type: 'geojson', data: fowFeature })
+            map.addSource(this.SOURCE_ID, { type: 'geojson', data: fowFeature })
         }
 
-        if (!this.map.getLayer(this.LAYER_ID)) {
-            this.map.addLayer({
+        if (!map.getLayer(this.LAYER_ID)) {
+            map.addLayer({
                 id: this.LAYER_ID,
                 type: 'fill',
                 source: this.SOURCE_ID,
@@ -163,15 +173,15 @@ export class MapFoWManagerService {
             properties: {}
         }
 
-        const outlineSource = this.map.getSource(this.OUTLINE_SOURCE_ID) as GeoJSONSource | undefined
+        const outlineSource = map.getSource(this.OUTLINE_SOURCE_ID) as GeoJSONSource | undefined
         if (outlineSource) {
             outlineSource.setData(outlineData)
         } else {
-            this.map.addSource(this.OUTLINE_SOURCE_ID, { type: 'geojson', data: outlineData })
+            map.addSource(this.OUTLINE_SOURCE_ID, { type: 'geojson', data: outlineData })
         }
 
-        if (!this.map.getLayer(this.OUTLINE_LAYER_ID)) {
-            this.map.addLayer({
+        if (!map.getLayer(this.OUTLINE_LAYER_ID)) {
+            map.addLayer({
                 id: this.OUTLINE_LAYER_ID,
                 type: 'line',
                 source: this.OUTLINE_SOURCE_ID,
@@ -184,7 +194,7 @@ export class MapFoWManagerService {
             })
         }
 
-        this.map.moveLayer(this.LAYER_ID)
-        this.map.moveLayer(this.OUTLINE_LAYER_ID)
+        map.moveLayer(this.LAYER_ID)
+        map.moveLayer(this.OUTLINE_LAYER_ID)
     }
 }

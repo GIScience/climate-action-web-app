@@ -1,20 +1,25 @@
 import { TestBed } from '@angular/core/testing'
 import type { Feature as GeoJSONFeature } from 'geojson'
+import type { GeoJSONSource, Map as MaplibreMap, Source } from 'maplibre-gl'
 import { MapFoWManagerService } from './map-fow-manager.service'
 
 describe('MapFoWManagerService', () => {
+    type MockMap = Pick<
+        MaplibreMap,
+        | 'on'
+        | 'isStyleLoaded'
+        | 'getSource'
+        | 'addSource'
+        | 'getLayer'
+        | 'addLayer'
+        | 'removeLayer'
+        | 'removeSource'
+        | 'moveLayer'
+    >
+    type MapLayer = NonNullable<ReturnType<MaplibreMap['getLayer']>>
+
     let service: MapFoWManagerService
-    let mockMap: {
-        on: jest.Mock
-        isStyleLoaded: jest.Mock
-        getSource: jest.Mock
-        addSource: jest.Mock
-        getLayer: jest.Mock
-        addLayer: jest.Mock
-        removeLayer: jest.Mock
-        removeSource: jest.Mock
-        moveLayer: jest.Mock
-    }
+    let mockMap: jest.Mocked<MockMap>
 
     const createMockFeature = (coordinates: number[][][]): GeoJSONFeature => ({
         type: 'Feature',
@@ -42,18 +47,24 @@ describe('MapFoWManagerService', () => {
         ]
     ]
 
+    const createMockMap = (): jest.Mocked<MockMap> => ({
+        on: jest.fn(),
+        isStyleLoaded: jest.fn().mockReturnValue(true),
+        getSource: jest.fn().mockReturnValue(undefined),
+        addSource: jest.fn(),
+        getLayer: jest.fn().mockReturnValue(undefined),
+        addLayer: jest.fn(),
+        removeLayer: jest.fn(),
+        removeSource: jest.fn(),
+        moveLayer: jest.fn()
+    })
+
+    const asMap = (map: jest.Mocked<MockMap>): MaplibreMap => map as unknown as MaplibreMap
+    const createMockLayer = (): MapLayer => ({ id: 'mock-layer' }) as unknown as MapLayer
+    const createMockSource = (): Source => ({ type: 'geojson' }) as unknown as Source
+
     beforeEach(() => {
-        mockMap = {
-            on: jest.fn(),
-            isStyleLoaded: jest.fn().mockReturnValue(true),
-            getSource: jest.fn().mockReturnValue(undefined),
-            addSource: jest.fn(),
-            getLayer: jest.fn().mockReturnValue(undefined),
-            addLayer: jest.fn(),
-            removeLayer: jest.fn(),
-            removeSource: jest.fn(),
-            moveLayer: jest.fn()
-        }
+        mockMap = createMockMap()
 
         TestBed.configureTestingModule({
             providers: [MapFoWManagerService]
@@ -64,7 +75,7 @@ describe('MapFoWManagerService', () => {
 
     describe('setMap', () => {
         it('should register style.load handler', () => {
-            service.setMap(mockMap as never)
+            service.setMap(asMap(mockMap))
 
             expect(mockMap.on).toHaveBeenCalledWith('style.load', expect.any(Function))
         })
@@ -72,13 +83,13 @@ describe('MapFoWManagerService', () => {
         it('should call updateMapLayers if style already loaded', () => {
             mockMap.isStyleLoaded.mockReturnValue(true)
 
-            service.setMap(mockMap as never)
+            service.setMap(asMap(mockMap))
 
             expect(mockMap.isStyleLoaded).toHaveBeenCalled()
         })
 
         it('should not add layers when no geometries exist', () => {
-            service.setMap(mockMap as never)
+            service.setMap(asMap(mockMap))
 
             expect(mockMap.addSource).not.toHaveBeenCalled()
             expect(mockMap.addLayer).not.toHaveBeenCalled()
@@ -87,14 +98,14 @@ describe('MapFoWManagerService', () => {
 
     describe('addGeometry', () => {
         beforeEach(() => {
-            service.setMap(mockMap as never)
+            service.setMap(asMap(mockMap))
             jest.clearAllMocks()
         })
 
         it('should add geometry and update map layers', () => {
             const feature = createMockFeature(simplePolygonCoords)
 
-            service.addGeometry('test-id', feature, 'focused')
+            service.addGeometry(asMap(mockMap), 'test-id', feature, 'focused')
 
             expect(mockMap.addSource).toHaveBeenCalledWith('fow-source', expect.any(Object))
             expect(mockMap.addLayer).toHaveBeenCalled()
@@ -105,13 +116,13 @@ describe('MapFoWManagerService', () => {
             const feature1 = createMockFeature(simplePolygonCoords)
             const feature2 = createMockFeature(anotherPolygonCoords)
 
-            service.addGeometry('id-1', feature1, 'focused')
+            service.addGeometry(asMap(mockMap), 'id-1', feature1, 'focused')
 
             const mockSource = { setData: jest.fn() }
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
-            service.addGeometry('id-2', feature2, 'pinned')
+            service.addGeometry(asMap(mockMap), 'id-2', feature2, 'pinned')
 
             expect(mockSource.setData).toHaveBeenCalled()
         })
@@ -120,14 +131,14 @@ describe('MapFoWManagerService', () => {
             const feature1 = createMockFeature(simplePolygonCoords)
             const feature2 = createMockFeature(anotherPolygonCoords)
 
-            service.addGeometry('focused-id', feature1, 'focused')
-            service.addGeometry('pinned-id', feature2, 'pinned')
+            service.addGeometry(asMap(mockMap), 'focused-id', feature1, 'focused')
+            service.addGeometry(asMap(mockMap), 'pinned-id', feature2, 'pinned')
 
-            service.clearByType('focused')
+            service.clearByType(asMap(mockMap), 'focused')
 
             const mockSource = { setData: jest.fn() }
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
             expect(mockMap.removeLayer).not.toHaveBeenCalled()
         })
@@ -135,7 +146,7 @@ describe('MapFoWManagerService', () => {
 
     describe('clearByType', () => {
         beforeEach(() => {
-            service.setMap(mockMap as never)
+            service.setMap(asMap(mockMap))
             jest.clearAllMocks()
         })
 
@@ -143,19 +154,19 @@ describe('MapFoWManagerService', () => {
             const focusedFeature = createMockFeature(simplePolygonCoords)
             const pinnedFeature = createMockFeature(anotherPolygonCoords)
 
-            service.addGeometry('focused-id', focusedFeature, 'focused')
+            service.addGeometry(asMap(mockMap), 'focused-id', focusedFeature, 'focused')
 
             const mockSource = { setData: jest.fn() }
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
-            service.addGeometry('pinned-id', pinnedFeature, 'pinned')
+            service.addGeometry(asMap(mockMap), 'pinned-id', pinnedFeature, 'pinned')
 
             jest.clearAllMocks()
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
-            service.clearByType('focused')
+            service.clearByType(asMap(mockMap), 'focused')
 
             expect(mockSource.setData).toHaveBeenCalled()
             expect(mockMap.removeLayer).not.toHaveBeenCalled()
@@ -164,12 +175,12 @@ describe('MapFoWManagerService', () => {
         it('should remove map layers when all geometries cleared', () => {
             const feature = createMockFeature(simplePolygonCoords)
 
-            service.addGeometry('test-id', feature, 'focused')
+            service.addGeometry(asMap(mockMap), 'test-id', feature, 'focused')
 
-            mockMap.getLayer.mockReturnValue({})
-            mockMap.getSource.mockReturnValue({})
+            mockMap.getLayer.mockReturnValue(createMockLayer())
+            mockMap.getSource.mockReturnValue(createMockSource())
 
-            service.clearByType('focused')
+            service.clearByType(asMap(mockMap), 'focused')
 
             expect(mockMap.removeLayer).toHaveBeenCalledWith('fow-layer')
             expect(mockMap.removeSource).toHaveBeenCalledWith('fow-source')
@@ -178,10 +189,10 @@ describe('MapFoWManagerService', () => {
         it('should not update map if no geometries of that type exist', () => {
             const feature = createMockFeature(simplePolygonCoords)
 
-            service.addGeometry('pinned-id', feature, 'pinned')
+            service.addGeometry(asMap(mockMap), 'pinned-id', feature, 'pinned')
             jest.clearAllMocks()
 
-            service.clearByType('focused')
+            service.clearByType(asMap(mockMap), 'focused')
 
             expect(mockMap.addSource).not.toHaveBeenCalled()
             expect(mockMap.removeLayer).not.toHaveBeenCalled()
@@ -191,22 +202,54 @@ describe('MapFoWManagerService', () => {
             const focusedFeature = createMockFeature(simplePolygonCoords)
             const pinnedFeature = createMockFeature(anotherPolygonCoords)
 
-            service.addGeometry('focused-id', focusedFeature, 'focused')
+            service.addGeometry(asMap(mockMap), 'focused-id', focusedFeature, 'focused')
 
             const mockSource = { setData: jest.fn() }
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
-            service.addGeometry('pinned-id', pinnedFeature, 'pinned')
+            service.addGeometry(asMap(mockMap), 'pinned-id', pinnedFeature, 'pinned')
             jest.clearAllMocks()
 
-            mockMap.getSource.mockReturnValue(mockSource)
-            mockMap.getLayer.mockReturnValue({})
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
 
-            service.clearByType('focused')
+            service.clearByType(asMap(mockMap), 'focused')
 
             expect(mockSource.setData).toHaveBeenCalled()
             expect(mockMap.removeSource).not.toHaveBeenCalled()
+        })
+
+        it('should isolate geometries across different maps', () => {
+            const secondaryMockMap = createMockMap()
+            const primaryFeature = createMockFeature(simplePolygonCoords)
+            const reportFeature = createMockFeature(anotherPolygonCoords)
+            const primarySource = { setData: jest.fn() }
+            const reportSource = { setData: jest.fn() }
+
+            service.setMap(asMap(secondaryMockMap))
+            mockMap.getSource.mockReturnValue(primarySource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
+            secondaryMockMap.getSource.mockReturnValue(reportSource as unknown as GeoJSONSource)
+            secondaryMockMap.getLayer.mockReturnValue(createMockLayer())
+
+            service.addGeometry(asMap(mockMap), 'primary-focused', primaryFeature, 'focused')
+            service.addGeometry(asMap(secondaryMockMap), 'report-focused', reportFeature, 'focused')
+
+            jest.clearAllMocks()
+            mockMap.getSource.mockReturnValue(primarySource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
+            secondaryMockMap.getSource.mockReturnValue(reportSource as unknown as GeoJSONSource)
+            secondaryMockMap.getLayer.mockReturnValue(createMockLayer())
+
+            service.clearByType(asMap(mockMap), 'focused')
+
+            expect(primarySource.setData).not.toHaveBeenCalled()
+            expect(mockMap.removeLayer).toHaveBeenCalledWith('fow-layer')
+            expect(mockMap.removeSource).toHaveBeenCalledWith('fow-source')
+            expect(reportSource.setData).not.toHaveBeenCalled()
+            expect(secondaryMockMap.removeLayer).not.toHaveBeenCalled()
+            expect(secondaryMockMap.removeSource).not.toHaveBeenCalled()
         })
     })
 })
