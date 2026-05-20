@@ -2,7 +2,7 @@ FROM node:22-slim AS build
 
 WORKDIR /ca-web-app
 
-COPY package*.json pnpm-lock.yaml ./
+COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile
 
