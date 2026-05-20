@@ -194,10 +194,6 @@ export class MapStyleSwitcherControl implements IControl {
 
                 return {
                     ...nextStyle,
-                    // Preserve projection — setProjection(undefined) crashes MapLibre's
-                    // diff when globe is active, forcing a full style rebuild.
-                    // TODO: Remove once https://github.com/maplibre/maplibre-gl-js/issues/7314 is fixed
-                    projection: previousStyle.projection,
                     sources,
                     layers
                 }
