@@ -12,6 +12,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461)
 - Labels for continuous legends can now wrap up to 2 lines ([#465](https://gitlab.heigit.org/climate-action/web-app/-/issues/465))
 - Scope FoW to individual map instances to prevent hijacking between report items
+- Use a UUID based identifier for artifacts in the report, to prevent incorrect collision checks
 
 ## [3.3.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.3.0) - 2026-04-23
 

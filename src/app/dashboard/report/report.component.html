@@ -48,7 +48,10 @@
             <ng-scrollbar>
                 <div class="report-contents">
                     @for (artifact of artifacts; track artifact) {
-                        <div class="report-item" #artifactContainer [attr.data-artifact-id]="artifact.filename">
+                        <div
+                            class="report-item"
+                            #artifactContainer
+                            [attr.data-artifact-id]="reportService.getArtifactKey(artifact)">
                             <div class="report-item-header">
                                 <div class="report-item-info">
                                     <h3>{{ artifact.name }}</h3>
@@ -67,9 +70,15 @@
                             </div>
                             @if (reportService.isMapArtifact(artifact.modality)) {
                                 <div class="report-map-container">
-                                    <div [id]="'report-map-' + artifact.filename" class="report-map"></div>
-                                    <div #legendContainer [id]="'report-map-legend-' + artifact.filename"></div>
-                                    <div class="map-zoom-note" [id]="'map-zoom-note-' + artifact.filename">
+                                    <div
+                                        [id]="'report-map-' + reportService.getArtifactKey(artifact)"
+                                        class="report-map"></div>
+                                    <div
+                                        #legendContainer
+                                        [id]="'report-map-legend-' + reportService.getArtifactKey(artifact)"></div>
+                                    <div
+                                        class="map-zoom-note"
+                                        [id]="'map-zoom-note-' + reportService.getArtifactKey(artifact)">
                                         {{ 'report.mapZoomNote' | transloco }}
                                     </div>
                                 </div>

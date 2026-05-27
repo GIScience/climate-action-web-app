@@ -47,9 +47,14 @@ export class ReportService {
     readonly MAX_ARTIFACTS = 4
     private readonly LOADING_TIMEOUT_MS = 10_000
 
+    getArtifactKey(artifact: Pick<ArtifactEntity, 'correlation_uuid' | 'filename'>): string {
+        return `${artifact.correlation_uuid}__${artifact.filename}`
+    }
+
     addArtifact(artifact: ArtifactEntity, computationBasicInfo: ComputationBasicInfo) {
         const artifactInstance = JSON.parse(JSON.stringify(artifact))
-        const existingIndex = this.artifacts.findIndex(a => a.artifact.filename === artifact.filename)
+        const artifactKey = this.getArtifactKey(artifactInstance)
+        const existingIndex = this.artifacts.findIndex(a => this.getArtifactKey(a.artifact) === artifactKey)
 
         if (existingIndex >= 0) {
             this.toastr.warning(this.translocoService.translate('report.artifactAlreadyInReport'), '', {
@@ -75,10 +80,10 @@ export class ReportService {
         this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
 
         if (this.isMapArtifact(artifactInstance.modality)) {
-            this.markArtifactLoading(artifactInstance.filename)
+            this.markArtifactLoading(artifactKey)
 
             setTimeout(() => {
-                const mapId = `report-map-${artifactInstance.filename}`
+                const mapId = `report-map-${artifactKey}`
 
                 const mapService = runInInjectionContext(this.injector, () => new MapService())
                 const mapElement = document.getElementById(mapId)
@@ -86,15 +91,15 @@ export class ReportService {
                     mapService.initMap(mapId, true)
 
                     // @ts-ignore: Store map instance globally for PDF export
-                    window[`maplibre_map_${artifactInstance.filename}`] = mapService.map
+                    window[`maplibre_map_${artifactKey}`] = mapService.map
 
                     const markReady = () => {
                         if (mapService.map) {
                             mapService.map.once('idle', () => {
-                                this.markArtifactReady(artifactInstance.filename)
+                                this.markArtifactReady(artifactKey)
                             })
                         } else {
-                            this.markArtifactReady(artifactInstance.filename)
+                            this.markArtifactReady(artifactKey)
                         }
                     }
 
@@ -152,20 +157,23 @@ export class ReportService {
     }
 
     removeArtifact(artifact: ArtifactEntity) {
-        const index = this.artifacts.findIndex(a => a.artifact.filename === artifact.filename)
+        const artifactKey = this.getArtifactKey(artifact)
+        const index = this.artifacts.findIndex(a => this.getArtifactKey(a.artifact) === artifactKey)
         if (index > -1) {
             this.artifacts.splice(index, 1)
             this.artifactsSubject.next(this.artifacts.map(a => a.artifact))
-            this.markArtifactReady(artifact.filename)
+            this.markArtifactReady(artifactKey)
         }
     }
 
     getServiceForArtifact(artifact: ArtifactEntity): ArtifactService | undefined {
-        return this.artifacts.find(a => a.artifact.filename === artifact.filename)?.service
+        const artifactKey = this.getArtifactKey(artifact)
+        return this.artifacts.find(a => this.getArtifactKey(a.artifact) === artifactKey)?.service
     }
 
     getComputationInfoForArtifact(artifact: ArtifactEntity): ComputationBasicInfo | undefined {
-        return this.artifacts.find(a => a.artifact.filename === artifact.filename)?.computationInfo
+        const artifactKey = this.getArtifactKey(artifact)
+        return this.artifacts.find(a => this.getArtifactKey(a.artifact) === artifactKey)?.computationInfo
     }
 
     openReport() {
@@ -192,29 +200,29 @@ export class ReportService {
         return modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'
     }
 
-    private markArtifactLoading(filename: string) {
+    private markArtifactLoading(artifactKey: string) {
         const current = this.loadingArtifactsSubject.value
         const next = new Set(current)
-        next.add(filename)
+        next.add(artifactKey)
         this.loadingArtifactsSubject.next(next)
 
         const timeout = setTimeout(() => {
-            this.markArtifactReady(filename)
+            this.markArtifactReady(artifactKey)
         }, this.LOADING_TIMEOUT_MS)
-        this.loadingTimeouts.set(filename, timeout)
+        this.loadingTimeouts.set(artifactKey, timeout)
     }
 
-    private markArtifactReady(filename: string) {
-        const timeout = this.loadingTimeouts.get(filename)
+    private markArtifactReady(artifactKey: string) {
+        const timeout = this.loadingTimeouts.get(artifactKey)
         if (timeout) {
             clearTimeout(timeout)
-            this.loadingTimeouts.delete(filename)
+            this.loadingTimeouts.delete(artifactKey)
         }
 
         const current = this.loadingArtifactsSubject.value
-        if (current.has(filename)) {
+        if (current.has(artifactKey)) {
             const next = new Set(current)
-            next.delete(filename)
+            next.delete(artifactKey)
             this.loadingArtifactsSubject.next(next)
         }
     }
