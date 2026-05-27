@@ -203,15 +203,16 @@ export class ExportPDFService {
         const mapCapturePromises = mapArtifacts.map(artifact => this.captureMapFromDOM(artifact, imageCache))
 
         const imagePromises = imageArtifacts.map(async artifact => {
+            const artifactKey = this.reportService.getArtifactKey(artifact)
             const artifactElement = artifactContainers?.find(
-                container => container.nativeElement.getAttribute('data-artifact-id') === artifact.filename
+                container => container.nativeElement.getAttribute('data-artifact-id') === artifactKey
             )
 
             if (artifactElement) {
                 const img = artifactElement.nativeElement.querySelector('app-artifact img') as HTMLImageElement
                 if (img && img.src) {
                     try {
-                        imageCache[artifact.filename] = await this.convertImageToBase64(img.src)
+                        imageCache[artifactKey] = await this.convertImageToBase64(img.src)
                     } catch (error) {
                         console.warn(`Failed to convert image for ${artifact.name}:`, error)
                     }
@@ -223,8 +224,9 @@ export class ExportPDFService {
     }
 
     private async captureMapFromDOM(artifact: ArtifactEntity, mapImageCache: Record<string, string>): Promise<void> {
+        const artifactKey = this.reportService.getArtifactKey(artifact)
         // @ts-ignore: Access global map instance for PDF export
-        const mapInstance = window[`maplibre_map_${artifact.filename}`]
+        const mapInstance = window[`maplibre_map_${artifactKey}`]
         if (!mapInstance) return
 
         try {
@@ -238,7 +240,7 @@ export class ExportPDFService {
                 setTimeout(() => resolve(''), 3000)
             })
 
-            if (screenshot?.length > 5000) mapImageCache[artifact.filename] = screenshot
+            if (screenshot?.length > 5000) mapImageCache[artifactKey] = screenshot
         } catch (error) {
             console.warn(`Failed to capture map for ${artifact.name}:`, error)
         }
@@ -283,15 +285,16 @@ export class ExportPDFService {
     ) {
         const isMap = this.reportService.isMapArtifact(artifact.modality)
         const isImage = artifact.modality === 'IMAGE'
+        const artifactKey = this.reportService.getArtifactKey(artifact)
 
         if (isMap || isImage) {
-            if (imageCache[artifact.filename]) {
-                const legendImg = legendImageCache[artifact.filename]
-                    ? `<img class="pdf-legend-img" src="${legendImageCache[artifact.filename]}" alt="Legend" style="position:absolute;top:5px;right:5px;width:150px;height:auto;" />`
+            if (imageCache[artifactKey]) {
+                const legendImg = legendImageCache[artifactKey]
+                    ? `<img class="pdf-legend-img" src="${legendImageCache[artifactKey]}" alt="Legend" style="position:absolute;top:5px;right:5px;width:150px;height:auto;" />`
                     : ''
                 return `
                     <div class="map-image-container">
-                        <img src="${imageCache[artifact.filename]}" alt="${artifact.name}" />
+                        <img src="${imageCache[artifactKey]}" alt="${artifact.name}" />
                         ${legendImg}
                     </div>
                 `
@@ -300,7 +303,7 @@ export class ExportPDFService {
         }
 
         const artifactComponent = artifactContainers
-            ?.find(container => container.nativeElement.getAttribute('data-artifact-id') === artifact.filename)
+            ?.find(container => container.nativeElement.getAttribute('data-artifact-id') === artifactKey)
             ?.nativeElement.querySelector('app-artifact')
 
         if (artifactComponent) {
@@ -320,7 +323,8 @@ export class ExportPDFService {
         const mapArtifacts = artifacts.filter(a => this.reportService.isMapArtifact(a.modality))
 
         for (const artifact of mapArtifacts) {
-            const container = document.getElementById(`report-map-legend-${artifact.filename}`)
+            const artifactKey = this.reportService.getArtifactKey(artifact)
+            const container = document.getElementById(`report-map-legend-${artifactKey}`)
             if (!container) continue
 
             // ViewContainerRef.createComponent() inserts as a sibling
@@ -334,7 +338,7 @@ export class ExportPDFService {
                     logging: false,
                     backgroundColor: '#ffffff'
                 })
-                legendImageCache[artifact.filename] = canvas.toDataURL('image/png')
+                legendImageCache[artifactKey] = canvas.toDataURL('image/png')
             } catch (error) {
                 console.warn(`Failed to capture legend for ${artifact.name}:`, error)
             }

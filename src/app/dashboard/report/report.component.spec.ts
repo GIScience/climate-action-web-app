@@ -23,6 +23,7 @@ interface MockReportService {
     isExportReady$: Observable<boolean>
     MAX_ARTIFACTS: 10
     isMapArtifact: jest.MockedFunction<(modality: ArtifactEntity['modality']) => boolean>
+    getArtifactKey: jest.MockedFunction<(artifact: Pick<ArtifactEntity, 'correlation_uuid' | 'filename'>) => string>
     getServiceForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ArtifactService | undefined>
     removeArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => void>
     closeReport: jest.MockedFunction<() => void>
@@ -136,6 +137,9 @@ describe('ReportComponent', () => {
             isMapArtifact: jest
                 .fn()
                 .mockImplementation(modality => modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'),
+            getArtifactKey: jest
+                .fn()
+                .mockImplementation(artifact => `${artifact.correlation_uuid}__${artifact.filename}`),
             getServiceForArtifact: jest.fn(),
             removeArtifact: jest.fn(),
             closeReport: jest.fn(),
@@ -249,6 +253,23 @@ describe('ReportComponent', () => {
             expect(reportService.getServiceForArtifact).toHaveBeenCalledWith(mockMapArtifact)
             expect(mockArtifactService.clearLegend).toHaveBeenCalled()
             expect(mockArtifactService.getLegend).toHaveBeenCalledWith(mockMapArtifact)
+        })
+
+        it('should create distinct map services for artifacts sharing a filename but differing in correlation_uuid', () => {
+            const artifactA: ArtifactEntity = {
+                ...mockMapArtifact,
+                correlation_uuid: 'aaaaaaaa-0000-0000-0000-000000000000'
+            }
+            const artifactB: ArtifactEntity = {
+                ...mockMapArtifact,
+                correlation_uuid: 'bbbbbbbb-0000-0000-0000-000000000000'
+            }
+
+            reportService._artifactsSubject.next([artifactA, artifactB])
+            fixture.detectChanges()
+
+            const mapServices = (component as unknown as { mapServices: Map<string, unknown> }).mapServices
+            expect(mapServices.size).toBe(2)
         })
 
         it('should handle visibility changes', () => {
