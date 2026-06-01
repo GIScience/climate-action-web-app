@@ -24,12 +24,12 @@
                                     class="plugin-state-badge" />
                             </a>
                         }
-                        @if (plugin.status === 'unavailable') {
+                        @if (!plugin.online) {
                             <i-lucide
                                 [img]="CloudOff"
                                 size="25"
                                 color="#ff7800"
-                                tp="This plugin is currently offline. Previous computations are still available."
+                                [tp]="'plugin.offline' | transloco"
                                 tpPlacement="bottom"></i-lucide>
                         }
                     </div>
@@ -91,29 +91,31 @@
                     </div>
                 </div>
                 <div class="plugin-content-wrapper">
-                    @if (plugin.status === 'unavailable' || computeState === 'inactive') {
+                    @if (computeState === 'inactive') {
                         <div class="computations-list">
                             <div class="computations-list__header">
                                 <h2>{{ 'plugin.computations' | transloco }}</h2>
-                                @if (plugin.status !== 'unavailable') {
-                                    <div
-                                        class="new-compute__wrapper"
-                                        [tp]="'plugin.loginToCompute' | transloco"
-                                        [tpIsEnabled]="!user">
-                                        <button
-                                            class="new-compute btn-primary btn-small btn-withtext--after"
-                                            (click)="enterComputeState()"
-                                            [disabled]="!user">
-                                            <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
-                                            {{ 'plugin.newComputation' | transloco }}
-                                        </button>
-                                    </div>
-                                }
+                                <div
+                                    class="new-compute__wrapper"
+                                    [tp]="
+                                        plugin.online
+                                            ? ('plugin.loginToCompute' | transloco)
+                                            : ('plugin.offlineNewCompute' | transloco)
+                                    "
+                                    [tpIsEnabled]="!plugin.online || !user">
+                                    <button
+                                        class="new-compute btn-primary btn-small btn-withtext--after"
+                                        (click)="enterComputeState()"
+                                        [disabled]="!plugin.online || !user">
+                                        <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
+                                        {{ 'plugin.newComputation' | transloco }}
+                                    </button>
+                                </div>
                             </div>
-                            <app-computations-index></app-computations-index>
+                            <app-computations-index [plugin]="plugin"></app-computations-index>
                         </div>
                     }
-                    @if (plugin.status !== 'unavailable' && computeState === 'compute-ready') {
+                    @if (plugin.online && computeState === 'compute-ready') {
                         <div class="plugin-compute">
                             <div class="plugin-compute__header">
                                 <h2>{{ 'plugin.computePanel' | transloco }}</h2>

@@ -37,7 +37,8 @@ export const mockPluginsList = () => {
                     icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
                 },
                 id: 'plugin_blueprint',
-                library_version: '5.1.0'
+                library_version: '5.1.0',
+                online: true
             },
             {
                 name: 'hiWalk',
@@ -108,7 +109,8 @@ export const mockPluginsList = () => {
                     title: 'ComputeInputWalkability',
                     type: 'object'
                 },
-                library_version: '6.0.2'
+                library_version: '6.0.2',
+                online: true
             }
         ]
     }).as('getPlugins')
@@ -335,7 +337,8 @@ export const mockPluginsListWithoutBlueprint = () => {
                     title: 'ComputeInputWalkability',
                     type: 'object'
                 },
-                library_version: '6.0.2'
+                library_version: '6.0.2',
+                online: true
             }
         ]
     }).as('getPluginsWithoutBlueprint')
@@ -497,9 +500,66 @@ export const mockPluginBlueprint = () => {
                 title: 'ComputeInput',
                 type: 'object'
             },
-            library_version: '5.1.0'
+            library_version: '5.1.0',
+            online: true
         }
     }).as('getPluginBlueprint')
+}
+
+export const mockPluginBlueprintGerman = () => {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=de`, {
+        body: {
+            name: 'Plugin Blueprint',
+            authors: [
+                {
+                    name: 'Max Mustermann',
+                    affiliation: 'XYZ gGmbH',
+                    website: 'https://example.com/'
+                },
+                {
+                    name: 'Erika Mustermann',
+                    affiliation: 'Consultant at XYZ gGmbH',
+                    website: 'https://example.com/'
+                }
+            ],
+            version: '0.0.1',
+            concerns: [],
+            purpose: '',
+            methodology: '',
+            sources: [
+                {
+                    pages: '14-15',
+                    volume: '2',
+                    journal: 'J. Geophys. Res.',
+                    year: '1954',
+                    title: 'Nothing Particular',
+                    author: 'J. G. Smith and H. K. Weston',
+                    ENTRYTYPE: 'article',
+                    ID: 'smit54'
+                }
+            ],
+            assets: {
+                icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
+            },
+            id: 'plugin_blueprint',
+            operator_schema: {
+                $defs: {},
+                properties: {
+                    bool_showcase: {
+                        description: 'Ein erforderlicher boolescher Parameter.',
+                        examples: [true],
+                        title: 'Boolescher Input',
+                        type: 'boolean'
+                    }
+                },
+                required: ['bool_showcase'],
+                title: 'ComputeInput',
+                type: 'object'
+            },
+            library_version: '5.1.0',
+            online: true
+        }
+    }).as('getPluginBlueprintGerman')
 }
 
 export const mockPluginHiWalk = () => {
@@ -573,7 +633,8 @@ export const mockPluginHiWalk = () => {
                 title: 'ComputeInputWalkability',
                 type: 'object'
             },
-            library_version: '6.0.2'
+            library_version: '6.0.2',
+            online: true
         }
     }).as('getPluginHiWalk')
 }

@@ -31,6 +31,7 @@ export interface Plugin {
     library_version: string
     language?: SupportedLanguage
     status?: 'active' | 'unavailable' | 'releasing-soon'
+    online: boolean
 }
 
 export type PluginBaseInfo = Pick<Plugin, 'id' | 'version'>

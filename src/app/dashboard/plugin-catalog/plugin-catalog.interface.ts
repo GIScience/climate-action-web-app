@@ -1,6 +1,9 @@
 import { Plugin } from '../plugin/plugin.interface'
 
-export interface PluginCard extends Pick<Plugin, 'name' | 'version' | 'teaser' | 'id' | 'library_version' | 'status'> {
+export interface PluginCard extends Pick<
+    Plugin,
+    'name' | 'version' | 'teaser' | 'id' | 'library_version' | 'status' | 'online'
+> {
     icon: string // Keep as string to allow for relative paths for overriden icons
     icon_credit?: string
 }

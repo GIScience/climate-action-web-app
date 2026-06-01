@@ -1,4 +1,4 @@
-import { interceptSearchORS } from '../support/interceptors'
+import { interceptSearchORS, mockPluginBlueprint, mockPluginsList } from '../support/interceptors'
 
 describe('Search', () => {
     beforeEach(() => {
@@ -7,6 +7,9 @@ describe('Search', () => {
     })
 
     it('should list suggestions when given a location', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.get('.search-locations').type('Berlin')
         cy.wait('@openRouteServiceSearchRequest')
         cy.get('.location-suggestion__item')
@@ -19,6 +22,9 @@ describe('Search', () => {
     })
 
     it('should add a marker when hovering over a suggestion', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.get('.search-locations').type('Berlin')
         cy.wait('@openRouteServiceSearchRequest')
         cy.get('.location-suggestion__item').first().trigger('mouseover')
@@ -36,6 +42,9 @@ describe('Search', () => {
     })
 
     it('should add a marker when clicking on a suggestion and change the map center', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.get('.search-locations').type('Berlin')
         cy.wait('@openRouteServiceSearchRequest')
         let initialCenter
@@ -63,6 +72,9 @@ describe('Search', () => {
     })
 
     it('features of the focused suggestion and the clicked suggestion should be the same', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.get('.search-locations').type('Berlin')
         cy.wait('@openRouteServiceSearchRequest')
         cy.get('.location-suggestion__item').first().trigger('mouseover')

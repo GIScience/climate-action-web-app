@@ -37,13 +37,13 @@ import {
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, Subscription, take, timer } from 'rxjs'
+import { BehaviorSubject, Subscription, timer } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
-import { DemoConfig } from '../plugin/plugin.interface'
+import { DemoConfig, Plugin } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
@@ -179,6 +179,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     openMenuId: string | null = null
 
     @Input() pluginId: string = ''
+    @Input() plugin?: Plugin
     @Input() hasDemoConfig: boolean = true
     demoConfig: DemoConfig | null = null
     pluginLanguage: SupportedLanguage = SupportedLanguage.EN
@@ -214,14 +215,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
 
         this.pluginId = this.route.snapshot.params['name']
-        this.pluginService
-            .getPluginDetails(this.pluginId)
-            .pipe(take(1))
-            .subscribe(({ demo_config, language }) => {
-                this.hasDemoConfig = !!demo_config
-                this.demoConfig = demo_config
-                this.pluginLanguage = language ?? SupportedLanguage.EN
-            })
 
         if (this.pluginService.computeState$) {
             this.pluginService.computeState$.subscribe(value => {
@@ -255,6 +248,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.hasDemoConfig = !!this.plugin?.demo_config
+        this.demoConfig = this.plugin?.demo_config ?? null
+        this.pluginLanguage = this.plugin?.language ?? SupportedLanguage.EN
+
         this.loadInitialPluginRuns()
 
         this.shareService.onComputationToImport().subscribe(computationId => {

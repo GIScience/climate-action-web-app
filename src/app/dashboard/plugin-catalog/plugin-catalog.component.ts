@@ -64,9 +64,10 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit, OnDestroy 
     }
 
     sortCards() {
-        this.cards.sort((a, b) => {
-            return a.name.localeCompare(b.name)
-        })
+        // Put online plugins first (true > false), then alphabetical by name
+        this.cards.sort((a, b) =>
+            a.online === b.online ? a.name.localeCompare(b.name) : (b.online ? 1 : 0) - (a.online ? 1 : 0)
+        )
     }
 
     loadPlugins() {
@@ -81,7 +82,8 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit, OnDestroy 
                         library_version: plugin.library_version,
                         version: plugin.version,
                         teaser: plugin.teaser,
-                        status: plugin.status || 'active'
+                        status: plugin.status || 'active',
+                        online: plugin.online
                     } as PluginCard
 
                     const existingCard = this.cards.find(x => x.id === plugin.id)
@@ -91,26 +93,6 @@ export class PluginCatalogComponent implements AfterViewInit, OnInit, OnDestroy 
                         this.cards.push(pluginCard)
                     }
                 })
-
-                // TODO: Refactor once gateway is updated to report plugin status (https://gitlab.heigit.org/climate-action/api-gateway/-/issues/38)
-
-                // const storedRuns = this.storageService.getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
-                // storedRuns.forEach(run => {
-                //     const existingCard = this.cards.find(x => x.id === run.pluginId)
-                //     if (!existingCard) {
-                //         const offlineCard = {
-                //             id: run.pluginId,
-                //             name: derivePluginNameFromId(run.pluginId || ''),
-                //             icon: this.pluginService.getIconUrl(run.pluginId || ''),
-                //             library_version: 'N/A',
-                //             version: 'N/A',
-                //             teaser: 'This plugin is currently offline',
-                //             status: 'unavailable'
-                //         } as PluginCard
-
-                //         this.cards.push(offlineCard)
-                //     }
-                // })
 
                 this.sortCards()
                 this.syncActiveCardWithRoute()
