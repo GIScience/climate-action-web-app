@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { importProvidersFrom } from '@angular/core'
+import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy, Routes, provideRouter } from '@angular/router'
@@ -86,6 +86,7 @@ const routes: Routes = [
 
 bootstrapApplication(AppComponent, {
     providers: [
+        provideZoneChangeDetection(),
         provideRouter(routes),
         importProvidersFrom(BrowserModule, BrowserAnimationsModule, LucideAngularModule.pick({ CircleUserRound })),
         {

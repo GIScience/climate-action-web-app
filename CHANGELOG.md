@@ -7,13 +7,17 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.3.0...main)
 
+### Changed
+
+- Updated Angular (and associated libraries) to v21
+
 ### Added
 
 - Derive plugin online/offline status from the API, and indicate offline plugins in the plugin catalog ([#272](https://gitlab.heigit.org/climate-action/web-app/-/issues/272))
 
 ### Fixed
 
-- Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461)
+- Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461))
 - Labels for continuous legends can now wrap up to 2 lines ([#465](https://gitlab.heigit.org/climate-action/web-app/-/issues/465))
 - Scope FoW to individual map instances to prevent hijacking between report items
 - Use a UUID based identifier for artifacts in the report, to prevent incorrect collision checks
