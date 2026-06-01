@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatTabsModule } from '@angular/material/tabs'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -21,7 +21,7 @@ import {
 } from 'lucide-angular'
 import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { Observable, Subscription, catchError, combineLatest, map, of, switchMap, tap, throwError } from 'rxjs'
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { ReportService } from '../report/report.service'
@@ -71,6 +71,7 @@ import { PluginService } from './plugin.service'
 export class PluginComponent implements AfterViewInit, OnDestroy {
     private pluginService = inject(PluginService)
     private route = inject(ActivatedRoute)
+    private router = inject(Router)
     private cdr = inject(ChangeDetectorRef)
     private appwriteService = inject(AppwriteService)
     private dialog = inject(MatDialog)
@@ -145,29 +146,8 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                     catchError(error => {
                         this.loading = false
                         if (error.status === 404) {
-                            const displayName = this.pluginService.getPluginNameById(pluginId)
-
-                            const plugin: Plugin = {
-                                name: displayName,
-                                id: pluginId,
-                                repository: 'N/A',
-                                version: 'N/A',
-                                library_version: 'N/A',
-                                teaser: 'This plugin is currently offline. Previous computations are still available.',
-                                purpose: 'This plugin is currently offline. Previous computations are still available.',
-                                methodology: 'Plugin is offline',
-                                authors: [],
-                                concerns: [],
-                                demo_config: null,
-                                sources: null,
-                                assets: {
-                                    icon: this.pluginService.getIconUrl(pluginId || '')
-                                },
-                                operator_schema: {},
-                                status: 'unavailable'
-                            }
-                            this.shortPurpose = this.extractFirstSentence(plugin.purpose)
-                            return of(plugin)
+                            this.router.navigate(['/404'], { skipLocationChange: true })
+                            return EMPTY
                         }
                         return throwError(() => error)
                     })

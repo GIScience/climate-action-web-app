@@ -37,6 +37,8 @@
         "computations": "Ergebnisse",
         "newComputation": "Neue Berechnung",
         "loginToCompute": "Bitte melde dich an, um eine Berechnung zu starten.",
+        "offline": "Dieses Analysewerkzeug ist derzeit offline.",
+        "offlineNewCompute": "Dieses Analysewerkzeug ist derzeit offline. Bitte versuche es später erneut.",
         "computePanel": "Berechnung konfigurieren",
         "computeStart": "Berechnung starten",
         "cancel": "Abbrechen",

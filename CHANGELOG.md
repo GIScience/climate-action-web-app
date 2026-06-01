@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.3.0...main)
 
+### Added
+
+- Derive plugin online/offline status from the API, and indicate offline plugins in the plugin catalog ([#272](https://gitlab.heigit.org/climate-action/web-app/-/issues/272))
+
 ### Fixed
 
 - Pipeline now fails fast on test failures ([#461](https://gitlab.heigit.org/climate-action/web-app/-/issues/461)

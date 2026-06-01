@@ -37,6 +37,8 @@
         "computations": "Computations",
         "newComputation": "New computation",
         "loginToCompute": "Please login to request a computation.",
+        "offline": "This plugin is currently offline.",
+        "offlineNewCompute": "This plugin is currently offline. Please try again later.",
         "computePanel": "New Computation",
         "computeStart": "Compute",
         "cancel": "Cancel",

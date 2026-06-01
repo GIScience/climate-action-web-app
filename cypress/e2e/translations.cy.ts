@@ -1,9 +1,10 @@
-import { mockPluginBlueprint, mockPluginsList } from '../support/interceptors'
+import { mockPluginBlueprint, mockPluginBlueprintGerman, mockPluginsList } from '../support/interceptors'
 
 describe('translations', () => {
     beforeEach(() => {
         mockPluginsList()
         mockPluginBlueprint()
+        mockPluginBlueprintGerman()
     })
 
     it('load the correct translation based on the browser language', () => {
@@ -39,10 +40,14 @@ describe('translations', () => {
             }
         })
 
+        cy.wait('@getPlugins')
+
         cy.get('button.language-button').click()
         cy.get('button.language-menu__item').eq(1).should('contain.text', 'DE - Deutsch').click()
 
-        cy.get('.plugins-list .plugin-card').eq(0).click()
+        cy.get('.plugins-list .plugin-card').eq(1).click()
+
+        cy.wait('@getPluginBlueprintGerman')
 
         cy.get('.computations-list__header h2').should('have.text', 'Ergebnisse')
     })

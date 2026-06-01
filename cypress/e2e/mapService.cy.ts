@@ -35,6 +35,9 @@ describe('mapService', () => {
     })
 
     it('remembers the selected layer', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.get('.maplibregl-style-list button').eq(1).click()
@@ -118,6 +121,9 @@ describe('mapService', () => {
     })
 
     it('remembers the collapsed state', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.get('.maplibregl-style-switcher').click()

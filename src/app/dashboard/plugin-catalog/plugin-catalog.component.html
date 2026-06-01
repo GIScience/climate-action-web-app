@@ -33,7 +33,10 @@
                             class="plugin-card"
                             (click)="showPlugin(card)"
                             (keydown)="showPlugin(card)"
-                            [ngClass]="{ 'plugin-card-highlight': activeCard === card }"
+                            [ngClass]="{
+                                'plugin-card-highlight': activeCard === card,
+                                'plugin-card-offline': !card.online
+                            }"
                             tabindex="0"
                             [tp]="tpl"
                             tpPlacement="right">
