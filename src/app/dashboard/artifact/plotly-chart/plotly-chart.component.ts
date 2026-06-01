@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import type { Data, Layout, PlotlyInstance } from 'plotly.js-strict-dist'
@@ -11,7 +10,7 @@ type PlotlyModule = typeof import('plotly.js-strict-dist')
     selector: 'app-plotly-chart',
     templateUrl: './plotly-chart.component.html',
     styleUrls: ['./plotly-chart.component.scss'],
-    imports: [CommonModule, TranslocoModule]
+    imports: [TranslocoModule]
 })
 export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('plotlyChart') plotlyChart?: ElementRef<HTMLDivElement>

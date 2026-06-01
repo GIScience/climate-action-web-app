@@ -18,6 +18,8 @@ describe('walkthrough', () => {
 
         cy.visit('/')
 
+        cy.wait(1000)
+
         cy.wait('@getPlugins')
 
         cy.wait(1000)
