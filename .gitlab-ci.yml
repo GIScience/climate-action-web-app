@@ -20,7 +20,7 @@ test_jest_and_lint:
             - .jest-cache
         policy: pull-push
     image:
-        name: trion/ng-cli-karma:20.3.11
+        name: trion/ng-cli-karma:21.0.2
     variables:
         NODE_OPTIONS: '--no-warnings'
     before_script:
