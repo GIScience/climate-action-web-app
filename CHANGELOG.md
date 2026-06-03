@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Updated Angular (and associated libraries) to v21
+- Made Geocode & Maps URL an environment variable, and switched to new api.heigit.org service
 
 ### Added
 

@@ -47,7 +47,7 @@ This is the repository of the frontend website of HeiGIT's [Climate Action](http
     - Copy `src/assets/env.template.js` to `src/assets/env.js`
     - Edit `env.js` with your settings:
         - `ENVIRONMENT_TYPE`: Set to `'development'` for local development
-        - `ORS_API_KEY`: Get an API key from [OpenRouteService (ORS)](https://openrouteservice.org/) for the Search function
+        - `GEOCODE_API_KEY`: Get an API key from [HeiGIT](https://account.heigit.org/) for the Search function
         - `CLIMATE_ACTION_API_URL`: Set to `'api/v1/gateway'` for local development with the backend
         - Other values can typically use the defaults provided
 4. Run `pnpm dev` or `ng serve` to start the dev server
@@ -83,7 +83,7 @@ docker build . --tag repo.heigit.org/climate-action/web-app:{image_tag}
 docker run --publish 8080:80 \
   -e ENVIRONMENT_TYPE="development" \
   -e CLIMATE_ACTION_API_URL="http://localhost/api/v1/gateway" \
-  -e ORS_API_KEY="your-ors-api-key" \
+  -e GEOCODE_API_KEY="your-ors-api-key" \
   -e APPWRITE_PROJECT_ID="your-project-id" \
   -e APPWRITE_ENDPOINT="appwrite-api-endpoint" \
   -e APPWRITE_WEBSITE_URL="appwrite-frontend" \

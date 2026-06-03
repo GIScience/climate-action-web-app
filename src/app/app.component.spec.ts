@@ -17,7 +17,8 @@ jest.mock(
             production: false,
             environmentType: 'testing',
             climateActionApiUrl: 'http://mock-api-url',
-            orsAPIKey: 'mock-ors-api-key',
+            geocodeUrl: 'http://mock-geocode-url',
+            geocodeAPIKey: 'mock-ors-api-key',
             appwriteProjectId: 'mock-appwrite-project-id',
             appwriteEndpoint: 'mock-appwrite-endpoint',
             appwriteWebsiteUrl: 'mock-appwrite-website-url'
