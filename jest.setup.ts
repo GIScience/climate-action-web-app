@@ -63,7 +63,8 @@ setupZoneTestEnv()
 ;(window as any).env = {
     ENVIRONMENT_TYPE: 'testing',
     CLIMATE_ACTION_API_URL: 'http://localhost/api/v1/gateway',
-    ORS_API_KEY: 'test-ors-key',
+    GEOCODE_URL: 'http://test-geocode-url',
+    GEOCODE_API_KEY: 'test-ors-key',
     APPWRITE_PROJECT_ID: 'test-project-id',
     APPWRITE_ENDPOINT: 'http://test-endpoint',
     APPWRITE_WEBSITE_URL: 'http://test-website'

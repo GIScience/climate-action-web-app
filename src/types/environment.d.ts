@@ -1,7 +1,9 @@
 export interface Environment {
     environmentType: EnvironmentType
     climateActionApiUrl: string
-    orsAPIKey: string
+    geocodeUrl: string
+    geocodeAPIKey: string
+    heigitMapsUrl: string
     appwriteProjectId: string
     appwriteEndpoint: string
     appwriteWebsiteUrl: string
@@ -16,7 +18,9 @@ declare global {
         env?: {
             ENVIRONMENT_TYPE?: EnvironmentType
             CLIMATE_ACTION_API_URL?: string
-            ORS_API_KEY?: string
+            GEOCODE_URL?: string
+            GEOCODE_API_KEY?: string
+            HEIGIT_MAPS_URL?: string
             APPWRITE_PROJECT_ID?: string
             APPWRITE_ENDPOINT?: string
             APPWRITE_WEBSITE_URL?: string

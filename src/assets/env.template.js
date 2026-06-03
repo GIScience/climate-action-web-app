@@ -3,7 +3,9 @@
 
     window['env']['ENVIRONMENT_TYPE'] = '${ENVIRONMENT_TYPE}'
     window['env']['CLIMATE_ACTION_API_URL'] = '${CLIMATE_ACTION_API_URL}'
-    window['env']['ORS_API_KEY'] = '${ORS_API_KEY}'
+    window['env']['GEOCODE_URL'] = '${GEOCODE_URL}'
+    window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
+    window['env']['HEIGIT_MAPS_URL'] = '${HEIGIT_MAPS_URL}'
     window['env']['APPWRITE_PROJECT_ID'] = '${APPWRITE_PROJECT_ID}'
     window['env']['APPWRITE_ENDPOINT'] = '${APPWRITE_ENDPOINT}'
     window['env']['APPWRITE_WEBSITE_URL'] = '${APPWRITE_WEBSITE_URL}'

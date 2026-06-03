@@ -167,7 +167,7 @@ export class MapService {
     // Drawing & Measurement Tools
     terraDrawControl: MaplibreTerradrawControl | undefined
 
-    private readonly orsAPIKey = environment.orsAPIKey
+    private readonly geocodeAPIKey = environment.geocodeAPIKey
     static readonly sqmToSqkmFactor = 1 / 1000000
     private static readonly HEIDELBERG_COORDS: [number, number] = [8.6759928, 49.4187355]
 
@@ -475,7 +475,7 @@ export class MapService {
     }
 
     getAutoCompleteSuggestions(query: string): Observable<AutocompleteFeature[]> {
-        const orsUrl = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${this.orsAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
+        const orsUrl = `${environment.geocodeUrl}/autocomplete?api_key=${this.geocodeAPIKey}&text=${query}&layers=address,venue,neighbourhood,locality,borough,localadmin,county,macrocounty`
 
         return this.http.get<FeatureCollection>(orsUrl).pipe(
             map(collection => {
@@ -1002,7 +1002,7 @@ export class MapService {
             return
         }
 
-        const ogcApiUrl = `https://maps.heigit.org/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
+        const ogcApiUrl = `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
 
         this.http.get<GeoJSONFeature>(ogcApiUrl, { headers: { Accept: 'application/geo+json' } }).subscribe({
             next: async feature => {

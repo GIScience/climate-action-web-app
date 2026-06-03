@@ -1339,7 +1339,7 @@ export const mockSimpleGeoJson = () => {
 }
 
 export const interceptSearchORS = () => {
-    cy.intercept('https://api.openrouteservice.org/geocode/autocomplete?*', {
+    cy.intercept(`${cypressEnvironment.geocodeUrl}/autocomplete?*`, {
         body: {
             geocoding: {
                 version: '0.2',
@@ -1768,7 +1768,7 @@ export const interceptSearchORS = () => {
 }
 
 export const interceptWalkthroughORS = () => {
-    cy.intercept('https://api.openrouteservice.org/geocode/autocomplete?*', {
+    cy.intercept(`${cypressEnvironment.geocodeUrl}/autocomplete?*`, {
         body: {
             geocoding: {
                 version: '0.2',

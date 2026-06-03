@@ -3,7 +3,9 @@ import { Environment } from '../types/environment'
 export const environment: Environment = {
     environmentType: window.env?.ENVIRONMENT_TYPE || 'production',
     climateActionApiUrl: window.env?.CLIMATE_ACTION_API_URL || 'http://localhost/api/v1/gateway',
-    orsAPIKey: window.env?.ORS_API_KEY || '',
+    geocodeUrl: window.env?.GEOCODE_URL || 'https://api.heigit.org/pelias/v1',
+    geocodeAPIKey: window.env?.GEOCODE_API_KEY || '',
+    heigitMapsUrl: window.env?.HEIGIT_MAPS_URL || 'https://maps.heigit.org',
     appwriteProjectId: window.env?.APPWRITE_PROJECT_ID || '',
     appwriteEndpoint: window.env?.APPWRITE_ENDPOINT || 'https://staging.api.account.heigit.org',
     appwriteWebsiteUrl: window.env?.APPWRITE_WEBSITE_URL || 'https://staging.account.heigit.org',

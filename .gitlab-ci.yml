@@ -69,7 +69,7 @@ test_cypress:
             ;(function (window) {
                 window.env = window.env || {}
                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
-                window['env']['ORS_API_KEY'] = '${ORS_API_KEY}'
+                window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
             })(this)
             EOF
         - npm install -g pnpm
