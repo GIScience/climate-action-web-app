@@ -10,5 +10,7 @@
     window['env']['APPWRITE_ENDPOINT'] = '${APPWRITE_ENDPOINT}'
     window['env']['APPWRITE_WEBSITE_URL'] = '${APPWRITE_WEBSITE_URL}'
     window['env']['APPWRITE_RUNS_COLLECTION_ID'] = '${APPWRITE_RUNS_COLLECTION_ID}'
-    window['env']['NPOINT_DOC_ID'] = '${NPOINT_DOC_ID}'
+    window['env']['CACHET_URL'] = '${CACHET_URL}'
+    window['env']['CACHET_WATCHED_COMPONENTS'] = '${CACHET_WATCHED_COMPONENTS}'
+    window['env']['SCHEDULE_LOOKAHEAD_DAYS'] = '${SCHEDULE_LOOKAHEAD_DAYS}'
 })(this)

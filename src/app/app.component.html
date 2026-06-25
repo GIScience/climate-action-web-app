@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container" [class.page-container--with-notices]="notices().length">
     <header class="navbar">
         <div class="header-container">
             <div class="heigit-logo__wrapper">
@@ -25,6 +25,10 @@
             </div>
         </div>
     </header>
+
+    @if (notices().length) {
+        <app-status-notices></app-status-notices>
+    }
 
     <div class="app-container">
         <router-outlet></router-outlet>

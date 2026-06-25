@@ -100,11 +100,12 @@ docker image push repo.heigit.org/climate-action/web-app:{image_tag}
 
 **Note**: The same Docker image can be used for all environments (development, staging, production - if compatible) by simply changing the environment variables at runtime.
 
-## Maintenance Announcements
+## Incident & Maintenance Announcements
 
-Maintenance announcements are logged in a [NPoint](https://npoint.io/) JSON document. The document ID is stored in the `NPOINT_DOC_ID` environment variable.
-
-To update the maintenance announcements, simply append to the document at NPoint, and the changes will be reflected in the web app.
+Incident and maintenance announcements are fetched from [Cachet](https://cachethq.io/) and displayed in the web app.
+The Cachet URL is stored in the `CACHET_URL` environment variable.
+The watched components are stored in the `CACHET_WATCHED_COMPONENTS` environment variable. This is a comma-separated list of `Group: Component` pairs (e.g. `Climate Action: Climate Action Navigator, OpenRouteService: Directions API`); an announcement is surfaced only when it references a component whose name **and** parent group both match one of these pairs.
+The number of days to look ahead for maintenance announcements is stored in the `SCHEDULE_LOOKAHEAD_DAYS` environment variable.
 
 ## Tests
 

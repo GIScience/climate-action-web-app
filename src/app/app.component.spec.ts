@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
@@ -21,7 +21,10 @@ jest.mock(
             geocodeAPIKey: 'mock-ors-api-key',
             appwriteProjectId: 'mock-appwrite-project-id',
             appwriteEndpoint: 'mock-appwrite-endpoint',
-            appwriteWebsiteUrl: 'mock-appwrite-website-url'
+            appwriteWebsiteUrl: 'mock-appwrite-website-url',
+            cachetUrl: 'http://mock-cachet-url',
+            cachetWatchedComponents: 'Climate Action: Climate Action Navigator',
+            scheduleLookaheadDays: '7'
         }
     }),
     { virtual: true }
@@ -58,7 +61,7 @@ describe('AppComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [
-                HttpClientModule,
+                HttpClientTestingModule,
                 RouterTestingModule,
                 AppComponent,
                 TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })

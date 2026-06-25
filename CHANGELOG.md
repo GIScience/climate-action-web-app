@@ -7,6 +7,14 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.4.0...main)
 
+### Changed
+
+- Hook into Cachet to fetch upcoming maintenance schedules and display them as toasts ([#414](https://gitlab.heigit.org/climate-action/web-app/-/issues/414))
+
+### Added
+
+- Fetch active incidents from Cachet affecting upstream services and display them as toasts ([#421](https://gitlab.heigit.org/climate-action/web-app/-/issues/421))
+
 ## [3.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.4.0) - 2026-06-03
 
 ### Changed

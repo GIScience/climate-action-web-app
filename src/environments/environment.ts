@@ -10,5 +10,7 @@ export const environment: Environment = {
     appwriteEndpoint: window.env?.APPWRITE_ENDPOINT || 'https://staging.api.account.heigit.org',
     appwriteWebsiteUrl: window.env?.APPWRITE_WEBSITE_URL || 'https://staging.account.heigit.org',
     appwriteRunsCollectionId: window.env?.APPWRITE_RUNS_COLLECTION_ID || 'staging-dashboard_data',
-    npointDocId: window.env?.NPOINT_DOC_ID || ''
+    cachetUrl: window.env?.CACHET_URL || 'https://status.heigit.org',
+    cachetWatchedComponents: window.env?.CACHET_WATCHED_COMPONENTS || 'Climate Action: Climate Action Navigator',
+    scheduleLookaheadDays: window.env?.SCHEDULE_LOOKAHEAD_DAYS || '7'
 }

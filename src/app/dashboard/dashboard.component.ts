@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import {
     Component,
     ElementRef,
@@ -12,7 +11,6 @@ import {
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
-import { ToastrService } from 'ngx-toastr'
 import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
 import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
@@ -24,15 +22,6 @@ import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.componen
 import { ReportComponent } from './report/report.component'
 import { ReportService } from './report/report.service'
 import { SearchComponent } from './search/search.component'
-
-interface MaintenanceAnnouncement {
-    maintenanceType: string
-    servicesAffected: string
-    impact: string
-    level: 'info' | 'warning'
-    downtimeEnd: string
-    messageDisplayStart: string
-}
 
 @Component({
     selector: 'app-dashboard',
@@ -55,8 +44,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
     private elementRef = inject(ElementRef)
-    private toastr = inject(ToastrService)
-    private http = inject(HttpClient)
 
     @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
@@ -81,35 +68,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.reportService.isVisible$.subscribe(isVisible => {
             this.isReportVisible = isVisible
-        })
-
-        this.fetchMaintenanceAnn()
-    }
-
-    private fetchMaintenanceAnn(): void {
-        this.http.get<MaintenanceAnnouncement[]>(`https://api.npoint.io/${window.env?.NPOINT_DOC_ID || ''}`).subscribe({
-            next: (announcements: MaintenanceAnnouncement[]) => {
-                this.processMaintenanceAnn(announcements)
-            },
-            error: err => {
-                console.error('Failed to load maintenance announcements:', err)
-            }
-        })
-    }
-
-    private processMaintenanceAnn(announcements: MaintenanceAnnouncement[]): void {
-        const now = new Date()
-        announcements.forEach((ann: MaintenanceAnnouncement) => {
-            const messageDisplayStart = new Date(ann.messageDisplayStart)
-            const downtimeEnd = new Date(ann.downtimeEnd)
-            if (messageDisplayStart <= now && downtimeEnd > now) {
-                this.toastr[ann.level](ann.servicesAffected + ' ' + ann.impact, ann.maintenanceType || '', {
-                    toastClass: 'ngx-toastr ngx-toastr--inverted',
-                    positionClass: 'toast-top-center',
-                    disableTimeOut: true,
-                    closeButton: true
-                })
-            }
         })
     }
 

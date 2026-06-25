@@ -4,6 +4,10 @@
     grid-template-rows: 60px calc(100vh - 85px) 25px;
     height: 100vh;
     overflow-x: hidden;
+
+    &--with-notices {
+        grid-template-rows: 60px 45px calc(100vh - 130px) 25px;
+    }
 }
 
 .app-container {

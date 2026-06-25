@@ -1,0 +1,24 @@
+@if (current(); as notice) {
+    <div class="status-notice status-notice--{{ notice.level }}" aria-live="polite">
+        <span class="status-notice__title">{{ notice.title }}:</span>
+        <span class="status-notice__message">{{ notice.message }}</span>
+        @if (notice.link) {
+            <span class="status-notice__link"
+                ><a [href]="notice.link" target="_blank" rel="noopener"
+                    >See details<i-lucide [img]="ExternalLink" size="16"></i-lucide></a
+            ></span>
+        }
+    </div>
+
+    @if (notices().length > 1) {
+        <div class="status-notices__nav">
+            <button type="button" class="status-notices__btn" (click)="prev()" aria-label="Previous notice">
+                <lucide-icon [img]="ChevronLeft" size="18"></lucide-icon>
+            </button>
+            <span class="status-notices__counter">{{ index() + 1 }} / {{ notices().length }}</span>
+            <button type="button" class="status-notices__btn" (click)="next()" aria-label="Next notice">
+                <lucide-icon [img]="ChevronRight" size="18"></lucide-icon>
+            </button>
+        </div>
+    }
+}

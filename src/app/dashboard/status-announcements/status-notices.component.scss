@@ -1,0 +1,79 @@
+:host {
+    align-items: flex-start;
+    display: flex;
+    overflow: hidden;
+}
+
+.status-notice {
+    align-items: baseline;
+    display: flex;
+    flex: 1;
+    font-size: 14px;
+    justify-content: center;
+    padding: 5px 15px;
+
+    &__title {
+        font-weight: 600;
+    }
+
+    &__message {
+        margin-left: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__link {
+        margin-left: 5px;
+
+        a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: underline;
+
+            i-lucide {
+                margin-left: 2.5px;
+                text-decoration: none;
+                vertical-align: text-top;
+            }
+        }
+    }
+
+    &--info {
+        background-color: #4773a3;
+        color: #fff;
+    }
+
+    &--warning {
+        background-color: #92600a;
+        color: #fff4e0;
+    }
+
+    &--error {
+        background-color: #b71c1c;
+        color: #fdecea;
+    }
+}
+
+.status-notices__nav {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    padding: 3.5px 7.5px;
+    position: absolute;
+    right: 0.5vw;
+}
+
+.status-notices__btn {
+    align-items: center;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    padding: 3.5px 2.5px 0;
+}
+
+.status-notices__counter {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}

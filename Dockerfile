@@ -24,6 +24,9 @@ ENV HEIGIT_MAPS_URL=""
 ENV APPWRITE_PROJECT_ID=""
 ENV APPWRITE_ENDPOINT=""
 ENV APPWRITE_WEBSITE_URL=""
+ENV CACHET_URL=""
+ENV CACHET_WATCHED_COMPONENTS=""
+ENV SCHEDULE_LOOKAHEAD_DAYS=""
 
 EXPOSE 80
 CMD ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]
