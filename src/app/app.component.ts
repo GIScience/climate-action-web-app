@@ -16,6 +16,8 @@ import { LucideAngularModule } from 'lucide-angular'
 import { default as packageInfo } from '../../package.json'
 import { AccountComponent } from './account/account.component'
 import { DashboardService } from './dashboard/dashboard.service'
+import { StatusAnnouncementsService } from './dashboard/status-announcements/status-announcements.service'
+import { StatusNoticesComponent } from './dashboard/status-announcements/status-notices.component'
 import { TourEngine } from './dashboard/walkthrough/tour-engine.service'
 import { LanguageComponent } from './language/language.component'
 import { MigrationService } from './migration.service'
@@ -42,13 +44,17 @@ import { MobileWarningComponent } from './mobile-warning/mobile-warning.componen
         FormlyModule,
         FormlyMatDatepickerModule,
         LucideAngularModule,
-        TranslocoModule
+        TranslocoModule,
+        StatusNoticesComponent
     ]
 })
 export class AppComponent implements OnInit, AfterViewInit {
     private dashboardService = inject(DashboardService)
     private tourEngine = inject(TourEngine)
     private titleService = inject(Title)
+    private statusAnnouncements = inject(StatusAnnouncementsService)
+
+    readonly notices = this.statusAnnouncements.notices
 
     constructor() {
         void inject(MigrationService)
@@ -63,6 +69,8 @@ export class AppComponent implements OnInit, AfterViewInit {
             const prefix = environment.environmentType.toUpperCase()
             this.titleService.setTitle(`[${prefix}] ${this.title}`)
         }
+
+        this.statusAnnouncements.showActiveAnnouncements()
     }
 
     currentYear(): number {

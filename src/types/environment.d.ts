@@ -8,7 +8,9 @@ export interface Environment {
     appwriteEndpoint: string
     appwriteWebsiteUrl: string
     appwriteRunsCollectionId: string
-    npointDocId: string
+    cachetUrl: string
+    cachetWatchedComponents: string
+    scheduleLookaheadDays: string
 }
 
 export type EnvironmentType = 'testing' | 'development' | 'staging' | 'production'
@@ -25,7 +27,9 @@ declare global {
             APPWRITE_ENDPOINT?: string
             APPWRITE_WEBSITE_URL?: string
             APPWRITE_RUNS_COLLECTION_ID?: string
-            NPOINT_DOC_ID?: string
+            CACHET_URL?: string
+            CACHET_WATCHED_COMPONENTS?: string
+            SCHEDULE_LOOKAHEAD_DAYS?: string
         }
     }
 }
