@@ -46,7 +46,7 @@
         "@turf/mask": "^7.3.1",
         "@versatiles/style": "^5.9.4",
         "@watergis/maplibre-gl-terradraw": "^1.4.0",
-        "appwrite": "^25.0.0",
+        "appwrite": "^26.0.0",
         "chart.js": "4.5.0",
         "date-fns": "^4.1.0",
         "driver.js": "^1.3.5",
