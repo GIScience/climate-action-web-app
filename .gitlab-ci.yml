@@ -20,7 +20,7 @@ test_jest_and_lint:
             - .jest-cache
         policy: pull-push
     image:
-        name: trion/ng-cli-karma:21.0.2
+        name: trion/ng-cli-karma:21.2.14
     variables:
         NODE_OPTIONS: '--no-warnings'
     before_script:
@@ -100,9 +100,9 @@ build_staging:
     cache: []
     rules:
         - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
-    image: docker.io/docker:29.5.2-cli
+    image: docker.io/docker:29.6.1-cli
     services:
-        - name: docker:29.5.2-dind
+        - name: docker:29.6.1-dind
           alias: thedockerhost
     variables:
         DOCKER_HOST: tcp://thedockerhost:2375
@@ -127,9 +127,9 @@ build_release:
     cache: []
     rules:
         - if: $CI_COMMIT_TAG
-    image: docker.io/docker:29.5.2-cli
+    image: docker.io/docker:29.6.1-cli
     services:
-        - name: docker:29.5.2-dind
+        - name: docker:29.6.1-dind
           alias: thedockerhost
     variables:
         DOCKER_HOST: tcp://thedockerhost:2375
