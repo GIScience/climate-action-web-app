@@ -1,3 +1,4 @@
+import type { Feature, GeoJSON } from 'geojson'
 import { GeoJSONSource, Map as MaplibreMap, MapMouseEvent, PointLike, Popup, type MapGeoJSONFeature } from 'maplibre-gl'
 
 interface HoverContext {
@@ -208,5 +209,19 @@ export class MapGeoJsonUtils {
     private static removeLayers(map: MaplibreMap): void {
         LAYER_IDS.forEach(id => map.getLayer(id) && map.removeLayer(id))
         if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID)
+    }
+    static extractFeature(object: GeoJSON): Feature {
+        switch (object.type) {
+            case 'Feature':
+                return object
+            case 'FeatureCollection':
+                return object.features[0]
+            default:
+                return {
+                    type: 'Feature',
+                    geometry: object,
+                    properties: {}
+                }
+        }
     }
 }

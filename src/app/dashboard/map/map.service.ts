@@ -2,13 +2,21 @@ import { HttpClient } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { NavigationEnd, Router } from '@angular/router'
 import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
+import { DrawInput } from '@app/dashboard/plugin/plugin.interface'
 import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import bbox from '@turf/bbox'
 import { colorful, graybeard } from '@versatiles/style'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
-import type { BBox, FeatureCollection, Feature as GeoJSONFeature, Point as GeoJSONPoint } from 'geojson'
+import type {
+    BBox,
+    FeatureCollection,
+    Feature as GeoJSONFeature,
+    Point as GeoJSONPoint,
+    Geometry,
+    MultiPolygon
+} from 'geojson'
 import maplibregl, {
     GeoJSONSource,
     IControl,
@@ -483,20 +491,17 @@ export class MapService {
                     .filter(
                         (feature: GeoJSONFeature): feature is AutocompleteFeature => feature.geometry!.type === 'Point'
                     )
-                    .map(
-                        (feature: GeoJSONFeature): AutocompleteFeature => ({
-                            ...feature,
-                            geometry: feature.geometry as GeoJSONPoint,
-                            // Ensure required properties exist with fallbacks
-                            properties: {
-                                ...feature.properties,
-                                name: feature.properties?.['name'] || 'Unknown location',
-                                label:
-                                    feature.properties?.['label'] || feature.properties?.['name'] || 'Unknown location'
-                            },
-                            bbox: feature.bbox
-                        })
-                    )
+                    .map((feature: GeoJSONFeature): AutocompleteFeature => ({
+                        ...feature,
+                        geometry: feature.geometry as GeoJSONPoint,
+                        // Ensure required properties exist with fallbacks
+                        properties: {
+                            ...feature.properties,
+                            name: feature.properties?.['name'] || 'Unknown location',
+                            label: feature.properties?.['label'] || feature.properties?.['name'] || 'Unknown location'
+                        },
+                        bbox: feature.bbox
+                    }))
             })
         )
     }
@@ -985,6 +990,36 @@ export class MapService {
         }
     }
 
+    async renderFeature(feature: GeoJSONFeature, featureIdFallback: string) {
+        if (!feature?.geometry) return
+
+        const processedFeature: GeoJSONFeature = {
+            type: 'Feature',
+            geometry: feature.geometry,
+            properties: {
+                name: resolveLocalizedName(feature.properties, this.translocoService.getActiveLang()),
+                id: (feature.properties?.['id'] || feature.id || featureIdFallback).toString(),
+                area: 0
+            }
+        }
+
+        // Calculate area after feature is created
+        if (feature.geometry) {
+            const { default: area } = await import('@turf/area')
+            processedFeature.properties!['area'] = Number(
+                (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
+            )
+        }
+
+        this.selectedFeatures = [processedFeature]
+        this.selectedFeatures$.next(this.selectedFeatures)
+
+        if (this.selectedRegionLayer) {
+            const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
+            source?.setData({ type: 'FeatureCollection', features: [processedFeature] })
+        }
+    }
+
     selectRegions(pixel: [number, number]) {
         if (!this.regionLayer?.visible || !this.map) return
 
@@ -1005,43 +1040,32 @@ export class MapService {
         const ogcApiUrl = `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
 
         this.http.get<GeoJSONFeature>(ogcApiUrl, { headers: { Accept: 'application/geo+json' } }).subscribe({
-            next: async feature => {
-                if (!feature?.geometry) return
-
-                this.selectedFeatures = []
-
-                const processedFeature: GeoJSONFeature = {
-                    type: 'Feature',
-                    geometry: feature.geometry,
-                    properties: {
-                        name: resolveLocalizedName(feature.properties, this.translocoService.getActiveLang()),
-                        id: (feature.properties?.['id'] || featureId).toString(),
-                        area: 0
-                    }
-                }
-
-                // Calculate area after feature is created
-                if (feature.geometry) {
-                    const { default: area } = await import('@turf/area')
-                    processedFeature.properties!['area'] = Number(
-                        (area(processedFeature) * MapService.sqmToSqkmFactor).toFixed(2)
-                    )
-                }
-
-                this.selectedFeatures.push(processedFeature)
-                this.selectedFeatures$.next(this.selectedFeatures)
-
-                if (this.selectedRegionLayer) {
-                    const source = this.map?.getSource(this.selectedRegionLayer.sourceId) as GeoJSONSource
-                    source?.setData({ type: 'FeatureCollection', features: [processedFeature] })
-                }
-            },
+            next: async feature => this.renderFeature(feature, featureId),
             error: error => console.error('Error fetching feature from OGC API:', error)
         })
     }
+    sanitizeGeom(geom: Geometry): MultiPolygon {
+        switch (geom.type) {
+            case 'MultiPolygon':
+                return geom
+            case 'Polygon':
+                return { type: 'MultiPolygon', coordinates: [geom.coordinates] }
+            default:
+                throw new Error(`Expected polygonal geometry, got ${geom.type}`)
+        }
+    }
 
     getSelectedRegion(): GeoJSONFeature | null {
-        return this.selectedFeatures.length > 0 ? this.selectedFeatures[0] : null
+        if (this.selectedFeatures.length === 0) return null
+
+        const feature = this.selectedFeatures[0]
+        try {
+            feature.geometry = this.sanitizeGeom(feature.geometry)
+        } catch (error) {
+            console.error(error)
+            return null
+        }
+        return feature
     }
 
     removeSelectedRegion(feature: GeoJSONFeature): void {
@@ -1054,7 +1078,7 @@ export class MapService {
         }
     }
 
-    startDrawing(type: 'Polygon' | 'Circle' | 'Box'): void {
+    startDrawing(type: DrawInput): void {
         if (this.mapDrawingService?.startDrawing) {
             this.mapDrawingService.startDrawing(type, this.map)
         }

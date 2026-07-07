@@ -14,6 +14,11 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Fetch active incidents from Cachet affecting upstream services and display them as toasts ([#421](https://gitlab.heigit.org/climate-action/web-app/-/issues/421))
+- Allow users to upload GeoJSON, KML, and GPX files as AoI ([#376](https://gitlab.heigit.org/climate-action/web-app/-/issues/376))
+
+### Fixed
+
+- Make the custom AoI name field call out for attention when empty, to indicate it is required ([#478](https://gitlab.heigit.org/climate-action/web-app/-/issues/478))
 
 ## [3.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.4.0) - 2026-06-03
 
