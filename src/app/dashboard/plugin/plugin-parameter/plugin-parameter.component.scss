@@ -17,19 +17,31 @@
         }
 
         .area-selection-buttons {
-            display: flex;
+            display: grid;
+            gap: 7.5px;
+            grid-template-columns: repeat(6, 1fr);
             margin: 15px 0;
 
             .draw-button {
                 align-items: center;
                 border: 2px solid #008080;
+                border-radius: 15px;
                 color: #008080;
                 cursor: pointer;
                 display: flex;
                 font-variation-settings: 'wght' 500;
+                grid-column: span 2;
+                justify-content: center;
                 margin: 0;
                 padding: 5px 7.5px;
-                transition: all 0.2s ease;
+                transition:
+                    background-color 0.2s ease,
+                    color 0.2s ease;
+                white-space: nowrap;
+
+                &:nth-child(-n + 2) {
+                    grid-column: span 3;
+                }
 
                 &:hover {
                     background-color: #f0f8f8;
@@ -38,18 +50,6 @@
                 &.active {
                     background-color: #008080;
                     color: #ffffff;
-                }
-
-                &:not(:first-child) {
-                    border-left: none;
-                }
-
-                &:first-child {
-                    border-radius: 15px 0 0 15px;
-                }
-
-                &:last-child:not(.clear-button) {
-                    border-radius: 0 15px 15px 0;
                 }
 
                 i-lucide {
@@ -88,10 +88,37 @@
         }
     }
 
+    input[type='file'] {
+        &::file-selector-button {
+            background-color: #008080;
+            border: 2px solid #008080;
+            border-radius: 25px;
+            color: #fff;
+            cursor: pointer;
+            font-family: Manrope;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 5px 15px;
+            transition: background-color 0.15s ease-in-out;
+
+            &:hover {
+                background-color: rgb(0 128 128 / 75%);
+            }
+        }
+
+        & + .selected-regions {
+            margin-top: 15px;
+        }
+    }
+
     .selected-regions {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+
+        & + hr {
+            margin-top: 15px;
+        }
 
         .region-item {
             align-items: center;
@@ -103,6 +130,11 @@
             padding: 7.5px 12.5px;
             position: relative;
             transition: all 0.2s ease;
+
+            &.empty-name {
+                background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+                border-color: #dc2626;
+            }
 
             .region-name {
                 font-size: 13px;
@@ -116,11 +148,15 @@
                 font-size: 13px;
                 font-weight: 500;
                 padding: 4px 8px;
-                width: 140px;
+                width: 200px;
 
                 &:focus {
                     border-color: #008080;
                     outline: none;
+                }
+
+                &.ng-invalid {
+                    border-color: #999;
                 }
             }
 
@@ -157,6 +193,12 @@
                     color: #dc2626;
                 }
             }
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-weight: 600;
+            width: 100%;
         }
     }
 

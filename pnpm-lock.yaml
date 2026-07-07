@@ -62,11 +62,17 @@ importers:
       '@ngx-formly/material':
         specifier: ^7.0.0
         version: 7.1.0(@angular/material@21.2.13(43e6423eb9d255a637c08fd0c9ec3bba))(@ngx-formly/core@7.1.0(@angular/forms@21.2.15(@angular/common@21.2.15(@angular/core@21.2.15(@angular/compiler@21.2.15)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.15(@angular/compiler@21.2.15)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.15(@angular/animations@21.2.15(@angular/core@21.2.15(@angular/compiler@21.2.15)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.15(@angular/core@21.2.15(@angular/compiler@21.2.15)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.15(@angular/compiler@21.2.15)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2))
+      '@tmcw/togeojson':
+        specifier: ^7.1.2
+        version: 7.1.2
       '@turf/area':
         specifier: ^7.2.0
         version: 7.3.5
       '@turf/bbox':
         specifier: ^7.3.4
+        version: 7.3.5
+      '@turf/buffer':
+        specifier: ^7.3.5
         version: 7.3.5
       '@turf/distance':
         specifier: ^7.3.4
@@ -80,6 +86,9 @@ importers:
       '@watergis/maplibre-gl-terradraw':
         specifier: ^1.4.0
         version: 1.14.0(maplibre-gl@5.24.0)(terra-draw@1.11.0)
+      '@xmldom/xmldom':
+        specifier: ^0.9.10
+        version: 0.9.10
       appwrite:
         specifier: ^26.0.0
         version: 26.1.0
@@ -213,6 +222,9 @@ importers:
       cypress-fail-fast:
         specifier: ^8.1.0
         version: 8.1.0(cypress@15.18.0)
+      cypress-file-upload:
+        specifier: ^5.0.8
+        version: 5.0.8(cypress@15.18.0)
       cypress-real-events:
         specifier: ^1.14.0
         version: 1.15.0(cypress@15.18.0)
@@ -2291,6 +2303,9 @@ packages:
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
 
+  '@tmcw/togeojson@7.1.2':
+    resolution: {integrity: sha512-QKnFs9DAuqqBVj4d6c69tV1Dj2TspSBTqffivoN0YoBCVdP/JY1+WaYCJbzU49RkoU5NOSOJ3jtFHCdEUVh21A==}
+
   '@tsconfig/node10@1.0.12':
     resolution: {integrity: sha512-UCYBaeFvM11aU2y3YPZ//O5Rhj+xKyzy7mvcIoAjASbigy8mHMryP5cK7dgjlz2hWxh1g5pLw084E0a/wlUSFQ==}
 
@@ -2317,6 +2332,12 @@ packages:
   '@turf/bbox@7.3.5':
     resolution: {integrity: sha512-oG1ya/HtBjAIg4TimbWx+nOYPbY0bCvt82Bq8tm6sBw3qqtbOyRSfDz79Sq90TnH7DXJprJ1qnVGKNtZ6jemfw==}
 
+  '@turf/buffer@7.3.5':
+    resolution: {integrity: sha512-TGls3nYtWzviKHT00XVBfHKa7Z2oIZKqiHN7R0xErGwMSAR7YhxVROhxq/iyIsWZjl1SlPwweZZIxWILQuxpZA==}
+
+  '@turf/center@7.3.5':
+    resolution: {integrity: sha512-eub5/Kfdmn89ZqwCONHI7astmTDEtN5M6+JfOkgoSyhKKFhUJYNxUyH1F/vCtIP7j1K369Vs4L9TYiuGapvIKQ==}
+
   '@turf/clone@7.3.5':
     resolution: {integrity: sha512-qfIaHj3410QEcTpiCRnTzhq8YrUp2gWrUIPLBAEFykopNxJkq1du1VrRzvuAo36ap2UV7KppkS6wGNypbcxswQ==}
 
@@ -2329,11 +2350,17 @@ packages:
   '@turf/invariant@7.3.5':
     resolution: {integrity: sha512-ZVIvsBvjr8lO7WxC5zYNjRsjSDvyGvWkJMjuWaJjTU8x+1tmfNnw3gDX/TI2Sit83gcRYLYkNo23lB/udqx/Hg==}
 
+  '@turf/jsts@2.7.2':
+    resolution: {integrity: sha512-zAezGlwWHPyU0zxwcX2wQY3RkRpwuoBmhhNE9HY9kWhFDkCxZ3aWK5URKwa/SWKJbj9aztO+8vtdiBA28KVJFg==}
+
   '@turf/mask@7.3.5':
     resolution: {integrity: sha512-zs9bBtdANOsSkG7xiLFYforeI2nszXu0QwPv3vkaX747oEVdcyd0nSW81aQRmSWw/fvhXja++8duIVXOIYr4ng==}
 
   '@turf/meta@7.3.5':
     resolution: {integrity: sha512-r+ohqxoyqeigFB0oFrQx/YEHIkOKqcKpCjvZkvZs7Tkv+IFco5MezAd2zd4rzK+0DfFgDP3KpJc7HqrYjvEjhg==}
+
+  '@turf/projection@7.3.5':
+    resolution: {integrity: sha512-G4bejYKT0vCQZryMhEoS9aLmP7ThDg6nb3zi3wPzELiTrGNOd2YgkWVheQDGCk4hcqEIWZc9fI2alaRSSkkLVw==}
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
@@ -2754,6 +2781,10 @@ packages:
         optional: true
       terradraw:
         optional: true
+
+  '@xmldom/xmldom@0.9.10':
+    resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
+    engines: {node: '>=14.6'}
 
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
@@ -3282,6 +3313,12 @@ packages:
     peerDependencies:
       cypress: '>=15.10.0'
 
+  cypress-file-upload@5.0.8:
+    resolution: {integrity: sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==}
+    engines: {node: '>=8.2.1'}
+    peerDependencies:
+      cypress: '>3.0.0'
+
   cypress-real-events@1.15.0:
     resolution: {integrity: sha512-in98xxTnnM9Z7lZBvvVozm99PBT2eEOjXRG5LKWyYvQnj9mGWXMiPNpfw7e7WiraBFh7XlXIxnE9Cu5o+52kQQ==}
     peerDependencies:
@@ -3311,6 +3348,9 @@ packages:
   cytoscape@3.32.1:
     resolution: {integrity: sha512-dbeqFTLYEwlFg7UGtcZhCCG/2WayX72zK3Sq323CEX29CY81tYfVhw1MIdduCtpstB0cTOhJswWlM/OEB3Xp+Q==}
     engines: {node: '>=0.10'}
+
+  d3-array@1.2.4:
+    resolution: {integrity: sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==}
 
   d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
@@ -3371,6 +3411,9 @@ packages:
   d3-format@3.1.0:
     resolution: {integrity: sha512-YyUI6AEuY/Wpt8KWLgZHsIU86atmikuoOmCfommt0LYHiQSPjvX2AcFc38PX0CBpr2RCyZhjex+NS/LPOv6YqA==}
     engines: {node: '>=12'}
+
+  d3-geo@1.7.1:
+    resolution: {integrity: sha512-O4AempWAr+P5qbk2bC2FuN/sDW4z+dN2wDf9QV3bxQt4M5HfOEeXLgJ/UKQW0+o1Dj8BE+L5kiDbdWUMjsmQpw==}
 
   d3-geo@3.1.1:
     resolution: {integrity: sha512-637ln3gXKXOwhalDzinUgY83KzNWZRKbYubaG+fGVuc/dxO64RRljtCTnf5ecMyE1RIdtqpkVcq0IbtU2S8j2Q==}
@@ -4522,6 +4565,10 @@ packages:
   jsprim@2.0.2:
     resolution: {integrity: sha512-gqXddjPqQ6G40VdnI6T6yObEC+pDNvyP95wdQhkWkg7crHH3km5qP1FsOXEkzEQwnz6gz5qGTn1c2Y52wP3OyQ==}
     engines: {'0': node >=0.6.0}
+
+  jsts@2.7.1:
+    resolution: {integrity: sha512-x2wSZHEBK20CY+Wy+BPE7MrFQHW6sIsdaGUMEqmGAio+3gFzQaBYPwLRonUfQf9Ak8pBieqj9tUofX1+WtAEIg==}
+    engines: {node: '>= 12'}
 
   katex@0.16.22:
     resolution: {integrity: sha512-XCHRdUw4lf3SKBaJe4EvgqIuWwkPSo9XoeO8GjQW94Bp7TWv9hNhzZjZ+OH9yf1UmLygb7DIT5GSFQiyt16zYg==}
@@ -8146,6 +8193,8 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.4
 
+  '@tmcw/togeojson@7.1.2': {}
+
   '@tsconfig/node10@1.0.12': {}
 
   '@tsconfig/node12@1.0.11': {}
@@ -8175,6 +8224,24 @@ snapshots:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
+  '@turf/buffer@7.3.5':
+    dependencies:
+      '@turf/bbox': 7.3.5
+      '@turf/center': 7.3.5
+      '@turf/helpers': 7.3.5
+      '@turf/jsts': 2.7.2
+      '@turf/meta': 7.3.5
+      '@turf/projection': 7.3.5
+      '@types/geojson': 7946.0.16
+      d3-geo: 1.7.1
+
+  '@turf/center@7.3.5':
+    dependencies:
+      '@turf/bbox': 7.3.5
+      '@turf/helpers': 7.3.5
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
   '@turf/clone@7.3.5':
     dependencies:
       '@turf/helpers': 7.3.5
@@ -8199,6 +8266,10 @@ snapshots:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
+  '@turf/jsts@2.7.2':
+    dependencies:
+      jsts: 2.7.1
+
   '@turf/mask@7.3.5':
     dependencies:
       '@turf/clone': 7.3.5
@@ -8210,6 +8281,14 @@ snapshots:
   '@turf/meta@7.3.5':
     dependencies:
       '@turf/helpers': 7.3.5
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
+  '@turf/projection@7.3.5':
+    dependencies:
+      '@turf/clone': 7.3.5
+      '@turf/helpers': 7.3.5
+      '@turf/meta': 7.3.5
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
@@ -8679,6 +8758,8 @@ snapshots:
     dependencies:
       maplibre-gl: 5.24.0
       terra-draw: 1.11.0
+
+  '@xmldom/xmldom@0.9.10': {}
 
   '@yarnpkg/lockfile@1.1.0': {}
 
@@ -9249,6 +9330,10 @@ snapshots:
       chalk: 4.1.2
       cypress: 15.18.0
 
+  cypress-file-upload@5.0.8(cypress@15.18.0):
+    dependencies:
+      cypress: 15.18.0
+
   cypress-real-events@1.15.0(cypress@15.18.0):
     dependencies:
       cypress: 15.18.0
@@ -9317,6 +9402,8 @@ snapshots:
 
   cytoscape@3.32.1:
     optional: true
+
+  d3-array@1.2.4: {}
 
   d3-array@2.12.1:
     dependencies:
@@ -9388,6 +9475,10 @@ snapshots:
     optional: true
 
   d3-format@3.1.0: {}
+
+  d3-geo@1.7.1:
+    dependencies:
+      d3-array: 1.2.4
 
   d3-geo@3.1.1:
     dependencies:
@@ -10883,6 +10974,8 @@ snapshots:
       extsprintf: 1.3.0
       json-schema: 0.4.0
       verror: 1.10.0
+
+  jsts@2.7.1: {}
 
   katex@0.16.22:
     dependencies:

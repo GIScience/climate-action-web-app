@@ -7,8 +7,8 @@
             <button
                 type="button"
                 class="draw-button"
-                [class.active]="currentSelectionMode === 'Boundary'"
-                (click)="setSelectionMode('Boundary')"
+                [class.active]="currentSelectionMode === ExternalInput.Boundary"
+                (click)="setSelectionMode(ExternalInput.Boundary)"
                 [title]="'pluginParameter.selectFromBoundaries' | transloco">
                 <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
                 {{ 'pluginParameter.boundary' | transloco }}
@@ -16,8 +16,17 @@
             <button
                 type="button"
                 class="draw-button"
-                [class.active]="currentSelectionMode === 'Circle'"
-                (click)="setSelectionMode('Circle')"
+                [class.active]="currentSelectionMode === ExternalInput.File"
+                (click)="setSelectionMode(ExternalInput.File)"
+                [title]="'pluginParameter.selectFile' | transloco">
+                <i-lucide [img]="File" size="16"></i-lucide>
+                {{ 'pluginParameter.file' | transloco }}
+            </button>
+            <button
+                type="button"
+                class="draw-button"
+                [class.active]="currentSelectionMode === DrawInput.Circle"
+                (click)="setSelectionMode(DrawInput.Circle)"
                 [title]="'pluginParameter.drawCircle' | transloco">
                 <i-lucide [img]="CircleDot" size="16"></i-lucide>
                 {{ 'pluginParameter.circle' | transloco }}
@@ -25,8 +34,8 @@
             <button
                 type="button"
                 class="draw-button"
-                [class.active]="currentSelectionMode === 'Box'"
-                (click)="setSelectionMode('Box')"
+                [class.active]="currentSelectionMode === DrawInput.Box"
+                (click)="setSelectionMode(DrawInput.Box)"
                 [title]="'pluginParameter.drawRectangle' | transloco">
                 <i-lucide [img]="Square" size="16"></i-lucide>
                 {{ 'pluginParameter.rectangle' | transloco }}
@@ -34,8 +43,8 @@
             <button
                 type="button"
                 class="draw-button"
-                [class.active]="currentSelectionMode === 'Polygon'"
-                (click)="setSelectionMode('Polygon')"
+                [class.active]="currentSelectionMode === DrawInput.Polygon"
+                (click)="setSelectionMode(DrawInput.Polygon)"
                 [title]="'pluginParameter.drawPolygon' | transloco">
                 <i-lucide [img]="Pentagon" size="16"></i-lucide>
                 {{ 'pluginParameter.polygon' | transloco }}
@@ -61,23 +70,29 @@
                     "
                     size="20"></i-lucide>
                 <span>
-                    @if (!areaSelected && currentSelectionMode === 'Boundary') {
+                    @if (!areaSelected && currentSelectionMode === ExternalInput.Boundary) {
                         {{ 'pluginParameter.clickInsideBoundary' | transloco }}
                     }
-                    @if (!areaSelected && (currentSelectionMode === 'Circle' || currentSelectionMode === 'Box')) {
+                    @if (
+                        !areaSelected &&
+                        (currentSelectionMode === DrawInput.Circle || currentSelectionMode === DrawInput.Box)
+                    ) {
                         {{
                             'pluginParameter.clickAndMovePointer'
                                 | transloco
                                     : {
                                           shape:
-                                              (currentSelectionMode === 'Box'
+                                              (currentSelectionMode === DrawInput.Box
                                                   ? 'pluginParameter.rectangle'
                                                   : 'pluginParameter.circle'
                                               ) | transloco
                                       }
                         }}
                     }
-                    @if (!areaSelected && currentSelectionMode === 'Polygon') {
+                    @if (!areaSelected && currentSelectionMode === ExternalInput.File) {
+                        {{ 'pluginParameter.uploadFileInstruction' | transloco }}
+                    }
+                    @if (!areaSelected && currentSelectionMode === DrawInput.Polygon) {
                         {{ 'pluginParameter.clickMultiplePoints' | transloco }}
                     }
                     @if (areaSelected && this.mapService.selectedFeatures.length > 1) {
@@ -91,16 +106,28 @@
                 </span>
             </div>
         }
-
+        @if (currentSelectionMode === ExternalInput.File) {
+            <input
+                #aoiFile
+                type="file"
+                id="aoiFile"
+                accept=".geojson,.json,.gpx,.kml"
+                (change)="readFileData(aoiFile.files)" />
+        }
         @if (areaSelected) {
             <div class="selected-regions">
-                @for (region of this.mapService.selectedFeatures; track region) {
-                    <div class="region-item">
-                        @if (currentSelectionMode === 'Boundary') {
+                @for (region of this.mapService.selectedFeatures; track $index) {
+                    <div
+                        class="region-item"
+                        [ngClass]="{
+                            'empty-name': areaLabelControl.invalid && currentSelectionMode !== ExternalInput.Boundary
+                        }">
+                        @if (currentSelectionMode === ExternalInput.Boundary) {
                             <span class="region-name">{{ region.properties?.['name'] }}</span>
                         }
-                        @if (currentSelectionMode !== 'Boundary') {
+                        @if (currentSelectionMode !== ExternalInput.Boundary) {
                             <input
+                                #areaLabelInput
                                 type="text"
                                 id="custom-area-label"
                                 class="region-name"
@@ -112,12 +139,30 @@
                         <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
                     </div>
                 }
-                @if (areaLabelControl.invalid && currentSelectionMode !== 'Boundary') {
+                @if (areaLabelControl.invalid && currentSelectionMode !== ExternalInput.Boundary) {
                     <div class="error-message">
                         {{ 'pluginParameter.areaNameRequired' | transloco }}
                     </div>
                 }
             </div>
+            @if (requiresBuffer) {
+                <hr />
+                <p class="buffer-hint">
+                    {{ 'pluginParameter.bufferHint' | transloco: { geometryType: bufferSourceGeomType } }}
+                </p>
+                <mat-form-field class="buffer-field">
+                    <mat-label>{{ 'pluginParameter.bufferDistance' | transloco }}</mat-label>
+                    <input
+                        matInput
+                        #buffer
+                        type="number"
+                        id="buffer"
+                        min="0"
+                        [value]="defaultBufferRadius"
+                        (change)="bufferAoi(buffer.valueAsNumber)" />
+                    <span matTextSuffix>m</span>
+                </mat-form-field>
+            }
         }
     </div>
 

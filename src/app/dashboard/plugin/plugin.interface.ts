@@ -52,3 +52,14 @@ export interface DemoConfig {
 }
 
 export type ComputeState = 'inactive' | 'compute-ready'
+
+export enum ExternalInput {
+    Boundary = 'boundary',
+    File = 'file'
+}
+export enum DrawInput {
+    Circle = 'circle',
+    Box = 'rectangle',
+    Polygon = 'polygon'
+}
+export type GeometryInputMode = ExternalInput | DrawInput

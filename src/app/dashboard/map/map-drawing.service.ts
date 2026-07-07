@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core'
+import { DrawInput } from '@app/dashboard/plugin/plugin.interface'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import distance from '@turf/distance'
@@ -22,7 +23,6 @@ export class MapDrawingService {
     private readonly SQM_TO_SQKM_FACTOR = 1e-6
     private formatRadius = (radius: number) =>
         radius >= 1000 ? `${(radius / 1000).toFixed(2)} km` : `${radius.toFixed(0)} m`
-    private readonly DRAW_MODES = { Polygon: 'polygon', Circle: 'circle', Box: 'rectangle' } as const
     private readonly TYPE_MAP = { circle: 'Circle', rectangle: 'Box', polygon: 'Polygon' } as const
     private readonly TOOLTIP_OFFSET: [number, number] = [0, -15]
     private readonly TOOLTIP_STYLES =
@@ -118,7 +118,7 @@ export class MapDrawingService {
         this.isDrawingMode.next(false)
     }
 
-    startDrawing(type: 'Polygon' | 'Circle' | 'Box', map?: Map): void {
+    startDrawing(mode: DrawInput, map?: Map): void {
         if (map) this.map = map
         this.clearDrawnFeatures()
 
@@ -139,7 +139,6 @@ export class MapDrawingService {
                 return
             }
 
-            const mode = this.DRAW_MODES[type]
             terraDraw.setMode(mode)
             this.currentDrawMode.next(mode)
 

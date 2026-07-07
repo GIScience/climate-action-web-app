@@ -1,8 +1,21 @@
 import { CommonModule } from '@angular/common'
-import { Component, inject, Input, NgZone, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
+import {
+    Component,
+    ElementRef,
+    inject,
+    Input,
+    NgZone,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core'
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
 import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
 import {
     constValidationMessage,
     exclusiveMaximumValidationMessage,
@@ -19,8 +32,15 @@ import {
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { ComputationRunState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
-import { MapService } from '@app/dashboard/map/map.service'
-import { ComputeRequest, Plugin } from '@app/dashboard/plugin/plugin.interface'
+import { Extent, MapService } from '@app/dashboard/map/map.service'
+import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
+import {
+    ComputeRequest,
+    DrawInput,
+    ExternalInput,
+    GeometryInputMode,
+    Plugin
+} from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { ObjectTypeComponent } from '@app/types/object/object.type'
@@ -31,15 +51,18 @@ import { FormlyFieldConfig, FormlyForm, FormlyFormOptions, provideFormlyCore } f
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
 import { withFormlyMaterial } from '@ngx-formly/material'
 import { withFormlyFieldDatepicker } from '@ngx-formly/material/datepicker'
+import bbox from '@turf/bbox'
+import { buffer } from '@turf/buffer'
 import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
-import type { Feature as GeoJSONFeature } from 'geojson'
+import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes } from 'geojson'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 import {
     CircleAlert,
     CircleDot,
     CirclePlay,
     CircleX,
+    File,
     Info,
     LucideAngularModule,
     MapPinPlusInside,
@@ -66,7 +89,9 @@ import { EnumOption, FormlyModel } from './plugin-parameter.interface'
         CommonModule,
         NgScrollbarModule,
         TippyDirective,
-        TranslocoModule
+        TranslocoModule,
+        MatFormFieldModule,
+        MatInputModule
     ],
     providers: [
         provideFormlyCore([
@@ -130,6 +155,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
 
+    @ViewChild('aoiFile') private aoiFileInput?: ElementRef<HTMLInputElement>
+    @ViewChild('areaLabelInput') private areaLabelInput?: ElementRef<HTMLInputElement>
+
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
     model: FormlyModel = {}
@@ -146,18 +174,32 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     readonly CircleDot = CircleDot
     readonly Square = Square
     readonly Pentagon = Pentagon
+    readonly File = File
     readonly Trash2 = Trash2
     readonly Info = Info
+    readonly ExternalInput = ExternalInput
+    readonly DrawInput = DrawInput
 
     areaSelected = false
+    areaGeomType: GeoJsonTypes | undefined
     highlightedFeaturesSubscription: Subscription | undefined
-    currentSelectionMode: 'Boundary' | 'Circle' | 'Box' | 'Polygon' = 'Boundary'
+    currentSelectionMode: GeometryInputMode = ExternalInput.Boundary
     areaLabelControl = new FormControl('')
+    private hadSelection = false
+
+    private bufferSourceFeature?: GeoJSONFeature
+    protected readonly defaultBufferRadius = 10
 
     constructor() {
         this.highlightedFeaturesSubscription = this.mapService.selectedFeatures$.subscribe(() => {
             this.ngZone.run(() => {
+                const hadSelection = this.hadSelection
                 this.toggleFormState()
+                this.hadSelection = this.areaSelected
+
+                if (this.areaSelected && !hadSelection && this.currentSelectionMode !== ExternalInput.Boundary) {
+                    this.focusAreaLabel()
+                }
             })
         })
 
@@ -194,9 +236,12 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     resetForm(): void {
         this.form.reset()
         this.mapService.clearDrawnFeatures()
+        this.bufferSourceFeature = undefined
         this.areaLabelControl.setValue('')
-        if (this.currentSelectionMode !== 'Boundary') {
+        if (this.isDrawMode(this.currentSelectionMode)) {
             this.mapService.startDrawing(this.currentSelectionMode)
+        } else if (this.currentSelectionMode === ExternalInput.File) {
+            this.resetFileInput()
         }
         this.toastr.info(this.translocoService.translate('pluginParameter.allSelectionsCleared'), '', {
             timeOut: 4000
@@ -205,12 +250,13 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     toggleFormState(): void {
         this.areaSelected = this.mapService.selectedFeatures.length > 0
+        this.areaGeomType = this.mapService.selectedFeatures[0]?.geometry.type
 
         if (this.areaSelected === this.form.enabled) {
             return
         }
 
-        if (this.areaSelected) {
+        if (this.areaSelected && this.areaGeomType?.includes('Polygon')) {
             this.form.enable()
         } else {
             this.form.disable()
@@ -320,7 +366,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
-        if (this.currentSelectionMode !== 'Boundary' && aoi?.properties) {
+        if (this.currentSelectionMode !== ExternalInput.Boundary && aoi?.properties) {
             aoi.properties['name'] =
                 this.areaLabelControl.value || this.translocoService.translate('pluginParameter.customArea')
         }
@@ -429,23 +475,29 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     hasValidAreaSelection(): boolean {
         const hasValidArea = this.mapService.selectedFeatures.length === 1
 
-        if (this.currentSelectionMode !== 'Boundary') {
+        if (this.currentSelectionMode !== ExternalInput.Boundary) {
             return hasValidArea && this.areaLabelControl.valid
         }
 
         return hasValidArea
     }
 
-    setSelectionMode(mode: 'Boundary' | 'Circle' | 'Box' | 'Polygon'): void {
+    setSelectionMode(mode: GeometryInputMode): void {
         const previousMode = this.currentSelectionMode
         this.currentSelectionMode = mode
         if (previousMode !== this.currentSelectionMode) {
             this.mapService.clearDrawnFeatures()
-            if (mode === 'Boundary') {
+            this.bufferSourceFeature = undefined
+            if (mode === ExternalInput.Boundary) {
                 this.areaLabelControl.setValue('')
                 this.areaLabelControl.clearValidators()
                 this.mapService.stopDrawing()
                 this.mapService.enableBoundarySelection()
+            } else if (mode === ExternalInput.File) {
+                this.areaLabelControl.setValidators([Validators.required])
+                this.areaLabelControl.updateValueAndValidity()
+                this.mapService.disableBoundarySelection()
+                this.mapService.stopDrawing()
             } else {
                 this.areaLabelControl.setValidators([Validators.required])
                 this.areaLabelControl.updateValueAndValidity()
@@ -455,13 +507,111 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
+    private async parseAoiFileContent(fileName: string, data: string): Promise<GeoJSON> {
+        const extension = fileName.slice(fileName.lastIndexOf('.'))
+        switch (extension) {
+            case '.gpx':
+            case '.kml': {
+                const { gpx, kml } = await import('@tmcw/togeojson')
+                const dom = new DOMParser().parseFromString(data, 'application/xml')
+                return (extension === '.kml' ? kml(dom) : gpx(dom)) as GeoJSON
+            }
+            case '.geojson':
+            case '.json':
+                return JSON.parse(data)
+            default:
+                throw new Error(`Unsupported file format: ${extension}`)
+        }
+    }
+
+    readFileData(files: FileList | null): void {
+        if (!files) return
+
+        const file = files[0]
+
+        const reader = new FileReader()
+
+        reader.onload = async () => {
+            const data = reader.result
+            if (typeof data !== 'string') return
+
+            try {
+                const geoJSONcontent = await this.parseAoiFileContent(file.name.toLowerCase(), data)
+
+                const feature = MapGeoJsonUtils.extractFeature(geoJSONcontent)
+                if (!feature?.geometry) {
+                    throw new Error('No usable geometry found in file')
+                }
+
+                const featureName = feature.properties?.['name']
+                if (typeof featureName === 'string' && featureName.trim()) {
+                    this.areaLabelControl.setValue(featureName.trim())
+                }
+
+                this.bufferSourceFeature = feature
+
+                if (feature.geometry.type.includes('Polygon')) {
+                    await this.mapService.renderFeature(feature, file.name)
+                } else {
+                    // Apply the default buffer eagerly so the AOI is immediately submittable
+                    this.bufferAoi(this.defaultBufferRadius)
+                }
+                // An uploaded AOI can be anywhere, so move the camera to it
+                // (boundary clicks and drawings are already within the viewport)
+                this.mapService.flyToExtent(bbox(feature) as Extent)
+            } catch (reason) {
+                console.error('File could not be loaded due to ', reason)
+                this.toastr.error(this.translocoService.translate('pluginParameter.fileParseError'))
+            }
+        }
+
+        reader.readAsText(file, 'UTF-8')
+    }
+
     removeSelectedRegion(region: GeoJSONFeature): void {
         this.mapService.removeSelectedRegion(region)
-        if (this.currentSelectionMode !== 'Boundary') {
+        this.bufferSourceFeature = undefined
+        if (this.isDrawMode(this.currentSelectionMode)) {
             this.mapService.clearDrawnFeatures()
             this.mapService.stopDrawing()
             this.areaLabelControl.setValue('')
             this.mapService.startDrawing(this.currentSelectionMode)
+        } else if (this.currentSelectionMode === ExternalInput.File) {
+            this.resetFileInput()
+        }
+    }
+
+    private isDrawMode(mode: GeometryInputMode): mode is DrawInput {
+        return Object.values(DrawInput).includes(mode as DrawInput)
+    }
+
+    private resetFileInput(): void {
+        if (this.aoiFileInput) {
+            this.aoiFileInput.nativeElement.value = ''
+        }
+    }
+
+    private focusAreaLabel(): void {
+        // Defer so the input is rendered by change detection before we focus it.
+        setTimeout(() => this.areaLabelInput?.nativeElement.focus())
+    }
+
+    // Gate on the original geometry so the control stays visible after the geometry has been buffered into a polygon
+    protected get requiresBuffer(): boolean {
+        return !!this.bufferSourceFeature && !this.bufferSourceFeature.geometry.type.includes('Polygon')
+    }
+
+    protected get bufferSourceGeomType(): GeoJsonTypes | undefined {
+        return this.bufferSourceFeature?.geometry.type
+    }
+
+    bufferAoi(bufferRadius: number) {
+        if (!this.bufferSourceFeature) return
+        const bufferedFeature = buffer(this.bufferSourceFeature, bufferRadius, { units: 'meters' })
+        if (bufferedFeature) {
+            this.mapService.renderFeature(bufferedFeature, 'buffered-aoi').catch(reason => {
+                console.error('Feature could not be buffered because ' + reason)
+            })
         }
     }
 }

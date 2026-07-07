@@ -8,10 +8,56 @@ import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
+import bbox from '@turf/bbox'
+import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes, LineString, Polygon } from 'geojson'
 import { JSONSchema7 } from 'json-schema'
 import { ToastrService } from 'ngx-toastr'
 import { MockToastrService } from '../../../../../jest.mocks'
 import { PluginParameterComponent } from './plugin-parameter.component'
+
+// Mock @tmcw/togeojson since it is ESM-only
+jest.mock('@tmcw/togeojson', () => ({
+    gpx: jest.fn(() => ({
+        type: 'FeatureCollection',
+        features: [
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [
+                        [0, 0],
+                        [1, 1]
+                    ]
+                },
+                properties: { name: 'My Track' }
+            }
+        ]
+    })),
+    kml: jest.fn(() => ({
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] }, properties: {} }]
+    }))
+}))
+
+type TestableComponent = {
+    bufferSourceFeature?: GeoJSONFeature
+    parseAoiFileContent(fileName: string, data: string): Promise<GeoJSON>
+    readonly requiresBuffer: boolean
+    readonly bufferSourceGeomType?: GeoJsonTypes
+    readonly defaultBufferRadius: number
+}
+
+async function flushUntil(predicate: () => boolean, tries = 50): Promise<void> {
+    for (let i = 0; i < tries; i++) {
+        if (predicate()) return
+        await new Promise<void>(resolve => setTimeout(resolve, 0))
+    }
+    throw new Error('flushUntil: condition was never met')
+}
+
+function asFileList(file: File): FileList {
+    return { 0: file, length: 1, item: () => file } as unknown as FileList
+}
 
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
@@ -825,6 +871,7 @@ describe('PluginParameterComponent', () => {
             }
         ])
     })
+
     it('should not put less than 4 optional attributes in a dialogue', () => {
         const schema: JSONSchema7 = {
             properties: {
@@ -903,6 +950,7 @@ describe('PluginParameterComponent', () => {
             }
         ])
     })
+
     it('should put more than 3 optional attributes in a dialogue', () => {
         const schema: JSONSchema7 = {
             properties: {
@@ -1010,6 +1058,7 @@ describe('PluginParameterComponent', () => {
             }
         ])
     })
+
     it('should not put an important parameter into a dialogue', () => {
         const schema: JSONSchema7 = {
             properties: {
@@ -1118,5 +1167,145 @@ describe('PluginParameterComponent', () => {
                 }
             }
         ])
+    })
+
+    describe('area-of-interest file upload & buffering', () => {
+        const polygonGeometry: Polygon = {
+            type: 'Polygon',
+            coordinates: [
+                [
+                    [0, 0],
+                    [0, 1],
+                    [1, 1],
+                    [1, 0],
+                    [0, 0]
+                ]
+            ]
+        }
+        const lineGeometry: LineString = {
+            type: 'LineString',
+            coordinates: [
+                [0, 0],
+                [1, 1],
+                [2, 0]
+            ]
+        }
+        const polygonFeature: GeoJSONFeature = { type: 'Feature', geometry: polygonGeometry, properties: {} }
+        const lineFeature: GeoJSONFeature = { type: 'Feature', geometry: lineGeometry, properties: {} }
+
+        let internal: TestableComponent
+        let toastr: MockToastrService
+
+        beforeEach(() => {
+            internal = component as unknown as TestableComponent
+            toastr = TestBed.inject(ToastrService) as unknown as MockToastrService
+        })
+
+        describe('parseAoiFileContent', () => {
+            it('should parse a GeoJSON file via JSON.parse', async () => {
+                const raw = JSON.stringify(polygonFeature)
+                await expect(internal.parseAoiFileContent('area.geojson', raw)).resolves.toEqual(polygonFeature)
+            })
+
+            it('should convert a GPX file through @tmcw/togeojson', async () => {
+                const { gpx } = await import('@tmcw/togeojson')
+                const result = await internal.parseAoiFileContent('track.gpx', '<gpx></gpx>')
+                expect(gpx).toHaveBeenCalled()
+                expect(result).toMatchObject({ type: 'FeatureCollection' })
+            })
+
+            it('should convert a KML file through @tmcw/togeojson', async () => {
+                const { kml } = await import('@tmcw/togeojson')
+                const result = await internal.parseAoiFileContent('places.kml', '<kml></kml>')
+                expect(kml).toHaveBeenCalled()
+                expect(result).toMatchObject({ type: 'FeatureCollection' })
+            })
+
+            it('should throw on an unsupported extension', async () => {
+                await expect(internal.parseAoiFileContent('notes.txt', 'hello')).rejects.toThrow(
+                    'Unsupported file format'
+                )
+            })
+        })
+
+        describe('bufferAoi', () => {
+            it('buffers the source geometry into a polygon and renders it', () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                internal.bufferSourceFeature = lineFeature
+
+                component.bufferAoi(50)
+
+                expect(renderSpy).toHaveBeenCalledTimes(1)
+                const [rendered, id] = renderSpy.mock.calls[0]
+                expect(rendered.geometry?.type).toContain('Polygon')
+                expect(id).toBe('buffered-aoi')
+            })
+
+            it('always re-buffers from the pristine source, never the previously buffered result', () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                internal.bufferSourceFeature = lineFeature
+
+                component.bufferAoi(10)
+                component.bufferAoi(1000)
+
+                // The source reference is untouched, so the second buffer is not compounded on the first.
+                expect(internal.bufferSourceFeature).toBe(lineFeature)
+                const firstBbox = bbox(renderSpy.mock.calls[0][0])
+                const secondBbox = bbox(renderSpy.mock.calls[1][0])
+                const width = (box: number[]) => box[2] - box[0]
+                expect(width(secondBbox)).toBeGreaterThan(width(firstBbox))
+            })
+        })
+
+        describe('readFileData', () => {
+            it('renders an uploaded polygon and prefills the area name', async () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+                const named: GeoJSONFeature = {
+                    type: 'Feature',
+                    geometry: polygonGeometry,
+                    properties: { name: 'Named Area' }
+                }
+                const file = new File([JSON.stringify(named)], 'poly.geojson')
+
+                component.readFileData(asFileList(file))
+                await flushUntil(() => flySpy.mock.calls.length > 0)
+
+                expect(renderSpy).toHaveBeenCalledTimes(1)
+                expect(renderSpy.mock.calls[0][0].geometry?.type).toBe('Polygon')
+                expect(component.areaLabelControl.value).toBe('Named Area')
+            })
+
+            it('eagerly buffers a non-polygonal upload so the AOI is immediately usable', async () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+                const file = new File([JSON.stringify(lineFeature)], 'track.geojson')
+
+                component.readFileData(asFileList(file))
+                await flushUntil(() => flySpy.mock.calls.length > 0)
+
+                expect(internal.bufferSourceFeature).toEqual(lineFeature)
+                expect(internal.requiresBuffer).toBe(true)
+                expect(renderSpy).toHaveBeenCalledTimes(1)
+                expect(renderSpy.mock.calls[0][0].geometry?.type).toContain('Polygon')
+            })
+
+            it('shows an error toast and renders nothing for an unparseable file', async () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const file = new File(['this is not geojson'], 'broken.geojson')
+
+                component.readFileData(asFileList(file))
+                await flushUntil(() => (toastr.error as jest.Mock).mock.calls.length > 0)
+
+                expect(toastr.error).toHaveBeenCalled()
+                expect(renderSpy).not.toHaveBeenCalled()
+            })
+
+            it('ignores an empty file list', () => {
+                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                expect(() => component.readFileData(null)).not.toThrow()
+                expect(renderSpy).not.toHaveBeenCalled()
+            })
+        })
     })
 })

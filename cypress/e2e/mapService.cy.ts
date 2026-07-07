@@ -487,21 +487,13 @@ describe('mapService', () => {
 
         cy.wait(500)
 
-        cy.window().then(win => {
-            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
-            if (mapService.regionLayer) {
-                mapService.map.setLayoutProperty(mapService.regionLayer.layerId, 'visibility', 'visible')
-                mapService.regionLayer.visible = true
-            }
-        })
-
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
 
         cy.waitForRenderComplete()
 
-        cy.get('.draw-button').eq(1).click()
+        cy.get('.draw-button').eq(2).click()
 
         cy.wait(2500)
 
@@ -520,5 +512,48 @@ describe('mapService', () => {
                 expect(feature.geometry.type).to.be.equal('MultiPolygon')
             }
         })
+    })
+
+    it('should be able to render geometry from an uploaded file, and auto-buffers paths', () => {
+        mockPluginsList()
+        mockPluginBlueprint()
+
+        cy.reload(true)
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_blueprint')
+
+        cy.wait('@getPluginBlueprint')
+
+        cy.clickFakeUserButtonUntilGone()
+
+        cy.wait(1000)
+
+        cy.get('.new-compute').click()
+
+        cy.wait(500)
+
+        cy.get('.draw-button').eq(1).click()
+
+        cy.get('input[id="aoiFile"][type="file"]').attachFile('sample_gpx_aoi.gpx')
+
+        cy.waitForRenderComplete()
+        cy.wait(500)
+
+        cy.window().then(win => {
+            const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
+            expect(mapService.selectedFeatures).to.have.length.greaterThan(0)
+
+            if (mapService.selectedFeatures.length > 0) {
+                const feature = mapService.selectedFeatures[0]
+                expect(feature.geometry.type).to.be.equal('Polygon')
+            }
+        })
+
+        cy.get('input[id="custom-area-label"][type="text"]').should(
+            'have.value',
+            'from Gémenos to Abbaye de Saint-Pons'
+        )
     })
 })
