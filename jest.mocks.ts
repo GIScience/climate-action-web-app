@@ -52,5 +52,8 @@ console.error = (...args: any[]) => {
     if (fullMessage.includes('Unsupported vector file format')) {
         return
     }
+    if (fullMessage.includes('File could not be loaded due to')) {
+        return
+    }
     originalConsoleError.apply(console, args)
 }

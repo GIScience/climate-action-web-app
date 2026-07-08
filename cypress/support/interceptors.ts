@@ -339,6 +339,163 @@ export const mockPluginsListWithoutBlueprint = () => {
                 },
                 library_version: '6.0.2',
                 online: true
+            },
+            {
+                name: 'Plugin Blueprint',
+                authors: [
+                    {
+                        name: 'Max Mustermann',
+                        affiliation: 'XYZ gGmbH',
+                        website: 'https://example.com/'
+                    },
+                    {
+                        name: 'Erika Mustermann',
+                        affiliation: 'Consultant at XYZ gGmbH',
+                        website: 'https://example.com/'
+                    }
+                ],
+                version: '0.0.1',
+                concerns: [],
+                purpose: '',
+                methodology: '',
+                sources: [
+                    {
+                        pages: '14-15',
+                        volume: '2',
+                        journal: 'J. Geophys. Res.',
+                        year: '1954',
+                        title: 'Nothing Particular',
+                        author: 'J. G. Smith and H. K. Weston',
+                        ENTRYTYPE: 'article',
+                        ID: 'smit54'
+                    }
+                ],
+                assets: {
+                    icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
+                },
+                id: 'plugin_blueprint',
+                operator_schema: {
+                    $defs: {
+                        Mapping: {
+                            properties: {
+                                good: {
+                                    description: 'A good string.',
+                                    examples: ['John Doe'],
+                                    title: 'String for Good',
+                                    type: 'string'
+                                },
+                                mediocre: {
+                                    default: 2.1,
+                                    description: 'A mediocre float.',
+                                    examples: [2.1],
+                                    maximum: 4,
+                                    minimum: 0.5,
+                                    title: 'Mediocre Float',
+                                    type: 'number'
+                                },
+                                bad: {
+                                    $ref: '#/$defs/Option',
+                                    default: 'Option 2',
+                                    description: 'A bad selection.',
+                                    examples: ['Option 1'],
+                                    title: 'Bad Selection'
+                                }
+                            },
+                            required: ['good'],
+                            title: 'Mapping',
+                            type: 'object'
+                        },
+                        Option: {
+                            enum: ['Option 1', 'Option 2'],
+                            title: 'Option',
+                            type: 'string'
+                        }
+                    },
+                    properties: {
+                        bool_showcase: {
+                            description: 'A required boolean parameter.',
+                            examples: [true],
+                            title: 'Boolean Input',
+                            type: 'boolean'
+                        },
+                        int_showcase: {
+                            default: 3,
+                            description: 'An optional integer parameter.',
+                            examples: [3],
+                            exclusiveMaximum: 100,
+                            exclusiveMinimum: 0,
+                            title: 'Integer Input',
+                            type: 'integer'
+                        },
+                        float_showcase: {
+                            default: 2.1,
+                            description: 'An optional floating point parameter.',
+                            examples: [2.1],
+                            maximum: 4,
+                            minimum: 0.5,
+                            title: 'Float Input',
+                            type: 'number'
+                        },
+                        string_showcase: {
+                            default: 'John Doe',
+                            description: 'An optional string parameter.',
+                            examples: ['John Doe'],
+                            title: 'String Input',
+                            type: 'string'
+                        },
+                        date_showcase: {
+                            default: '2020-01-01',
+                            description: 'An optional date parameter.',
+                            examples: ['2020-01-01'],
+                            format: 'date',
+                            title: 'Date Input',
+                            type: 'string'
+                        },
+                        select_showcase: {
+                            $ref: '#/$defs/Option',
+                            default: 'Option 2',
+                            description:
+                                'An optional selection parameter. The user can choose one of the available options.',
+                            examples: ['Option 2'],
+                            title: 'Selection Input'
+                        },
+                        select_multi_showcase: {
+                            default: ['Option 2'],
+                            description:
+                                'An optional selection parameter. The user can choose multiple of the available options.',
+                            examples: [['Option 2']],
+                            items: {
+                                $ref: '#/$defs/Option'
+                            },
+                            title: 'Multi-Selection Input',
+                            type: 'array',
+                            uniqueItems: true
+                        },
+                        mapping_showcase: {
+                            $ref: '#/$defs/Mapping',
+                            default: {
+                                good: 'John Doe',
+                                mediocre: 2.1,
+                                bad: 'Option 2'
+                            },
+                            description:
+                                'This input represents a custom grouping of input values. They will be shown together in the front-end and will get a dedicated title and description. You can use it e.g. to group input variables that correspond to the same aspect of your indicator.Alternatively it can be used as a mapping input where the user can define key->value pairs representing choices/options that values/results are mapped to. E.g. the user could be asked to provide a tier list for bikeable path categories.',
+                            examples: [
+                                {
+                                    bad: 'Option 2',
+                                    good: 'John Doe',
+                                    mediocre: 2.1
+                                }
+                            ],
+                            title: 'Grouping or Mapping Input'
+                        }
+                    },
+                    required: ['bool_showcase'],
+                    title: 'ComputeInput',
+                    type: 'object'
+                },
+                library_version: '5.1.0',
+                online: false
             }
         ]
     }).as('getPluginsWithoutBlueprint')
@@ -504,6 +661,168 @@ export const mockPluginBlueprint = () => {
             online: true
         }
     }).as('getPluginBlueprint')
+}
+
+export const mockPluginBlueprintOffline = () => {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=en`, {
+        body: {
+            name: 'Plugin Blueprint',
+            authors: [
+                {
+                    name: 'Max Mustermann',
+                    affiliation: 'XYZ gGmbH',
+                    website: 'https://example.com/'
+                },
+                {
+                    name: 'Erika Mustermann',
+                    affiliation: 'Consultant at XYZ gGmbH',
+                    website: 'https://example.com/'
+                }
+            ],
+            version: '0.0.1',
+            concerns: [],
+            purpose: '',
+            methodology: '',
+            sources: [
+                {
+                    pages: '14-15',
+                    volume: '2',
+                    journal: 'J. Geophys. Res.',
+                    year: '1954',
+                    title: 'Nothing Particular',
+                    author: 'J. G. Smith and H. K. Weston',
+                    ENTRYTYPE: 'article',
+                    ID: 'smit54'
+                }
+            ],
+            assets: {
+                icon: 'assets/plugin_blueprint/0.0.1/ICON.jpeg'
+            },
+            id: 'plugin_blueprint',
+            operator_schema: {
+                $defs: {
+                    Mapping: {
+                        properties: {
+                            good: {
+                                description: 'A good string.',
+                                examples: ['John Doe'],
+                                title: 'String for Good',
+                                type: 'string'
+                            },
+                            mediocre: {
+                                default: 2.1,
+                                description: 'A mediocre float.',
+                                examples: [2.1],
+                                maximum: 4,
+                                minimum: 0.5,
+                                title: 'Mediocre Float',
+                                type: 'number'
+                            },
+                            bad: {
+                                $ref: '#/$defs/Option',
+                                default: 'Option 2',
+                                description: 'A bad selection.',
+                                examples: ['Option 1'],
+                                title: 'Bad Selection'
+                            }
+                        },
+                        required: ['good'],
+                        title: 'Mapping',
+                        type: 'object'
+                    },
+                    Option: {
+                        enum: ['Option 1', 'Option 2'],
+                        title: 'Option',
+                        type: 'string'
+                    }
+                },
+                properties: {
+                    bool_showcase: {
+                        description: 'A required boolean parameter.',
+                        examples: [true],
+                        title: 'Boolean Input',
+                        type: 'boolean'
+                    },
+                    int_showcase: {
+                        default: 3,
+                        description: 'An optional integer parameter.',
+                        examples: [3],
+                        exclusiveMaximum: 100,
+                        exclusiveMinimum: 0,
+                        title: 'Integer Input',
+                        type: 'integer'
+                    },
+                    float_showcase: {
+                        default: 2.1,
+                        description: 'An optional floating point parameter.',
+                        examples: [2.1],
+                        maximum: 4,
+                        minimum: 0.5,
+                        title: 'Float Input',
+                        type: 'number'
+                    },
+                    string_showcase: {
+                        default: 'John Doe',
+                        description: 'An optional string parameter.',
+                        examples: ['John Doe'],
+                        title: 'String Input',
+                        type: 'string'
+                    },
+                    date_showcase: {
+                        default: '2020-01-01',
+                        description: 'An optional date parameter.',
+                        examples: ['2020-01-01'],
+                        format: 'date',
+                        title: 'Date Input',
+                        type: 'string'
+                    },
+                    select_showcase: {
+                        $ref: '#/$defs/Option',
+                        default: 'Option 2',
+                        description:
+                            'An optional selection parameter. The user can choose one of the available options.',
+                        examples: ['Option 2'],
+                        title: 'Selection Input'
+                    },
+                    select_multi_showcase: {
+                        default: ['Option 2'],
+                        description:
+                            'An optional selection parameter. The user can choose multiple of the available options.',
+                        examples: [['Option 2']],
+                        items: {
+                            $ref: '#/$defs/Option'
+                        },
+                        title: 'Multi-Selection Input',
+                        type: 'array',
+                        uniqueItems: true
+                    },
+                    mapping_showcase: {
+                        $ref: '#/$defs/Mapping',
+                        default: {
+                            good: 'John Doe',
+                            mediocre: 2.1,
+                            bad: 'Option 2'
+                        },
+                        description:
+                            'This input represents a custom grouping of input values. They will be shown together in the front-end and will get a dedicated title and description. You can use it e.g. to group input variables that correspond to the same aspect of your indicator.Alternatively it can be used as a mapping input where the user can define key->value pairs representing choices/options that values/results are mapped to. E.g. the user could be asked to provide a tier list for bikeable path categories.',
+                        examples: [
+                            {
+                                bad: 'Option 2',
+                                good: 'John Doe',
+                                mediocre: 2.1
+                            }
+                        ],
+                        title: 'Grouping or Mapping Input'
+                    }
+                },
+                required: ['bool_showcase'],
+                title: 'ComputeInput',
+                type: 'object'
+            },
+            library_version: '5.1.0',
+            online: false
+        }
+    }).as('getPluginBlueprintOffline')
 }
 
 export const mockPluginBlueprintGerman = () => {
@@ -785,12 +1104,6 @@ export const mockPluginHiWalkComputation = () => {
             artifact_errors: {}
         }
     }).as('getPluginHiWalkComputation')
-}
-
-export const mockPluginBlueprint404 = () => {
-    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=en`, {
-        statusCode: 404
-    }).as('getPluginBlueprint404')
 }
 
 export const mockPluginBluePrintIcon = () => {

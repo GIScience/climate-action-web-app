@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject, signal } from '@angular/core'
 import { environment } from '@environments/environment'
+import { TranslocoService } from '@jsverse/transloco'
 import { ToastrService } from 'ngx-toastr'
 import { EMPTY, Observable, catchError, concat, retry, tap } from 'rxjs'
 import {
@@ -53,6 +54,7 @@ const RETRY_DELAY_MS = 400
 export class StatusAnnouncementsService {
     private http = inject(HttpClient)
     private toastr = inject(ToastrService)
+    private transloco = inject(TranslocoService)
     private cachetUrl = environment.cachetUrl
 
     readonly notices = signal<StatusNotice[]>([])
@@ -141,7 +143,10 @@ export class StatusAnnouncementsService {
     }
 
     private formatTimestamp(timestamp: string): string {
-        return this.toDate(timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+        return this.toDate(timestamp).toLocaleString(this.transloco.getActiveLang(), {
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        })
     }
 
     // Normalise Cachet UTC timestamps to ISO-8601 format with 'Z' for instant parsing.
