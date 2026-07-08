@@ -34,7 +34,8 @@ describe('PluginCatalogComponent', () => {
         fixture.detectChanges()
 
         const req = httpMock.expectOne(
-            request => request.url === `${environment.climateActionApiUrl}/plugin` && request.params.get('lang') === 'en'
+            request =>
+                request.url === `${environment.climateActionApiUrl}/plugin` && request.params.get('lang') === 'en'
         )
         req.flush([
             {

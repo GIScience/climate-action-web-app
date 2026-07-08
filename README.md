@@ -18,12 +18,16 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-    	<li><a href="#backend-server">Backend Server</a></li>
+    	  <li><a href="#backend-server">Backend Server</a></li>
+        <li><a href="#code-formatting--pre-commit-hook">Code Formatting & Pre-commit Hook</a></li>
       </ul>
     </li>
     <li><a href="#build">Build</a></li>
     <li><a href="#docker">Docker</a></li>
+    <li><a href="#incident--maintenance-announcements">Incident & Maintenance Announcements</a></li>
     <li><a href="#tests">Tests</a></li>
+    <li><a href="#references">References</a></li>
+    <li><a href="#attribution">Attribution</a></li>
   </ol>
 </details>
 
@@ -62,6 +66,15 @@ The application will automatically reload if you change any of the source files.
 To see more than the raw website and access the plugins, you will need to set up a local dev environment of the [Climate Action Infrastructure](https://gitlab.heigit.org/climate-action/infrastructure).
 
 Make sure to start at least one plugin along with the API Gateway, for example `docker compose up -d ca-plugin-blueprint ca-api-gateway`
+
+### Code Formatting & Pre-commit Hook
+
+Formatting is enforced automatically – there is nothing to activate or configure manually:
+
+- [Prettier](https://prettier.io/) formats all code and organizes/sorts imports. Configuration lives in `.prettierrc.json`.
+- A pre-commit hook ([husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged)) runs Prettier on staged files at every commit. The hook is installed automatically by `pnpm install` (via the `prepare` script) – no further setup needed.
+
+To format the whole project manually, run `pnpm exec prettier --write .`
 
 ## Build
 

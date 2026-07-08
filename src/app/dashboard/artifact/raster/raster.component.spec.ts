@@ -1,8 +1,8 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { MapService } from '@app/dashboard/map/map.service'
 import { jest } from '@jest/globals'
 import maplibregl from 'maplibre-gl'
-import { MapService } from '@app/dashboard/map/map.service'
 import { RasterComponent } from './raster.component'
 
 describe('RasterComponent', () => {

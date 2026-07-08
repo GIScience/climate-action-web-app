@@ -1,9 +1,9 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
-import { fakeAsync, ComponentFixture, TestBed, tick } from '@angular/core/testing'
-import { jest } from '@jest/globals'
-import { delay, of } from 'rxjs'
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
 import { MapService } from '@app/dashboard/map/map.service'
+import { jest } from '@jest/globals'
+import { delay, of } from 'rxjs'
 import { VectorComponent } from './vector.component'
 
 describe('VectorComponent', () => {
