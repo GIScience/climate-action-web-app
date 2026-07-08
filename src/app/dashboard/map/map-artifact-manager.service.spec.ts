@@ -1,9 +1,9 @@
 import { ComponentRef } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
+import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
 import { BehaviorSubject } from 'rxjs'
 import { ArtifactData, ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
 import { MapArtifactManagerService } from './map-artifact-manager.service'
 import type { MapService } from './map.service'
 

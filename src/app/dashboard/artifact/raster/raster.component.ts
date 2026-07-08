@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core'
+import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.interface'
 import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
 import { MapService } from '@app/dashboard/map/map.service'
-import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.interface'
 
 @Component({
     selector: 'app-raster',

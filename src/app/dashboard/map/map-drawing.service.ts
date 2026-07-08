@@ -208,8 +208,7 @@ export class MapDrawingService {
 
         const mode = this.currentDrawMode.value
         const feature = this.terraDrawControl?.getTerraDrawInstance()?.getSnapshot().at(-1) as
-            | GeoJSONFeature
-            | undefined
+            GeoJSONFeature | undefined
         const coords = feature?.geometry.type === 'Polygon' ? feature.geometry.coordinates[0] : undefined
 
         const hasValidCoords =

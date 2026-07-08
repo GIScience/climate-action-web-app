@@ -1,5 +1,5 @@
-import { FormlyFieldConfig } from '@ngx-formly/core'
 import { ValidationErrors } from '@angular/forms'
+import { FormlyFieldConfig } from '@ngx-formly/core'
 
 export function minItemsValidationMessage(_: ValidationErrors, field: FormlyFieldConfig) {
     return `should NOT have fewer than ${field?.props?.['minItems']} items`
