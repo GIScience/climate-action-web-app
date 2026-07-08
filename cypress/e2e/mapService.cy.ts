@@ -539,7 +539,7 @@ describe('mapService', () => {
         cy.get('input[id="aoiFile"][type="file"]').attachFile('sample_gpx_aoi.gpx')
 
         cy.waitForRenderComplete()
-        cy.wait(500)
+        cy.wait(1000)
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
