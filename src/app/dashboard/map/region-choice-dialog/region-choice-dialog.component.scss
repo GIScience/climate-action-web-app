@@ -1,0 +1,65 @@
+.region-choice-dialog {
+    padding: 20px 25px;
+
+    h2 {
+        color: #333;
+        margin: 0;
+    }
+
+    .close-dialog {
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 17.5px;
+
+        :hover {
+            color: #111;
+        }
+    }
+
+    .dialog-content {
+        p {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+
+            .choice-row {
+                align-items: center;
+                text-align: left;
+
+                .choice-name {
+                    flex: 1;
+                    font-weight: 600;
+                }
+
+                .choice-level {
+                    color: #666;
+                    font-size: 0.85em;
+                    white-space: nowrap;
+                }
+
+                i-lucide {
+                    color: #999;
+                    flex-shrink: 0;
+                }
+            }
+        }
+    }
+
+    .osm-link {
+        color: #666;
+        font-size: 0.85em;
+        padding-top: 5px;
+        text-align: center;
+    }
+}

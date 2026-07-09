@@ -20,6 +20,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Make the custom AoI name field call out for attention when empty, to indicate it is required ([#478](https://gitlab.heigit.org/climate-action/web-app/-/issues/478))
+- Introduce a region selection dialog to surface all options, when there are overlapping AoIs at the point of click ([#481](https://gitlab.heigit.org/climate-action/web-app/-/issues/481))
 
 ## [3.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.4.0) - 2026-06-03
 

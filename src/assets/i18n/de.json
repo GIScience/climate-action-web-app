@@ -311,6 +311,11 @@
             "width": "Breite",
             "height": "Höhe",
             "measuring": "Messen..."
+        },
+        "regionChoiceDialog": {
+            "title": "Überlappende Regionen",
+            "description": "An diesem Punkt überlappen sich mehrere Verwaltungsgrenzen. Wähle die Region aus, die du für deine Berechnung verwenden möchtest.",
+            "osmWikiNote": "Besuche das <a href=\"{{ url }}\" target=\"_blank\" rel=\"noopener noreferrer\">OSM-Wiki</a>, um mehr über den <code>admin_level</code>-Tag zu erfahren."
         }
     }
 }
