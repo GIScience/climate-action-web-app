@@ -311,6 +311,11 @@
             "width": "Width",
             "height": "Height",
             "measuring": "Measuring..."
+        },
+        "regionChoiceDialog": {
+            "title": "Multiple regions here",
+            "description": "Several administrative boundaries overlap at this point. Choose the one to use for your computation.",
+            "osmWikiNote": "Visit the <a href=\"{{ url }}\" target=\"_blank\" rel=\"noopener noreferrer\">OSM wiki</a> to learn more about the <code>admin_level</code> tag."
         }
     }
 }

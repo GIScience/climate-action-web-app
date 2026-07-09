@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
 import { NavigationEnd, Router } from '@angular/router'
 import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
 import { DrawInput } from '@app/dashboard/plugin/plugin.interface'
@@ -22,7 +23,7 @@ import maplibregl, {
     IControl,
     LngLatBounds,
     LngLatLike,
-    Map,
+    Map as MaplibreMap,
     Marker,
     Popup,
     StyleSpecification
@@ -35,6 +36,7 @@ import { PluginService } from '../plugin/plugin.service'
 import { MapArtifactLayer, MapArtifactManagerService } from './map-artifact-manager.service'
 import { MapDrawingService } from './map-drawing.service'
 import { MapFoWManagerService } from './map-fow-manager.service'
+import { RegionChoiceDialogComponent, RegionChoiceOption } from './region-choice-dialog/region-choice-dialog.component'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
 import { MapGlobeUtils } from './utils/map-globe.utils'
@@ -139,9 +141,10 @@ export class MapService {
     private router = inject(Router, { optional: true })
     private mapDrawingService = inject(MapDrawingService, { optional: true })
     private mapArtifactManager = inject(MapArtifactManagerService, { optional: true })
+    private dialog = inject(MatDialog, { optional: true })
 
     // Core Map Instance
-    map: Map | undefined
+    map: MaplibreMap | undefined
     mapId: string = 'main-map'
     isOnLanding: boolean = true
 
@@ -228,7 +231,7 @@ export class MapService {
         this.currentBasemapStyle = isBasemapStyleName(storedStyle) ? storedStyle : BasemapStyleName.Colorful
         this.styleChangeSubject.next(this.currentBasemapStyle)
 
-        this.map = new Map({
+        this.map = new MaplibreMap({
             container: targetId,
             style: this.getStyleFor(this.currentBasemapStyle),
             zoom: 3,
@@ -290,7 +293,7 @@ export class MapService {
         })
 
         if (environment.environmentType === 'testing' || environment.environmentType === 'development') {
-            ;(window as Window & { map?: Map }).map = this.map
+            ;(window as Window & { map?: MaplibreMap }).map = this.map
         }
     }
 
@@ -1029,14 +1032,50 @@ export class MapService {
 
         if (!vectorFeatures.length) return
 
-        const clickedFeature = vectorFeatures[0]
-        const featureId = clickedFeature.properties?.['id']
+        // De-duplicate by feature id, since vector tiles can return same feature multiple times.
+        const uniqueFeatures = new Map<string, GeoJSONFeature>()
+        for (const feature of vectorFeatures) {
+            const id = feature.properties?.['id']
+            if (id && !uniqueFeatures.has(id.toString())) {
+                uniqueFeatures.set(id.toString(), feature)
+            }
+        }
 
-        if (!featureId) {
+        const distinctFeatures = [...uniqueFeatures.values()]
+
+        if (!distinctFeatures.length) {
             console.error('No feature ID found in vector tile')
             return
         }
 
+        if (distinctFeatures.length === 1 || !this.dialog) {
+            this.applyRegionSelection(distinctFeatures[0].properties!['id'].toString())
+            return
+        }
+
+        const options: RegionChoiceOption[] = distinctFeatures
+            .map(feature => ({
+                id: feature.properties!['id'].toString(),
+                name: resolveLocalizedName(feature.properties, this.translocoService.getActiveLang()),
+                adminLevel: Number(feature.properties?.['admin_level'])
+            }))
+            .sort((a, b) => a.adminLevel - b.adminLevel)
+
+        this.dialog
+            .open(RegionChoiceDialogComponent, {
+                width: '450px',
+                autoFocus: false,
+                data: { options }
+            })
+            .afterClosed()
+            .subscribe((choice?: RegionChoiceOption) => {
+                if (choice) {
+                    this.applyRegionSelection(choice.id)
+                }
+            })
+    }
+
+    private applyRegionSelection(featureId: string): void {
         const ogcApiUrl = `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${featureId}`
 
         this.http.get<GeoJSONFeature>(ogcApiUrl, { headers: { Accept: 'application/geo+json' } }).subscribe({

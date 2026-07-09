@@ -1,0 +1,28 @@
+<div class="region-choice-dialog">
+    <h2>{{ 'map.regionChoiceDialog.title' | transloco }}</h2>
+    <button (click)="closeDialog()" class="close-dialog">
+        <i-lucide [img]="X" size="25"></i-lucide>
+    </button>
+
+    <div class="dialog-content">
+        <p>
+            {{ 'map.regionChoiceDialog.description' | transloco }}
+        </p>
+
+        <div class="choice-list">
+            @for (option of data.options; track option.id) {
+                <button class="choice-row btn-alt" (click)="select(option)">
+                    <span class="choice-name">{{ option.name }}</span>
+                    <span class="choice-level">
+                        OSM <code>admin_level</code>: <strong>{{ option.adminLevel }}</strong>
+                    </span>
+                    <i-lucide [img]="ChevronRight" size="18"></i-lucide>
+                </button>
+            }
+        </div>
+    </div>
+
+    <p
+        class="osm-link"
+        [innerHTML]="'map.regionChoiceDialog.osmWikiNote' | transloco: { url: osmWikiAdminLevelUrl }"></p>
+</div>
