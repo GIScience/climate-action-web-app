@@ -215,6 +215,7 @@ export class MapService {
 
         this.translocoService.langChanges$.subscribe(lang => {
             if (this.map) {
+                this.mapDrawingService?.destroyTerraDrawControl()
                 updateMaplibreLocale(this.map, lang)
             }
         })
@@ -1249,9 +1250,7 @@ export class MapService {
             this.currentBasemapStyle,
             this.translocoService,
             (styleName: string) => {
-                if (this.mapDrawingService?.clearTerraDrawAfterStyleChange) {
-                    this.mapDrawingService.clearTerraDrawAfterStyleChange()
-                }
+                this.mapDrawingService?.destroyTerraDrawControl()
 
                 if (isBasemapStyleName(styleName)) {
                     this.currentBasemapStyle = styleName

@@ -230,6 +230,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         if (this.highlightedFeaturesSubscription) {
             this.highlightedFeaturesSubscription.unsubscribe()
         }
+        if (this.currentSelectionMode !== ExternalInput.Boundary) {
+            this.mapService.clearDrawnFeatures()
+        }
         this.mapService.stopDrawing()
     }
 

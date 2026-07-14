@@ -3,14 +3,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ReactiveFormsModule } from '@angular/forms'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { Plugin } from '@app/dashboard/plugin/plugin.interface'
-import { TranslocoTestingModule } from '@jsverse/transloco'
+import { DrawInput, ExternalInput, Plugin } from '@app/dashboard/plugin/plugin.interface'
+import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
 import bbox from '@turf/bbox'
 import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes, LineString, Polygon } from 'geojson'
 import { JSONSchema7 } from 'json-schema'
+import { Map as MaplibreMap } from 'maplibre-gl'
 import { ToastrService } from 'ngx-toastr'
 import { MockToastrService } from '../../../../../jest.mocks'
 import { PluginParameterComponent } from './plugin-parameter.component'
@@ -57,6 +58,18 @@ async function flushUntil(predicate: () => boolean, tries = 50): Promise<void> {
 
 function asFileList(file: File): FileList {
     return { 0: file, length: 1, item: () => file } as unknown as FileList
+}
+
+function createFakeMap(): MaplibreMap {
+    return {
+        addControl: jest.fn(),
+        removeControl: jest.fn(),
+        once: jest.fn(),
+        getCanvas: () => ({ style: {} }),
+        loaded: () => true,
+        isStyleLoaded: () => true,
+        _controls: []
+    } as unknown as MaplibreMap
 }
 
 describe('PluginParameterComponent', () => {
@@ -1400,6 +1413,51 @@ describe('PluginParameterComponent', () => {
                 expect(() => component.readFileData(null)).not.toThrow()
                 expect(renderSpy).not.toHaveBeenCalled()
             })
+        })
+    })
+
+    describe('language change', () => {
+        beforeEach(() => {
+            jest.useFakeTimers()
+        })
+
+        afterEach(() => {
+            jest.clearAllTimers()
+            jest.useRealTimers()
+        })
+
+        it('rebuilds the TerraDraw control', () => {
+            const map = createFakeMap()
+            component.mapService.map = map
+
+            component.mapService.startDrawing(DrawInput.Polygon)
+            const firstControl = (map.addControl as jest.Mock).mock.calls[0][0]
+
+            TestBed.inject(TranslocoService).setActiveLang('de')
+            expect(map.removeControl).toHaveBeenCalledWith(firstControl)
+
+            component.mapService.startDrawing(DrawInput.Polygon)
+            expect(map.addControl).toHaveBeenCalledTimes(2)
+            expect((map.addControl as jest.Mock).mock.calls[1][0]).not.toBe(firstControl)
+        })
+
+        it('clears a drawn area when the panel is destroyed', () => {
+            const clearSpy = jest.spyOn(component.mapService, 'clearDrawnFeatures')
+            component.setSelectionMode(DrawInput.Polygon)
+            clearSpy.mockClear()
+
+            fixture.destroy()
+
+            expect(clearSpy).toHaveBeenCalled()
+        })
+
+        it('keeps a boundary selection when the panel is destroyed', () => {
+            const clearSpy = jest.spyOn(component.mapService, 'clearDrawnFeatures')
+            expect(component.currentSelectionMode).toBe(ExternalInput.Boundary)
+
+            fixture.destroy()
+
+            expect(clearSpy).not.toHaveBeenCalled()
         })
     })
 })
