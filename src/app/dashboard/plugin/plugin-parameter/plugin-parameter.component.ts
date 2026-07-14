@@ -156,7 +156,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     @Input() plugin!: Plugin
 
     @ViewChild('aoiFile') private aoiFileInput?: ElementRef<HTMLInputElement>
-    @ViewChild('areaLabelInput') private areaLabelInput?: ElementRef<HTMLInputElement>
+    @ViewChild('areaLabelInput', { read: ElementRef }) private areaLabelInput?: ElementRef<HTMLInputElement>
 
     form: FormGroup = new FormGroup({})
     fields: FormlyFieldConfig[] = []
@@ -328,8 +328,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             return field
         }
 
+        field.props = field.props || {}
+        field.props['subscriptSizing'] = 'dynamic'
+
         if (schema.examples && Array.isArray(schema.examples)) {
-            field.props = field.props || {}
             field.props.placeholder = String(schema.examples[0])
         }
 
@@ -490,17 +492,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.bufferSourceFeature = undefined
             if (mode === ExternalInput.Boundary) {
                 this.areaLabelControl.setValue('')
-                this.areaLabelControl.clearValidators()
+                this.setAreaNameRequired(false)
                 this.mapService.stopDrawing()
                 this.mapService.enableBoundarySelection()
             } else if (mode === ExternalInput.File) {
-                this.areaLabelControl.setValidators([Validators.required])
-                this.areaLabelControl.updateValueAndValidity()
+                this.setAreaNameRequired(true)
                 this.mapService.disableBoundarySelection()
                 this.mapService.stopDrawing()
             } else {
-                this.areaLabelControl.setValidators([Validators.required])
-                this.areaLabelControl.updateValueAndValidity()
+                this.setAreaNameRequired(true)
                 this.mapService.disableBoundarySelection()
                 this.mapService.startDrawing(mode)
             }
@@ -570,7 +570,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     removeSelectedRegion(region: GeoJSONFeature): void {
         this.mapService.removeSelectedRegion(region)
-        this.bufferSourceFeature = undefined
         if (this.isDrawMode(this.currentSelectionMode)) {
             this.mapService.clearDrawnFeatures()
             this.mapService.stopDrawing()
@@ -578,11 +577,24 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.mapService.startDrawing(this.currentSelectionMode)
         } else if (this.currentSelectionMode === ExternalInput.File) {
             this.resetFileInput()
+            this.areaLabelControl.setValue('')
+            this.bufferSourceFeature = undefined
         }
     }
 
     private isDrawMode(mode: GeometryInputMode): mode is DrawInput {
         return Object.values(DrawInput).includes(mode as DrawInput)
+    }
+
+    private setAreaNameRequired(required: boolean): void {
+        if (required) {
+            this.areaLabelControl.setValidators([Validators.required])
+            this.areaLabelControl.markAsTouched()
+        } else {
+            this.areaLabelControl.clearValidators()
+            this.areaLabelControl.markAsUntouched()
+        }
+        this.areaLabelControl.updateValueAndValidity()
     }
 
     private resetFileInput(): void {

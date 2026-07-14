@@ -26,14 +26,13 @@
         }
 
         .optional-attributes {
-            mat-form-field {
-                margin-bottom: 20px;
-            }
+            --mat-form-field-container-height: 48px;
+            --mat-form-field-filled-with-label-container-padding-top: 20px;
+            --mat-form-field-filled-with-label-container-padding-bottom: 6px;
+            --mat-form-field-container-vertical-padding: 12px;
 
-            .mat-mdc-form-field-hint-wrapper,
-            .mat-mdc-form-field-error-wrapper {
-                margin-top: -20px;
-                position: relative !important;
+            mat-form-field {
+                margin-bottom: 12px;
             }
         }
 

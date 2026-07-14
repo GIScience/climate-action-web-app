@@ -401,7 +401,7 @@ export class TourStepsService {
         const poll = () => {
             const selectedRegions = document.querySelector('.selected-regions')
             if (selectedRegions) {
-                const regionItems = selectedRegions.querySelectorAll('.region-item')
+                const regionItems = selectedRegions.querySelectorAll('.region-summary')
                 if (regionItems.length === 1) {
                     const regionName = regionItems[0].querySelector('span.region-name')
                     if (regionName && regionName.textContent?.includes('Ventotene')) {

@@ -1,173 +1,188 @@
 <div class="plugin-parameter-container">
-    <div class="area-selection">
-        <h4>{{ 'pluginParameter.areaSelection' | transloco }}</h4>
-        <p>{{ 'pluginParameter.searchOrZoomInstruction' | transloco }}</p>
-        <hr />
-        <div class="area-selection-buttons">
-            <button
-                type="button"
-                class="draw-button"
-                [class.active]="currentSelectionMode === ExternalInput.Boundary"
-                (click)="setSelectionMode(ExternalInput.Boundary)"
-                [title]="'pluginParameter.selectFromBoundaries' | transloco">
-                <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
-                {{ 'pluginParameter.boundary' | transloco }}
-            </button>
-            <button
-                type="button"
-                class="draw-button"
-                [class.active]="currentSelectionMode === ExternalInput.File"
-                (click)="setSelectionMode(ExternalInput.File)"
-                [title]="'pluginParameter.selectFile' | transloco">
-                <i-lucide [img]="File" size="16"></i-lucide>
-                {{ 'pluginParameter.file' | transloco }}
-            </button>
-            <button
-                type="button"
-                class="draw-button"
-                [class.active]="currentSelectionMode === DrawInput.Circle"
-                (click)="setSelectionMode(DrawInput.Circle)"
-                [title]="'pluginParameter.drawCircle' | transloco">
-                <i-lucide [img]="CircleDot" size="16"></i-lucide>
-                {{ 'pluginParameter.circle' | transloco }}
-            </button>
-            <button
-                type="button"
-                class="draw-button"
-                [class.active]="currentSelectionMode === DrawInput.Box"
-                (click)="setSelectionMode(DrawInput.Box)"
-                [title]="'pluginParameter.drawRectangle' | transloco">
-                <i-lucide [img]="Square" size="16"></i-lucide>
-                {{ 'pluginParameter.rectangle' | transloco }}
-            </button>
-            <button
-                type="button"
-                class="draw-button"
-                [class.active]="currentSelectionMode === DrawInput.Polygon"
-                (click)="setSelectionMode(DrawInput.Polygon)"
-                [title]="'pluginParameter.drawPolygon' | transloco">
-                <i-lucide [img]="Pentagon" size="16"></i-lucide>
-                {{ 'pluginParameter.polygon' | transloco }}
-            </button>
-        </div>
-
-        @if (
-            !areaSelected ||
-            (areaSelected && this.mapService.selectedFeatures.length > 1) ||
-            (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500)
-        ) {
-            <div
-                class="area-selection-message"
-                [ngClass]="{
-                    'message--info': !areaSelected,
-                    'message--blocked': areaSelected && this.mapService.selectedFeatures.length > 1,
-                    'message--warning':
-                        areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
-                }">
-                <i-lucide
-                    [img]="
-                        !areaSelected ? Info : this.mapService.selectedFeatures.length > 1 ? TriangleAlert : CircleAlert
-                    "
-                    size="20"></i-lucide>
-                <span>
-                    @if (!areaSelected && currentSelectionMode === ExternalInput.Boundary) {
-                        {{ 'pluginParameter.clickInsideBoundary' | transloco }}
-                    }
-                    @if (
-                        !areaSelected &&
-                        (currentSelectionMode === DrawInput.Circle || currentSelectionMode === DrawInput.Box)
-                    ) {
-                        {{
-                            'pluginParameter.clickAndMovePointer'
-                                | transloco
-                                    : {
-                                          shape:
-                                              (currentSelectionMode === DrawInput.Box
-                                                  ? 'pluginParameter.rectangle'
-                                                  : 'pluginParameter.circle'
-                                              ) | transloco
-                                      }
-                        }}
-                    }
-                    @if (!areaSelected && currentSelectionMode === ExternalInput.File) {
-                        {{ 'pluginParameter.uploadFileInstruction' | transloco }}
-                    }
-                    @if (!areaSelected && currentSelectionMode === DrawInput.Polygon) {
-                        {{ 'pluginParameter.clickMultiplePoints' | transloco }}
-                    }
-                    @if (areaSelected && this.mapService.selectedFeatures.length > 1) {
-                        {{ 'pluginParameter.multipleAreasSelected' | transloco }}
-                    }
-                    @if (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500) {
-                        {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
-                            'pluginParameter.processingMayTakeLonger' | transloco
-                        }}
-                    }
-                </span>
-            </div>
-        }
-        @if (currentSelectionMode === ExternalInput.File) {
-            <input
-                #aoiFile
-                type="file"
-                id="aoiFile"
-                accept=".geojson,.json,.gpx,.kml"
-                (change)="readFileData(aoiFile.files)" />
-        }
-        @if (areaSelected) {
-            <div class="selected-regions">
-                @for (region of this.mapService.selectedFeatures; track $index) {
-                    <div
-                        class="region-item"
-                        [ngClass]="{
-                            'empty-name': areaLabelControl.invalid && currentSelectionMode !== ExternalInput.Boundary
-                        }">
-                        @if (currentSelectionMode === ExternalInput.Boundary) {
-                            <span class="region-name">{{ region.properties?.['name'] }}</span>
-                        }
-                        @if (currentSelectionMode !== ExternalInput.Boundary) {
-                            <input
-                                #areaLabelInput
-                                type="text"
-                                id="custom-area-label"
-                                class="region-name"
-                                [placeholder]="'pluginParameter.customAreaName' | transloco"
-                                [formControl]="areaLabelControl"
-                                [value]="areaLabelControl.value" />
-                        }
-                        <span class="region-area">{{ region.properties?.['area'] }} km<sup>2</sup></span>
-                        <button class="deselect-region" (click)="removeSelectedRegion(region)">×</button>
-                    </div>
-                }
-                @if (areaLabelControl.invalid && currentSelectionMode !== ExternalInput.Boundary) {
-                    <div class="error-message">
-                        {{ 'pluginParameter.areaNameRequired' | transloco }}
-                    </div>
-                }
-            </div>
-            @if (requiresBuffer) {
-                <hr />
-                <p class="buffer-hint">
-                    {{ 'pluginParameter.bufferHint' | transloco: { geometryType: bufferSourceGeomType } }}
-                </p>
-                <mat-form-field class="buffer-field">
-                    <mat-label>{{ 'pluginParameter.bufferDistance' | transloco }}</mat-label>
-                    <input
-                        matInput
-                        #buffer
-                        type="number"
-                        id="buffer"
-                        min="0"
-                        [value]="defaultBufferRadius"
-                        (change)="bufferAoi(buffer.valueAsNumber)" />
-                    <span matTextSuffix>m</span>
-                </mat-form-field>
-            }
-        }
-    </div>
-
     <form [formGroup]="form" (ngSubmit)="onSubmit(model)">
         <ng-scrollbar orientation="vertical">
+            <div class="area-selection">
+                <h4>{{ 'pluginParameter.areaSelection' | transloco }}</h4>
+                <p>{{ 'pluginParameter.searchOrZoomInstruction' | transloco }}</p>
+                <hr />
+                <div class="area-selection-buttons">
+                    <button
+                        type="button"
+                        class="draw-button"
+                        [class.active]="currentSelectionMode === ExternalInput.Boundary"
+                        (click)="setSelectionMode(ExternalInput.Boundary)"
+                        [title]="'pluginParameter.selectFromBoundaries' | transloco">
+                        <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
+                        {{ 'pluginParameter.boundary' | transloco }}
+                    </button>
+                    <button
+                        type="button"
+                        class="draw-button"
+                        [class.active]="currentSelectionMode === ExternalInput.File"
+                        (click)="setSelectionMode(ExternalInput.File)"
+                        [title]="'pluginParameter.selectFile' | transloco">
+                        <i-lucide [img]="File" size="16"></i-lucide>
+                        {{ 'pluginParameter.file' | transloco }}
+                    </button>
+                    <button
+                        type="button"
+                        class="draw-button"
+                        [class.active]="currentSelectionMode === DrawInput.Circle"
+                        (click)="setSelectionMode(DrawInput.Circle)"
+                        [title]="'pluginParameter.drawCircle' | transloco">
+                        <i-lucide [img]="CircleDot" size="16"></i-lucide>
+                        {{ 'pluginParameter.circle' | transloco }}
+                    </button>
+                    <button
+                        type="button"
+                        class="draw-button"
+                        [class.active]="currentSelectionMode === DrawInput.Box"
+                        (click)="setSelectionMode(DrawInput.Box)"
+                        [title]="'pluginParameter.drawRectangle' | transloco">
+                        <i-lucide [img]="Square" size="16"></i-lucide>
+                        {{ 'pluginParameter.rectangle' | transloco }}
+                    </button>
+                    <button
+                        type="button"
+                        class="draw-button"
+                        [class.active]="currentSelectionMode === DrawInput.Polygon"
+                        (click)="setSelectionMode(DrawInput.Polygon)"
+                        [title]="'pluginParameter.drawPolygon' | transloco">
+                        <i-lucide [img]="Pentagon" size="16"></i-lucide>
+                        {{ 'pluginParameter.polygon' | transloco }}
+                    </button>
+                </div>
+
+                @if (
+                    !areaSelected ||
+                    (areaSelected && this.mapService.selectedFeatures.length > 1) ||
+                    (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500)
+                ) {
+                    <div
+                        class="area-selection-message"
+                        [ngClass]="{
+                            'message--info': !areaSelected,
+                            'message--blocked': areaSelected && this.mapService.selectedFeatures.length > 1,
+                            'message--warning':
+                                areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
+                        }">
+                        <i-lucide
+                            [img]="
+                                !areaSelected
+                                    ? Info
+                                    : this.mapService.selectedFeatures.length > 1
+                                      ? TriangleAlert
+                                      : CircleAlert
+                            "
+                            size="20"></i-lucide>
+                        <span>
+                            @if (!areaSelected && currentSelectionMode === ExternalInput.Boundary) {
+                                {{ 'pluginParameter.clickInsideBoundary' | transloco }}
+                            }
+                            @if (
+                                !areaSelected &&
+                                (currentSelectionMode === DrawInput.Circle || currentSelectionMode === DrawInput.Box)
+                            ) {
+                                {{
+                                    'pluginParameter.clickAndMovePointer'
+                                        | transloco
+                                            : {
+                                                  shape:
+                                                      (currentSelectionMode === DrawInput.Box
+                                                          ? 'pluginParameter.rectangle'
+                                                          : 'pluginParameter.circle'
+                                                      ) | transloco
+                                              }
+                                }}
+                            }
+                            @if (!areaSelected && currentSelectionMode === ExternalInput.File) {
+                                {{ 'pluginParameter.uploadFileInstruction' | transloco }}
+                            }
+                            @if (!areaSelected && currentSelectionMode === DrawInput.Polygon) {
+                                {{ 'pluginParameter.clickMultiplePoints' | transloco }}
+                            }
+                            @if (areaSelected && this.mapService.selectedFeatures.length > 1) {
+                                {{ 'pluginParameter.multipleAreasSelected' | transloco }}
+                            }
+                            @if (
+                                areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
+                            ) {
+                                {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
+                                    'pluginParameter.processingMayTakeLonger' | transloco
+                                }}
+                            }
+                        </span>
+                    </div>
+                }
+                @if (currentSelectionMode === ExternalInput.File) {
+                    <input
+                        #aoiFile
+                        type="file"
+                        id="aoiFile"
+                        accept=".geojson,.json,.gpx,.kml"
+                        (change)="readFileData(aoiFile.files)" />
+                }
+                @if (areaSelected) {
+                    <div class="selected-regions">
+                        @for (region of this.mapService.selectedFeatures; track $index) {
+                            @if (currentSelectionMode === ExternalInput.Boundary) {
+                                <div class="region-summary">
+                                    <span class="region-name">{{ region.properties?.['name'] }}</span>
+                                    <span class="region-area">{{ region.properties?.['area'] }} km<sup>2</sup></span>
+                                    <button
+                                        type="button"
+                                        class="deselect-region"
+                                        [attr.aria-label]="'pluginParameter.removeRegion' | transloco"
+                                        (click)="removeSelectedRegion(region)">
+                                        <i-lucide [img]="Trash2" size="16"></i-lucide>
+                                    </button>
+                                </div>
+                            } @else {
+                                <mat-form-field class="region-field" subscriptSizing="dynamic">
+                                    <mat-label>{{ 'pluginParameter.areaName' | transloco }}</mat-label>
+                                    <input
+                                        matInput
+                                        #areaLabelInput
+                                        type="text"
+                                        [placeholder]="'pluginParameter.customArea' | transloco"
+                                        [formControl]="areaLabelControl" />
+                                    <span matTextSuffix class="region-area"
+                                        >{{ region.properties?.['area'] }} km<sup>2</sup></span
+                                    >
+                                    <button
+                                        matSuffix
+                                        type="button"
+                                        class="deselect-region"
+                                        [attr.aria-label]="'pluginParameter.removeRegion' | transloco"
+                                        (click)="removeSelectedRegion(region)">
+                                        <i-lucide [img]="Trash2" size="16"></i-lucide>
+                                    </button>
+                                    <mat-error>{{ 'pluginParameter.areaNameRequired' | transloco }}</mat-error>
+                                </mat-form-field>
+                            }
+                        }
+                    </div>
+                    @if (requiresBuffer) {
+                        <hr />
+                        <p class="buffer-hint">
+                            {{ 'pluginParameter.bufferHint' | transloco: { geometryType: bufferSourceGeomType } }}
+                        </p>
+                        <mat-form-field class="buffer-field" subscriptSizing="dynamic">
+                            <mat-label>{{ 'pluginParameter.bufferDistance' | transloco }}</mat-label>
+                            <input
+                                matInput
+                                #buffer
+                                type="number"
+                                id="buffer"
+                                min="0"
+                                [value]="defaultBufferRadius"
+                                (change)="bufferAoi(buffer.valueAsNumber)" />
+                            <span matTextSuffix>m</span>
+                        </mat-form-field>
+                    }
+                }
+            </div>
+
             <formly-form
                 [model]="model"
                 [fields]="fields"
@@ -175,6 +190,7 @@
                 [form]="form"
                 class="plugin-params-form"></formly-form>
         </ng-scrollbar>
+
         <div class="btn-container">
             <div [tp]="'plugin.loginToCompute' | transloco" [tpIsEnabled]="!user">
                 <button

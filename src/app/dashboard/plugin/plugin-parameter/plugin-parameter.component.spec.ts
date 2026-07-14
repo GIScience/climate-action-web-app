@@ -131,7 +131,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -144,7 +145,8 @@ describe('PluginParameterComponent', () => {
                         props: {
                             label: 'Boolean Input',
                             description: 'A required boolean parameter.',
-                            placeholder: 'true'
+                            placeholder: 'true',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'bool_showcase',
                         validators: {
@@ -155,13 +157,15 @@ describe('PluginParameterComponent', () => {
                         templateOptions: {
                             label: 'Boolean Input',
                             description: 'A required boolean parameter.',
-                            placeholder: 'true'
+                            placeholder: 'true',
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {}
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -190,7 +194,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -205,7 +210,8 @@ describe('PluginParameterComponent', () => {
                             description: 'Test description.',
                             exclusiveMinimum: 0,
                             exclusiveMaximum: 100,
-                            placeholder: '3'
+                            placeholder: '3',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         validators: {
@@ -218,14 +224,16 @@ describe('PluginParameterComponent', () => {
                             description: 'Test description.',
                             exclusiveMinimum: 0,
                             exclusiveMaximum: 100,
-                            placeholder: '3'
+                            placeholder: '3',
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {},
                         parsers: [null]
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -254,7 +262,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -269,7 +278,8 @@ describe('PluginParameterComponent', () => {
                             description: 'Test description.',
                             min: 0.5,
                             max: 4.0,
-                            placeholder: '2.1'
+                            placeholder: '2.1',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         validators: {
@@ -282,14 +292,16 @@ describe('PluginParameterComponent', () => {
                             description: 'Test description.',
                             min: 0.5,
                             max: 4.0,
-                            placeholder: '2.1'
+                            placeholder: '2.1',
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {},
                         parsers: [null]
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -316,7 +328,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -329,7 +342,8 @@ describe('PluginParameterComponent', () => {
                         props: {
                             label: 'Test Title',
                             description: 'Test description.',
-                            placeholder: 'John Doe'
+                            placeholder: 'John Doe',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         defaultValue: '',
@@ -341,14 +355,16 @@ describe('PluginParameterComponent', () => {
                         templateOptions: {
                             label: 'Test Title',
                             description: 'Test description.',
-                            placeholder: 'John Doe'
+                            placeholder: 'John Doe',
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {},
                         parsers: [null]
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -376,7 +392,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -389,7 +406,8 @@ describe('PluginParameterComponent', () => {
                         props: {
                             label: 'Test Title',
                             description: 'Test description.',
-                            placeholder: '2020-01-01'
+                            placeholder: '2020-01-01',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         validators: {},
@@ -398,13 +416,15 @@ describe('PluginParameterComponent', () => {
                         templateOptions: {
                             label: 'Test Title',
                             description: 'Test description.',
-                            placeholder: '2020-01-01'
+                            placeholder: '2020-01-01',
+                            subscriptSizing: 'dynamic'
                         },
                         parsers: [null]
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -438,7 +458,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -455,7 +476,8 @@ describe('PluginParameterComponent', () => {
                             options: [
                                 { value: 'Option 1', label: 'Option 1' },
                                 { value: 'Option 2', label: 'Option 2' }
-                            ]
+                            ],
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         defaultValue: '',
@@ -471,14 +493,16 @@ describe('PluginParameterComponent', () => {
                             options: [
                                 { value: 'Option 1', label: 'Option 1' },
                                 { value: 'Option 2', label: 'Option 2' }
-                            ]
+                            ],
+                            subscriptSizing: 'dynamic'
                         },
                         parsers: [null],
                         expressions: {}
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -516,7 +540,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -535,7 +560,8 @@ describe('PluginParameterComponent', () => {
                                 { value: 'Option 1', label: 'Option 1' },
                                 { value: 'Option 2', label: 'Option 2' }
                             ],
-                            placeholder: 'Option 2'
+                            placeholder: 'Option 2',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'showcase',
                         defaultValue: [],
@@ -553,13 +579,15 @@ describe('PluginParameterComponent', () => {
                                 { value: 'Option 2', label: 'Option 2' }
                             ],
                             placeholder: 'Option 2',
+                            subscriptSizing: 'dynamic',
                             uniqueItems: true
                         },
                         expressions: {}
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -605,7 +633,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -623,7 +652,8 @@ describe('PluginParameterComponent', () => {
                                 { value: 'Option 1', label: 'Option Eins' },
                                 { value: 'Option 2', label: 'Option Zwei' },
                                 { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
-                            ]
+                            ],
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'select',
                         defaultValue: '',
@@ -640,7 +670,8 @@ describe('PluginParameterComponent', () => {
                                 { value: 'Option 1', label: 'Option Eins' },
                                 { value: 'Option 2', label: 'Option Zwei' },
                                 { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
-                            ]
+                            ],
+                            subscriptSizing: 'dynamic'
                         },
                         parsers: [null],
                         expressions: {}
@@ -657,7 +688,8 @@ describe('PluginParameterComponent', () => {
                                 { value: 'Option 2', label: 'Option Zwei' },
                                 { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
                             ],
-                            placeholder: 'Option 2'
+                            placeholder: 'Option 2',
+                            subscriptSizing: 'dynamic'
                         },
                         key: 'multi_select',
                         defaultValue: [],
@@ -676,13 +708,15 @@ describe('PluginParameterComponent', () => {
                                 { value: 'NonTranslatedOption', label: 'NonTranslatedOption' }
                             ],
                             placeholder: 'Option 2',
-                            uniqueItems: true
+                            uniqueItems: true,
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {}
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -751,7 +785,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -773,7 +808,8 @@ describe('PluginParameterComponent', () => {
                                         props: {
                                             label: 'String for Good',
                                             description: 'A good string.',
-                                            placeholder: 'John Doe'
+                                            placeholder: 'John Doe',
+                                            subscriptSizing: 'dynamic'
                                         },
                                         key: 'good',
                                         defaultValue: '',
@@ -785,7 +821,8 @@ describe('PluginParameterComponent', () => {
                                         templateOptions: {
                                             label: 'String for Good',
                                             description: 'A good string.',
-                                            placeholder: 'John Doe'
+                                            placeholder: 'John Doe',
+                                            subscriptSizing: 'dynamic'
                                         },
                                         parsers: [null],
                                         expressions: {}
@@ -797,7 +834,8 @@ describe('PluginParameterComponent', () => {
                                             description: 'A mediocre float.',
                                             min: 0.5,
                                             max: 4.0,
-                                            placeholder: '2.1'
+                                            placeholder: '2.1',
+                                            subscriptSizing: 'dynamic'
                                         },
                                         key: 'mediocre',
                                         defaultValue: 2.1,
@@ -811,7 +849,8 @@ describe('PluginParameterComponent', () => {
                                             description: 'A mediocre float.',
                                             min: 0.5,
                                             max: 4.0,
-                                            placeholder: '2.1'
+                                            placeholder: '2.1',
+                                            subscriptSizing: 'dynamic'
                                         },
                                         parsers: [null]
                                     },
@@ -824,7 +863,8 @@ describe('PluginParameterComponent', () => {
                                             options: [
                                                 { value: 'Option 1', label: 'Option 1' },
                                                 { value: 'Option 2', label: 'Option 2' }
-                                            ]
+                                            ],
+                                            subscriptSizing: 'dynamic'
                                         },
                                         key: 'bad',
                                         defaultValue: 'Option 2',
@@ -840,7 +880,8 @@ describe('PluginParameterComponent', () => {
                                             options: [
                                                 { value: 'Option 1', label: 'Option 1' },
                                                 { value: 'Option 2', label: 'Option 2' }
-                                            ]
+                                            ],
+                                            subscriptSizing: 'dynamic'
                                         },
                                         parsers: [null]
                                     }
@@ -856,17 +897,20 @@ describe('PluginParameterComponent', () => {
                         },
                         props: {
                             label: 'Test Title',
-                            description: 'Test description.'
+                            description: 'Test description.',
+                            subscriptSizing: 'dynamic'
                         },
                         templateOptions: {
                             label: 'Test Title',
-                            description: 'Test description.'
+                            description: 'Test description.',
+                            subscriptSizing: 'dynamic'
                         },
                         expressions: {}
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -899,7 +943,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -910,8 +955,12 @@ describe('PluginParameterComponent', () => {
                     {
                         type: 'boolean',
                         key: 'optional_one',
-                        props: {},
-                        templateOptions: {},
+                        props: {
+                            subscriptSizing: 'dynamic'
+                        },
+                        templateOptions: {
+                            subscriptSizing: 'dynamic'
+                        },
                         validators: {
                             type: {
                                 schemaType: ['boolean']
@@ -922,8 +971,12 @@ describe('PluginParameterComponent', () => {
                     {
                         type: 'boolean',
                         key: 'optional_two',
-                        props: {},
-                        templateOptions: {},
+                        props: {
+                            subscriptSizing: 'dynamic'
+                        },
+                        templateOptions: {
+                            subscriptSizing: 'dynamic'
+                        },
                         validators: {
                             type: {
                                 schemaType: ['boolean']
@@ -934,8 +987,12 @@ describe('PluginParameterComponent', () => {
                     {
                         type: 'boolean',
                         key: 'optional_three',
-                        props: {},
-                        templateOptions: {},
+                        props: {
+                            subscriptSizing: 'dynamic'
+                        },
+                        templateOptions: {
+                            subscriptSizing: 'dynamic'
+                        },
                         validators: {
                             type: {
                                 schemaType: ['boolean']
@@ -945,7 +1002,8 @@ describe('PluginParameterComponent', () => {
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -982,7 +1040,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -1002,8 +1061,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_one',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1014,8 +1077,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_two',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1026,8 +1093,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_three',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1038,8 +1109,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_four',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1053,7 +1128,8 @@ describe('PluginParameterComponent', () => {
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])
@@ -1092,7 +1168,8 @@ describe('PluginParameterComponent', () => {
             {
                 type: 'object',
                 props: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 },
                 validators: {
                     type: {
@@ -1103,8 +1180,12 @@ describe('PluginParameterComponent', () => {
                     {
                         type: 'boolean',
                         key: 'optional_one',
-                        props: {},
-                        templateOptions: {},
+                        props: {
+                            subscriptSizing: 'dynamic'
+                        },
+                        templateOptions: {
+                            subscriptSizing: 'dynamic'
+                        },
                         validators: {
                             type: {
                                 schemaType: ['boolean']
@@ -1124,8 +1205,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_two',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1136,8 +1221,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_three',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1148,8 +1237,12 @@ describe('PluginParameterComponent', () => {
                                     {
                                         type: 'boolean',
                                         key: 'optional_four',
-                                        props: {},
-                                        templateOptions: {},
+                                        props: {
+                                            subscriptSizing: 'dynamic'
+                                        },
+                                        templateOptions: {
+                                            subscriptSizing: 'dynamic'
+                                        },
                                         validators: {
                                             type: {
                                                 schemaType: ['boolean']
@@ -1163,7 +1256,8 @@ describe('PluginParameterComponent', () => {
                     }
                 ],
                 templateOptions: {
-                    label: 'ComputeInput'
+                    label: 'ComputeInput',
+                    subscriptSizing: 'dynamic'
                 }
             }
         ])

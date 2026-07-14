@@ -1,4 +1,18 @@
 .plugin-parameter-container {
+    --mat-form-field-container-height: 48px;
+    --mat-form-field-filled-with-label-container-padding-top: 20px;
+    --mat-form-field-filled-with-label-container-padding-bottom: 6px;
+    --mat-form-field-container-vertical-padding: 12px;
+
+    display: flex;
+    flex-direction: column;
+
+    > form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
     .area-selection {
         border: 1px solid #bbb;
         border-radius: 15px;
@@ -58,6 +72,7 @@
             }
         }
     }
+
     .area-selection-message {
         align-items: center;
         border-bottom: 2.5px solid;
@@ -113,97 +128,62 @@
 
     .selected-regions {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 10px;
 
         & + hr {
             margin-top: 15px;
         }
 
-        .region-item {
-            align-items: center;
-            background: linear-gradient(135deg, #f0fdfa 0%, #e6f7f5 100%);
-            border: 1px solid rgba(0, 128, 128, 0.5);
-            border-radius: 7.5px;
-            display: inline-flex;
-            gap: 7.5px;
-            padding: 7.5px 12.5px;
-            position: relative;
-            transition: all 0.2s ease;
+        .region-field {
+            width: 100%;
+        }
 
-            &.empty-name {
-                background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-                border-color: #dc2626;
-            }
+        .region-summary {
+            align-items: center;
+            background: linear-gradient(135deg, #f0fdfa, #e6f7f5);
+            border: 1px solid rgba(0, 128, 128, 0.5);
+            border-radius: 4px;
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
 
             .region-name {
+                flex: 1 1 auto;
                 font-size: 13px;
                 font-weight: 600;
-            }
-
-            input.region-name {
-                background: #fff;
-                border: 1px solid rgba(0, 128, 128, 0.25);
-                border-radius: 4px;
-                font-size: 13px;
-                font-weight: 500;
-                padding: 4px 8px;
-                width: 200px;
-
-                &:focus {
-                    border-color: #008080;
-                    outline: none;
-                }
-
-                &.ng-invalid {
-                    border-color: #999;
-                }
-            }
-
-            .region-area {
-                background-color: rgba(0, 0, 0, 0.1);
-                border-radius: 20px;
-                font-size: 12px;
-                padding: 2.5px 7.5px;
-                white-space: nowrap;
-            }
-
-            .deselect-region {
-                align-items: center;
-                background: #eee;
-                border: 1px solid #aaa;
-                border-radius: 50%;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                color: #666;
-                cursor: pointer;
-                display: flex;
-                font-size: 18px;
-                font-weight: 600;
-                height: 22.5px;
-                justify-content: center;
-                position: absolute;
-                right: -10px;
-                top: -10px;
-                transition: all 0.15s ease;
-                width: 22.5px;
-
-                &:hover {
-                    background: #fef2f2;
-                    border-color: #fecaca;
-                    color: #dc2626;
-                }
             }
         }
 
-        .error-message {
-            color: #dc2626;
-            font-weight: 600;
-            width: 100%;
+        .region-area {
+            color: #666;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .deselect-region {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            display: inline-flex;
+            margin-left: 8px;
+            transition: color 0.15s ease;
+
+            &:hover {
+                color: #dc2626;
+            }
         }
     }
 
+    .buffer-field {
+        width: 100%;
+    }
+
     ng-scrollbar {
-        max-height: 25vh;
+        flex: 1 1 auto;
+        max-height: 50vh;
+        min-height: 0;
     }
 
     formly-form {
@@ -228,22 +208,18 @@
     }
 
     .plugin-params-form .mat-mdc-form-field {
-        margin: 10px 0;
-    }
-
-    .mat-mdc-form-field-hint-wrapper,
-    .mat-mdc-form-field-error-wrapper {
-        margin-top: -20px;
-        position: relative !important;
+        margin: 4px 0;
     }
 
     .btn-container {
         display: flex;
+        flex: 0 0 auto;
+        gap: 10px;
         justify-content: center;
-        margin: 15px auto 0;
+        margin-top: 15px;
 
         button {
-            margin: 0 5px;
+            margin: 0;
         }
     }
 }
