@@ -416,11 +416,10 @@ describe('mapService', () => {
         // Should read boundaries and display them
         cy.get('canvas.maplibregl-canvas').click()
 
-        cy.get('.selected-regions').children().should('have.class', 'region-item')
+        cy.get('.selected-regions').children().should('have.class', 'region-summary')
 
         cy.get('.selected-regions')
             .children()
-            .first()
             .find('span.region-name')
             .invoke('text')
             .then(text => {
@@ -551,9 +550,6 @@ describe('mapService', () => {
             }
         })
 
-        cy.get('input[id="custom-area-label"][type="text"]').should(
-            'have.value',
-            'from Gémenos to Abbaye de Saint-Pons'
-        )
+        cy.get('.selected-regions input[type="text"]').should('have.value', 'from Gémenos to Abbaye de Saint-Pons')
     })
 })
