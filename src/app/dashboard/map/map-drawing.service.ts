@@ -95,7 +95,7 @@ export class MapDrawingService {
         return this.terraDrawControl
     }
 
-    clearTerraDrawAfterStyleChange(): void {
+    destroyTerraDrawControl(): void {
         if (this.terraDrawControl) {
             const terraDraw = this.terraDrawControl.getTerraDrawInstance()
             if (terraDraw && terraDraw.enabled) {
@@ -149,7 +149,10 @@ export class MapDrawingService {
     }
 
     stopDrawing(): void {
-        this.terraDrawControl?.getTerraDrawInstance()?.setMode('static')
+        const terraDraw = this.terraDrawControl?.getTerraDrawInstance()
+        if (terraDraw?.enabled) {
+            terraDraw.setMode('static')
+        }
 
         this.measureTooltip?.remove()
         this.measureTooltip = undefined
@@ -163,7 +166,7 @@ export class MapDrawingService {
 
     clearDrawnFeatures(): void {
         const terraDraw = this.terraDrawControl?.getTerraDrawInstance()
-        if (terraDraw) {
+        if (terraDraw?.enabled) {
             const featureIds = terraDraw
                 .getSnapshot()
                 .map(f => f.id)
