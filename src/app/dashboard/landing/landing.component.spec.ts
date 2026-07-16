@@ -1,9 +1,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { ToastrService } from 'ngx-toastr'
-import { MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { LandingComponent } from './landing.component'
 
 describe('LandingComponent', () => {
@@ -12,12 +11,7 @@ describe('LandingComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-                LandingComponent,
-                RouterModule.forRoot([]),
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [HttpClientTestingModule, LandingComponent, RouterModule.forRoot([]), getTranslocoTestingModule()],
             providers: [{ provide: ToastrService, useClass: MockToastrService }]
         }).compileComponents()
 

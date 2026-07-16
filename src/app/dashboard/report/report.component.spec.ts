@@ -3,11 +3,10 @@ import { ElementRef, QueryList } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { SafeUrl } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { ArtifactData, ArtifactEntity, ChartData, LegendObject, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
@@ -156,12 +155,7 @@ describe('ReportComponent', () => {
         pluginService = {} as jest.Mocked<MockPluginService>
 
         await TestBed.configureTestingModule({
-            imports: [
-                ReportComponent,
-                HttpClientModule,
-                NoopAnimationsModule,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [ReportComponent, HttpClientModule, NoopAnimationsModule, getTranslocoTestingModule()],
             providers: [
                 { provide: ToastrService, useClass: MockToastrService },
                 { provide: ReportService, useValue: reportService },

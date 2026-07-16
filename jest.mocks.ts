@@ -1,3 +1,6 @@
+import '@angular/compiler'
+import { TranslocoTestingModule, TranslocoTestingOptions } from '@jsverse/transloco'
+
 // Mock browser APIs that might not be available in test environment
 
 // Mock URL.createObjectURL used by Plotly Maps
@@ -25,6 +28,15 @@ export class MockToastrService {
         progressBar: true,
         closeButton: true
     }
+}
+
+// Shared Transloco testing setup — pass options to override langs/config for a specific spec
+export function getTranslocoTestingModule(options: TranslocoTestingOptions = {}) {
+    return TranslocoTestingModule.forRoot({
+        langs: { en: {}, de: {} },
+        translocoConfig: { defaultLang: 'en' },
+        ...options
+    })
 }
 
 const originalConsoleError = console.error

@@ -1,13 +1,12 @@
 import { HttpClientModule } from '@angular/common/http'
-import { ComponentFixture, TestBed, discardPeriodicTasks, fakeAsync, flush, tick } from '@angular/core/testing'
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
-import { MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -74,12 +73,7 @@ describe('ComputationComponent', () => {
         }
 
         await TestBed.configureTestingModule({
-            imports: [
-                ComputationsIndexComponent,
-                NoopAnimationsModule,
-                HttpClientModule,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [ComputationsIndexComponent, NoopAnimationsModule, HttpClientModule, getTranslocoTestingModule()],
             providers: [
                 { provide: PluginService, useValue: mockPluginService },
                 { provide: StorageService, useValue: mockStorageService },

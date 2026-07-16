@@ -10,6 +10,7 @@ export default defineConfig({
         runMode: 2,
         openMode: 0
     },
+    allowCypressEnv: false,
     e2e: {
         baseUrl: 'http://localhost:4200',
         expose: {

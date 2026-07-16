@@ -2,8 +2,8 @@ import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
 import { processSourceUrls } from '@app/utils/source.utils'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { ToastrModule } from 'ngx-toastr'
+import { getTranslocoTestingModule } from '../../../../jest.mocks'
 import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
 import { PluginComponent } from './plugin.component'
 import { Plugin } from './plugin.interface'
@@ -64,7 +64,7 @@ describe('PluginComponent', () => {
                 PluginComponent,
                 PluginCatalogComponent,
                 RouterModule.forRoot([]),
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } }),
+                getTranslocoTestingModule(),
                 ToastrModule.forRoot()
             ]
         })
