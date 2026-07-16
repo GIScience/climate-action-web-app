@@ -1,9 +1,8 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
-import { TestBed, fakeAsync, tick } from '@angular/core/testing'
+import { fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { environment } from '@environments/environment'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { ToastrService } from 'ngx-toastr'
-import { MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StatusAnnouncementsService } from './status-announcements.service'
 
 const groupRef = (id: string) => ({ relationships: { group: { data: { type: 'componentGroups', id } } } })
@@ -42,10 +41,7 @@ describe('StatusAnnouncementsService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [HttpClientTestingModule, getTranslocoTestingModule()],
             providers: [StatusAnnouncementsService, { provide: ToastrService, useClass: MockToastrService }]
         })
         service = TestBed.inject(StatusAnnouncementsService)

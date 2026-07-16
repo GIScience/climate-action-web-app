@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { DrawInput, ExternalInput, Plugin } from '@app/dashboard/plugin/plugin.interface'
-import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
+import { TranslocoService } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { FormlyMaterialModule } from '@ngx-formly/material'
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker'
@@ -13,7 +13,7 @@ import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes, LineString, Poly
 import { JSONSchema7 } from 'json-schema'
 import { Map as MaplibreMap } from 'maplibre-gl'
 import { ToastrService } from 'ngx-toastr'
-import { MockToastrService } from '../../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../../jest.mocks'
 import { PluginParameterComponent } from './plugin-parameter.component'
 
 // Mock @tmcw/togeojson since it is ESM-only
@@ -87,7 +87,7 @@ describe('PluginParameterComponent', () => {
                 PluginParameterComponent,
                 ReactiveFormsModule,
                 HttpClientModule,
-                TranslocoTestingModule.forRoot({
+                getTranslocoTestingModule({
                     langs: {
                         en: {
                             pluginParameter: {

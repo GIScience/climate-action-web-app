@@ -1,8 +1,8 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { jest } from '@jest/globals'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { of } from 'rxjs'
+import { getTranslocoTestingModule } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
@@ -124,10 +124,7 @@ describe('PluginService', () => {
         }
 
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientModule,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [HttpClientModule, getTranslocoTestingModule()],
             providers: [
                 {
                     provide: HttpClient,

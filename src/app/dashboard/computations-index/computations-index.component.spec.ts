@@ -4,11 +4,11 @@ import { MatDialog } from '@angular/material/dialog'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
-import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
+import { TranslocoService } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
-import { MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -96,7 +96,7 @@ describe('ComputationsIndexComponent', () => {
                 HttpClientTestingModule,
                 NoopAnimationsModule,
                 RouterModule.forRoot([]),
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
+                getTranslocoTestingModule()
             ],
             providers: [
                 { provide: PluginService, useValue: mockPluginService },

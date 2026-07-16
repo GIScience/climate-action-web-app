@@ -1,8 +1,8 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { environment } from '@environments/environment'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { getTranslocoTestingModule } from '../../../../jest.mocks'
 import { PluginCatalogComponent } from './plugin-catalog.component'
 
 describe('PluginCatalogComponent', () => {
@@ -12,11 +12,7 @@ describe('PluginCatalogComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-                PluginCatalogComponent,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [HttpClientTestingModule, PluginCatalogComponent, getTranslocoTestingModule()],
             providers: [
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({

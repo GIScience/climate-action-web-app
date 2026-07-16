@@ -1,8 +1,8 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
+import { getTranslocoTestingModule } from '../../../../jest.mocks'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ArtifactViewerComponent } from './artifact-viewer.component'
 
@@ -12,11 +12,7 @@ describe('ArtifactViewerComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [
-                ArtifactViewerComponent,
-                HttpClientModule,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ],
+            imports: [ArtifactViewerComponent, HttpClientModule, getTranslocoTestingModule()],
             providers: [
                 ArtifactService,
                 provideTippyLoader(() => import('tippy.js')),

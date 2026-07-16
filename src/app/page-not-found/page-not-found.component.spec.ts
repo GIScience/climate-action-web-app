@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { TranslocoTestingModule } from '@jsverse/transloco'
+import { getTranslocoTestingModule } from '../../../jest.mocks'
 import { PageNotFoundComponent } from './page-not-found.component'
 
 describe('PageNotFoundComponent', () => {
@@ -8,10 +8,7 @@ describe('PageNotFoundComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [
-                PageNotFoundComponent,
-                TranslocoTestingModule.forRoot({ langs: { en: {}, de: {} }, translocoConfig: { defaultLang: 'en' } })
-            ]
+            imports: [PageNotFoundComponent, getTranslocoTestingModule()]
         }).compileComponents()
 
         fixture = TestBed.createComponent(PageNotFoundComponent)
