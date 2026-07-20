@@ -12,5 +12,6 @@ export const environment: Environment = {
     appwriteRunsCollectionId: window.env?.APPWRITE_RUNS_COLLECTION_ID || 'staging-dashboard_data',
     cachetUrl: window.env?.CACHET_URL || 'https://status.heigit.org',
     cachetWatchedComponents: window.env?.CACHET_WATCHED_COMPONENTS || 'Climate Action: Climate Action Navigator',
-    scheduleLookaheadDays: window.env?.SCHEDULE_LOOKAHEAD_DAYS || '7'
+    scheduleLookaheadDays: window.env?.SCHEDULE_LOOKAHEAD_DAYS || '7',
+    fallbackSchedulesUrl: window.env?.FALLBACK_SCHEDULES_URL || ''
 }
