@@ -23,7 +23,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Make the custom AoI name field call out for attention when empty, to indicate it is required ([#478](https://gitlab.heigit.org/climate-action/web-app/-/issues/478))
 - Introduce a region selection dialog to surface all options, when there are overlapping AoIs at the point of click ([#481](https://gitlab.heigit.org/climate-action/web-app/-/issues/481))
 - Ensure the compute panel doesn't get clipped on smaller screens, and freeze submit buttons to be always visible ([#484](https://gitlab.heigit.org/climate-action/web-app/-/issues/484))
-- TerraDraw control is now properly rebuilt when the language changes, and drawn features are cleared when the panel is reset
+- TerraDraw startup is now readiness-driven, and the control is properly rebuilt after a breakdown (i.e. language or basemap changes)
 
 ## [3.4.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.4.0) - 2026-06-03
 

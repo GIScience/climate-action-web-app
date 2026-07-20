@@ -64,6 +64,8 @@ function createFakeMap(): MaplibreMap {
     return {
         addControl: jest.fn(),
         removeControl: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn(),
         once: jest.fn(),
         getCanvas: () => ({ style: {} }),
         loaded: () => true,

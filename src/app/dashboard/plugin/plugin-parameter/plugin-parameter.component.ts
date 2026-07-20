@@ -74,7 +74,7 @@ import {
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { Subscription } from 'rxjs'
+import { skip, Subscription } from 'rxjs'
 import { EnumOption, FormlyModel } from './plugin-parameter.interface'
 
 @Component({
@@ -183,6 +183,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     areaSelected = false
     areaGeomType: GeoJsonTypes | undefined
     highlightedFeaturesSubscription: Subscription | undefined
+    private styleChangeSubscription: Subscription | undefined
     currentSelectionMode: GeometryInputMode = ExternalInput.Boundary
     areaLabelControl = new FormControl('')
     private hadSelection = false
@@ -205,6 +206,12 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
         this.appwriteService._user.subscribe(user => {
             this.user = user
+        })
+
+        this.styleChangeSubscription = this.mapService.styleChange$.pipe(skip(1)).subscribe(() => {
+            if (this.isDrawMode(this.currentSelectionMode) && this.mapService.selectedFeatures.length === 0) {
+                this.mapService.startDrawing(this.currentSelectionMode)
+            }
         })
     }
 
@@ -230,6 +237,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
         if (this.highlightedFeaturesSubscription) {
             this.highlightedFeaturesSubscription.unsubscribe()
         }
+        this.styleChangeSubscription?.unsubscribe()
         if (this.currentSelectionMode !== ExternalInput.Boundary) {
             this.mapService.clearDrawnFeatures()
         }
