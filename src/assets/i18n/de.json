@@ -311,7 +311,8 @@
             "area": "Fläche",
             "width": "Breite",
             "height": "Höhe",
-            "measuring": "Messen..."
+            "measuring": "Messen...",
+            "startupFailed": "Zeichenwerkzeuge konnten nicht gestartet werden. Bitte versuche es erneut."
         },
         "regionChoiceDialog": {
             "title": "Überlappende Regionen",

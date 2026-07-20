@@ -311,7 +311,8 @@
             "area": "Area",
             "width": "Width",
             "height": "Height",
-            "measuring": "Measuring..."
+            "measuring": "Measuring...",
+            "startupFailed": "Drawing tools could not be started. Please try again."
         },
         "regionChoiceDialog": {
             "title": "Multiple regions here",
