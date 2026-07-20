@@ -116,9 +116,24 @@ docker image push repo.heigit.org/climate-action/web-app:{image_tag}
 ## Incident & Maintenance Announcements
 
 Incident and maintenance announcements are fetched from [Cachet](https://cachethq.io/) and displayed in the web app.
-The Cachet URL is stored in the `CACHET_URL` environment variable.
-The watched components are stored in the `CACHET_WATCHED_COMPONENTS` environment variable. This is a comma-separated list of `Group: Component` pairs (e.g. `Climate Action: Climate Action Navigator, OpenRouteService: Directions API`); an announcement is surfaced only when it references a component whose name **and** parent group both match one of these pairs.
-The number of days to look ahead for maintenance announcements is stored in the `SCHEDULE_LOOKAHEAD_DAYS` environment variable.
+
+- The Cachet URL is stored in the `CACHET_URL` environment variable.
+- The watched components are stored in the `CACHET_WATCHED_COMPONENTS` environment variable. This is a comma-separated list of `Group: Component` pairs (e.g. `Climate Action: Climate Action Navigator, OpenRouteService: Directions API`); an announcement is surfaced only when it references a component whose name **and** parent group match one of these pairs.
+- The number of days to look ahead for maintenance announcements is stored in the `SCHEDULE_LOOKAHEAD_DAYS` environment variable.
+
+If Cachet is unreachable, maintenance schedules fall back to a static JSON document, which can be hosted anywhere (e.g. [NPoint](https://npoint.io/)). The full URL of the document is stored in the `FALLBACK_SCHEDULES_URL` environment variable (leave it empty to disable the fallback).
+To update the fallback maintenance announcements, simply edit the hosted document, and the changes will be reflected in the web app. The document is an array of announcements shaped like:
+
+```json
+[
+    {
+        "maintenanceType": "Scheduled maintenance",
+        "impact": "Expect brief downtime.",
+        "downtimeStart": "2026-07-05T06:00:00Z",
+        "downtimeEnd": "2026-07-05T08:00:00Z"
+    }
+]
+```
 
 ## Tests
 

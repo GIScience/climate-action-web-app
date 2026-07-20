@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject, signal } from '@angular/core'
+import { formatScheduleTitle, isWithinLookaheadWindow } from '@app/utils/schedule.utils'
 import { environment } from '@environments/environment'
 import { TranslocoService } from '@jsverse/transloco'
 import { ToastrService } from 'ngx-toastr'
-import { EMPTY, Observable, catchError, concat, retry, tap } from 'rxjs'
+import { EMPTY, Observable, catchError, concat, retry, tap, timeout } from 'rxjs'
+import { StatusNotice, ToastLevel } from './announcement.types'
 import {
     CachetAnnouncement,
     CachetComponent,
@@ -14,15 +16,7 @@ import {
     IncidentStatus,
     ScheduleStatus
 } from './cachet.types'
-
-type ToastLevel = 'info' | 'warning' | 'error'
-
-export interface StatusNotice {
-    level: ToastLevel
-    title: string
-    message: string
-    link?: string // Only for incidents
-}
+import { FallbackSchedulesService } from './fallback-schedules.service'
 
 const ACTIVE_SCHEDULE_STATUSES = [ScheduleStatus.Upcoming, ScheduleStatus.InProgress]
 const ACTIVE_INCIDENT_STATUSES = [
@@ -47,6 +41,7 @@ const WATCHED_COMPONENT_KEYS = new Set(
 // throw random "database is locked" 500s under concurrency — a brief retry rides those out.
 const RETRY_COUNT = 2
 const RETRY_DELAY_MS = 400
+const REQUEST_TIMEOUT_MS = 5000
 
 @Injectable({
     providedIn: 'root'
@@ -55,6 +50,7 @@ export class StatusAnnouncementsService {
     private http = inject(HttpClient)
     private toastr = inject(ToastrService)
     private transloco = inject(TranslocoService)
+    private fallbackSchedules = inject(FallbackSchedulesService)
     private cachetUrl = environment.cachetUrl
 
     readonly notices = signal<StatusNotice[]>([])
@@ -72,8 +68,23 @@ export class StatusAnnouncementsService {
             () => 'info',
             () => undefined,
             schedule => this.scheduleTitle(schedule),
-            schedule => this.isWithinLookaheadWindow(schedule),
-            schedule => schedule.attributes.status.value === ScheduleStatus.InProgress
+            schedule => this.isScheduleRelevant(schedule),
+            schedule => schedule.attributes.status.value === ScheduleStatus.InProgress,
+            () => this.fetchFallbackSchedules()
+        )
+    }
+
+    // When Cachet itself is unreachable, fall back to the static maintenance-schedule document.
+    private fetchFallbackSchedules(): Observable<unknown> {
+        return this.fallbackSchedules.fetchActiveSchedules().pipe(
+            tap(({ pinned, upcoming }) => {
+                upcoming.forEach(notice => this.showToast(notice))
+                if (pinned.length) this.notices.update(current => [...current, ...pinned])
+            }),
+            catchError(err => {
+                console.error('Failed to load fallback maintenance schedules:', err)
+                return EMPTY
+            })
         )
     }
 
@@ -95,10 +106,12 @@ export class StatusAnnouncementsService {
         link: (item: T) => string | undefined = () => undefined,
         formatTitle: (item: T) => string = item => item.attributes.name,
         shouldShow: (item: T) => boolean = () => true,
-        isPinned: (item: T) => boolean = () => true
+        isPinned: (item: T) => boolean = () => true,
+        fallback: () => Observable<unknown> = () => EMPTY
     ): Observable<unknown> {
         const url = `${this.cachetUrl}/api/${path}?include=components.group&filter[status]=${activeStatuses.join(',')}`
         return this.http.get<CachetListResponse<T>>(url).pipe(
+            timeout(REQUEST_TIMEOUT_MS),
             retry({ count: RETRY_COUNT, delay: RETRY_DELAY_MS }),
             tap(response => {
                 const watchedIds = this.watchedComponentIds(response.included)
@@ -123,7 +136,7 @@ export class StatusAnnouncementsService {
             }),
             catchError(err => {
                 console.error(errorMessage, err)
-                return EMPTY
+                return fallback()
             })
         )
     }
@@ -133,39 +146,27 @@ export class StatusAnnouncementsService {
         return status === IncidentStatus.Watching ? 'warning' : 'error'
     }
 
-    // Append the maintenance window to the schedule's name: "Name (start → end)", or just "Name" with no window.
     private scheduleTitle(item: CachetSchedule): string {
-        const { name, scheduled, completed } = item.attributes
-        if (!scheduled?.string) return name
-        const start = this.formatTimestamp(scheduled.string)
-        const window = completed?.string ? `${start} → ${this.formatTimestamp(completed.string)}` : start
-        return `${name} (${window})`
+        const { start, end } = this.scheduleWindow(item)
+        return formatScheduleTitle(item.attributes.name, this.transloco.getActiveLang(), start, end)
     }
 
-    private formatTimestamp(timestamp: string): string {
-        return this.toDate(timestamp).toLocaleString(this.transloco.getActiveLang(), {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-        })
+    private isScheduleRelevant(item: CachetSchedule): boolean {
+        const { start, end } = this.scheduleWindow(item)
+        return isWithinLookaheadWindow(start, end)
+    }
+
+    private scheduleWindow(item: CachetSchedule): { start?: Date; end?: Date } {
+        const { scheduled, completed } = item.attributes
+        return {
+            start: scheduled?.string ? this.toDate(scheduled.string) : undefined,
+            end: completed?.string ? this.toDate(completed.string) : undefined
+        }
     }
 
     // Normalise Cachet UTC timestamps to ISO-8601 format with 'Z' for instant parsing.
     private toDate(timestamp: string): Date {
         return new Date(`${timestamp.replace(' ', 'T')}Z`)
-    }
-
-    // Show a schedule only while it's relevant: ongoing or occurring within the defined lookahead window.
-    private isWithinLookaheadWindow(item: CachetSchedule): boolean {
-        const { scheduled, completed } = item.attributes
-        const now = new Date()
-
-        // Past its planned end → the window's over; drop it even if Cachet hasn't flipped it to Complete yet.
-        if (completed?.string && this.toDate(completed.string) < now) return false
-
-        if (!scheduled?.string) return true
-        const cutoff = new Date(now)
-        cutoff.setDate(cutoff.getDate() + parseInt(environment.scheduleLookaheadDays))
-        return this.toDate(scheduled.string) <= cutoff
     }
 
     // Resolves each included component to its (group, name) pair and keeps the ids whose pair is watched.

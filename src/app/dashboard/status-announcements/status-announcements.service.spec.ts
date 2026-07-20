@@ -30,6 +30,7 @@ const sameNameOtherGroup = {
     ...groupRef('20')
 }
 const componentRef = (id: string) => ({ relationships: { components: { data: [{ type: 'components', id }] } } })
+const daysFromNow = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString()
 
 describe('StatusAnnouncementsService', () => {
     let service: StatusAnnouncementsService
@@ -38,8 +39,10 @@ describe('StatusAnnouncementsService', () => {
 
     const schedulesUrl = `${environment.cachetUrl}/api/schedules?include=components.group&filter[status]=0,1`
     const incidentsUrl = `${environment.cachetUrl}/api/incidents?include=components.group&filter[status]=0,1,2,3`
+    const fallbackUrl = 'https://example.org/fallback-schedules.json'
 
     beforeEach(() => {
+        environment.fallbackSchedulesUrl = fallbackUrl
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, getTranslocoTestingModule()],
             providers: [StatusAnnouncementsService, { provide: ToastrService, useClass: MockToastrService }]
@@ -50,6 +53,7 @@ describe('StatusAnnouncementsService', () => {
     })
 
     afterEach(() => {
+        environment.fallbackSchedulesUrl = ''
         httpMock.verify()
         jest.useRealTimers()
     })
@@ -304,5 +308,87 @@ describe('StatusAnnouncementsService', () => {
                 link: `${environment.cachetUrl}/incidents/guid-1`
             }
         ])
+    }))
+
+    it('falls back to the schedules document when Cachet stays unreachable', fakeAsync(() => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation()
+
+        service.showActiveAnnouncements()
+
+        // Initial attempt plus both retries fail → Cachet is considered down.
+        httpMock.expectOne(schedulesUrl).error(new ProgressEvent('error'))
+        tick(500)
+        httpMock.expectOne(schedulesUrl).error(new ProgressEvent('error'))
+        tick(500)
+        httpMock.expectOne(schedulesUrl).error(new ProgressEvent('error'))
+
+        httpMock.expectOne(fallbackUrl).flush([
+            {
+                maintenanceType: 'Live maintenance',
+                impact: 'Currently unavailable.',
+                downtimeStart: daysFromNow(-1), // downtime underway → pinned notice
+                downtimeEnd: daysFromNow(1)
+            },
+            {
+                maintenanceType: 'Scheduled maintenance',
+                impact: 'Expect brief downtime.',
+                downtimeStart: daysFromNow(3), // downtime within the lookahead window → toast
+                downtimeEnd: daysFromNow(4)
+            },
+            {
+                maintenanceType: 'Past maintenance',
+                impact: 'None.',
+                downtimeStart: daysFromNow(-2),
+                downtimeEnd: daysFromNow(-1) // downtime already over → dropped
+            }
+        ])
+        // The incidents fetch still runs afterwards — it has no fallback.
+        httpMock.expectOne(incidentsUrl).flush({ data: [] })
+
+        expect(consoleError).toHaveBeenCalledWith('Failed to load maintenance schedules:', expect.anything())
+
+        expect(toastr.info).toHaveBeenCalledTimes(1)
+        expect(toastr.info).toHaveBeenCalledWith(
+            'Expect brief downtime.',
+            expect.stringMatching(/^Scheduled maintenance \(.+ → .+\)$/),
+            expect.objectContaining({ positionClass: 'toast-top-center', disableTimeOut: true })
+        )
+        expect(toastr.warning).not.toHaveBeenCalled()
+        expect(service.notices()).toEqual([
+            {
+                level: 'info',
+                title: expect.stringMatching(/^Live maintenance \(.+ → .+\)$/),
+                message: 'Currently unavailable.'
+            }
+        ])
+
+        consoleError.mockRestore()
+    }))
+
+    it('times out stalled Cachet requests before retrying and falling back', fakeAsync(() => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation()
+
+        service.showActiveAnnouncements()
+
+        const firstAttempt = httpMock.expectOne(schedulesUrl)
+        tick(5000)
+        expect(firstAttempt.cancelled).toBe(true)
+        tick(400)
+
+        const secondAttempt = httpMock.expectOne(schedulesUrl)
+        tick(5000)
+        expect(secondAttempt.cancelled).toBe(true)
+        tick(400)
+
+        const finalAttempt = httpMock.expectOne(schedulesUrl)
+        tick(5000)
+        expect(finalAttempt.cancelled).toBe(true)
+
+        httpMock.expectOne(fallbackUrl).flush([])
+        httpMock.expectOne(incidentsUrl).flush({ data: [] })
+
+        expect(consoleError).toHaveBeenCalledWith('Failed to load maintenance schedules:', expect.anything())
+
+        consoleError.mockRestore()
     }))
 })

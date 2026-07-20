@@ -14,6 +14,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Fetch active incidents from Cachet affecting upstream services and display them as toasts ([#421](https://gitlab.heigit.org/climate-action/web-app/-/issues/421))
+- Fall back to a static maintenance-schedule JSON document when Cachet is unreachable
 - Allow users to upload GeoJSON, KML, and GPX files as AoI ([#376](https://gitlab.heigit.org/climate-action/web-app/-/issues/376))
 - Add Prettier pre-commit hook on staged files ([#479](https://gitlab.heigit.org/climate-action/web-app/-/issues/479))
 
