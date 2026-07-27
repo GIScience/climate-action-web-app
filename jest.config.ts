@@ -4,6 +4,7 @@ process.env.TZ = 'UTC'
 
 const config: Config = {
     preset: 'jest-preset-angular',
+    setupFiles: ['<rootDir>/jest.mocks.ts'],
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/cypress/', '<rootDir>/.cache/'],
     coverageReporters: ['html', 'text-summary', 'cobertura', 'lcov'],
