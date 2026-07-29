@@ -115,6 +115,7 @@ bootstrapApplication(AppComponent, {
             positionClass: 'toast-bottom-center',
             extendedTimeOut: 0,
             preventDuplicates: true,
+            includeTitleDuplicates: true,
             maxOpened: 10,
             easeTime: 100,
             autoDismiss: true,

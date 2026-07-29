@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.5.0...main)
 
+### Fixed
+
+- Toasts now compare titles before suppressing duplicates, avoiding swallowed schedule messages with identical boilerplate bodies
+
 ## [3.5.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.5.0) - 2026-07-20
 
 ### Changed
