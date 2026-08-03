@@ -133,6 +133,10 @@ i-lucide {
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+        .toast-title {
+            white-space: pre-line;
+        }
+
         &.toast-success {
             background-color: rgba(41, 124, 41, 0.75);
         }

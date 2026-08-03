@@ -171,7 +171,7 @@ describe('StatusAnnouncementsService', () => {
         // Upcoming (id1): dismissable toast at the top.
         expect(toastr.info).toHaveBeenCalledWith(
             'Brief downtime expected',
-            expect.stringMatching(/^DB upgrade \(Jun 20, 2026, 6:30\sAM → Jun 20, 2026, 10:30\sAM\)$/),
+            expect.stringMatching(/^DB upgrade\n\(Jun 20, 2026, 6:30\s–\s10:30\sAM UTC\)$/),
             expect.objectContaining({
                 toastClass: 'ngx-toastr ngx-toastr--inverted',
                 positionClass: 'toast-top-center',
@@ -181,7 +181,7 @@ describe('StatusAnnouncementsService', () => {
         // Upcoming with no end time yet (id7): still shown, title carries just the start.
         expect(toastr.info).toHaveBeenCalledWith(
             'No end time set',
-            expect.stringMatching(/^Open-ended window \(Jun 20, 2026, 6:30\sAM\)$/),
+            expect.stringMatching(/^Open-ended window\n\(Jun 20, 2026, 6:30\sAM UTC\)$/),
             expect.objectContaining({ positionClass: 'toast-top-center', tapToDismiss: true })
         )
         // In progress (id4): not a toast — surfaced in the persistent notices section instead.
@@ -350,14 +350,14 @@ describe('StatusAnnouncementsService', () => {
         expect(toastr.info).toHaveBeenCalledTimes(1)
         expect(toastr.info).toHaveBeenCalledWith(
             'Expect brief downtime.',
-            expect.stringMatching(/^Scheduled maintenance \(.+ → .+\)$/),
+            expect.stringMatching(/^Scheduled maintenance\n\(.+\s–\s.+ UTC\)$/),
             expect.objectContaining({ positionClass: 'toast-top-center', disableTimeOut: true })
         )
         expect(toastr.warning).not.toHaveBeenCalled()
         expect(service.notices()).toEqual([
             {
                 level: 'info',
-                title: expect.stringMatching(/^Live maintenance \(.+ → .+\)$/),
+                title: expect.stringMatching(/^Live maintenance\n\(.+\s–\s.+ UTC\)$/),
                 message: 'Currently unavailable.'
             }
         ])

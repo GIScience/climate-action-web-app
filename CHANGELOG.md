@@ -10,6 +10,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 ### Fixed
 
 - Toasts now compare titles before suppressing duplicates, avoiding swallowed schedule messages with identical boilerplate bodies
+- Append timezone info to schedules; format and condense the message
 
 ## [3.5.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.5.0) - 2026-07-20
 
