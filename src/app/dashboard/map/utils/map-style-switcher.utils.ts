@@ -1,8 +1,18 @@
 import { TranslocoService } from '@jsverse/transloco'
-import { ControlPosition, IControl, LayerSpecification, Map as MaplibreMap, StyleSpecification } from 'maplibre-gl'
+import {
+    AllPaintProperties,
+    ControlPosition,
+    ExpressionSpecification,
+    IControl,
+    LayerSpecification,
+    Map as MaplibreMap,
+    StyleSpecification
+} from 'maplibre-gl'
 import { Subscription } from 'rxjs'
 import type { Artifact, ArtifactEntity } from '../../artifact/artifact.interface'
 import type { MapArtifactLayer } from '../map-artifact-manager.service'
+
+type OpacityPaintKey = keyof AllPaintProperties & `${string}-opacity`
 
 export interface MapStyle {
     title: string
@@ -222,7 +232,7 @@ export class MapStyleSwitcherControl implements IControl {
 
         if (!currentStyle?.layers || !this.isVectorStyleActive()) return
 
-        const localizedExpression = [
+        const localizedExpression: ExpressionSpecification = [
             'case',
             ['to-boolean', ['get', localizedField]],
             ['get', localizedField],
@@ -379,7 +389,7 @@ export class MapStyleSwitcherControl implements IControl {
             if (firstLayerId) {
                 const layer = this.map!.getLayer(firstLayerId)
                 if (layer) {
-                    const paintKey = `${layer.type}-opacity`
+                    const paintKey = `${layer.type}-opacity` as OpacityPaintKey
                     const currentValue = this.map!.getPaintProperty(firstLayerId, paintKey)
                     if (typeof currentValue === 'number' && !Number.isNaN(currentValue)) {
                         initialOpacity = currentValue
@@ -405,7 +415,7 @@ export class MapStyleSwitcherControl implements IControl {
                     const layer = this.map!.getLayer(id)
                     if (!layer) return
 
-                    this.map!.setPaintProperty(id, `${layer.type}-opacity`, v)
+                    this.map!.setPaintProperty(id, `${layer.type}-opacity` as OpacityPaintKey, v)
 
                     if (layer.type === 'circle') {
                         this.map!.setPaintProperty(id, 'circle-stroke-opacity', v)

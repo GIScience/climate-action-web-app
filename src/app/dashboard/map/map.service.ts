@@ -18,7 +18,8 @@ import type {
     Geometry,
     MultiPolygon
 } from 'geojson'
-import maplibregl, {
+import * as maplibregl from 'maplibre-gl'
+import {
     GeoJSONSource,
     IControl,
     LngLatBounds,

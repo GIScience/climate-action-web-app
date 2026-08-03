@@ -111,7 +111,7 @@ export class MapGeoJsonUtils {
             ctx.hoverId = id
             map.getCanvas().style.cursor = 'pointer'
             const source = map.getSource(SOURCE_ID) as GeoJSONSource
-            const json = typeof first.toJSON === 'function' ? first.toJSON() : JSON.parse(JSON.stringify(first))
+            const json = JSON.parse(JSON.stringify(typeof first.toJSON === 'function' ? first.toJSON() : first))
             source?.setData({ type: 'FeatureCollection', features: [json] })
         }
 

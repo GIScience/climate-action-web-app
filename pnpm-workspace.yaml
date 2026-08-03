@@ -1,8 +1,12 @@
+# TODO: Drop once a maplibre-gl v6 compatible release exists.
+patchedDependencies:
+    maplibre-ui-translations@0.4.0: patches/maplibre-ui-translations@0.4.0.patch
+
 allowBuilds:
-  '@parcel/watcher': true
-  core-js: true
-  cypress: true
-  esbuild: true
-  lmdb: true
-  msgpackr-extract: true
-  unrs-resolver: true
+    '@parcel/watcher': true
+    core-js: true
+    cypress: true
+    esbuild: true
+    lmdb: true
+    msgpackr-extract: true
+    unrs-resolver: true

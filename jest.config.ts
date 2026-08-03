@@ -17,11 +17,12 @@ const config: Config = {
         '^@app/(.*)$': '<rootDir>/src/app/$1',
         '^@environments/(.*)$': '<rootDir>/src/environments/$1',
         '^@shared/(.*)$': '<rootDir>/src/app/shared/$1',
-        '^src/environments/environment$': '<rootDir>/src/environments/environment.ts'
+        '^src/environments/environment$': '<rootDir>/src/environments/environment.ts',
+        '^maplibre-gl$': '<rootDir>/node_modules/maplibre-gl/dist/maplibre-gl.mjs'
     },
 
     transformIgnorePatterns: [
-        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|@jsverse|rxjs|@kurkle|chart\\.js|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|ngx-markdown|ngx-toastr|marked|rbush|quickselect|@versatiles))'
+        'node_modules/(?!(.*\\.pnpm/.*/node_modules/)?(maplibre-gl|ol|quick-lru|geotiff|color-space|color-name|color-rgba|color-parse|@angular|@ngneat|@jsverse|rxjs|@kurkle|chart\\.js|ngx-scrollbar|ngx-papaparse|ng2-charts|lodash-es|lucide-angular|@ngx-formly|ngx-markdown|ngx-toastr|marked|rbush|quickselect|@versatiles))'
     ],
 
     transform: {
