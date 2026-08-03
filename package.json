@@ -68,7 +68,7 @@
         "ngx-papaparse": "^8.0.0",
         "ngx-scrollbar": "^19.0.0",
         "ngx-toastr": "^20.0.0",
-        "plotly.js-locales": "3.6.0",
+        "plotly.js-locales": "3.7.0",
         "plotly.js-strict-dist": "^3.0.1",
         "pmtiles": "^4.3.0",
         "polyclip-ts": "^0.16.8",
