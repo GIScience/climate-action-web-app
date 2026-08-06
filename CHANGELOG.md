@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.5.0...main)
 
+### Added
+
+- Plotly Chart artifacts can now supply a separate CSV file for download ([#496](https://gitlab.heigit.org/climate-action/web-app/-/issues/496))
+
 ### Fixed
 
 - Toasts now compare titles before suppressing duplicates, avoiding swallowed schedule messages with identical boilerplate bodies

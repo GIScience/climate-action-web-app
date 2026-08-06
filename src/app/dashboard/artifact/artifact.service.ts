@@ -79,8 +79,9 @@ export class ArtifactService {
     }
 
     getPlotlyChart(artifact: Artifact): void {
+        const filename = artifact.attachments.display_filename || artifact.filename
         this.http
-            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`)
+            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`)
             .subscribe(data => {
                 this.plotlyChartSubject.next({
                     data: data,

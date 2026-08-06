@@ -2,7 +2,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { jest } from '@jest/globals'
 import { of } from 'rxjs'
-import { Artifact, ChartData, LegendObject } from './artifact.interface'
+import { Artifact, ChartData, LegendObject, PlotlyChartData } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
 
 describe('ArtifactService', () => {
@@ -127,6 +127,42 @@ describe('ArtifactService', () => {
                 data: test_chart,
                 artifact: test_artifact
             })
+            expect(httpClientSpy.get).toHaveBeenCalledWith(
+                expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+            )
+            done()
+        })
+    })
+
+    it('should get plotly chart artifact item using display_filename', done => {
+        const test_plotly_chart = { data: [], layout: {} } as PlotlyChartData
+        const display_filename = 'simple_scatter_chart.json'
+        const test_plotly_artifact = {
+            ...test_artifact,
+            modality: 'CHART_PLOTLY',
+            attachments: { display_filename }
+        } as Artifact
+
+        httpClientSpy.get.mockReturnValue(of(test_plotly_chart))
+
+        service.getPlotlyChart(test_plotly_artifact)
+        service.plotlyChart.subscribe(x => {
+            expect(x).toEqual({
+                data: test_plotly_chart,
+                artifact: test_plotly_artifact
+            })
+            expect(httpClientSpy.get).toHaveBeenCalledWith(
+                expect.stringContaining(`/store/${correlation_uuid}/${display_filename}`)
+            )
+            done()
+        })
+    })
+
+    it('should get plotly chart artifact item falling back to filename', done => {
+        httpClientSpy.get.mockReturnValue(of({ data: [], layout: {} } as PlotlyChartData))
+
+        service.getPlotlyChart(test_artifact)
+        service.plotlyChart.subscribe(() => {
             expect(httpClientSpy.get).toHaveBeenCalledWith(
                 expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
             )
