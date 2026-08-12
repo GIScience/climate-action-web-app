@@ -42,12 +42,12 @@
     flex-direction: column;
     padding: 2em;
     position: relative;
-    width: 600px;
+    width: 42.857rem;
 
     h2 {
         font-variation-settings: 'wght' 600;
         margin: 0;
-        padding: 0 20px;
+        padding: 0 1.429rem;
         text-align: center;
     }
 
@@ -55,7 +55,7 @@
         h3 {
             color: #2a6d6d;
             font-variation-settings: 'wght' 600;
-            margin: 15px 0;
+            margin: 1.071rem 0;
             text-align: center;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
@@ -66,8 +66,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: block;
             margin: 0 auto;
-            max-width: 400px;
-            padding: 20px;
+            max-width: 28.571rem;
+            padding: 1.429rem;
             text-decoration: none;
             transition: all 0.3s ease;
 
@@ -80,19 +80,19 @@
                 align-items: center;
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
+                margin-bottom: 0.714rem;
 
                 .plugin-name {
                     color: #2a6d6d;
-                    font-size: 18px;
+                    font-size: 1.25rem;
                     font-variation-settings: 'wght' 600;
                 }
 
                 .status {
                     border-radius: 10px;
-                    font-size: 12px;
+                    font-size: 0.85rem;
                     font-variation-settings: 'wght' 500;
-                    padding: 4px 8px;
+                    padding: 0.286rem 0.571rem;
                     text-transform: uppercase;
 
                     &.status-success {
@@ -116,14 +116,14 @@
                 .aoi-name {
                     color: #333;
                     display: block;
-                    font-size: 16px;
+                    font-size: 1.15rem;
                     font-variation-settings: 'wght' 500;
-                    margin-bottom: 5px;
+                    margin-bottom: 0.357rem;
                 }
 
                 .timestamp {
                     color: #666;
-                    font-size: 12px;
+                    font-size: 0.85rem;
                 }
             }
         }
@@ -133,26 +133,26 @@
 .welcome-content__loading {
     align-items: center;
     display: flex;
-    height: 200px;
+    height: 14.286rem;
     justify-content: center;
     position: relative;
-    width: 600px;
+    width: 42.857rem;
     z-index: 1;
 
     .loading-text {
         color: #2a6d6d;
-        font-size: 18px;
+        font-size: 1.25rem;
         font-variation-settings: 'wght' 500;
     }
 }
 
 .welcome-content__new {
     position: relative;
-    width: 800px;
+    width: 57.143rem;
     z-index: 1;
 
     &::-webkit-scrollbar {
-        width: 6px;
+        width: 0.429rem;
     }
 
     &::-webkit-scrollbar-track {
@@ -184,13 +184,13 @@
     }
 
     .intro-section {
-        padding: 15px 40px;
+        padding: 1.071rem 2.857rem;
 
         h1 {
             color: #2a6d6d;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            margin: 0 0 15px;
+            letter-spacing: -0.036rem;
+            margin: 0 0 1.071rem;
             text-align: center;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
@@ -209,8 +209,8 @@
         display: inline-block;
         font-variation-settings: 'wght' 600;
         left: 50%;
-        margin: 0 0 15px;
-        padding: 0 20px;
+        margin: 0 0 1.071rem;
+        padding: 0 1.429rem;
         position: relative;
         transform: translateX(-50%);
     }
@@ -219,8 +219,8 @@
         display: grid;
         flex-direction: column;
         grid-template-columns: repeat(2, 1fr);
-        grid-gap: 15px;
-        padding: 5px 15px;
+        grid-gap: 1.071rem;
+        padding: 0.357rem 1.071rem;
     }
 
     .note-card {
@@ -231,7 +231,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         display: flex;
         overflow: hidden;
-        padding: 12.5px 17.5px;
+        padding: 0.929rem 1.286rem;
         position: relative;
         transition: all 0.3s ease;
 
@@ -248,7 +248,7 @@
             flex-direction: row;
 
             .icon-wrapper {
-                margin-right: 10px;
+                margin-right: 0.714rem;
             }
         }
 
@@ -257,7 +257,7 @@
             flex-direction: row-reverse;
 
             .icon-wrapper {
-                margin-left: 10px;
+                margin-left: 0.714rem;
             }
         }
     }
@@ -266,7 +266,7 @@
         align-items: center;
         display: flex;
         flex-direction: column;
-        padding: 20px 15px;
+        padding: 1.429rem 1.071rem;
 
         p {
             color: #111;
@@ -279,18 +279,18 @@
             span::before {
                 content: '←';
                 display: inline-block;
-                margin-right: 5px;
+                margin-right: 0.357rem;
                 transform: translateX(0);
                 transition: transform 0.2s ease;
             }
 
             &:hover span::before {
-                transform: translateX(-4px);
+                transform: translateX(-0.286rem);
             }
 
             &.or-text {
                 display: inline-flex;
-                margin: 12.5px 0;
+                margin: 0.929rem 0;
                 position: relative;
 
                 &::before,
@@ -298,10 +298,10 @@
                     border-top: 1px solid #aaa;
                     content: '';
                     display: inline-block;
-                    margin: 0 10px;
+                    margin: 0 0.714rem;
                     position: absolute;
-                    top: 10px;
-                    width: 225px;
+                    top: 0.714rem;
+                    width: 16.071rem;
                 }
 
                 &:before {
@@ -319,7 +319,7 @@
 @keyframes fadeSlideInLeft {
     from {
         opacity: 0;
-        transform: translateX(-30px);
+        transform: translateX(-2.143rem);
     }
     to {
         opacity: 1;
@@ -330,7 +330,7 @@
 @keyframes fadeSlideInRight {
     from {
         opacity: 0;
-        transform: translateX(30px);
+        transform: translateX(2.143rem);
     }
     to {
         opacity: 1;

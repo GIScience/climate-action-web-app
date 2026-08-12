@@ -8,6 +8,14 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+html {
+    font-size: 14px;
+
+    @media (min-resolution: 1.5dppx) and (max-height: 1200px) {
+        font-size: 12px;
+    }
+}
+
 a {
     cursor: pointer;
     text-decoration: none;
@@ -25,7 +33,7 @@ a {
 body {
     color: #111;
     font-family: fonts.$font-primary;
-    font-size: 14px;
+    font-size: 1rem;
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -55,7 +63,7 @@ p {
 }
 
 .lead {
-    font-size: 18px;
+    font-size: 1.3rem;
 }
 
 ul {

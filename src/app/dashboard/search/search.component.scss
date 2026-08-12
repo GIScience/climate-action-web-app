@@ -1,11 +1,11 @@
 .search-locations__wrapper {
     position: relative;
     text-align: right;
-    width: 250px;
+    width: 17.857rem;
     z-index: 2;
 
     ng-scrollbar {
-        max-height: 500px;
+        max-height: 35.714rem;
     }
 
     form {
@@ -13,14 +13,14 @@
 
         input.search-locations {
             background-image: url('../../../assets/images/search.svg');
-            background-position: 7.5px center;
+            background-position: 0.571rem center;
             background-repeat: no-repeat;
-            background-size: 17.5px;
+            background-size: 1.286rem;
             border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
-            padding: 7.5px 30px;
+            font-size: 1.15rem;
+            padding: 0.571rem 2.143rem;
             position: relative;
             transition: width 0.25s ease;
             width: 75%;
@@ -45,7 +45,7 @@
             border: none;
             position: absolute;
             right: 0;
-            top: 7px;
+            top: 0.5rem;
             z-index: 2;
         }
     }
@@ -55,9 +55,9 @@
         background-color: rgb(255 255 255 / 85%);
         border: 1px solid #ddd;
         border-radius: 5px;
-        margin-top: -10px;
+        margin-top: -0.714rem;
         overflow-y: auto;
-        padding-top: 10px;
+        padding-top: 0.714rem;
         text-align: left;
         width: 100%;
 
@@ -70,8 +70,8 @@
     .location-suggestion__item {
         border-bottom: 1px solid #ddd;
         cursor: pointer;
-        line-height: 18px;
-        padding: 10px;
+        line-height: 1.286rem;
+        padding: 0.714rem;
 
         &:last-of-type {
             border-bottom: none;
@@ -94,7 +94,7 @@
 
         .suggestion__subtitle {
             color: #666;
-            font-size: 12px;
+            font-size: 0.85rem;
         }
     }
 }

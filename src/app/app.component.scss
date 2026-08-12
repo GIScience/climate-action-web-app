@@ -1,12 +1,12 @@
 .page-container {
     background-image: linear-gradient(45deg, #e7e7e7c9, #ededed80);
     display: grid;
-    grid-template-rows: 60px calc(100vh - 85px) 25px;
+    grid-template-rows: 4.286rem calc(100vh - 6.071rem) 1.786rem;
     height: 100vh;
     overflow-x: hidden;
 
     &--with-notices {
-        grid-template-rows: 60px 45px calc(100vh - 130px) 25px;
+        grid-template-rows: 4.286rem 3.214rem calc(100vh - 9.286rem) 1.786rem;
     }
 }
 
@@ -44,17 +44,17 @@ footer {
     .about-info,
     .contact-info {
         display: flex;
-        gap: 7.5px;
+        gap: 0.571rem;
     }
 
     .about-info {
         float: left;
-        margin: 0 20px;
+        margin: 0 1.429rem;
     }
 
     .contact-info {
         float: right;
-        margin: 0 20px;
+        margin: 0 1.429rem;
     }
 }
 

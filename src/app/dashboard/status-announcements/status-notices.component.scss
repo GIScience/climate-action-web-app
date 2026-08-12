@@ -8,30 +8,30 @@
     align-items: baseline;
     display: flex;
     flex: 1;
-    font-size: 14px;
+    font-size: 1rem;
     justify-content: center;
-    padding: 5px 15px;
+    padding: 0.357rem 1.071rem;
 
     &__title {
         font-weight: 600;
     }
 
     &__message {
-        margin-left: 5px;
+        margin-left: 0.357rem;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     &__link {
-        margin-left: 5px;
+        margin-left: 0.357rem;
 
         a {
             color: rgba(255, 255, 255, 0.85);
             text-decoration: underline;
 
             i-lucide {
-                margin-left: 2.5px;
+                margin-left: 0.214rem;
                 text-decoration: none;
                 vertical-align: text-top;
             }
@@ -58,7 +58,7 @@
     align-items: center;
     display: flex;
     flex-shrink: 0;
-    padding: 3.5px 7.5px;
+    padding: 0.286rem 0.571rem;
     position: absolute;
     right: 0.5vw;
 }
@@ -70,7 +70,7 @@
     color: #fff;
     cursor: pointer;
     display: flex;
-    padding: 3.5px 2.5px 0;
+    padding: 0.286rem 0.214rem 0;
 }
 
 .status-notices__counter {

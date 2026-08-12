@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.6.0...main)
 
+### Fixed
+
+- Use responsive sizing (rem) for all spacing values to fix clipping in zoomed in screens ([#494](https://gitlab.heigit.org/climate-action/web-app/-/issues/494))
+
 ## [3.6.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.6.0) - 2026-08-06
 
 ### Added

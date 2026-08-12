@@ -2,7 +2,7 @@
     border-left: 1px solid #aaa;
     display: flex;
     justify-content: flex-end;
-    padding: 0 30px 0 7.5px;
+    padding: 0 2.143rem 0 0.571rem;
     position: relative;
 }
 
@@ -18,12 +18,12 @@
         color: #008080;
         cursor: pointer;
         display: flex;
-        font-size: 12px;
+        font-size: 0.85rem;
         font-variation-settings: 'wght' 600;
-        height: 45px;
+        height: 3.214rem;
         justify-content: center;
         transition: all 0.2s;
-        width: 45px;
+        width: 3.214rem;
 
         &:hover {
             background-color: rgb(0 128 128 / 15%);
@@ -31,23 +31,23 @@
 
         i-lucide {
             align-items: center;
-            border: 3px solid #008080;
+            border: 0.214rem solid #008080;
             border-radius: 50%;
             display: flex;
-            height: 30px;
+            height: 1.929rem;
             justify-content: center;
-            width: 30px;
+            width: 1.929rem;
         }
 
         .current-lang {
             background: #008080;
             border-radius: 50%;
             color: #fff;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            padding: 4px;
+            font-size: 0.8rem;
+            letter-spacing: 0.036rem;
+            padding: 0.286rem;
             position: absolute;
-            right: -5px;
+            right: -0.357rem;
             top: 0;
         }
     }

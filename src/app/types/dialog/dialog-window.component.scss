@@ -1,6 +1,6 @@
 :host ::ng-deep {
     .dialog-window {
-        padding: 20px;
+        padding: 1.429rem;
 
         & * {
             font-family: Manrope !important;
@@ -17,8 +17,8 @@
             color: #666;
             cursor: pointer;
             position: absolute;
-            right: 10px;
-            top: 17.5px;
+            right: 0.714rem;
+            top: 1.286rem;
         }
 
         .ng-scrollbar {
@@ -26,21 +26,21 @@
         }
 
         .optional-attributes {
-            --mat-form-field-container-height: 48px;
-            --mat-form-field-filled-with-label-container-padding-top: 20px;
-            --mat-form-field-filled-with-label-container-padding-bottom: 6px;
-            --mat-form-field-container-vertical-padding: 12px;
+            --mat-form-field-container-height: 3.429rem;
+            --mat-form-field-filled-with-label-container-padding-top: 1.429rem;
+            --mat-form-field-filled-with-label-container-padding-bottom: 0.429rem;
+            --mat-form-field-container-vertical-padding: 0.857rem;
 
             mat-form-field {
-                margin-bottom: 12px;
+                margin-bottom: 0.857rem;
             }
         }
 
         .dialog-window-buttons {
             display: flex;
-            gap: 10px;
+            gap: 0.714rem;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 1.429rem;
         }
     }
 }

@@ -2,7 +2,7 @@
     pointer-events: all;
     position: relative;
     transition: transform 0.2s ease-in-out;
-    width: 425px;
+    width: 30.357rem;
 
     &::after {
         background-color: red;
@@ -22,7 +22,7 @@
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 1rem 15px 1.5rem;
+    padding: 1rem 1.071rem 1.5rem;
     position: relative;
 
     &.is-loading {
@@ -55,12 +55,12 @@
             display: flex;
 
             .plugin-state-badge {
-                margin-left: 10px;
+                margin-left: 0.714rem;
             }
         }
 
         i-lucide {
-            margin-left: 10px;
+            margin-left: 0.714rem;
         }
     }
 
@@ -90,10 +90,10 @@
                     border-top: 1px solid #999;
                     content: '';
                     display: inline-block;
-                    margin: 0 10px;
+                    margin: 0 0.714rem;
                     position: absolute;
-                    top: 10px;
-                    width: 150px;
+                    top: 0.714rem;
+                    width: 10.714rem;
                 }
 
                 &:before {
@@ -106,16 +106,16 @@
             }
 
             i {
-                margin-left: 5px;
+                margin-left: 0.357rem;
             }
         }
 
         .plugin-links-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 0.714rem;
             justify-content: flex-start;
-            padding: 15px 0 5px;
+            padding: 1.071rem 0 0.357rem;
         }
     }
 }
@@ -126,10 +126,10 @@
     border-radius: 15px;
     border-radius: 15px;
     box-shadow:
-        0px -5px 7.5px -5px hsl(172deg 20.75% 51.51% / 75%),
+        0px -5px 8px -5px hsl(172deg 20.75% 51.51% / 75%),
         2px 2px 4px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-    margin-top: -12.5px;
+    margin-top: -0.929rem;
     overflow: hidden;
     position: relative;
 
@@ -144,7 +144,7 @@
         );
         background-size: 200% 100%;
         border-radius: 15px;
-        padding: 15px 15px 10vh;
+        padding: 1.071rem 1.071rem 10vh;
 
         h2 {
             background: rgba(255, 255, 255, 0.6);
@@ -155,13 +155,13 @@
 }
 
 .computations-list {
-    padding: 15px 15px 0;
+    padding: 1.071rem 1.071rem 0;
 
     .computations-list__header {
         align-items: center;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 15px;
+        margin-bottom: 1.071rem;
         h2 {
             margin: 0;
         }
@@ -174,13 +174,13 @@
 }
 
 .plugin-compute {
-    padding: 15px;
+    padding: 1.071rem;
 
     .plugin-compute__header {
         align-items: center;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 15px;
+        margin-bottom: 1.071rem;
 
         & h2 {
             margin: 0;
@@ -192,10 +192,10 @@
         border: none;
         border-radius: 50%;
         cursor: pointer;
-        padding: 5px;
+        padding: 0.357rem;
         position: absolute;
-        right: 15px;
-        top: 15px;
+        right: 1.071rem;
+        top: 1.071rem;
         transition: background-color 0.2s;
 
         &:hover {
@@ -211,20 +211,20 @@
 }
 
 .plugin-methodology-dialog {
-    padding: 20px 30px;
+    padding: 1.429rem 2.143rem;
     position: relative;
 
     mat-tab-group {
-        min-width: 500px;
+        min-width: 35.714rem;
     }
 
     &__scrollbar {
         max-height: 50vh !important;
-        max-width: 650px !important;
+        max-width: 46.429rem !important;
     }
 
     &__content {
-        padding: 15px 5px;
+        padding: 1.071rem 0.357rem;
     }
 
     button.close-dialog {
@@ -235,7 +235,7 @@
         cursor: pointer;
         position: absolute;
         right: 0;
-        top: 7.5px;
+        top: 0.571rem;
     }
 
     table,
@@ -243,7 +243,7 @@
     td {
         border: 1px solid #ccc;
         border-collapse: collapse;
-        padding: 5px;
+        padding: 0.357rem;
     }
 
     .plugin-sources {
@@ -265,8 +265,8 @@
 
 .plugin-credits-dialog {
     max-height: 50vh !important;
-    max-width: 650px !important;
-    padding: 20px 30px;
+    max-width: 46.429rem !important;
+    padding: 1.429rem 2.143rem;
     position: relative;
 
     h2 {
@@ -280,8 +280,8 @@
         color: #666;
         cursor: pointer;
         position: absolute;
-        right: 5px;
-        top: 17.5px;
+        right: 0.357rem;
+        top: 1.286rem;
     }
 
     ul.plugin-authors {
@@ -291,14 +291,14 @@
         padding-left: 0;
 
         li {
-            margin-bottom: 20px;
-            margin-right: 10px;
+            margin-bottom: 1.429rem;
+            margin-right: 0.714rem;
 
             a {
                 background-color: #f3f3f3;
                 border-radius: 5px;
                 color: #008080;
-                padding: 5px 10px;
+                padding: 0.357rem 0.714rem;
                 transition: background-color 0.2s ease;
 
                 &:hover {

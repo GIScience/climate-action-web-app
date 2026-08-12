@@ -6,7 +6,7 @@
     color: #fff;
     margin-right: 0.5vw;
     overflow: hidden;
-    padding-top: 15px;
+    padding-top: 1.071rem;
     pointer-events: all;
     position: relative;
 
@@ -28,7 +28,7 @@
 
     #catalog-toggle:checked {
         ~ .plugins-list {
-            width: 120px;
+            width: 8.571rem;
         }
 
         ~ #catalog-header .plugin-title {
@@ -61,11 +61,11 @@
 
         ~ .plugins-list {
             .plugin-card {
-                width: 107.5px;
+                width: 7.714rem;
 
                 .plugin-card__icon {
                     img {
-                        transform: translateY(-12.5px) scale(0.65);
+                        transform: translateY(-0.929rem) scale(0.65);
                     }
 
                     .plugin-card__icon-text {
@@ -85,12 +85,12 @@
     #catalog-header {
         align-items: center;
         display: flex;
-        height: 50px;
-        padding: 0 20px;
+        height: 3.571rem;
+        padding: 0 1.429rem;
         position: relative;
 
         h3.plugin-title {
-            margin: 10px 0;
+            margin: 0.714rem 0;
             position: absolute;
             text-wrap: nowrap;
             transition: opacity 0.25s ease-in-out;
@@ -103,8 +103,8 @@
             height: 100%;
             justify-content: center;
             position: absolute;
-            right: 10px;
-            width: 40px;
+            right: 0.714rem;
+            width: 2.857rem;
         }
 
         #catalog-toggle-burger {
@@ -140,37 +140,37 @@
     }
 
     ng-scrollbar {
-        max-height: calc(100vh - 150px - 1vw);
+        max-height: calc(100vh - 10.714rem - 1vw);
 
         ::ng-deep {
             .ng-scroll-content {
-                padding-left: 2.5px;
+                padding-left: 0.214rem;
             }
         }
     }
 }
 
 .plugins-list {
-    padding-left: 10px;
+    padding-left: 0.714rem;
     transition: width 0.25s ease-in-out;
-    width: 240px;
+    width: 17.143rem;
 
     ul {
-        padding: 10px 0 0 0;
+        padding: 0.714rem 0 0 0;
     }
 
     .loading-state {
         pointer-events: none;
 
         ul {
-            padding-left: 2.5px;
+            padding-left: 0.214rem;
 
             li {
                 .plugin-card__text {
                     h3 {
                         background: rgba(255, 255, 255, 0.6);
                         color: transparent;
-                        margin-bottom: 5px;
+                        margin-bottom: 0.357rem;
                         width: 150%;
                     }
 
@@ -188,18 +188,18 @@
         border-radius: 5px;
         cursor: pointer;
         display: flex;
-        height: 95px;
-        margin-bottom: 10px;
-        padding: 5px;
+        height: 6.786rem;
+        margin-bottom: 0.714rem;
+        padding: 0.357rem;
         position: relative;
         transition: width 0.25s ease-in-out;
-        width: 227.5px;
+        width: 16.286rem;
 
         .plugin-card__icon {
             background-color: #fafafa;
             border: 2px solid rgba(255, 255, 255, 0.85);
             border-radius: 5px;
-            padding: 10px;
+            padding: 0.714rem;
             position: relative;
 
             img {
@@ -207,14 +207,14 @@
                 filter: saturate(1.5);
                 height: 100%;
                 transition: transform 0.25s ease-in-out 0.25s;
-                width: 60px;
+                width: 4.286rem;
             }
 
             .plugin-card__icon-text {
                 align-items: center;
                 bottom: 0;
                 display: flex;
-                height: 30px;
+                height: 2.143rem;
                 justify-content: center;
                 left: 0;
                 opacity: 0;
@@ -241,16 +241,16 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 10px;
+            padding: 0.714rem;
             transition: opacity 0.3s ease-in-out 0.3s;
 
             h3 {
-                font-size: small;
+                font-size: 0.9rem;
                 margin: 0;
             }
 
             span {
-                font-size: smaller;
+                font-size: 0.85rem;
             }
         }
 
@@ -265,11 +265,11 @@
                 bottom: 100%;
                 box-shadow: 18px 18px #f2f2f2;
                 content: '';
-                height: 32px;
+                height: 2.286rem;
                 pointer-events: none;
                 position: absolute;
                 right: 0;
-                width: 32px;
+                width: 2.286rem;
             }
 
             &:after {

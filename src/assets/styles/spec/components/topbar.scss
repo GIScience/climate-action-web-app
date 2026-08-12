@@ -11,7 +11,7 @@ header {
     .header-container {
         align-items: center;
         display: flex;
-        height: baseColors.$header-height;
+        height: 4.286rem;
         justify-content: space-between;
 
         .heigit-logo__wrapper {
@@ -19,15 +19,15 @@ header {
             flex-grow: 1;
 
             img.heigit-logo {
-                height: 35px;
-                margin-left: 25px;
+                height: 2.5rem;
+                margin-left: 1.786rem;
             }
         }
 
         .ca-logo {
             cursor: pointer;
-            height: 37.5px;
-            margin-bottom: 2.5px;
+            height: 2.714rem;
+            margin-bottom: 0.214rem;
         }
 
         .header-right {
@@ -66,14 +66,14 @@ header {
             background-color: transparent;
             border: 0;
             box-shadow: none;
-            font-size: 18px;
-            height: 40px;
-            margin-top: 12px;
+            font-size: 1.3rem;
+            height: 2.857rem;
+            margin-top: 0.857rem;
             outline: none;
-            padding: 5px;
+            padding: 0.357rem;
 
             @include mediaQueriesRanges.to(breakpoints.$breakpoint-sm) {
-                width: 85px;
+                width: 6.071rem;
             }
 
             @include placeholder.placeholder {

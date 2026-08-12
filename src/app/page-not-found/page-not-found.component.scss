@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    height: calc(100vh - 85px);
+    height: calc(100vh - 6.071rem);
     justify-content: center;
     margin: 0 0.5vw;
     overflow: hidden;
@@ -103,7 +103,7 @@
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(1.429rem);
     }
     to {
         opacity: 1;

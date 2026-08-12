@@ -1,8 +1,8 @@
 .plugin-parameter-container {
-    --mat-form-field-container-height: 48px;
-    --mat-form-field-filled-with-label-container-padding-top: 20px;
-    --mat-form-field-filled-with-label-container-padding-bottom: 6px;
-    --mat-form-field-container-vertical-padding: 12px;
+    --mat-form-field-container-height: 3.429rem;
+    --mat-form-field-filled-with-label-container-padding-top: 1.429rem;
+    --mat-form-field-filled-with-label-container-padding-bottom: 0.429rem;
+    --mat-form-field-container-vertical-padding: 0.857rem;
 
     display: flex;
     flex-direction: column;
@@ -16,25 +16,25 @@
     .area-selection {
         border: 1px solid #bbb;
         border-radius: 15px;
-        margin-bottom: 15px;
-        padding: 15px 10px;
+        margin-bottom: 1.071rem;
+        padding: 1rem 0.714rem;
 
         h4 {
-            margin-bottom: 5px;
+            margin-bottom: 0.357rem;
             margin-top: 0;
         }
 
         p {
-            font-size: small;
-            margin-bottom: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 0.714rem;
             margin-top: 0;
         }
 
         .area-selection-buttons {
             display: grid;
-            gap: 7.5px;
+            gap: 0.571rem;
             grid-template-columns: repeat(6, 1fr);
-            margin: 15px 0;
+            margin: 1.071rem 0;
 
             .draw-button {
                 align-items: center;
@@ -47,7 +47,7 @@
                 grid-column: span 2;
                 justify-content: center;
                 margin: 0;
-                padding: 5px 7.5px;
+                padding: 0.357rem 0.571rem;
                 transition:
                     background-color 0.2s ease,
                     color 0.2s ease;
@@ -67,7 +67,7 @@
                 }
 
                 i-lucide {
-                    margin-right: 2.5px;
+                    margin-right: 0.214rem;
                 }
             }
         }
@@ -75,16 +75,16 @@
 
     .area-selection-message {
         align-items: center;
-        border-bottom: 2.5px solid;
-        border-top: 2.5px solid;
+        border-bottom: 3px solid;
+        border-top: 3px solid;
         display: flex;
-        margin-bottom: 15px;
-        margin-left: -10px;
-        padding: 7.5px 10px;
-        width: calc(100% + 20px);
+        margin-bottom: 1.071rem;
+        margin-left: -0.714rem;
+        padding: 0.571rem 0.714rem;
+        width: calc(100% + 1.429rem);
 
         i-lucide {
-            margin-right: 7.5px;
+            margin-right: 0.571rem;
         }
 
         &.message--info {
@@ -111,9 +111,9 @@
             color: #fff;
             cursor: pointer;
             font-family: Manrope;
-            font-size: 13px;
+            font-size: 0.9rem;
             font-weight: 500;
-            padding: 5px 15px;
+            padding: 0.357rem 1.071rem;
             transition: background-color 0.15s ease-in-out;
 
             &:hover {
@@ -122,17 +122,17 @@
         }
 
         & + .selected-regions {
-            margin-top: 15px;
+            margin-top: 1.071rem;
         }
     }
 
     .selected-regions {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 0.714rem;
 
         & + hr {
-            margin-top: 15px;
+            margin-top: 1.071rem;
         }
 
         .region-field {
@@ -145,19 +145,19 @@
             border: 1px solid rgba(0, 128, 128, 0.5);
             border-radius: 4px;
             display: flex;
-            gap: 8px;
-            padding: 10px 12px;
+            gap: 0.571rem;
+            padding: 0.714rem 0.857rem;
 
             .region-name {
                 flex: 1 1 auto;
-                font-size: 13px;
+                font-size: 0.9rem;
                 font-weight: 600;
             }
         }
 
         .region-area {
             color: #666;
-            font-size: 12px;
+            font-size: 0.85rem;
             white-space: nowrap;
         }
 
@@ -167,7 +167,7 @@
             color: #666;
             cursor: pointer;
             display: inline-flex;
-            margin-left: 8px;
+            margin-left: 0.571rem;
             transition: color 0.15s ease;
 
             &:hover {
@@ -184,10 +184,14 @@
         flex: 1 1 auto;
         max-height: 50vh;
         min-height: 0;
+
+        @media (min-resolution: 1.5dppx) and (max-height: 1200px) {
+            max-height: 40vh;
+        }
     }
 
     formly-form {
-        margin: 0 0 10px 0;
+        margin: 0 0 0.714rem 0;
 
         .mat-expansion-panel {
             background-color: #e5e5e5;
@@ -195,11 +199,11 @@
             border-radius: 5px;
             border-top: 1px solid #ccc;
             box-shadow: none !important;
-            padding: 5px;
+            padding: 0.357rem;
         }
 
         .mat-expansion-panel-header {
-            padding: 0 16px;
+            padding: 0 1.143rem;
         }
 
         .mat-expansion-panel-body {
@@ -208,15 +212,15 @@
     }
 
     .plugin-params-form .mat-mdc-form-field {
-        margin: 4px 0;
+        margin: 0.286rem 0;
     }
 
     .btn-container {
         display: flex;
         flex: 0 0 auto;
-        gap: 10px;
+        gap: 0.714rem;
         justify-content: center;
-        margin-top: 15px;
+        margin-top: 1.071rem;
 
         button {
             margin: 0;

@@ -1,7 +1,7 @@
 .account-container {
     display: flex;
     justify-content: flex-end;
-    padding: 0 7.5px;
+    padding: 0 0.571rem;
     position: relative;
 
     .login-container {
@@ -23,8 +23,8 @@
         cursor: pointer;
         display: flex;
         font-variation-settings: 'wght' 600;
-        gap: 5px;
-        padding: 7.5px 7.5px 7.5px 10px;
+        gap: 0.357rem;
+        padding: 0.571rem 0.571rem 0.571rem 0.714rem;
         transition: background-color 0.2s;
 
         &:hover {
@@ -33,11 +33,13 @@
 
         i-lucide {
             color: #666;
+            height: 2.143rem;
+            width: 2.143rem;
         }
     }
 
     .fake-user-button {
         border: 2px dashed #e78400;
-        margin-right: 10px;
+        margin-right: 0.714rem;
     }
 }

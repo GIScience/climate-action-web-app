@@ -4,7 +4,7 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         margin-right: 0.5vw;
-        top: calc(0.5vw + 35px);
+        top: calc(0.5vw + 2.5rem);
 
         &::before {
             content: '';
@@ -16,9 +16,9 @@
 
     .maplibregl-ctrl.maplibregl-ctrl-scale {
         backdrop-filter: blur(5px);
-        font-size: 12px;
-        height: 29px;
-        line-height: 29px;
+        font-size: 0.85rem;
+        height: 2.071rem;
+        line-height: 2.071rem;
         margin-right: 0;
         order: 3;
     }
@@ -27,7 +27,7 @@
         align-items: center;
         display: flex;
         flex-direction: row;
-        gap: 10px;
+        gap: 0.714rem;
         justify-content: center;
         order: 1;
     }
@@ -43,8 +43,8 @@
         }
 
         img {
-            height: 18px;
-            width: 18px;
+            height: 1.286rem;
+            width: 1.286rem;
         }
     }
 }
@@ -56,24 +56,24 @@
         backdrop-filter: blur(5px);
         background-color: rgb(255 255 255 / 85%);
         margin: 0;
-        max-width: 200px;
+        max-width: 14.286rem;
 
         .panel-container {
             display: none;
-            padding: 10px;
+            padding: 0.714rem;
         }
 
         .maplibregl-layer-controls {
-            margin-bottom: 20px;
+            margin-bottom: 1.429rem;
 
             h3 {
-                margin-bottom: 15px;
+                margin-bottom: 1.071rem;
                 margin-top: 0;
             }
 
             .slider-container {
-                height: 22px;
-                margin-top: 8px;
+                height: 1.571rem;
+                margin-top: 0.571rem;
                 position: relative;
 
                 &:hover {
@@ -87,7 +87,7 @@
             .slider-track {
                 background: #ddd;
                 border-radius: 3px;
-                height: 6px;
+                height: 0.429rem;
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
@@ -96,7 +96,7 @@
                 .slider-fill {
                     background-color: #008080;
                     border-radius: 3px;
-                    height: 6px;
+                    height: 0.429rem;
                     position: absolute;
                     top: 50%;
                     transform: translateY(-50%);
@@ -111,19 +111,19 @@
                         0 2px 4px rgba(0, 0, 0, 0.2),
                         0 1px 2px rgba(0, 0, 0, 0.1);
                     display: flex;
-                    height: 18px;
+                    height: 1.286rem;
                     justify-content: center;
                     position: absolute;
                     top: 50%;
-                    transform: translateX(-2.5px) translateY(-50%);
+                    transform: translateX(-0.214rem) translateY(-50%);
                     transition: background-color 0.15s ease-out;
-                    width: 35px;
+                    width: 2.5rem;
                 }
             }
 
             .slider-percentage {
                 color: #fff;
-                font-size: 10px;
+                font-size: 0.7rem;
                 font-weight: 600;
                 user-select: none;
             }
@@ -143,8 +143,8 @@
                 background-color: rgb(204 204 204 / 50%);
                 border: 2px solid rgba(0, 128, 128, 0.5);
                 border-radius: 5px;
-                margin-bottom: 15px;
-                padding: 10px;
+                margin-bottom: 1.071rem;
+                padding: 0.714rem;
 
                 &.map-layer--pinned {
                     border-color: #4d0080;
@@ -153,23 +153,23 @@
                 .map-layer-header {
                     align-items: center;
                     display: grid;
-                    grid-template-columns: 1fr 45px;
+                    grid-template-columns: 1fr 3.214rem;
 
                     label {
-                        font-size: 12px;
+                        font-size: 0.85rem;
                     }
 
                     .map-layer-actions {
                         align-items: center;
                         display: flex;
-                        gap: 4px;
+                        gap: 0.286rem;
 
                         .map-layer-pin {
                             background: transparent;
                             border: none;
                             color: #666;
                             cursor: pointer;
-                            padding: 0 4px;
+                            padding: 0 0.286rem;
                             transition: all 0.2s ease;
 
                             svg {
@@ -189,8 +189,8 @@
                             background: transparent;
                             border: none;
                             cursor: pointer;
-                            font-size: 14px;
-                            padding: 0 4px;
+                            font-size: 1rem;
+                            padding: 0 0.286rem;
 
                             &:hover {
                                 color: #dc3545;
@@ -209,11 +209,11 @@
             background-size: 65%;
             border-radius: 5px;
             box-sizing: content-box;
-            height: 27.5px;
+            height: 2rem;
             margin: 0;
             position: relative;
             transition: background-color 0.2s ease;
-            width: 27.5px;
+            width: 2rem;
             z-index: 2;
 
             &:hover {
@@ -227,8 +227,8 @@
                 background-size: 65%;
                 border: 1px solid #ddd;
                 position: absolute;
-                right: 7.5px;
-                top: 7.5px;
+                right: 0.571rem;
+                top: 0.571rem;
             }
 
             .panel-container {
@@ -248,15 +248,15 @@
 
 .maplibregl-style-list {
     h3 {
-        margin-bottom: 15px;
+        margin-bottom: 1.071rem;
         margin-top: 0;
     }
 
     button {
         border-radius: 5px !important;
         height: auto;
-        min-width: 170px;
-        padding: 8px;
+        min-width: 12.143rem;
+        padding: 0.571rem;
         position: relative;
         width: 100%;
 
@@ -296,7 +296,7 @@
     .maplibregl-popup-content {
         border-radius: 10px;
         overflow-wrap: break-word;
-        padding: 7.5px 10px;
+        padding: 0.571rem 0.714rem;
     }
 
     &.smooth-popup {

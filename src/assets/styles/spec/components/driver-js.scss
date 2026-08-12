@@ -1,5 +1,5 @@
 .driver-popover {
-    max-width: 350px;
+    max-width: 25rem;
 
     .driver-popover-title {
         font-family: Manrope;
@@ -11,7 +11,7 @@
         font-family: Manrope;
         font-variation-settings: 'wght' 400;
         line-height: 1.6;
-        padding-right: 15px;
+        padding-right: 1.071rem;
     }
 
     .driver-popover-prev-btn {
@@ -33,9 +33,9 @@
     }
 
     .driver-popover-close-btn {
-        font-size: 24px;
-        right: 2.5px;
-        top: 10px;
+        font-size: 1.7rem;
+        right: 0.214rem;
+        top: 0.714rem;
         z-index: 5;
     }
 
@@ -48,18 +48,18 @@
         .driver-popover-loading-indicator {
             display: flex;
             justify-content: center;
-            padding: 15px 0;
+            padding: 1.071rem 0;
             position: absolute;
-            width: calc(100% - 30px);
+            width: calc(100% - 2.143rem);
 
             .driver-popover-spinner {
                 animation: rotation 1s linear infinite;
-                border: 2.5px solid #fff;
+                border: 3px solid #fff;
                 border-bottom-color: #008080;
                 border-radius: 50%;
                 box-sizing: border-box;
-                height: 22px;
-                width: 22px;
+                height: 1.571rem;
+                width: 1.571rem;
             }
         }
     }
