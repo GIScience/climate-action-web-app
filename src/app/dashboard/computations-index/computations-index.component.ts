@@ -37,7 +37,7 @@ import {
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, Subscription, timer } from 'rxjs'
+import { BehaviorSubject, Subscription } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
@@ -49,31 +49,19 @@ import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import {
+    formatParameterName,
+    getParameterEntries,
+    hasUserRequestedParams,
+    isUserRequestedParam
+} from './computation-parameter.utils'
+import { ComputationSyncService } from './computation-sync.service'
+import {
     ComputationDatabaseEntity,
     ComputationDisplayEntity,
     ComputationMetadata,
     ComputationParameters
 } from './computation.interface'
-
-const ARTIFACT_ICON_MAP: { [index: string]: string } = {
-    IMAGE: 'image',
-    MARKDOWN: 'description',
-    CHART: 'data_usage',
-    CHART_PLOTLY: 'bar_chart',
-    TABLE: 'table_chart',
-    VECTOR_MAP_LAYER: 'layers',
-    RASTER_MAP_LAYER: 'map'
-}
-
-const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
-    description: 1,
-    image: 2,
-    layers: 3,
-    map: 4,
-    data_usage: 5,
-    bar_chart: 6,
-    table_chart: 7
-}
+import { mapComputationMetadata } from './computation.mapper'
 
 @Component({
     selector: 'app-computations-index',
@@ -115,7 +103,8 @@ const ARTIFACT_ORDER_MAP: { [index: string]: number } = {
         ])
     ],
     templateUrl: './computations-index.component.html',
-    styleUrl: './computations-index.component.scss'
+    styleUrl: './computations-index.component.scss',
+    providers: [ComputationSyncService]
 })
 export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private pluginService = inject(PluginService)
@@ -132,6 +121,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private databaseService = inject(DatabaseService)
     private translocoService = inject(TranslocoService)
     private cdr = inject(ChangeDetectorRef)
+    private syncService = inject(ComputationSyncService)
 
     computations: ComputationDisplayEntity[] = []
     dataChange = new BehaviorSubject<ComputationDisplayEntity[]>([])
@@ -201,13 +191,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     user: Models.User<Models.Preferences> | null = null
     scheduledRunsSubscription: Subscription = new Subscription()
     userSubscription: Subscription
-    private syncSubscription?: Subscription
+    private syncTransitionsSub?: Subscription
     private reportVisibilitySubscription: Subscription = new Subscription()
     private mapArtifactsSubscription?: Subscription
-    private visibilityChangeHandler?: () => void
-
-    private readonly POLL_INTERVAL = 5000
-    private readonly MAX_INTERVAL = 1800000
 
     constructor() {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
@@ -259,6 +245,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.importComputation(computationId)
             }
         })
+
+        this.syncTransitionsSub = this.syncService.transitions$.subscribe(transition =>
+            this.transitionRunStatus(transition.run, transition.newStatus, transition.message)
+        )
 
         this.dataChange.subscribe(data => {
             if (data.length > 0) {
@@ -400,17 +390,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         if (this.scheduledRunsSubscription) this.scheduledRunsSubscription.unsubscribe()
-        if (this.syncSubscription) {
-            this.syncSubscription.unsubscribe()
+        if (this.syncTransitionsSub) {
+            this.syncTransitionsSub.unsubscribe()
         }
         if (this.reportVisibilitySubscription) {
             this.reportVisibilitySubscription.unsubscribe()
         }
         if (this.mapArtifactsSubscription) {
             this.mapArtifactsSubscription.unsubscribe()
-        }
-        if (this.visibilityChangeHandler) {
-            document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
         }
     }
 
@@ -429,34 +416,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     getRedirectUrl(): string {
         return this.appwriteService.getRedirectUrl()
-    }
-
-    syncRuns() {
-        this.currentRuns
-            .filter(run => run.status === 'PENDING' || run.status === 'STARTED')
-            .forEach(run => {
-                this.pluginService.getComputationRunState(run.correlation_uuid).subscribe({
-                    next: stateInfo => {
-                        switch (stateInfo.state) {
-                            case 'STARTED':
-                                this.transitionRunStatus(run, 'STARTED')
-                                break
-                            case 'SUCCESS':
-                                this.transitionRunStatus(run, 'SUCCESS')
-                                break
-                            case 'FAILURE':
-                                this.transitionRunStatus(run, 'FAILURE', stateInfo.message)
-                                break
-                            case 'PENDING':
-                            default:
-                                break
-                        }
-                    },
-                    error: error => {
-                        console.error('Error checking state for run:', run.correlation_uuid, error)
-                    }
-                })
-            })
     }
 
     private transitionRunStatus(
@@ -504,56 +463,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     fetchAndProcessComputations(run: ComputationDatabaseEntity) {
         this.pluginService.getComputationMetadata(run.correlation_uuid).subscribe({
             next: (response: ComputationMetadata) => {
-                const artifacts = response.artifacts
-                if (!artifacts) return
-                const computation: ComputationDisplayEntity = {
-                    correlation_uuid: run.correlation_uuid,
-                    artifacts: [],
-                    status: response.status,
-                    request_ts: response.request_ts,
-                    language: response.language,
-                    aoiName: response.aoi?.properties?.['name'] as string | undefined,
-                    geometry: response.aoi,
-                    pluginId: response.plugin_info?.id,
-                    params: response.params,
-                    requested_params: response.requested_params,
-                    artifact_errors: response.artifact_errors,
-                    flags: run.flags
-                }
-
-                if (Array.isArray(artifacts) && artifacts.length > 0) {
-                    computation.artifacts = artifacts
-                        .map<ArtifactEntity>(x => {
-                            return {
-                                name: x.name,
-                                modality: x.modality,
-                                primary: x.primary,
-                                tags: x.tags,
-                                summary: x.summary,
-                                description: x.description,
-                                correlation_uuid: x.correlation_uuid,
-                                filename: x.filename,
-                                attachments: x.attachments,
-                                rank: x.rank,
-                                sources: x.sources,
-                                icon: ARTIFACT_ICON_MAP[x.modality]
-                            }
-                        })
-                        .sort((a, b) => {
-                            if (a.icon == b.icon) {
-                                return (a.name || '').localeCompare(b.name || '')
-                            } else if (
-                                a.icon &&
-                                b.icon &&
-                                a.icon in ARTIFACT_ORDER_MAP &&
-                                b.icon in ARTIFACT_ORDER_MAP
-                            ) {
-                                return ARTIFACT_ORDER_MAP[a.icon] - ARTIFACT_ORDER_MAP[b.icon]
-                            }
-                            return 0
-                        })
-                }
-                this.updateComputation(run.correlation_uuid, computation)
+                if (!response.artifacts) return
+                this.updateComputation(run.correlation_uuid, mapComputationMetadata(run, response))
             },
             error: () => {
                 console.error('Error fetching computations for:', run.correlation_uuid)
@@ -757,102 +668,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private startPeriodicSync() {
-        if (this.syncSubscription && !this.syncSubscription.closed) {
-            return
-        }
-
-        const POLL_INTERVAL_MS = this.POLL_INTERVAL
-
-        const checkAndScheduleNext = () => {
-            const pendingRuns = this.currentRuns.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
-
-            const hasPendingRuns = pendingRuns.length > 0
-
-            const now = Date.now()
-            const allExceededMaxInterval =
-                hasPendingRuns &&
-                pendingRuns.every(run => {
-                    const runTs = new Date(run.request_ts).getTime()
-                    return now - runTs >= this.MAX_INTERVAL
-                })
-
-            if (hasPendingRuns && !allExceededMaxInterval) {
-                this.syncRuns()
-                this.syncSubscription = timer(POLL_INTERVAL_MS).subscribe(() => checkAndScheduleNext())
-            } else {
-                if (allExceededMaxInterval) {
-                    this.syncRuns()
-                }
-                if (this.syncSubscription) {
-                    this.syncSubscription.unsubscribe()
-                    this.syncSubscription = undefined
-                }
-            }
-        }
-
-        const handleVisibilityChange = () => {
-            if (!document.hidden) {
-                const hasPendingRuns = this.currentRuns.some(
-                    run => run.status === 'PENDING' || run.status === 'STARTED'
-                )
-                if (hasPendingRuns && (!this.syncSubscription || this.syncSubscription.closed)) {
-                    checkAndScheduleNext()
-                }
-            }
-        }
-
-        if (!this.visibilityChangeHandler) {
-            document.addEventListener('visibilitychange', handleVisibilityChange)
-            this.visibilityChangeHandler = handleVisibilityChange
-        }
-
-        checkAndScheduleNext()
+        this.syncService.start(() =>
+            this.currentRuns.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
+        )
     }
 
-    getParameterEntries(params: string | object | null | undefined): { key: string; value: string }[] {
-        if (!params) return []
-        const obj = typeof params === 'string' ? JSON.parse(params) : params
-        if (!obj || typeof obj !== 'object') return []
-        return Object.entries(obj).map(([key, value]) => ({
-            key,
-            value: this.formatParameterValue(value)
-        }))
-    }
-
-    formatParameterValue(value: unknown): string {
-        if (value === null || value === undefined) {
-            return ''
-        }
-        if (Array.isArray(value)) {
-            return value.map(v => this.formatParameterValue(v)).join(', ')
-        }
-        switch (typeof value) {
-            case 'boolean':
-                return value ? 'Yes' : 'No'
-            case 'object':
-                return Object.entries(value as Record<string, unknown>)
-                    .map(([k, v]) => `${this.formatParameterName(k)}: ${this.formatParameterValue(v)}`)
-                    .join('; ')
-            default:
-                return String(value)
-        }
-    }
-
-    isUserRequestedParam(key: string, requestedParams?: ComputationParameters): boolean {
-        return !!requestedParams && key in requestedParams
-    }
-
-    hasUserRequestedParams(params?: ComputationParameters, requestedParams?: ComputationParameters): boolean {
-        if (!params || !requestedParams) return false
-        return Object.keys(params).some(key => key in requestedParams)
-    }
-
-    formatParameterName(name: string): string {
-        return name
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-    }
+    // Pure parameter-formatting helpers live in computation-parameter.utils.ts.
+    getParameterEntries = getParameterEntries
+    isUserRequestedParam = isUserRequestedParam
+    hasUserRequestedParams = hasUserRequestedParams
+    formatParameterName = formatParameterName
 
     importComputation(correlationUuid: string): void {
         if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
