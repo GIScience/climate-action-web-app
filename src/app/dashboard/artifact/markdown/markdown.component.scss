@@ -1,8 +1,10 @@
+@use 'spec/tools/rem' as *;
+
 .markdown-artifact-item {
     > * {
         margin-left: auto;
         margin-right: auto;
-        max-width: 50rem;
+        max-width: rem(800);
     }
 
     table {
@@ -11,24 +13,24 @@
         th {
             background-color: #f5f5f5;
             border: 1px solid #ddd;
-            padding: 0.571rem;
+            padding: rem(8);
         }
 
         td {
             border: 1px solid #ddd;
-            padding: 0.571rem;
+            padding: rem(8);
         }
     }
 
     ul,
     ol {
         list-style: revert;
-        padding-left: 1.429rem;
+        padding-left: rem(20);
     }
 
     pre {
         background-color: #f5f5f5;
-        padding: 0.714rem;
+        padding: rem(10);
     }
 
     p:has(img) {

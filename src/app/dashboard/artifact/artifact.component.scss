@@ -1,15 +1,17 @@
+@use 'spec/tools/rem' as *;
+
 .artifact {
     height: calc(100% - 3.571rem);
     line-height: 1.4;
-    padding: 0.714rem 1.071rem;
+    padding: rem(10) rem(15);
     position: relative;
     transition: 0.3s ease;
 }
 
 .artifact-meta {
-    margin: 1.429rem auto 0;
-    max-width: 50rem;
-    padding-bottom: 1.429rem;
+    margin: rem(20) auto 0;
+    max-width: rem(800);
+    padding-bottom: rem(20);
 
     p.artifact-summary,
     p.table-summary {
@@ -23,7 +25,7 @@
     }
 
     p.artifact-summary {
-        padding: 0 1.25rem;
+        padding: 0 rem(20);
     }
 
     .artifact-description,
@@ -33,7 +35,7 @@
         border-top: 1px solid #ccc;
         box-shadow: none;
         display: block;
-        margin-top: 1.429rem;
+        margin-top: rem(20);
 
         .mat-expansion-panel-header {
             font-size: 0.9rem;

@@ -1,5 +1,7 @@
+@use 'spec/tools/rem' as *;
+
 .tour-choice-dialog {
-    padding: 1.429rem 1.786rem;
+    padding: rem(20) rem(25);
 
     h2 {
         color: #333;
@@ -15,10 +17,10 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        padding: 0.714rem;
+        padding: rem(10);
         position: absolute;
-        right: 0.357rem;
-        top: 0.929rem;
+        right: rem(5);
+        top: rem(13);
 
         :hover {
             color: #111;
@@ -38,14 +40,14 @@
             display: flex;
             flex-direction: row;
             justify-content: space-evenly;
-            margin: 0.714rem 0 0.714rem -1.786rem;
-            padding: 1.286rem 0;
-            width: 39.286rem;
+            margin: rem(10) 0 rem(10) rem(-25);
+            padding: rem(18) 0;
+            width: rem(550);
         }
 
         .guest-tour-note {
             color: #666 !important;
-            margin: 0.714rem 0 0 0 !important;
+            margin: rem(10) 0 0 0 !important;
             text-align: center;
         }
     }

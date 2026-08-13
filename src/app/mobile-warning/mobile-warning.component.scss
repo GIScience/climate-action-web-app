@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 .mobile-warning {
     align-items: center;
     background: linear-gradient(30deg, rgba(189, 195, 199), rgba(44, 62, 80));
@@ -17,7 +19,7 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    padding: 1.429rem;
+    padding: rem(20);
     text-align: center;
     width: 80vw;
 

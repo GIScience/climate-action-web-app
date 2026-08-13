@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 .page-container {
     background-image: linear-gradient(45deg, #e7e7e7c9, #ededed80);
     display: grid;
@@ -32,8 +34,10 @@ app-dashboard {
 
 footer {
     align-items: center;
+    color: #7c8695;
     display: flex;
     justify-content: space-between;
+    text-align: center;
     white-space: pre-line;
     width: 100vw;
 
@@ -44,17 +48,17 @@ footer {
     .about-info,
     .contact-info {
         display: flex;
-        gap: 0.571rem;
+        gap: rem(8);
     }
 
     .about-info {
         float: left;
-        margin: 0 1.429rem;
+        margin: 0 rem(20);
     }
 
     .contact-info {
         float: right;
-        margin: 0 1.429rem;
+        margin: 0 rem(20);
     }
 }
 

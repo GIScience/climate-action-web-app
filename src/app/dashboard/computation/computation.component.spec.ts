@@ -146,7 +146,7 @@ describe('ComputationComponent', () => {
         component.ngOnInit()
         fixture.detectChanges()
 
-        const metaElements = fixture.debugElement.queryAll(By.css('.card-subtitle.m-0'))
+        const metaElements = fixture.debugElement.queryAll(By.css('.card-subtitle'))
         expect(metaElements.length).toBeGreaterThan(0)
 
         discardPeriodicTasks()

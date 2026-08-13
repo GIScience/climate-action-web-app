@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 .plugin-catalog {
     backdrop-filter: blur(5px);
     background-image: linear-gradient(30deg, rgb(189 195 199 / 95%), rgb(44 62 80 / 85%));
@@ -6,7 +8,7 @@
     color: #fff;
     margin-right: 0.5vw;
     overflow: hidden;
-    padding-top: 1.071rem;
+    padding-top: rem(15);
     pointer-events: all;
     position: relative;
 
@@ -28,7 +30,7 @@
 
     #catalog-toggle:checked {
         ~ .plugins-list {
-            width: 8.571rem;
+            width: rem(120);
         }
 
         ~ #catalog-header .plugin-title {
@@ -61,11 +63,11 @@
 
         ~ .plugins-list {
             .plugin-card {
-                width: 7.714rem;
+                width: rem(108);
 
                 .plugin-card__icon {
                     img {
-                        transform: translateY(-0.929rem) scale(0.65);
+                        transform: translateY(rem(-13)) scale(0.65);
                     }
 
                     .plugin-card__icon-text {
@@ -85,12 +87,12 @@
     #catalog-header {
         align-items: center;
         display: flex;
-        height: 3.571rem;
-        padding: 0 1.429rem;
+        height: rem(50);
+        padding: 0 rem(20);
         position: relative;
 
         h3.plugin-title {
-            margin: 0.714rem 0;
+            margin: rem(10) 0;
             position: absolute;
             text-wrap: nowrap;
             transition: opacity 0.25s ease-in-out;
@@ -103,8 +105,8 @@
             height: 100%;
             justify-content: center;
             position: absolute;
-            right: 0.714rem;
-            width: 2.857rem;
+            right: rem(10);
+            width: rem(40);
         }
 
         #catalog-toggle-burger {
@@ -144,33 +146,33 @@
 
         ::ng-deep {
             .ng-scroll-content {
-                padding-left: 0.214rem;
+                padding-left: rem(3);
             }
         }
     }
 }
 
 .plugins-list {
-    padding-left: 0.714rem;
+    padding-left: rem(10);
     transition: width 0.25s ease-in-out;
-    width: 17.143rem;
+    width: rem(240);
 
     ul {
-        padding: 0.714rem 0 0 0;
+        padding: rem(10) 0 0 0;
     }
 
     .loading-state {
         pointer-events: none;
 
         ul {
-            padding-left: 0.214rem;
+            padding-left: rem(3);
 
             li {
                 .plugin-card__text {
                     h3 {
                         background: rgba(255, 255, 255, 0.6);
                         color: transparent;
-                        margin-bottom: 0.357rem;
+                        margin-bottom: rem(5);
                         width: 150%;
                     }
 
@@ -188,18 +190,18 @@
         border-radius: 5px;
         cursor: pointer;
         display: flex;
-        height: 6.786rem;
-        margin-bottom: 0.714rem;
-        padding: 0.357rem;
+        height: rem(95);
+        margin-bottom: rem(10);
+        padding: rem(5);
         position: relative;
         transition: width 0.25s ease-in-out;
-        width: 16.286rem;
+        width: rem(228);
 
         .plugin-card__icon {
             background-color: #fafafa;
             border: 2px solid rgba(255, 255, 255, 0.85);
             border-radius: 5px;
-            padding: 0.714rem;
+            padding: rem(10);
             position: relative;
 
             img {
@@ -207,14 +209,14 @@
                 filter: saturate(1.5);
                 height: 100%;
                 transition: transform 0.25s ease-in-out 0.25s;
-                width: 4.286rem;
+                width: rem(60);
             }
 
             .plugin-card__icon-text {
                 align-items: center;
                 bottom: 0;
                 display: flex;
-                height: 2.143rem;
+                height: rem(30);
                 justify-content: center;
                 left: 0;
                 opacity: 0;
@@ -241,7 +243,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0.714rem;
+            padding: rem(10);
             transition: opacity 0.3s ease-in-out 0.3s;
 
             h3 {
@@ -265,11 +267,11 @@
                 bottom: 100%;
                 box-shadow: 18px 18px #f2f2f2;
                 content: '';
-                height: 2.286rem;
+                height: rem(32);
                 pointer-events: none;
                 position: absolute;
                 right: 0;
-                width: 2.286rem;
+                width: rem(32);
             }
 
             &:after {

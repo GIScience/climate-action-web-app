@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 .page-not-found {
     align-items: center;
     background: linear-gradient(180deg, #0a0a14 0%, #0d1117 50%, #0a0a14 100%);
@@ -6,7 +8,7 @@
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: rem(32);
     height: calc(100vh - 6.071rem);
     justify-content: center;
     margin: 0 0.5vw;
@@ -29,13 +31,13 @@
         align-items: center;
         animation: fadeInUp 0.8s ease-out;
         display: flex;
-        gap: clamp(0.5rem, 2vw, 1.5rem);
+        gap: clamp(0.571rem, 2vw, 1.714rem);
         position: relative;
     }
 
     .digit {
         color: #e8e8f0;
-        font-size: clamp(6rem, 20vw, 14rem);
+        font-size: clamp(6.857rem, 20vw, 16rem);
         font-weight: 800;
         letter-spacing: -0.02em;
         line-height: 1;
@@ -49,7 +51,7 @@
         aspect-ratio: 1;
         border: 3px solid rgba(255, 255, 255, 0.15);
         border-radius: 50%;
-        height: clamp(5.5rem, 18vw, 12.5rem);
+        height: clamp(6.286rem, 18vw, 14.286rem);
         overflow: hidden;
         position: relative;
 
@@ -78,7 +80,7 @@
     .message {
         animation: fadeInUp 0.8s ease-out 0.15s backwards;
         color: #b9c2d0;
-        font-size: clamp(0.95rem, 2vw, 1.15rem);
+        font-size: clamp(1.086rem, 2vw, 1.314rem);
         font-weight: 400;
         letter-spacing: 0.02em;
         margin: 0;
@@ -103,7 +105,7 @@
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(1.429rem);
+        transform: translateY(rem(20));
     }
     to {
         opacity: 1;

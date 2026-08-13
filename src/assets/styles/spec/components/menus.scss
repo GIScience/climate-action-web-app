@@ -1,15 +1,17 @@
+@use 'spec/tools/rem' as *;
+
 .actions-menu {
     animation: menuFadeIn 0.15s ease-out;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    min-width: 12.857rem;
-    padding: 0.429rem 0;
+    min-width: rem(180);
+    padding: rem(6) 0;
 
     &__divider {
         background-color: #eee;
-        height: 1px;
-        margin: 0.429rem 0;
+        height: rem(1);
+        margin: rem(6) 0;
     }
 
     &__item {
@@ -20,8 +22,8 @@
         cursor: pointer;
         display: flex;
         font-size: 0.9rem;
-        gap: 0.714rem;
-        padding: 0.571rem 1rem;
+        gap: rem(10);
+        padding: rem(8) rem(14);
         text-align: left;
         transition: background-color 0.15s;
         width: 100%;
@@ -54,17 +56,17 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    min-width: 14.286rem;
-    padding: 0.571rem 0;
+    min-width: rem(200);
+    padding: rem(8) 0;
 
     .user-info {
-        padding: 0.571rem 1.143rem;
+        padding: rem(8) rem(16);
 
         .name {
             color: #333;
-            font-size: 1rem;
+            font-size: rem(14);
             font-variation-settings: 'wght' 600;
-            margin-bottom: 0.286rem;
+            margin-bottom: rem(4);
         }
 
         .email {
@@ -75,8 +77,8 @@
 
     .divider {
         background-color: #eee;
-        height: 0.071rem;
-        margin: 0.571rem 0;
+        height: rem(1);
+        margin: rem(8) 0;
     }
 
     .account-menu__item {
@@ -86,9 +88,9 @@
         color: #333;
         cursor: pointer;
         display: flex;
-        font-size: 1rem;
-        gap: 0.857rem;
-        padding: 0.571rem 1.143rem;
+        font-size: rem(14);
+        gap: rem(12);
+        padding: rem(8) rem(16);
         text-align: left;
         text-decoration: none;
         transition: background-color 0.2s;
@@ -122,8 +124,8 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    min-width: 10.714rem;
-    padding: 0.571rem 0;
+    min-width: rem(150);
+    padding: rem(8) 0;
 
     .language-menu__item {
         background: none;
@@ -131,8 +133,8 @@
         color: #333;
         cursor: pointer;
         display: block;
-        font-size: 1rem;
-        padding: 0.571rem 1.143rem;
+        font-size: rem(14);
+        padding: rem(8) rem(16);
         text-align: left;
         transition: background-color 0.2s;
         width: 100%;
@@ -152,7 +154,7 @@
 @keyframes menuFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-0.357rem);
+        transform: translateY(rem(-5));
     }
     to {
         opacity: 1;

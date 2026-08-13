@@ -1,11 +1,13 @@
+@use 'spec/tools/rem' as *;
+
 .search-locations__wrapper {
     position: relative;
     text-align: right;
-    width: 17.857rem;
+    width: rem(250);
     z-index: 2;
 
     ng-scrollbar {
-        max-height: 35.714rem;
+        max-height: rem(500);
     }
 
     form {
@@ -13,14 +15,14 @@
 
         input.search-locations {
             background-image: url('../../../assets/images/search.svg');
-            background-position: 0.571rem center;
+            background-position: rem(8) center;
             background-repeat: no-repeat;
-            background-size: 1.286rem;
+            background-size: rem(18);
             border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             font-size: 1.15rem;
-            padding: 0.571rem 2.143rem;
+            padding: rem(8) rem(30);
             position: relative;
             transition: width 0.25s ease;
             width: 75%;
@@ -45,7 +47,7 @@
             border: none;
             position: absolute;
             right: 0;
-            top: 0.5rem;
+            top: rem(7);
             z-index: 2;
         }
     }
@@ -55,9 +57,9 @@
         background-color: rgb(255 255 255 / 85%);
         border: 1px solid #ddd;
         border-radius: 5px;
-        margin-top: -0.714rem;
+        margin-top: rem(-10);
         overflow-y: auto;
-        padding-top: 0.714rem;
+        padding-top: rem(10);
         text-align: left;
         width: 100%;
 
@@ -70,8 +72,8 @@
     .location-suggestion__item {
         border-bottom: 1px solid #ddd;
         cursor: pointer;
-        line-height: 1.286rem;
-        padding: 0.714rem;
+        line-height: rem(18);
+        padding: rem(10);
 
         &:last-of-type {
             border-bottom: none;

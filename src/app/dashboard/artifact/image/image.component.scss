@@ -1,7 +1,11 @@
+@use 'spec/tools/rem' as *;
+
 .image-artifact-item {
-    margin: 0 auto;
-    max-width: 50rem;
-    min-width: 10rem;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.0625);
+    margin: rem(2) auto;
+    max-width: rem(800);
+    min-width: rem(160);
 
     img {
         object-fit: contain !important;

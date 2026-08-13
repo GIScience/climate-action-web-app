@@ -1,6 +1,6 @@
-<div class="bd mY-2 table-artifact-item">
+<div class="table-artifact-item">
     @if (csvData.length > 0) {
-        <table class="artifact-table table-bordered table-hover bgc-white">
+        <table class="artifact-table table-bordered table-hover">
             <thead>
                 @for (record of csvData | slice: 0 : 1; track record) {
                     <tr>

@@ -1,8 +1,10 @@
+@use 'spec/tools/rem' as *;
+
 button {
     cursor: pointer;
     display: flex;
     font-family: Manrope;
-    font-size: 1rem;
+    font-size: rem(14);
 
     &.btn-primary {
         background-color: #008080;
@@ -10,7 +12,7 @@ button {
         border-radius: 25px;
         color: #fff;
         font-weight: 500;
-        padding: 0.714rem 1.429rem;
+        padding: rem(10) rem(20);
         transition: background-color 0.15s ease-in-out;
 
         &:hover {
@@ -24,7 +26,7 @@ button {
         border-radius: 25px;
         color: #008080;
         font-weight: 500;
-        padding: 0.714rem 1.429rem;
+        padding: rem(10) rem(20);
         transition: background-color 0.15s ease-in-out;
 
         &:hover {
@@ -38,7 +40,7 @@ button {
         border-radius: 25px;
         color: #424242;
         font-weight: 500;
-        padding: 0.714rem 1.429rem;
+        padding: rem(10) rem(20);
         transition: background-color 0.15s ease-in-out;
 
         &:hover {
@@ -48,7 +50,7 @@ button {
 
     &.btn-small {
         font-size: 0.9rem;
-        padding: 0.357rem 1.071rem;
+        padding: rem(5) rem(15);
     }
 
     &.btn-withtext--after,
@@ -58,11 +60,11 @@ button {
     }
 
     &.btn-withtext--after i-lucide {
-        margin-right: 0.357rem;
+        margin-right: rem(5);
     }
 
     &.btn-withtext--before i-lucide {
-        margin-left: 0.357rem;
+        margin-left: rem(5);
     }
 
     &.btn-onlyicon {
@@ -72,10 +74,10 @@ button {
         border-radius: 50%;
         color: #555;
         display: flex;
-        height: 2.357rem;
+        height: rem(33);
         justify-content: center;
         transition: background-color 0.15s ease-in-out;
-        width: 2.357rem;
+        width: rem(33);
 
         &:hover {
             background-color: #cddddc;
@@ -87,8 +89,8 @@ button {
         }
 
         &.btn-onlyicon--large {
-            height: 2.5rem;
-            width: 2.5rem;
+            height: rem(35);
+            width: rem(35);
         }
     }
 
@@ -110,8 +112,8 @@ i-lucide {
 
         .ngx-toastr {
             margin-bottom: 0;
-            margin-top: 0.714rem;
-            width: 32.143rem;
+            margin-top: rem(10);
+            width: rem(450);
         }
     }
 
@@ -119,9 +121,9 @@ i-lucide {
         margin-top: calc(4.286rem + 0.5vw);
 
         .ngx-toastr {
-            margin-bottom: 0.714rem;
+            margin-bottom: rem(10);
             margin-top: 0;
-            width: 32.143rem;
+            width: rem(450);
         }
     }
 
@@ -132,11 +134,10 @@ i-lucide {
         display: flex;
         flex-direction: column;
         line-height: 1.5;
-        padding: 0.714rem 1.786rem 0.714rem 3.571rem;
+        padding: rem(10) rem(25) rem(10) rem(50);
 
         &:hover {
-            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            box-shadow: 0.143rem 0.143rem 0.286rem rgba(0, 0, 0, 0.1);
+            box-shadow: rem(2) rem(2) rem(4) rgba(0, 0, 0, 0.1);
         }
 
         .toast-title {
@@ -188,8 +189,8 @@ i-lucide {
 
     button.toast-close-button {
         position: absolute;
-        right: 0.714rem;
-        top: 0.357rem;
+        right: rem(10);
+        top: rem(5);
     }
 }
 

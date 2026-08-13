@@ -1,6 +1,8 @@
+@use 'spec/tools/rem' as *;
+
 :host ::ng-deep {
     .dialog-window {
-        padding: 1.429rem;
+        padding: rem(20);
 
         & * {
             font-family: Manrope !important;
@@ -17,8 +19,8 @@
             color: #666;
             cursor: pointer;
             position: absolute;
-            right: 0.714rem;
-            top: 1.286rem;
+            right: rem(10);
+            top: rem(18);
         }
 
         .ng-scrollbar {
@@ -26,21 +28,21 @@
         }
 
         .optional-attributes {
-            --mat-form-field-container-height: 3.429rem;
-            --mat-form-field-filled-with-label-container-padding-top: 1.429rem;
-            --mat-form-field-filled-with-label-container-padding-bottom: 0.429rem;
-            --mat-form-field-container-vertical-padding: 0.857rem;
+            --mat-form-field-container-height: 48px;
+            --mat-form-field-filled-with-label-container-padding-top: 20px;
+            --mat-form-field-filled-with-label-container-padding-bottom: 6px;
+            --mat-form-field-container-vertical-padding: 12px;
 
             mat-form-field {
-                margin-bottom: 0.857rem;
+                margin-bottom: rem(12);
             }
         }
 
         .dialog-window-buttons {
             display: flex;
-            gap: 0.714rem;
+            gap: rem(10);
             justify-content: center;
-            margin-top: 1.429rem;
+            margin-top: rem(20);
         }
     }
 }

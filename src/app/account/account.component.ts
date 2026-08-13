@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
 import { Models } from 'appwrite'
 import {
-    CircleUserRound,
     Footprints,
     LifeBuoy,
     LogIn,
@@ -10,7 +9,8 @@ import {
     LucideAngularModule,
     Percent,
     TestTubeDiagonal,
-    User
+    User,
+    UserRound
 } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
@@ -35,7 +35,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     private userSubscription: Subscription
     readonly environment = environment
 
-    readonly CircleUserRound = CircleUserRound
+    readonly UserRound = UserRound
     readonly User = User
     readonly LogIn = LogIn
     readonly Percent = Percent

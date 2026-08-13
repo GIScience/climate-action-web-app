@@ -1,23 +1,23 @@
 @use '../settings/baseColors';
-@use '../settings/materialColors';
+@use 'spec/tools/rem' as *;
 
 .checkbox label {
     display: inline-block;
     margin-bottom: 0;
-    padding-left: 1.214rem;
+    padding-left: rem(17);
     position: relative;
     vertical-align: middle;
 }
 
 .checkbox label::before {
-    background-color: materialColors.$md-white;
+    background-color: #fff;
     border: 1px solid baseColors.$grey-300;
     border-radius: 3px;
     content: '';
     display: inline-block;
-    height: 1.214rem;
+    height: rem(17);
     left: 0;
-    margin-left: -0.857rem;
+    margin-left: rem(-12);
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -30,22 +30,22 @@
     transition:
         border 0.15s ease-in-out,
         color 0.15s ease-in-out;
-    width: 1.214rem;
+    width: rem(17);
 }
 
 .checkbox label::after {
     color: baseColors.$grey-500;
     display: inline-block;
     font-size: 0.7rem !important;
-    height: 1.214rem;
+    height: rem(17);
     left: 0;
-    line-height: 1.214rem;
-    margin-left: -0.857rem;
+    line-height: rem(17);
+    margin-left: rem(-12);
     position: absolute;
     text-align: center;
     top: 50%;
     transform: translateY(-50%);
-    width: 1.214rem;
+    width: rem(17);
 }
 
 .checkbox input[type='checkbox'] {
@@ -55,8 +55,8 @@
 
 .checkbox input[type='checkbox']:focus + label::before {
     outline: thin dotted;
-    outline: 0.357rem auto -webkit-focus-ring-color;
-    outline-offset: -0.143rem;
+    outline: rem(5) auto -webkit-focus-ring-color;
+    outline-offset: rem(-2);
 }
 
 .checkbox input[type='checkbox']:checked + label::after {
@@ -97,7 +97,7 @@
 }
 
 .checkbox-danger input[type='checkbox']:checked + label::after {
-    color: materialColors.$md-white;
+    color: #fff;
 }
 
 .checkbox-info input[type='checkbox']:checked + label::before {
@@ -106,7 +106,7 @@
 }
 
 .checkbox-info input[type='checkbox']:checked + label::after {
-    color: materialColors.$md-white;
+    color: #fff;
 }
 
 .checkbox-warning input[type='checkbox']:checked + label::before {
@@ -115,7 +115,7 @@
 }
 
 .checkbox-warning input[type='checkbox']:checked + label::after {
-    color: materialColors.$md-white;
+    color: #fff;
 }
 
 .checkbox-success input[type='checkbox']:checked + label::before {
@@ -124,16 +124,16 @@
 }
 
 .checkbox-success input[type='checkbox']:checked + label::after {
-    color: materialColors.$md-white;
+    color: #fff;
 }
 
 .radio {
-    padding-left: 1.429rem;
+    padding-left: rem(20);
 }
 
 .radio label {
     display: inline-block;
-    padding-left: 0.357rem;
+    padding-left: rem(5);
     position: relative;
     vertical-align: middle;
 }
@@ -144,14 +144,14 @@
     border-radius: 50%;
     content: '';
     display: inline-block;
-    height: 1.214rem;
+    height: rem(17);
     left: 0;
-    margin-left: -1.429rem;
+    margin-left: rem(-20);
     position: absolute;
     -webkit-transition: border 0.15s ease-in-out;
     -o-transition: border 0.15s ease-in-out;
     transition: border 0.15s ease-in-out;
-    width: 1.214rem;
+    width: rem(17);
 }
 
 .radio label::after {
@@ -159,11 +159,11 @@
     border-radius: 50%;
     content: ' ';
     display: inline-block;
-    height: 0.786rem;
-    left: 0.214rem;
-    margin-left: -1.429rem;
+    height: rem(11);
+    left: rem(3);
+    margin-left: rem(-20);
     position: absolute;
-    top: 0.214rem;
+    top: rem(3);
     -webkit-transform: scale(0, 0);
     -ms-transform: scale(0, 0);
     -o-transform: scale(0, 0);
@@ -172,7 +172,7 @@
     -moz-transition: -moz-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
     -o-transition: -o-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
     transition: transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
-    width: 0.786rem;
+    width: rem(11);
 }
 
 .radio input[type='radio'] {
@@ -182,8 +182,8 @@
 
 .radio input[type='radio']:focus + label::before {
     outline: thin dotted;
-    outline: 5px auto -webkit-focus-ring-color;
-    outline-offset: -2px;
+    outline: rem(5) auto -webkit-focus-ring-color;
+    outline-offset: rem(-2);
 }
 
 .radio input[type='radio']:checked + label::after {

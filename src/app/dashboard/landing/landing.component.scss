@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 ::ng-deep {
     .maplibregl-ctrl-top-right,
     .maplibregl-style-switcher-container {
@@ -42,12 +44,12 @@
     flex-direction: column;
     padding: 2em;
     position: relative;
-    width: 42.857rem;
+    width: rem(600);
 
     h2 {
         font-variation-settings: 'wght' 600;
         margin: 0;
-        padding: 0 1.429rem;
+        padding: 0 rem(20);
         text-align: center;
     }
 
@@ -55,7 +57,7 @@
         h3 {
             color: #2a6d6d;
             font-variation-settings: 'wght' 600;
-            margin: 1.071rem 0;
+            margin: rem(15) 0;
             text-align: center;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
@@ -66,8 +68,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: block;
             margin: 0 auto;
-            max-width: 28.571rem;
-            padding: 1.429rem;
+            max-width: rem(400);
+            padding: rem(20);
             text-decoration: none;
             transition: all 0.3s ease;
 
@@ -80,11 +82,11 @@
                 align-items: center;
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 0.714rem;
+                margin-bottom: rem(10);
 
                 .plugin-name {
                     color: #2a6d6d;
-                    font-size: 1.25rem;
+                    font-size: rem(18);
                     font-variation-settings: 'wght' 600;
                 }
 
@@ -92,7 +94,7 @@
                     border-radius: 10px;
                     font-size: 0.85rem;
                     font-variation-settings: 'wght' 500;
-                    padding: 0.286rem 0.571rem;
+                    padding: rem(4) rem(8);
                     text-transform: uppercase;
 
                     &.status-success {
@@ -118,7 +120,7 @@
                     display: block;
                     font-size: 1.15rem;
                     font-variation-settings: 'wght' 500;
-                    margin-bottom: 0.357rem;
+                    margin-bottom: rem(5);
                 }
 
                 .timestamp {
@@ -133,26 +135,26 @@
 .welcome-content__loading {
     align-items: center;
     display: flex;
-    height: 14.286rem;
+    height: rem(200);
     justify-content: center;
     position: relative;
-    width: 42.857rem;
+    width: rem(600);
     z-index: 1;
 
     .loading-text {
         color: #2a6d6d;
-        font-size: 1.25rem;
+        font-size: rem(18);
         font-variation-settings: 'wght' 500;
     }
 }
 
 .welcome-content__new {
     position: relative;
-    width: 57.143rem;
+    width: rem(800);
     z-index: 1;
 
     &::-webkit-scrollbar {
-        width: 0.429rem;
+        width: rem(6);
     }
 
     &::-webkit-scrollbar-track {
@@ -184,13 +186,13 @@
     }
 
     .intro-section {
-        padding: 1.071rem 2.857rem;
+        padding: rem(15) rem(40);
 
         h1 {
             color: #2a6d6d;
             font-weight: 800;
-            letter-spacing: -0.036rem;
-            margin: 0 0 1.071rem;
+            letter-spacing: rem(-0.5);
+            margin: 0 0 rem(15);
             text-align: center;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
@@ -209,8 +211,8 @@
         display: inline-block;
         font-variation-settings: 'wght' 600;
         left: 50%;
-        margin: 0 0 1.071rem;
-        padding: 0 1.429rem;
+        margin: 0 0 rem(15);
+        padding: 0 rem(20);
         position: relative;
         transform: translateX(-50%);
     }
@@ -219,8 +221,8 @@
         display: grid;
         flex-direction: column;
         grid-template-columns: repeat(2, 1fr);
-        grid-gap: 1.071rem;
-        padding: 0.357rem 1.071rem;
+        grid-gap: rem(15);
+        padding: rem(5) rem(15);
     }
 
     .note-card {
@@ -231,7 +233,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         display: flex;
         overflow: hidden;
-        padding: 0.929rem 1.286rem;
+        padding: rem(13) rem(18);
         position: relative;
         transition: all 0.3s ease;
 
@@ -248,7 +250,7 @@
             flex-direction: row;
 
             .icon-wrapper {
-                margin-right: 0.714rem;
+                margin-right: rem(10);
             }
         }
 
@@ -257,7 +259,7 @@
             flex-direction: row-reverse;
 
             .icon-wrapper {
-                margin-left: 0.714rem;
+                margin-left: rem(10);
             }
         }
     }
@@ -266,7 +268,7 @@
         align-items: center;
         display: flex;
         flex-direction: column;
-        padding: 1.429rem 1.071rem;
+        padding: rem(20) rem(15);
 
         p {
             color: #111;
@@ -279,18 +281,18 @@
             span::before {
                 content: '←';
                 display: inline-block;
-                margin-right: 0.357rem;
+                margin-right: rem(5);
                 transform: translateX(0);
                 transition: transform 0.2s ease;
             }
 
             &:hover span::before {
-                transform: translateX(-0.286rem);
+                transform: translateX(rem(-4));
             }
 
             &.or-text {
                 display: inline-flex;
-                margin: 0.929rem 0;
+                margin: rem(13) 0;
                 position: relative;
 
                 &::before,
@@ -298,10 +300,10 @@
                     border-top: 1px solid #aaa;
                     content: '';
                     display: inline-block;
-                    margin: 0 0.714rem;
+                    margin: 0 rem(10);
                     position: absolute;
-                    top: 0.714rem;
-                    width: 16.071rem;
+                    top: rem(10);
+                    width: rem(225);
                 }
 
                 &:before {
@@ -319,7 +321,7 @@
 @keyframes fadeSlideInLeft {
     from {
         opacity: 0;
-        transform: translateX(-2.143rem);
+        transform: translateX(rem(-30));
     }
     to {
         opacity: 1;
@@ -330,7 +332,7 @@
 @keyframes fadeSlideInRight {
     from {
         opacity: 0;
-        transform: translateX(2.143rem);
+        transform: translateX(rem(30));
     }
     to {
         opacity: 1;

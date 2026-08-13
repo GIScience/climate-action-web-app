@@ -16,6 +16,7 @@
         "test-chromium-headless": "jest",
         "cy:open": "cypress open",
         "cy:run": "cypress run --headless --browser chrome",
+        "cy:run:all": "cypress run --headless --browser chrome --expose failFastEnabled=false --config retries=0",
         "test:all": "pnpm run test && pnpm run cy:run",
         "lint": "ng lint --max-warnings 0",
         "lint:fix": "ng lint --fix",

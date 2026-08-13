@@ -80,7 +80,7 @@
                                                     <span class="demo-badge">DEMO</span>
                                                 }
                                             </div>
-                                            <p class="card-subtitle m-0">
+                                            <p class="card-subtitle">
                                                 <i-lucide [img]="Clock" size="15"></i-lucide>
                                                 {{ formatTimestamp(scheduledRun.request_ts) }} •
                                                 <i-lucide [img]="Hash" size="15"></i-lucide>
@@ -162,7 +162,7 @@
                                                     <span class="demo-badge">DEMO</span>
                                                 }
                                             </div>
-                                            <p class="card-subtitle m-0">
+                                            <p class="card-subtitle">
                                                 <i-lucide [img]="Clock" size="15"></i-lucide>
                                                 {{ formatTimestamp(computation.request_ts) }} •
                                                 <i-lucide [img]="Hash" size="15"></i-lucide
@@ -293,7 +293,7 @@
                                         <div class="archived-item">
                                             <div>
                                                 <h3>{{ archivedComputation.aoiName }}</h3>
-                                                <p class="card-subtitle m-0">
+                                                <p class="card-subtitle">
                                                     <i-lucide [img]="Clock" size="15"></i-lucide>
                                                     {{ formatTimestamp(archivedComputation.request_ts) }} •
                                                     <i-lucide [img]="Hash" size="15"></i-lucide
@@ -304,7 +304,7 @@
                                                 (click)="unarchiveComputation(archivedComputation.correlation_uuid)"
                                                 [attr.aria-label]="'computationsIndex.actions.unarchive' | transloco"
                                                 [tp]="'computationsIndex.actions.unarchive' | transloco"
-                                                class="pX-5 pY-3 btn-onlyicon btn-onlyicon--cta">
+                                                class="btn-onlyicon btn-onlyicon--cta">
                                                 <i-lucide [img]="ArchiveRestore" size="17"></i-lucide>
                                             </button>
                                         </div>

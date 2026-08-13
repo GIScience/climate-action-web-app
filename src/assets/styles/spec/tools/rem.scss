@@ -1,0 +1,14 @@
+@use 'sass:math';
+
+// The html root font-size is 87.5% of the browser default (14px default).
+// This base lets sizes be authored in design px, i.e. rem(15) or rem(15px)
+// while emitting rem that scales with the root.
+$base: 14;
+
+@function rem($px) {
+    @if not math.is-unitless($px) {
+        $px: math.div($px, 1px);
+    }
+
+    @return math.div(math.round(math.div($px, $base) * 1000), 1000) * 1rem;
+}

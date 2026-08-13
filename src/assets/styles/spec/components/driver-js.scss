@@ -1,5 +1,7 @@
+@use 'spec/tools/rem' as *;
+
 .driver-popover {
-    max-width: 25rem;
+    max-width: rem(350);
 
     .driver-popover-title {
         font-family: Manrope;
@@ -11,7 +13,7 @@
         font-family: Manrope;
         font-variation-settings: 'wght' 400;
         line-height: 1.6;
-        padding-right: 1.071rem;
+        padding-right: rem(15);
     }
 
     .driver-popover-prev-btn {
@@ -34,8 +36,8 @@
 
     .driver-popover-close-btn {
         font-size: 1.7rem;
-        right: 0.214rem;
-        top: 0.714rem;
+        right: rem(3);
+        top: rem(10);
         z-index: 5;
     }
 
@@ -48,7 +50,7 @@
         .driver-popover-loading-indicator {
             display: flex;
             justify-content: center;
-            padding: 1.071rem 0;
+            padding: rem(15) 0;
             position: absolute;
             width: calc(100% - 2.143rem);
 
@@ -58,8 +60,8 @@
                 border-bottom-color: #008080;
                 border-radius: 50%;
                 box-sizing: border-box;
-                height: 1.571rem;
-                width: 1.571rem;
+                height: rem(22);
+                width: rem(22);
             }
         }
     }

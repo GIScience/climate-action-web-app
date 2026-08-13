@@ -3,6 +3,7 @@
 @use '../settings/breakpoints';
 @use '../tools/mixins/mediaQueriesRanges';
 @use '../tools/mixins/placeholder';
+@use 'spec/tools/rem' as *;
 
 header {
     width: 100vw;
@@ -11,7 +12,7 @@ header {
     .header-container {
         align-items: center;
         display: flex;
-        height: 4.286rem;
+        height: rem(60);
         justify-content: space-between;
 
         .heigit-logo__wrapper {
@@ -19,15 +20,15 @@ header {
             flex-grow: 1;
 
             img.heigit-logo {
-                height: 2.5rem;
-                margin-left: 1.786rem;
+                height: rem(35);
+                margin-left: rem(25);
             }
         }
 
         .ca-logo {
             cursor: pointer;
-            height: 2.714rem;
-            margin-bottom: 0.214rem;
+            height: rem(38);
+            margin-bottom: rem(3);
         }
 
         .header-right {
@@ -66,14 +67,14 @@ header {
             background-color: transparent;
             border: 0;
             box-shadow: none;
-            font-size: 1.3rem;
-            height: 2.857rem;
-            margin-top: 0.857rem;
+            font-size: rem(18);
+            height: rem(40);
+            margin-top: rem(12);
             outline: none;
-            padding: 0.357rem;
+            padding: rem(5);
 
             @include mediaQueriesRanges.to(breakpoints.$breakpoint-sm) {
-                width: 6.071rem;
+                width: rem(85);
             }
 
             @include placeholder.placeholder {

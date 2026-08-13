@@ -1,6 +1,7 @@
 @use 'sass:color';
 @use '../settings/baseColors';
 @use '../settings/fonts';
+@use 'spec/tools/rem' as *;
 
 html,
 html a,
@@ -9,10 +10,10 @@ body {
 }
 
 html {
-    font-size: 14px;
+    font-size: 87.5%;
 
-    @media (min-resolution: 1.5dppx) and (max-height: 1200px) {
-        font-size: 12px;
+    @media (max-height: 800px) {
+        font-size: 75%;
     }
 }
 
@@ -33,7 +34,7 @@ a {
 body {
     color: #111;
     font-family: fonts.$font-primary;
-    font-size: 1rem;
+    font-size: rem(14);
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -63,7 +64,7 @@ p {
 }
 
 .lead {
-    font-size: 1.3rem;
+    font-size: rem(18);
 }
 
 ul {

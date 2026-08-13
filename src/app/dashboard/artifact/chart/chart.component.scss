@@ -1,5 +1,10 @@
+@use 'spec/tools/rem' as *;
+
 .chart-artifact-item {
     aspect-ratio: 3 / 2;
-    margin: 0 auto;
-    max-width: 50rem;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.0625);
+    margin: rem(2) auto;
+    max-width: rem(800);
+    padding: rem(4);
 }

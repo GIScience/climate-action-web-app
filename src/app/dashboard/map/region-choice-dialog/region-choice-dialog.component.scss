@@ -1,5 +1,7 @@
+@use 'spec/tools/rem' as *;
+
 .region-choice-dialog {
-    padding: 1.429rem 1.786rem;
+    padding: rem(20) rem(25);
 
     h2 {
         color: #333;
@@ -13,8 +15,8 @@
         color: #666;
         cursor: pointer;
         position: absolute;
-        right: 0.714rem;
-        top: 1.286rem;
+        right: rem(10);
+        top: rem(18);
 
         :hover {
             color: #111;
@@ -30,8 +32,8 @@
         .choice-list {
             display: flex;
             flex-direction: column;
-            gap: 0.714rem;
-            margin-top: 1.071rem;
+            gap: rem(10);
+            margin-top: rem(15);
 
             .choice-row {
                 align-items: center;
@@ -59,7 +61,7 @@
     .osm-link {
         color: #666;
         font-size: 0.85em;
-        padding-top: 0.357rem;
+        padding-top: rem(5);
         text-align: center;
     }
 }

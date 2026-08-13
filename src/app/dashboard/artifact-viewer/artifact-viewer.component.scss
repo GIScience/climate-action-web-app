@@ -1,3 +1,5 @@
+@use 'spec/tools/rem' as *;
+
 .artifact-container {
     backdrop-filter: blur(15px);
     background-color: rgb(255 255 255 / 85%);
@@ -18,7 +20,7 @@
     }
 
     &.minimised {
-        height: 3.429rem;
+        height: rem(48);
         left: 20%;
         margin-top: calc(98vh - 9.5rem);
         top: 0;
@@ -29,10 +31,10 @@
         align-items: center;
         background-color: rgba(240, 248, 255, 0.5);
         display: flex;
-        padding: 0.714rem;
+        padding: rem(10);
 
         .artifact-name {
-            margin: 0 0.571rem;
+            margin: 0 rem(8);
         }
 
         .artifact-window-controls {
@@ -42,7 +44,7 @@
             .minimise-btn {
                 border-color: #666;
                 color: #666;
-                margin-right: 0.571rem;
+                margin-right: rem(8);
 
                 &:hover {
                     background-color: #e5e5e5;

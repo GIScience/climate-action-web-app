@@ -1,8 +1,10 @@
+@use 'spec/tools/rem' as *;
+
 .language-container {
     border-left: 1px solid #aaa;
     display: flex;
     justify-content: flex-end;
-    padding: 0 2.143rem 0 0.571rem;
+    padding: 0 rem(30) 0 rem(7.5);
     position: relative;
 }
 
@@ -20,10 +22,10 @@
         display: flex;
         font-size: 0.85rem;
         font-variation-settings: 'wght' 600;
-        height: 3.214rem;
+        height: rem(45);
         justify-content: center;
         transition: all 0.2s;
-        width: 3.214rem;
+        width: rem(45);
 
         &:hover {
             background-color: rgb(0 128 128 / 15%);
@@ -31,12 +33,12 @@
 
         i-lucide {
             align-items: center;
-            border: 0.214rem solid #008080;
+            border: rem(2) solid #008080;
             border-radius: 50%;
             display: flex;
-            height: 1.929rem;
+            height: rem(30);
             justify-content: center;
-            width: 1.929rem;
+            width: rem(30);
         }
 
         .current-lang {
@@ -44,10 +46,10 @@
             border-radius: 50%;
             color: #fff;
             font-size: 0.8rem;
-            letter-spacing: 0.036rem;
-            padding: 0.286rem;
+            letter-spacing: rem(0.5);
+            padding: rem(4);
             position: absolute;
-            right: -0.357rem;
+            right: rem(-5);
             top: 0;
         }
     }

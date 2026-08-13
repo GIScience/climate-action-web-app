@@ -9,7 +9,7 @@
             }
             <a type="button" class="profile-button" [href]="getAppwriteUrl('/login?redirect=' + getRedirectUrl())">
                 {{ 'account.login' | transloco }}
-                <i-lucide [img]="LogIn" size="30" color="#008080"></i-lucide>
+                <i-lucide [img]="LogIn" size="17.5" color="#008080"></i-lucide>
             </a>
         </div>
     }
@@ -17,7 +17,7 @@
         <div class="account-menu__wrapper">
             <button #accountTrigger class="profile-button" (click)="toggleAccountMenu()">
                 {{ 'account.account' | transloco }}
-                <i-lucide [img]="CircleUserRound" size="33" color="#008080"></i-lucide>
+                <i-lucide [img]="UserRound" size="30" color="#008080"></i-lucide>
             </button>
             <ng-template
                 [appDropdownMenu]="accountTrigger"
