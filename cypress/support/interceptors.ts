@@ -1,5 +1,20 @@
 import { cypressEnvironment } from './cypress-environment'
 
+const STORAGE_BASE = 'http://storage.example.com/store'
+
+const mockStoreArtifact = (
+    correlationUuid: string,
+    filename: string,
+    response: { fixture: string } | { body: unknown },
+    alias: string
+) => {
+    const storageUrl = `${STORAGE_BASE}/${correlationUuid}/${filename}`
+    cy.intercept(`${cypressEnvironment.apiBasePath}/store/${correlationUuid}/${filename}`, {
+        body: { go_to: storageUrl }
+    }).as(`${alias}GoTo`)
+    cy.intercept(storageUrl, response).as(alias)
+}
+
 export const mockPluginsList = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/plugin?lang=en`, {
         body: [
@@ -1185,14 +1200,13 @@ export const mockPluginBlueprintComputation = () => {
     }).as('getPluginBlueprintComputation')
 }
 
-export const mockBlueprintTable = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/8649e714-f29d-423f-85ce-cd55f4e5022a/2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv`,
-        {
-            fixture: 'sample_table_blueprint.csv'
-        }
-    ).as('getBlueprintTable')
-}
+export const mockBlueprintTable = () =>
+    mockStoreArtifact(
+        '8649e714-f29d-423f-85ce-cd55f4e5022a',
+        '2b983131-5bf9-4cdb-9c36-f6e910817407_table.csv',
+        { fixture: 'sample_table_blueprint.csv' },
+        'getBlueprintTable'
+    )
 
 export const mockGeoTiffComputation = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/store/8a897536-c4b4-4e5a-9d70-50430183ac66/metadata`, {
@@ -1606,50 +1620,45 @@ export const mockSimpleGeoJsonComputation = () => {
     }).as('getSimpleGeoJsonComputation')
 }
 
-export const mockGeoTiff = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/8a897536-c4b4-4e5a-9d70-50430183ac66/a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff`,
-        {
-            fixture: 'sample_raster_blueprint.tiff'
-        }
-    ).as('getGeoTiff')
-}
+export const mockGeoTiff = () =>
+    mockStoreArtifact(
+        '8a897536-c4b4-4e5a-9d70-50430183ac66',
+        'a126bc7d-1236-4459-97d8-65afc529053e_raster_blueprint.tiff',
+        { fixture: 'sample_raster_blueprint.tiff' },
+        'getGeoTiff'
+    )
 
-export const mockGeoJsonDetourFactorsJinrongjie = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/sample_vector_detourfactors-jinrongjie.geojson`,
-        {
-            fixture: 'sample_vector_detourfactors-jinrongjie.geojson'
-        }
-    ).as('getGeoJsonDetourFactorsJinrongjie')
-}
+export const mockGeoJsonDetourFactorsJinrongjie = () =>
+    mockStoreArtifact(
+        '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+        'sample_vector_detourfactors-jinrongjie.geojson',
+        { fixture: 'sample_vector_detourfactors-jinrongjie.geojson' },
+        'getGeoJsonDetourFactorsJinrongjie'
+    )
 
-export const mockGeoJsonJinrongjie = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/3495b256-6ebc-4cd1-a2f5-8216f57f7f85/2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson`,
-        {
-            fixture: 'sample_vector_blueprint-jinrongjie.geojson'
-        }
-    ).as('getGeoJsonJinrongjie')
-}
+export const mockGeoJsonJinrongjie = () =>
+    mockStoreArtifact(
+        '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+        '2075e569-8576-4842-ba7a-13f703275da3_raster_blueprint.geojson',
+        { fixture: 'sample_vector_blueprint-jinrongjie.geojson' },
+        'getGeoJsonJinrongjie'
+    )
 
-export const mockGeoJsonWestChangan = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/0f4552a1-79c4-452c-9e01-3c33a9bae0e8/67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson`,
-        {
-            fixture: 'sample_vector_blueprint-westchangan.geojson'
-        }
-    ).as('getGeoJsonWestChangan')
-}
+export const mockGeoJsonWestChangan = () =>
+    mockStoreArtifact(
+        '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
+        '67bff711-54af-4ee3-a5dd-7e76907bc5d8_walkable.geojson',
+        { fixture: 'sample_vector_blueprint-westchangan.geojson' },
+        'getGeoJsonWestChangan'
+    )
 
-export const mockSimpleGeoJson = () => {
-    cy.intercept(
-        `${cypressEnvironment.apiBasePath}/store/1cfd2634-1724-43a2-ab1e-6466ba433364/4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson`,
-        {
-            fixture: 'simple_vector_blueprint.geojson'
-        }
-    ).as('getSimpleGeoJson')
-}
+export const mockSimpleGeoJson = () =>
+    mockStoreArtifact(
+        '1cfd2634-1724-43a2-ab1e-6466ba433364',
+        '4d715d0f-a3ec-4d9c-8aed-d01a4e07165a_block_blueprint.geojson',
+        { fixture: 'simple_vector_blueprint.geojson' },
+        'getSimpleGeoJson'
+    )
 
 export const interceptSearchORS = () => {
     cy.intercept(`${cypressEnvironment.geocodeUrl}/autocomplete?*`, {

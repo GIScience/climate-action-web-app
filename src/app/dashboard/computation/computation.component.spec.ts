@@ -14,6 +14,7 @@ import { ComputationDisplayEntity, ComputationMetadata } from '../computations-i
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { StoreService } from '../store/store.service'
 import { ComputationComponent } from './computation.component'
 
 describe('ComputationComponent', () => {
@@ -24,6 +25,7 @@ describe('ComputationComponent', () => {
     let mockStorageService: Partial<StorageService>
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
+    let mockStoreService: Partial<StoreService>
 
     let pluginRuns$: BehaviorSubject<ComputationDisplayEntity[]>
 
@@ -71,6 +73,11 @@ describe('ComputationComponent', () => {
         mockMapService = {
             initMap: jest.fn()
         }
+        mockStoreService = {
+            getArtifactS3Url: jest.fn((correlationUuid: string, filename: string) =>
+                of(`https://storage.example.com/${correlationUuid}/${filename}?X-Amz-Signature=abc`)
+            )
+        }
 
         await TestBed.configureTestingModule({
             imports: [ComputationsIndexComponent, NoopAnimationsModule, HttpClientModule, getTranslocoTestingModule()],
@@ -79,6 +86,7 @@ describe('ComputationComponent', () => {
                 { provide: StorageService, useValue: mockStorageService },
                 { provide: ArtifactService, useValue: mockArtifactService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: StoreService, useValue: mockStoreService },
                 {
                     provide: ActivatedRoute,
                     useValue: {
@@ -482,9 +490,10 @@ describe('ComputationComponent', () => {
 
         computationComponent.downloadContent(testArtifact as ArtifactEntity)
 
+        expect(mockStoreService.getArtifactS3Url).toHaveBeenCalledWith('test-uuid', 'sample-image')
         expect(createElementSpy).toHaveBeenCalled()
         expect(createElementSpy).toHaveBeenCalledWith('a')
-        expect(fakeAnchor.href).toContain('/store/test-uuid/sample-image')
+        expect(fakeAnchor.href).toContain('storage.example.com/test-uuid/sample-image')
         expect(fakeAnchor.download).toBeTruthy()
         expect(fakeAnchor.click).toHaveBeenCalled()
         expect(appendChildSpy).toHaveBeenCalled()

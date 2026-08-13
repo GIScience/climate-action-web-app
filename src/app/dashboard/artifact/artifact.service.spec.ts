@@ -14,6 +14,7 @@ describe('ArtifactService', () => {
 
     const correlation_uuid = 'd9660bee-85ca-40c1-80b8-b51c5fd0cd9f'
     const store_uuid = '063c0ef6-5955-4b10-84c2-45e7b4cccf05'
+    const presigned_url = `https://storage.example.com/${correlation_uuid}/${store_uuid}?X-Amz-Signature=abc`
 
     const test_artifact = {
         name: 'test_artifact',
@@ -47,7 +48,7 @@ describe('ArtifactService', () => {
     beforeEach(() => {
         httpClientSpy = {
             post: jest.fn().mockImplementation(() => of({})),
-            get: jest.fn().mockImplementation(() => of({}))
+            get: jest.fn().mockImplementation(() => of({ go_to: presigned_url }))
         }
 
         TestBed.configureTestingModule({
@@ -72,7 +73,7 @@ describe('ArtifactService', () => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,
-                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                    url: presigned_url
                 })
             )
             done()
@@ -85,7 +86,7 @@ describe('ArtifactService', () => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,
-                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                    url: presigned_url
                 })
             )
             done()
@@ -98,7 +99,7 @@ describe('ArtifactService', () => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,
-                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                    url: presigned_url
                 })
             )
             done()
@@ -111,7 +112,7 @@ describe('ArtifactService', () => {
             expect(x).toEqual(
                 expect.objectContaining({
                     ...test_artifact,
-                    url: expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+                    url: presigned_url
                 })
             )
             done()
@@ -119,7 +120,7 @@ describe('ArtifactService', () => {
     })
 
     it('should get chart artifact item', done => {
-        httpClientSpy.get.mockReturnValue(of(test_chart))
+        httpClientSpy.get.mockReturnValueOnce(of({ go_to: presigned_url })).mockReturnValueOnce(of(test_chart))
 
         service.getChart(test_artifact)
         service.chart.subscribe(x => {
@@ -130,6 +131,7 @@ describe('ArtifactService', () => {
             expect(httpClientSpy.get).toHaveBeenCalledWith(
                 expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
             )
+            expect(httpClientSpy.get).toHaveBeenCalledWith(presigned_url)
             done()
         })
     })

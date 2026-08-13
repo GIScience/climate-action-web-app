@@ -15,7 +15,6 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatTabsModule } from '@angular/material/tabs'
 import { formatSourceText } from '@app/utils/source.utils'
-import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import { TippyDirective } from '@ngneat/helipopper'
 import { ClipboardPlus, Download, LucideAngularModule, Pin, PinOff, ReceiptText, X } from 'lucide-angular'
@@ -31,6 +30,7 @@ import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
+import { StoreService } from '../store/store.service'
 
 const DEFAULT_TAGS = {
     ALL: 'all',
@@ -66,6 +66,7 @@ export class ComputationComponent implements OnInit, OnDestroy {
     mapArtifactManager = inject(MapArtifactManagerService)
     private reportService = inject(ReportService)
     private artifactViewerService = inject(ArtifactViewerService)
+    private storeService = inject(StoreService)
     private toastr = inject(ToastrService)
     private translocoService = inject(TranslocoService)
     private dialog = inject(MatDialog)
@@ -299,15 +300,17 @@ export class ComputationComponent implements OnInit, OnDestroy {
     downloadContent(artifact: ArtifactEntity, event?: Event): void {
         event?.stopPropagation()
 
-        const apiUrl = environment.climateActionApiUrl
-        const artifactUrl = `${apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`
-
-        const a = document.createElement('a')
-        a.href = artifactUrl
-        a.download = artifact.filename
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
+        this.storeService.getArtifactS3Url(artifact.correlation_uuid, artifact.filename).subscribe({
+            next: url => {
+                const a = document.createElement('a')
+                a.href = url
+                a.download = artifact.filename
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+            },
+            error: error => console.error(`Error resolving download URL for ${artifact.filename}:`, error)
+        })
     }
 
     viewDescription(artifact: ArtifactEntity, event?: Event): void {

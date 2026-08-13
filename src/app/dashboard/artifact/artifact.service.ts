@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { SafeUrl } from '@angular/platform-browser'
-import { environment } from '@environments/environment'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, switchMap } from 'rxjs'
+import { StoreService } from '../store/store.service'
 import { Artifact, ArtifactData, ChartData, LegendObject, PlotlyChartData } from './artifact.interface'
 
 @Injectable({
@@ -10,11 +10,10 @@ import { Artifact, ArtifactData, ChartData, LegendObject, PlotlyChartData } from
 })
 export class ArtifactService {
     private http = inject(HttpClient)
+    private storeService = inject(StoreService)
 
     currentUrl: string | null = null
     downloadJsonHref: SafeUrl | null = null
-
-    private apiUrl = environment.climateActionApiUrl
 
     private markdownSubject = new BehaviorSubject<ArtifactData | null>(null)
     markdown = this.markdownSubject.asObservable()
@@ -47,62 +46,66 @@ export class ArtifactService {
     plotlyChart = this.plotlyChartSubject.asObservable()
 
     getMarkdown(artifact: Artifact): void {
-        this.markdownSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
-            ...artifact
-        })
+        this.resolveAndPublish(this.markdownSubject, artifact, artifact.filename)
     }
 
     getImage(artifact: Artifact): void {
-        this.imageSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
-            ...artifact
-        })
+        this.resolveAndPublish(this.imageSubject, artifact, artifact.filename)
     }
 
     getTable(artifact: Artifact): void {
-        this.tableSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`,
-            ...artifact
-        })
+        this.resolveAndPublish(this.tableSubject, artifact, artifact.filename)
     }
 
     getChart(artifact: Artifact): void {
-        this.http
-            .get<ChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${artifact.filename}`)
-            .subscribe(data => {
-                this.chartSubject.next({
-                    data: data,
-                    artifact: artifact
-                })
+        this.storeService
+            .getArtifactS3Url(artifact.correlation_uuid, artifact.filename)
+            .pipe(switchMap(url => this.http.get<ChartData>(url)))
+            .subscribe({
+                next: data => {
+                    this.chartSubject.next({
+                        data: data,
+                        artifact: artifact
+                    })
+                },
+                error: error => console.error(`Error fetching chart ${artifact.filename}:`, error)
             })
     }
 
     getPlotlyChart(artifact: Artifact): void {
         const filename = artifact.attachments.display_filename || artifact.filename
-        this.http
-            .get<PlotlyChartData>(`${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`)
-            .subscribe(data => {
-                this.plotlyChartSubject.next({
-                    data: data,
-                    artifact: artifact
-                })
+        this.storeService
+            .getArtifactS3Url(artifact.correlation_uuid, filename)
+            .pipe(switchMap(url => this.http.get<PlotlyChartData>(url)))
+            .subscribe({
+                next: data => {
+                    this.plotlyChartSubject.next({
+                        data: data,
+                        artifact: artifact
+                    })
+                },
+                error: error => console.error(`Error fetching chart ${artifact.filename}:`, error)
             })
     }
 
     getRaster(artifact: Artifact): void {
         const filename = artifact.attachments.display_filename || artifact.filename
-        this.rasterSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`,
-            ...artifact
-        })
+        this.resolveAndPublish(this.rasterSubject, artifact, filename)
     }
 
     getVector(artifact: Artifact): void {
         const filename = artifact.attachments.display_filename || artifact.filename
-        this.vectorSubject.next({
-            url: `${this.apiUrl}/store/${artifact.correlation_uuid}/${filename}`,
-            ...artifact
+        this.resolveAndPublish(this.vectorSubject, artifact, filename)
+    }
+
+    private resolveAndPublish(
+        subject: BehaviorSubject<ArtifactData | null>,
+        artifact: Artifact,
+        filename: string
+    ): void {
+        this.storeService.getArtifactS3Url(artifact.correlation_uuid, filename).subscribe({
+            next: url => subject.next({ url, ...artifact }),
+            error: error => console.error(`Error resolving store URL for ${filename}:`, error)
         })
     }
 

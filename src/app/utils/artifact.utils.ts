@@ -1,3 +1,16 @@
+import type { Artifact } from '@app/dashboard/artifact/artifact.interface'
+
+export type VectorArtifactFormat = 'geojson' | 'pmtiles'
+
+export function getVectorArtifactFormat(
+    artifact: Pick<Artifact, 'filename' | 'attachments'>
+): VectorArtifactFormat | undefined {
+    const filename = artifact.attachments.display_filename || artifact.filename
+    const extension = filename.match(/\.([^.]+)$/)?.[1].toLowerCase()
+
+    return extension === 'geojson' || extension === 'pmtiles' ? extension : undefined
+}
+
 export function convertToTitleCase(str: string | number): string {
     const prepositions = ['and', 'or', 'for', 'nor', 'on', 'at', 'to', 'by', 'with', 'in', 'out']
     return str

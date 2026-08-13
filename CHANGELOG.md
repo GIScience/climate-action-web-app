@@ -13,6 +13,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Use responsive sizing (rem) for all spacing values to fix clipping in zoomed in screens ([#494](https://gitlab.heigit.org/climate-action/web-app/-/issues/494))
 
+### Changed
+
+- Handle new redirect URL for artifacts directly, instead of using browser's Fetch (307)
+
 ## [3.6.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.6.0) - 2026-08-06
 
 ### Added

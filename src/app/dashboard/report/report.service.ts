@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { EnvironmentInjector, Injectable, inject, runInInjectionContext } from '@angular/core'
+import { getVectorArtifactFormat } from '@app/utils/artifact.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import type { FeatureCollection } from 'geojson'
 import { ToastrService } from 'ngx-toastr'
@@ -124,12 +125,13 @@ export class ReportService {
                                     artifactService.getVector(artifactInstance)
                                     artifactService.vector.subscribe(data => {
                                         if (data) {
-                                            if (data.url.endsWith('.geojson')) {
+                                            const format = getVectorArtifactFormat(data)
+                                            if (format === 'geojson') {
                                                 this.http.get<FeatureCollection>(data.url).subscribe(geojson => {
                                                     mapService.addGeoJsonLayer(geojson, artifactInstance.name)
                                                     markReady()
                                                 })
-                                            } else if (data.url.endsWith('.pmtiles')) {
+                                            } else if (format === 'pmtiles') {
                                                 mapService.addPmtilesLayer(data.url, artifactInstance.name)
                                                 markReady()
                                             }

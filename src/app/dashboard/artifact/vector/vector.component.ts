@@ -4,6 +4,7 @@ import { Artifact, ArtifactEntity } from '@app/dashboard/artifact/artifact.inter
 import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
 import { MapService } from '@app/dashboard/map/map.service'
 import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
+import { getVectorArtifactFormat } from '@app/utils/artifact.utils'
 import type { FeatureCollection } from 'geojson'
 import { from, Subscription } from 'rxjs'
 
@@ -23,20 +24,21 @@ export class VectorComponent implements OnInit, OnDestroy {
     private layer?: { layerIds: string[]; sourceId: string; name: string; baseLayerId?: string }
 
     ngOnInit() {
-        if (!this.inputData?.url) return
+        if (!this.inputData?.url || !this.inputData.artifact) return
 
-        if (this.inputData.url.endsWith('.geojson')) {
-            this.subscription = this.http.get<FeatureCollection>(this.inputData.url).subscribe({
+        const { url, artifact } = this.inputData
+        const format = getVectorArtifactFormat(artifact)
+
+        if (format === 'geojson') {
+            this.subscription = this.http.get<FeatureCollection>(url).subscribe({
                 next: data => {
-                    this.layer = this.mapService.addGeoJsonLayer(data, this.inputData!.artifact!.name || 'Unnamed')
+                    this.layer = this.mapService.addGeoJsonLayer(data, artifact.name || 'Unnamed')
                     this.registerLayerWithArtifactManager()
                 },
                 error: error => console.error('Failed to load GeoJSON:', error)
             })
-        } else if (this.inputData.url.endsWith('.pmtiles')) {
-            this.subscription = from(
-                this.mapService.addPmtilesLayer(this.inputData.url, this.inputData!.artifact!.name || 'Unnamed')
-            ).subscribe({
+        } else if (format === 'pmtiles') {
+            this.subscription = from(this.mapService.addPmtilesLayer(url, artifact.name || 'Unnamed')).subscribe({
                 next: layer => {
                     this.layer = layer
                     this.registerLayerWithArtifactManager()
@@ -44,7 +46,7 @@ export class VectorComponent implements OnInit, OnDestroy {
                 error: error => console.error('Failed to load PMTiles:', error)
             })
         } else {
-            console.error('Unsupported vector file format:', this.inputData.url)
+            console.error('Unsupported vector file format:', artifact.filename)
         }
     }
 

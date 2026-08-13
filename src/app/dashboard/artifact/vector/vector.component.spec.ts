@@ -149,12 +149,12 @@ describe('VectorComponent', () => {
             rank: 0
         }
         component.inputData = {
-            url: 'http://test_url/layer.geojson',
+            url: 'https://storage.example/object?X-Amz-Signature=signed',
             artifact
         }
         component.ngOnInit()
 
-        expect(httpClientSpy.get).toHaveBeenCalledWith('http://test_url/layer.geojson')
+        expect(httpClientSpy.get).toHaveBeenCalledWith('https://storage.example/object?X-Amz-Signature=signed')
         expect(mapServiceSpy.addGeoJsonLayer).not.toHaveBeenCalled()
         expect(mapArtifactManagerSpy.updateLayerInfo).not.toHaveBeenCalled()
 
@@ -178,7 +178,7 @@ describe('VectorComponent', () => {
         mapServiceSpy.addPmtilesLayer.mockResolvedValue(mockLayer)
 
         component.inputData = {
-            url: 'http://test_url/layer.pmtiles',
+            url: 'https://storage.example/object?download=layer.geojson',
             artifact: {
                 primary: true,
                 name: 'pmtiles-layer',
@@ -197,6 +197,9 @@ describe('VectorComponent', () => {
         fixture.detectChanges()
 
         expect(httpClientSpy.get).not.toHaveBeenCalled()
-        expect(mapServiceSpy.addPmtilesLayer).toHaveBeenCalledWith('http://test_url/layer.pmtiles', 'pmtiles-layer')
+        expect(mapServiceSpy.addPmtilesLayer).toHaveBeenCalledWith(
+            'https://storage.example/object?download=layer.geojson',
+            'pmtiles-layer'
+        )
     })
 })
