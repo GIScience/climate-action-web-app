@@ -26,7 +26,12 @@
                         "inlineStyleLanguage": "scss",
                         "assets": [
                             "src/favicon.ico",
-                            "src/assets",
+                            {
+                                "glob": "**/*",
+                                "input": "src/assets",
+                                "output": "/assets/",
+                                "ignore": ["scripts/js-colormaps.js"]
+                            },
                             {
                                 "glob": "mapbox-gl-rtl-text.js",
                                 "input": "node_modules/@mapbox/mapbox-gl-rtl-text/dist/",

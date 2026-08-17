@@ -104,7 +104,6 @@ build_staging:
         DOCKER_TLS_CERTDIR: ''
         DOCKER_DRIVER: overlay2
     before_script:
-        - apk add --no-cache git
         - unset DOCKER_AUTH_CONFIG
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
     script:
@@ -131,7 +130,6 @@ build_release:
         DOCKER_TLS_CERTDIR: ''
         DOCKER_DRIVER: overlay2
     before_script:
-        - apk add --no-cache git
         - unset DOCKER_AUTH_CONFIG
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
     script:

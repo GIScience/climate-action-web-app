@@ -8,7 +8,7 @@
         "build:prod": "ng build --configuration production --base-href /",
         "build:dev": "ng build --configuration development --base-href /",
         "build:stats": "ng build --stats-json",
-        "analyze": "pnpm dlx esbuild-visualizer --metadata ./dist/browser/stats.json",
+        "analyze": "pnpm dlx esbuild-visualizer --metadata ./dist/stats.json --open",
         "watch": "ng build --watch --configuration development",
         "test": "jest",
         "test:watch": "jest --watch --onlyChanged",

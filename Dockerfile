@@ -1,16 +1,26 @@
 FROM node:22-slim AS build
 
+ARG PNPM_VERSION=11.13.0
+
 WORKDIR /ca-web-app
+
+ENV CYPRESS_INSTALL_BINARY=0
 
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches/ ./patches/
-RUN npm install -g pnpm
+RUN npm install -g pnpm@${PNPM_VERSION}
 RUN pnpm install --frozen-lockfile
 
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
 RUN pnpm run build:prod
+
+RUN find dist/browser -type f \
+        \( -name '*.js' -o -name '*.mjs' -o -name '*.css' -o -name '*.svg' \
+        -o -name '*.html' -o -name '*.json' -o -name '*.ttf' \) \
+        ! -name 'env.js' ! -name 'env.template.js' -size +1k \
+        -exec gzip -9 -k {} +
 
 FROM nginx:1.31-alpine AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
