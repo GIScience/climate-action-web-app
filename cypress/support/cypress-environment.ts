@@ -4,5 +4,6 @@
  */
 export const cypressEnvironment = {
     apiBasePath: 'api/v1/gateway',
-    geocodeUrl: 'https://api.heigit.org/pelias/v1'
+    geocodeUrl: 'https://api.heigit.org/pelias/v1',
+    cachetUrl: 'https://status.heigit.org'
 }
