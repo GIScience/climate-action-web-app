@@ -3,7 +3,42 @@
         <ng-scrollbar orientation="vertical">
             <div class="area-selection">
                 <h4>{{ 'pluginParameter.areaSelection' | transloco }}</h4>
-                <p>{{ 'pluginParameter.searchOrZoomInstruction' | transloco }}</p>
+                <p>
+                    {{ 'pluginParameter.searchOrZoomInstruction' | transloco }}
+                </p>
+                @if (aoiConstraints.hasConstraints) {
+                    <p class="constraint-note" [tp]="constraintDetails" tpPlacement="right">
+                        <i-lucide [img]="Info" size="16"></i-lucide>
+                        <span>{{ 'pluginParameter.constraintNote' | transloco }}</span>
+                    </p>
+                    <ng-template #constraintDetails>
+                        @for (constraint of constraintDescriptions; track $index) {
+                            <span>
+                                @switch (constraint.kind) {
+                                    @case ('area') {
+                                        {{
+                                            'pluginParameter.constraintDescArea'
+                                                | transloco: { min: constraint.minArea, max: constraint.maxArea }
+                                        }}
+                                    }
+                                    @case ('boundary-selection') {
+                                        {{
+                                            'pluginParameter.constraintDescBoundarySelection'
+                                                | transloco: { names: constraint.names.join(', ') || '…' }
+                                        }}
+                                    }
+                                    @case ('covered-by-geom')
+                                    @case ('covered-by-boundary') {
+                                        {{
+                                            'pluginParameter.constraintDescWithin'
+                                                | transloco: { names: constraint.names.join(', ') || '…' }
+                                        }}
+                                    }
+                                }</span
+                            ><br />
+                        }
+                    </ng-template>
+                }
                 <hr />
                 <div class="area-selection-buttons">
                     <button
@@ -18,6 +53,7 @@
                     <button
                         type="button"
                         class="draw-button"
+                        [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === ExternalInput.File"
                         (click)="setSelectionMode(ExternalInput.File)"
                         [title]="'pluginParameter.selectFile' | transloco">
@@ -27,6 +63,7 @@
                     <button
                         type="button"
                         class="draw-button"
+                        [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Circle"
                         (click)="setSelectionMode(DrawInput.Circle)"
                         [title]="'pluginParameter.drawCircle' | transloco">
@@ -36,6 +73,7 @@
                     <button
                         type="button"
                         class="draw-button"
+                        [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Box"
                         (click)="setSelectionMode(DrawInput.Box)"
                         [title]="'pluginParameter.drawRectangle' | transloco">
@@ -45,6 +83,7 @@
                     <button
                         type="button"
                         class="draw-button"
+                        [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Polygon"
                         (click)="setSelectionMode(DrawInput.Polygon)"
                         [title]="'pluginParameter.drawPolygon' | transloco">
@@ -53,63 +92,83 @@
                     </button>
                 </div>
 
-                @if (
-                    !areaSelected ||
-                    (areaSelected && this.mapService.selectedFeatures.length > 1) ||
-                    (areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500)
-                ) {
+                @if (bannerState; as banner) {
                     <div
                         class="area-selection-message"
                         [ngClass]="{
-                            'message--info': !areaSelected,
-                            'message--blocked': areaSelected && this.mapService.selectedFeatures.length > 1,
-                            'message--warning':
-                                areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
+                            'message--info': banner.level === 'info',
+                            'message--blocked': banner.level === 'blocked',
+                            'message--warning': banner.level === 'warning'
                         }">
                         <i-lucide
                             [img]="
-                                !areaSelected
+                                banner.level === 'info'
                                     ? Info
-                                    : this.mapService.selectedFeatures.length > 1
+                                    : banner.level === 'blocked'
                                       ? TriangleAlert
                                       : CircleAlert
                             "
                             size="20"></i-lucide>
                         <span>
-                            @if (!areaSelected && currentSelectionMode === ExternalInput.Boundary) {
-                                {{ 'pluginParameter.clickInsideBoundary' | transloco }}
-                            }
-                            @if (
-                                !areaSelected &&
-                                (currentSelectionMode === DrawInput.Circle || currentSelectionMode === DrawInput.Box)
-                            ) {
-                                {{
-                                    'pluginParameter.clickAndMovePointer'
-                                        | transloco
-                                            : {
-                                                  shape:
-                                                      (currentSelectionMode === DrawInput.Box
-                                                          ? 'pluginParameter.rectangle'
-                                                          : 'pluginParameter.circle'
-                                                      ) | transloco
-                                              }
-                                }}
-                            }
-                            @if (!areaSelected && currentSelectionMode === ExternalInput.File) {
-                                {{ 'pluginParameter.uploadFileInstruction' | transloco }}
-                            }
-                            @if (!areaSelected && currentSelectionMode === DrawInput.Polygon) {
-                                {{ 'pluginParameter.clickMultiplePoints' | transloco }}
-                            }
-                            @if (areaSelected && this.mapService.selectedFeatures.length > 1) {
-                                {{ 'pluginParameter.multipleAreasSelected' | transloco }}
-                            }
-                            @if (
-                                areaSelected && this.mapService.selectedFeatures.length === 1 && getSelectedArea() > 500
-                            ) {
-                                {{ 'pluginParameter.selectedRegionLarge' | transloco }}<br />{{
-                                    'pluginParameter.processingMayTakeLonger' | transloco
-                                }}
+                            @switch (banner.reason) {
+                                @case ('multiple') {
+                                    {{ 'pluginParameter.multipleAreasSelected' | transloco }}
+                                }
+                                @case ('area') {
+                                    {{
+                                        'pluginParameter.areaOutOfBounds'
+                                            | transloco
+                                                : {
+                                                      min: aoiConstraints.areaConstraint?.min_area,
+                                                      max: aoiConstraints.areaConstraint?.max_area
+                                                  }
+                                    }}
+                                }
+                                @case ('outside-region') {
+                                    {{ 'pluginParameter.outsideAllowedRegion' | transloco }}
+                                }
+                                @case ('not-allowed-boundary') {
+                                    {{ 'pluginParameter.notAllowedBoundary' | transloco }}
+                                }
+                                @case ('load-failed') {
+                                    {{ 'pluginParameter.constraintLoadFailed' | transloco }}
+                                }
+                                @case ('loading') {
+                                    {{ 'pluginParameter.constraintLoading' | transloco }}
+                                }
+                                @case ('large-area') {
+                                    {{
+                                        'pluginParameter.selectedRegionLarge'
+                                            | transloco: { threshold: softAreaWarningThreshold }
+                                    }}<br />{{ 'pluginParameter.processingMayTakeLonger' | transloco }}
+                                }
+                                @default {
+                                    @if (currentSelectionMode === ExternalInput.Boundary) {
+                                        {{ 'pluginParameter.clickInsideBoundary' | transloco }}
+                                    }
+                                    @if (
+                                        currentSelectionMode === DrawInput.Circle ||
+                                        currentSelectionMode === DrawInput.Box
+                                    ) {
+                                        {{
+                                            'pluginParameter.clickAndMovePointer'
+                                                | transloco
+                                                    : {
+                                                          shape:
+                                                              (currentSelectionMode === DrawInput.Box
+                                                                  ? 'pluginParameter.rectangle'
+                                                                  : 'pluginParameter.circle'
+                                                              ) | transloco
+                                                      }
+                                        }}
+                                    }
+                                    @if (currentSelectionMode === ExternalInput.File) {
+                                        {{ 'pluginParameter.uploadFileInstruction' | transloco }}
+                                    }
+                                    @if (currentSelectionMode === DrawInput.Polygon) {
+                                        {{ 'pluginParameter.clickMultiplePoints' | transloco }}
+                                    }
+                                }
                             }
                         </span>
                     </div>
@@ -207,4 +266,10 @@
             </button>
         </div>
     </form>
+    @if (mapPreparing) {
+        <div class="map-preparing-overlay" role="status">
+            <span class="map-preparing-spinner"></span>
+            <p>{{ 'pluginParameter.preparingMap' | transloco }}</p>
+        </div>
+    }
 </div>

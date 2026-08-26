@@ -14,6 +14,7 @@ import { JSONSchema7 } from 'json-schema'
 import { Map as MaplibreMap } from 'maplibre-gl'
 import { ToastrService } from 'ngx-toastr'
 import { getTranslocoTestingModule, MockToastrService } from '../../../../../jest.mocks'
+import { AoiConstraintService } from './aoi-constraint.service'
 import { PluginParameterComponent } from './plugin-parameter.component'
 
 // Mock @tmcw/togeojson since it is ESM-only
@@ -1460,6 +1461,152 @@ describe('PluginParameterComponent', () => {
             fixture.destroy()
 
             expect(clearSpy).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('AoI constraints', () => {
+        let constraintService: AoiConstraintService
+
+        const selectedFeature = (area: number): GeoJSONFeature => ({
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPolygon',
+                coordinates: [
+                    [
+                        [
+                            [0, 0],
+                            [1, 0],
+                            [1, 1],
+                            [0, 1],
+                            [0, 0]
+                        ]
+                    ]
+                ]
+            },
+            properties: { name: 'Test Region', id: '-1', area }
+        })
+
+        const selectFeature = (feature: GeoJSONFeature): void => {
+            component.mapService.selectedFeatures = [feature]
+            component.mapService.selectedFeatures$.next([feature])
+            fixture.detectChanges()
+        }
+
+        const bannerElement = (): HTMLElement | null =>
+            (fixture.nativeElement as HTMLElement).querySelector('.area-selection-message')
+
+        const overlayElement = (): HTMLElement | null =>
+            (fixture.nativeElement as HTMLElement).querySelector('.map-preparing-overlay')
+
+        beforeEach(() => {
+            constraintService = fixture.debugElement.injector.get(AoiConstraintService)
+            jest.spyOn(constraintService, 'activate').mockImplementation(() => {})
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        it('keeps the legacy soft warning and allows submit when the plugin has no constraints', () => {
+            selectFeature(selectedFeature(600))
+
+            expect(bannerElement()?.classList).toContain('message--warning')
+            expect(component.hasValidAreaSelection()).toBe(true)
+        })
+
+        it('invalidates the area selection and shows a blocker message on a constraint violation, keeping the selection', () => {
+            jest.spyOn(constraintService, 'validate').mockReturnValue({ kind: 'area' })
+
+            selectFeature(selectedFeature(600))
+
+            expect(bannerElement()?.classList).toContain('message--blocked')
+            expect(component.hasValidAreaSelection()).toBe(false)
+            expect(component.mapService.selectedFeatures).toHaveLength(1)
+        })
+
+        it('suppresses the legacy soft warning when an AreaConstraint is active', () => {
+            jest.spyOn(constraintService, 'areaConstraint', 'get').mockReturnValue({
+                constraint_type: 'AreaConstraint',
+                min_area: 0,
+                max_area: 1000
+            })
+            jest.spyOn(constraintService, 'validate').mockReturnValue(null)
+
+            selectFeature(selectedFeature(600))
+
+            expect(bannerElement()).toBeNull()
+            expect(component.hasValidAreaSelection()).toBe(true)
+        })
+
+        it('shows the constraint note only when the plugin has constraints', () => {
+            fixture.detectChanges()
+            expect((fixture.nativeElement as HTMLElement).querySelector('.constraint-note')).toBeNull()
+
+            jest.spyOn(constraintService, 'hasConstraints', 'get').mockReturnValue(true)
+            fixture.detectChanges()
+            expect((fixture.nativeElement as HTMLElement).querySelector('.constraint-note')).not.toBeNull()
+        })
+
+        it('locks the non-boundary tools and forces Boundary mode for a BoundarySelectionConstraint', () => {
+            jest.spyOn(constraintService, 'boundarySelectionConstraint', 'get').mockReturnValue({
+                constraint_type: 'BoundarySelectionConstraint',
+                osm_ids: [-11674964, -14320076]
+            })
+
+            component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
+            component.ngOnChanges()
+            fixture.detectChanges()
+
+            expect(component.currentSelectionMode).toBe(ExternalInput.Boundary)
+
+            const buttons = Array.from(
+                (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.draw-button')
+            )
+            expect(buttons).toHaveLength(5)
+            expect(buttons[0].disabled).toBe(false)
+            buttons.slice(1).forEach(button => expect(button.disabled).toBe(true))
+        })
+
+        it('updates the fog of war and revalidates when constraint geometries arrive', () => {
+            const allowed = [selectedFeature(1)]
+            jest.spyOn(constraintService, 'allowedGeometries', 'get').mockReturnValue(allowed)
+            const validateSpy = jest.spyOn(constraintService, 'validate').mockReturnValue(null)
+            const fowSpy = jest.spyOn(component.mapService, 'updateFoWGeometries')
+
+            selectFeature(selectedFeature(2))
+            validateSpy.mockClear()
+
+            constraintService.geometriesChanged$.next()
+
+            expect(fowSpy).toHaveBeenCalledWith(allowed, 'constraint')
+            expect(validateSpy).toHaveBeenCalled()
+        })
+
+        it('overlays the panel while constraint geometries load and hides it once the map settles', async () => {
+            const loadState = jest.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
+
+            component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
+            component.ngOnChanges()
+            fixture.detectChanges()
+            expect(overlayElement()).not.toBeNull()
+
+            loadState.mockReturnValue('ready')
+            constraintService.geometriesChanged$.next()
+
+            await flushUntil(() => {
+                fixture.detectChanges()
+                return overlayElement() === null
+            })
+        })
+
+        it('clears constraint state on destroy', () => {
+            const fowSpy = jest.spyOn(component.mapService, 'clearFoWByType')
+            const deactivateSpy = jest.spyOn(constraintService, 'deactivate')
+
+            fixture.destroy()
+
+            expect(fowSpy).toHaveBeenCalledWith('constraint')
+            expect(deactivateSpy).toHaveBeenCalled()
         })
     })
 })

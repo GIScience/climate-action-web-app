@@ -8,6 +8,7 @@
 
     display: flex;
     flex-direction: column;
+    position: relative;
 
     > form {
         display: flex;
@@ -17,7 +18,7 @@
 
     .area-selection {
         border: 1px solid #bbb;
-        border-radius: 15px;
+        border-radius: 10px;
         margin-bottom: rem(15);
         padding: rem(15) rem(10);
 
@@ -28,8 +29,25 @@
 
         p {
             font-size: 0.9rem;
-            margin-bottom: rem(10);
+            margin-bottom: rem(5);
             margin-top: 0;
+        }
+
+        .constraint-note {
+            align-items: center;
+            color: #4773a3;
+            cursor: help;
+            display: flex;
+            gap: rem(6);
+
+            span {
+                text-decoration: underline dotted;
+                text-underline-offset: 3px;
+            }
+
+            i-lucide {
+                flex: 0 0 auto;
+            }
         }
 
         .area-selection-buttons {
@@ -66,6 +84,14 @@
                 &.active {
                     background-color: #008080;
                     color: #ffffff;
+                }
+
+                &:disabled {
+                    background-color: transparent;
+                    border-color: #b8c4c4;
+                    color: #9aa5a5;
+                    cursor: not-allowed;
+                    opacity: 0.6;
                 }
 
                 i-lucide {
@@ -222,10 +248,55 @@
         flex: 0 0 auto;
         gap: rem(10);
         justify-content: center;
+        margin-bottom: rem(5);
         margin-top: rem(15);
 
         button {
             margin: 0;
+        }
+    }
+
+    .map-preparing-overlay {
+        align-items: center;
+        animation: overlay-appear 0.15s ease 0.3s both;
+        backdrop-filter: saturate(0.25) blur(5px);
+        background-color: rgb(249 249 249 / 85%);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        inset: 0;
+        justify-content: center;
+        position: absolute;
+        z-index: 10;
+
+        .map-preparing-spinner {
+            animation: spin 0.8s linear infinite;
+            border: 3px solid rgb(0 128 128 / 20%);
+            border-radius: 50%;
+            border-top-color: #008080;
+            display: inline-block;
+            height: rem(32);
+            width: rem(32);
+        }
+
+        p {
+            margin-top: rem(5);
+        }
+    }
+
+    @keyframes overlay-appear {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
     }
 }

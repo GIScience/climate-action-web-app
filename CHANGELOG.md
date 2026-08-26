@@ -7,6 +7,11 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.6.1...main)
 
+### Added
+
+- Display and validate AoI selections in a request, based on constraints provided by the plugin
+- Show a loading overlay over the parameter panel until constraint regions and map layers have finished loading and rendering
+
 ## [3.6.1](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.6.1) - 2026-08-13
 
 ### Fixed

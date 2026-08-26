@@ -678,6 +678,86 @@ export const mockPluginBlueprint = () => {
     }).as('getPluginBlueprint')
 }
 
+export const mockPluginShowcaseWithConstraints = () => {
+    cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_showcase?lang=en`, {
+        body: {
+            name: 'Plugin Showcase',
+            authors: [
+                {
+                    name: 'Max Mustermann',
+                    affiliation: 'XYZ gGmbH',
+                    website: 'https://example.com/'
+                },
+                {
+                    name: 'Erika Mustermann',
+                    affiliation: 'Consultant at XYZ gGmbH',
+                    website: 'https://example.com/'
+                }
+            ],
+            state: 'active',
+            concerns: ['ghg_emission'],
+            teaser: 'A showcase to exhibit the full set of functionalities available on the CA Platform.',
+            computation_shelf_life: 'P28D',
+            aoi_constraints: [
+                [
+                    {
+                        constraint_type: 'AreaConstraint',
+                        min_area: 0.1,
+                        max_area: 10
+                    },
+                    {
+                        constraint_type: 'CoveredByGeomConstraint',
+                        description: 'Heidelberg',
+                        geom: {
+                            type: 'MultiPolygon',
+                            coordinates: [
+                                [
+                                    [
+                                        [8.38, 49.64],
+                                        [8.92, 49.64],
+                                        [8.92, 49.34],
+                                        [8.38, 49.34],
+                                        [8.38, 49.64]
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            ],
+            id: 'plugin_showcase',
+            version: '0.4.0',
+            repository: 'https://gitlab.heigit.org/climate-action/plugins/plugin-showcase',
+            purpose:
+                'The purpose of this plugin is to showcase the full set of functionalities available on the CA Platform.\n',
+            methodology:
+                'This plugin has no methodology except requesting 3rd party endpoints and forwarding their results. No logic is applied.\n',
+            sources: [],
+            assets: {
+                icon: 'assets/plugin_showcase/latest/ICON.png'
+            },
+            operator_schema: {
+                $defs: {},
+                properties: {
+                    bool_showcase: {
+                        description: 'A boolean parameter.',
+                        examples: [true],
+                        title: 'Boolean Input',
+                        type: 'boolean'
+                    }
+                },
+                required: ['bool_showcase'],
+                title: 'ComputeInput',
+                type: 'object'
+            },
+            demo_config: {},
+            library_version: '7.4.0',
+            language: 'en',
+            online: true
+        }
+    }).as('getPluginShowcaseWithConstraints')
+}
+
 export const mockPluginBlueprintOffline = () => {
     cy.intercept(`${cypressEnvironment.apiBasePath}/plugin/plugin_blueprint?lang=en`, {
         body: {

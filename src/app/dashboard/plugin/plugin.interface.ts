@@ -32,7 +32,33 @@ export interface Plugin {
     language?: SupportedLanguage
     status?: 'active' | 'unavailable' | 'releasing-soon'
     online: boolean
+    aoi_constraints?: AoiConstraint[][] // Outer array = OR alternatives, inner array = AND conditions. Currently only the first group is enforced.
 }
+
+export interface AreaConstraint {
+    constraint_type: 'AreaConstraint'
+    min_area: number // km²
+    max_area: number // km²
+}
+
+export interface CoveredByGeomConstraint {
+    constraint_type: 'CoveredByGeomConstraint'
+    geom: MultiPolygon
+    description: string
+}
+
+export interface CoveredByBoundaryConstraint {
+    constraint_type: 'CoveredByBoundaryConstraint'
+    osm_ids: number[]
+}
+
+export interface BoundarySelectionConstraint {
+    constraint_type: 'BoundarySelectionConstraint'
+    osm_ids: number[]
+}
+
+export type AoiConstraint =
+    AreaConstraint | CoveredByGeomConstraint | CoveredByBoundaryConstraint | BoundarySelectionConstraint
 
 export type PluginBaseInfo = Pick<Plugin, 'id' | 'version'>
 

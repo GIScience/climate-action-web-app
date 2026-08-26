@@ -36,7 +36,7 @@ import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
 import { MapArtifactLayer, MapArtifactManagerService } from './map-artifact-manager.service'
 import { MapDrawingService } from './map-drawing.service'
-import { MapFoWManagerService } from './map-fow-manager.service'
+import { FoWGeometryType, MapFoWManagerService } from './map-fow-manager.service'
 import { RegionChoiceDialogComponent, RegionChoiceOption } from './region-choice-dialog/region-choice-dialog.component'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
@@ -964,17 +964,27 @@ export class MapService {
         this.fowManager.clearByType(this.map, 'focused')
     }
 
-    updateFoWGeometries(geometries: GeoJSONFeature[], type: 'pinned'): void {
+    updateFoWGeometries(geometries: GeoJSONFeature[], type: Exclude<FoWGeometryType, 'focused'>): void {
         if (!this.map) return
-        this.fowManager.clearByType(this.map, type)
-        geometries.forEach((geom, index) => {
-            this.fowManager.addGeometry(this.map!, `${type}-${index}`, geom, type)
-        })
+        this.fowManager.setGeometriesByType(this.map, type, geometries)
     }
 
-    clearFoWByType(type: 'pinned'): void {
+    clearFoWByType(type: Exclude<FoWGeometryType, 'focused'>): void {
         if (!this.map) return
         this.fowManager.clearByType(this.map, type)
+    }
+
+    whenIdle(): Promise<void> {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const map = this.map
+                if (!map || map.loaded()) {
+                    resolve()
+                } else {
+                    map.once('idle', () => resolve())
+                }
+            })
+        })
     }
 
     enableComputeLayers() {
@@ -1085,15 +1095,9 @@ export class MapService {
             error: error => console.error('Error fetching feature from OGC API:', error)
         })
     }
+
     sanitizeGeom(geom: Geometry): MultiPolygon {
-        switch (geom.type) {
-            case 'MultiPolygon':
-                return geom
-            case 'Polygon':
-                return { type: 'MultiPolygon', coordinates: [geom.coordinates] }
-            default:
-                throw new Error(`Expected polygonal geometry, got ${geom.type}`)
-        }
+        return MapGeoJsonUtils.toMultiPolygon(geom)
     }
 
     getSelectedRegion(): GeoJSONFeature | null {

@@ -1,5 +1,8 @@
-import type { Feature, GeoJSON } from 'geojson'
+import area from '@turf/area'
+import { buffer } from '@turf/buffer'
+import type { Feature, GeoJSON, Geometry, MultiPolygon, Polygon, Position } from 'geojson'
 import { GeoJSONSource, Map as MaplibreMap, MapMouseEvent, PointLike, Popup, type MapGeoJSONFeature } from 'maplibre-gl'
+import { difference, type Geom as PolyclipGeom } from 'polyclip-ts'
 
 interface HoverContext {
     layers: Map<string, string>
@@ -210,6 +213,64 @@ export class MapGeoJsonUtils {
         LAYER_IDS.forEach(id => map.getLayer(id) && map.removeLayer(id))
         if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID)
     }
+
+    static isPolygonal(geom: Geometry | null | undefined): geom is Polygon | MultiPolygon {
+        return geom?.type === 'Polygon' || geom?.type === 'MultiPolygon'
+    }
+
+    static toMultiPolygon(geom: Geometry): MultiPolygon {
+        switch (geom.type) {
+            case 'MultiPolygon':
+                return geom
+            case 'Polygon':
+                return { type: 'MultiPolygon', coordinates: [geom.coordinates] }
+            default:
+                throw new Error(`Expected polygonal geometry, got ${geom.type}`)
+        }
+    }
+
+    // Distance by which the allowed regions are buffered for the coverage check,
+    // to allow for minor mismatches in the border geometry.
+    private static readonly COVERAGE_TOLERANCE_METERS = 50
+
+    static dilateForCoverage(outers: (Polygon | MultiPolygon)[]): (Polygon | MultiPolygon)[] {
+        return outers
+            .map(
+                outer =>
+                    buffer({ type: 'Feature', geometry: outer, properties: {} }, this.COVERAGE_TOLERANCE_METERS, {
+                        units: 'meters'
+                    })?.geometry
+            )
+            .filter(MapGeoJsonUtils.isPolygonal)
+    }
+
+    // Check if `inner` lies fully inside the union of the `outers`, within COVERAGE_TOLERANCE_METERS
+    static isCoveredBy(
+        inner: Polygon | MultiPolygon,
+        outers: (Polygon | MultiPolygon)[],
+        getDilatedOuters?: () => (Polygon | MultiPolygon)[]
+    ): boolean {
+        if (outers.length === 0) return false
+
+        const toPolyclipGeom = (geom: Polygon | MultiPolygon): PolyclipGeom =>
+            this.toMultiPolygon(geom).coordinates as PolyclipGeom
+
+        // Fast path: exactly inside the union, no buffering needed
+        if (difference(toPolyclipGeom(inner), ...outers.map(toPolyclipGeom)).length === 0) return true
+
+        const dilatedOuters = getDilatedOuters?.() ?? this.dilateForCoverage(outers)
+        const remainder = difference(toPolyclipGeom(inner), ...dilatedOuters.map(toPolyclipGeom))
+        if (remainder.length === 0) return true
+
+        // Ignore leftover clipping artifacts below 1m² resulting from rounding errors
+        const remainderArea = area({
+            type: 'Feature',
+            geometry: { type: 'MultiPolygon', coordinates: remainder as Position[][][] },
+            properties: {}
+        })
+        return remainderArea <= 1
+    }
+
     static extractFeature(object: GeoJSON): Feature {
         switch (object.type) {
             case 'Feature':

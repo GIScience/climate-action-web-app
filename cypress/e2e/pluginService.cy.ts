@@ -3,6 +3,7 @@ import {
     mockPluginBlueprint,
     mockPluginBlueprintComputation,
     mockPluginBlueprintOffline,
+    mockPluginShowcaseWithConstraints,
     mockPluginWalkabilitytIcon,
     mockPluginsList,
     mockPluginsListWithoutBlueprint
@@ -61,6 +62,41 @@ describe('pluginService', () => {
         cy.get('button.optional-attributes-button').click()
 
         cy.get('.dialog-window input[type="number"]').should('exist')
+    })
+
+    it('read and validate the AoI constraints correctly', () => {
+        mockPluginsList()
+        mockPluginShowcaseWithConstraints()
+
+        cy.visit('/')
+
+        cy.wait('@getPlugins')
+
+        cy.visit('dashboard/plugin/plugin_showcase')
+
+        cy.wait('@getPluginShowcaseWithConstraints')
+
+        cy.clickFakeUserButtonUntilGone()
+
+        cy.wait(500)
+
+        cy.get('button.new-compute').click()
+
+        cy.get('.constraint-note').should('exist')
+
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+        cy.get('.maplibregl-ctrl-zoom-in').click()
+
+        cy.wait(500)
+
+        cy.waitForRenderComplete()
+
+        cy.get('canvas.maplibregl-canvas').click(1000, 300)
+
+        cy.get('.area-selection-message').should('have.class', 'message--blocked')
+
+        cy.get('button[type="submit"]').should('be.disabled')
     })
 
     it('should still display the plugin component even if the plugin is offline', () => {

@@ -7,12 +7,6 @@ import { cypressEnvironment } from './cypress-environment'
 addCompareSnapshotCommand()
 
 beforeEach(() => {
-    cy.intercept('**/assets/env.js', req => {
-        req.continue(res => {
-            res.body = `${res.body}\nwindow.env.CACHET_URL = '${cypressEnvironment.cachetUrl}'\n`
-        })
-    }).as('envJs')
-
     cy.intercept(`${cypressEnvironment.cachetUrl}/**`, { body: { data: [], included: [] } }).as('blockCachetCalls')
 
     cy.intercept(`**/${cypressEnvironment.apiBasePath}/**`, {

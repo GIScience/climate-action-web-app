@@ -220,6 +220,48 @@ describe('MapFoWManagerService', () => {
             expect(mockMap.removeSource).not.toHaveBeenCalled()
         })
 
+        it('should support the constraint geometry type', () => {
+            const feature = createMockFeature(simplePolygonCoords)
+
+            service.addGeometry(asMap(mockMap), 'constraint-0', feature, 'constraint')
+
+            expect(mockMap.addSource).toHaveBeenCalledWith('fow-source', expect.any(Object))
+
+            mockMap.getLayer.mockReturnValue(createMockLayer())
+            mockMap.getSource.mockReturnValue(createMockSource())
+
+            service.clearByType(asMap(mockMap), 'constraint')
+
+            expect(mockMap.removeLayer).toHaveBeenCalledWith('fow-layer')
+            expect(mockMap.removeSource).toHaveBeenCalledWith('fow-source')
+        })
+
+        it('should replace all geometries of a type in a single update via setGeometriesByType', () => {
+            const feature1 = createMockFeature(simplePolygonCoords)
+            const feature2 = createMockFeature(anotherPolygonCoords)
+            const mockSource = { setData: jest.fn() }
+
+            service.setGeometriesByType(asMap(mockMap), 'constraint', [feature1, feature2])
+            expect(mockMap.addSource).toHaveBeenCalledTimes(2) // fow + outline sources, exactly one update
+
+            mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
+            mockMap.getLayer.mockReturnValue(createMockLayer())
+
+            service.setGeometriesByType(asMap(mockMap), 'constraint', [feature1])
+            expect(mockSource.setData).toHaveBeenCalledTimes(2) // fow + outline data, exactly one update
+
+            service.setGeometriesByType(asMap(mockMap), 'constraint', [])
+            expect(mockMap.removeLayer).toHaveBeenCalledWith('fow-layer')
+            expect(mockMap.removeSource).toHaveBeenCalledWith('fow-source')
+        })
+
+        it('should not touch the map when setGeometriesByType replaces nothing with nothing', () => {
+            service.setGeometriesByType(asMap(mockMap), 'constraint', [])
+
+            expect(mockMap.addSource).not.toHaveBeenCalled()
+            expect(mockMap.removeLayer).not.toHaveBeenCalled()
+        })
+
         it('should isolate geometries across different maps', () => {
             const secondaryMockMap = createMockMap()
             const primaryFeature = createMockFeature(simplePolygonCoords)

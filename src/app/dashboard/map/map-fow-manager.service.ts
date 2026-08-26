@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
 import mask from '@turf/mask'
 import type { Feature as GeoJSONFeature, MultiPolygon, Polygon, Position } from 'geojson'
 import type { GeoJSONSource, Map as MaplibreMap } from 'maplibre-gl'
@@ -7,7 +8,7 @@ import { union as polyclipUnion } from 'polyclip-ts'
 type PolyclipRing = [number, number][]
 type PolyclipPolygon = PolyclipRing[]
 
-export type FoWGeometryType = 'focused' | 'pinned'
+export type FoWGeometryType = 'focused' | 'pinned' | 'constraint'
 
 interface FoWGeometry {
     geometry: GeoJSONFeature
@@ -52,6 +53,18 @@ export class MapFoWManagerService {
     }
 
     clearByType(map: MaplibreMap, type: FoWGeometryType): void {
+        if (this.deleteByType(map, type)) this.updateMapLayers(map)
+    }
+
+    // Replace all geometries of one type in a single mask recomputation
+    setGeometriesByType(map: MaplibreMap, type: FoWGeometryType, features: GeoJSONFeature[]): void {
+        const changed = this.deleteByType(map, type)
+        const geometries = this.getGeometries(map)
+        features.forEach((feature, index) => geometries.set(`${type}-${index}`, { geometry: feature, type }))
+        if (changed || features.length > 0) this.updateMapLayers(map)
+    }
+
+    private deleteByType(map: MaplibreMap, type: FoWGeometryType): boolean {
         const geometries = this.getGeometries(map)
         let changed = false
         for (const [id, geom] of geometries) {
@@ -60,7 +73,7 @@ export class MapFoWManagerService {
                 changed = true
             }
         }
-        if (changed) this.updateMapLayers(map)
+        return changed
     }
 
     private getGeometries(map: MaplibreMap): Map<string, FoWGeometry> {
@@ -86,7 +99,7 @@ export class MapFoWManagerService {
         const polygons: GeoJSONFeature<Polygon | MultiPolygon>[] = []
 
         for (const { geometry: feat } of geometries.values()) {
-            if (feat?.geometry?.type === 'Polygon' || feat?.geometry?.type === 'MultiPolygon') {
+            if (MapGeoJsonUtils.isPolygonal(feat?.geometry)) {
                 polygons.push(feat as GeoJSONFeature<Polygon | MultiPolygon>)
             }
         }
@@ -94,13 +107,9 @@ export class MapFoWManagerService {
         if (polygons.length === 0) return
 
         // Extract polygon coordinates for polyclip-ts
-        const polyclipPolygons: PolyclipPolygon[] = polygons.flatMap(feature => {
-            if (feature.geometry.type === 'Polygon') {
-                return [feature.geometry.coordinates as PolyclipPolygon]
-            } else {
-                return feature.geometry.coordinates as PolyclipPolygon[]
-            }
-        })
+        const polyclipPolygons: PolyclipPolygon[] = polygons.flatMap(
+            feature => MapGeoJsonUtils.toMultiPolygon(feature.geometry).coordinates as PolyclipPolygon[]
+        )
 
         // Union all polygons - polyclip detects enclosed regions and creates holes
         const unionResult = polyclipUnion(polyclipPolygons[0], ...polyclipPolygons.slice(1))
@@ -166,9 +175,7 @@ export class MapFoWManagerService {
             type: 'Feature',
             geometry: {
                 type: 'MultiPolygon',
-                coordinates: polygons.flatMap(p =>
-                    p.geometry.type === 'MultiPolygon' ? p.geometry.coordinates : [p.geometry.coordinates]
-                )
+                coordinates: polygons.flatMap(p => MapGeoJsonUtils.toMultiPolygon(p.geometry).coordinates)
             },
             properties: {}
         }

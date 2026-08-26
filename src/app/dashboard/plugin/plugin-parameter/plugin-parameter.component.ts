@@ -75,7 +75,18 @@ import {
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { skip, Subscription } from 'rxjs'
+import {
+    AoiConstraintDescription,
+    AoiConstraintService,
+    AoiViolation,
+    AoiViolationKind
+} from './aoi-constraint.service'
 import { EnumOption, FormlyModel } from './plugin-parameter.interface'
+
+interface BannerState {
+    level: 'info' | 'blocked' | 'warning'
+    reason?: 'multiple' | 'large-area' | AoiViolationKind
+}
 
 @Component({
     selector: 'app-plugin-parameter',
@@ -94,6 +105,7 @@ import { EnumOption, FormlyModel } from './plugin-parameter.interface'
         MatInputModule
     ],
     providers: [
+        AoiConstraintService,
         provideFormlyCore([
             {
                 validationMessages: [
@@ -151,6 +163,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private formlyJsonschema = inject(FormlyJsonschema)
     private appwriteService = inject(AppwriteService)
     private translocoService = inject(TranslocoService)
+    protected aoiConstraints = inject(AoiConstraintService)
 
     @Input() schema!: JSONSchema7
     @Input() plugin!: Plugin
@@ -184,9 +197,18 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     areaGeomType: GeoJsonTypes | undefined
     highlightedFeaturesSubscription: Subscription | undefined
     private styleChangeSubscription: Subscription | undefined
+    private constraintGeometriesSubscription: Subscription | undefined
+    private langChangeSubscription: Subscription | undefined
     currentSelectionMode: GeometryInputMode = ExternalInput.Boundary
     areaLabelControl = new FormControl('')
     private hadSelection = false
+    protected constraintViolation: AoiViolation | null = null
+    protected readonly softAreaWarningThreshold = 500
+    protected bannerState: BannerState | null = null
+    protected boundaryOnly = false
+    protected constraintDescriptions: AoiConstraintDescription[] = []
+    protected mapPreparing = false
+    private mapPreparationToken = 0
 
     private bufferSourceFeature?: GeoJSONFeature
     protected readonly defaultBufferRadius = 10
@@ -196,6 +218,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.ngZone.run(() => {
                 const hadSelection = this.hadSelection
                 this.toggleFormState()
+                this.updateConstraintViolation()
                 this.hadSelection = this.areaSelected
 
                 if (this.areaSelected && !hadSelection && this.currentSelectionMode !== ExternalInput.Boundary) {
@@ -213,6 +236,17 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 this.mapService.startDrawing(this.currentSelectionMode)
             }
         })
+
+        this.constraintGeometriesSubscription = this.aoiConstraints.geometriesChanged$.subscribe(() => {
+            this.ngZone.run(() => {
+                this.refreshConstraintState()
+                this.settleMapPreparation()
+            })
+        })
+
+        this.langChangeSubscription = this.translocoService.langChanges$.subscribe(lang => {
+            this.constraintDescriptions = this.aoiConstraints.describeConstraints(lang)
+        })
     }
 
     ngOnInit(): void {
@@ -222,6 +256,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnChanges(): void {
         this.fields = this.parseFieldsFromSchema(this.plugin.operator_schema)
+        this.applyConstraints()
         Promise.resolve().then(() => {
             this.toggleFormState()
         })
@@ -238,10 +273,15 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.highlightedFeaturesSubscription.unsubscribe()
         }
         this.styleChangeSubscription?.unsubscribe()
+        this.constraintGeometriesSubscription?.unsubscribe()
+        this.langChangeSubscription?.unsubscribe()
         if (this.currentSelectionMode !== ExternalInput.Boundary) {
             this.mapService.clearDrawnFeatures()
         }
         this.mapService.stopDrawing()
+        this.mapService.clearFoWByType('constraint')
+        this.aoiConstraints.deactivate()
+        this.mapPreparationToken++
     }
 
     resetForm(): void {
@@ -262,6 +302,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     toggleFormState(): void {
         this.areaSelected = this.mapService.selectedFeatures.length > 0
         this.areaGeomType = this.mapService.selectedFeatures[0]?.geometry.type
+        this.updateBannerState()
 
         if (this.areaSelected === this.form.enabled) {
             return
@@ -486,13 +527,79 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     hasValidAreaSelection(): boolean {
-        const hasValidArea = this.mapService.selectedFeatures.length === 1
+        const hasValidArea = this.mapService.selectedFeatures.length === 1 && !this.constraintViolation
 
         if (this.currentSelectionMode !== ExternalInput.Boundary) {
             return hasValidArea && this.areaLabelControl.valid
         }
 
         return hasValidArea
+    }
+
+    private updateBannerState(): void {
+        this.bannerState = this.computeBannerState()
+    }
+
+    private computeBannerState(): BannerState | null {
+        if (!this.areaSelected) return { level: 'info' }
+        if (this.mapService.selectedFeatures.length > 1) return { level: 'blocked', reason: 'multiple' }
+
+        if (this.constraintViolation) {
+            const { kind } = this.constraintViolation
+            return { level: kind === 'loading' ? 'info' : 'blocked', reason: kind }
+        }
+
+        // AreaConstraint, if it exists, supersedes the soft area warning
+        if (!this.aoiConstraints.areaConstraint && this.getSelectedArea() > this.softAreaWarningThreshold) {
+            return { level: 'warning', reason: 'large-area' }
+        }
+        return null
+    }
+
+    private applyConstraints(): void {
+        this.aoiConstraints.activate(this.plugin)
+
+        const boundaryConstraint = this.aoiConstraints.boundarySelectionConstraint
+        this.boundaryOnly = !!boundaryConstraint
+        if (boundaryConstraint) {
+            this.setSelectionMode(ExternalInput.Boundary)
+            // setSelectionMode does nothing when Boundary mode is already active, so turn the layer on explicitly
+            this.mapService.enableBoundarySelection()
+        }
+        this.refreshConstraintState()
+        this.beginMapPreparation()
+    }
+
+    // Display a loading spinner until the map is actually usable: constraint geometries fetched (if any),
+    // the FoW computed, and the boundary/FoW layers rendered (accounts for slow boundary-tile fetches as well).
+    private beginMapPreparation(): void {
+        this.mapPreparing = true
+        this.mapPreparationToken++
+        if (this.aoiConstraints.loadState !== 'loading') {
+            this.settleMapPreparation()
+        }
+    }
+
+    private settleMapPreparation(): void {
+        const token = this.mapPreparationToken
+        this.mapService.whenIdle().then(() => {
+            if (token !== this.mapPreparationToken) return
+            this.ngZone.run(() => (this.mapPreparing = false))
+        })
+    }
+
+    private refreshConstraintState(): void {
+        this.mapService.updateFoWGeometries(this.aoiConstraints.allowedGeometries, 'constraint')
+        this.constraintDescriptions = this.aoiConstraints.describeConstraints(this.translocoService.getActiveLang())
+        this.updateConstraintViolation()
+    }
+
+    private updateConstraintViolation(): void {
+        this.constraintViolation =
+            this.mapService.selectedFeatures.length === 1
+                ? this.aoiConstraints.validate(this.mapService.selectedFeatures[0])
+                : null
+        this.updateBannerState()
     }
 
     setSelectionMode(mode: GeometryInputMode): void {
