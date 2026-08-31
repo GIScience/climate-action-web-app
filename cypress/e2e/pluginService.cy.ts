@@ -84,6 +84,8 @@ describe('pluginService', () => {
 
         cy.get('.constraint-note').should('exist')
 
+        cy.get('.area-selection-buttons .draw-button').first().click()
+
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()

@@ -251,7 +251,9 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnInit(): void {
         this.form.disable()
-        this.mapService.enableBoundarySelection()
+        if (this.currentSelectionMode === ExternalInput.Boundary) {
+            this.mapService.enableBoundarySelection()
+        }
     }
 
     ngOnChanges(): void {
@@ -565,6 +567,10 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.setSelectionMode(ExternalInput.Boundary)
             // setSelectionMode does nothing when Boundary mode is already active, so turn the layer on explicitly
             this.mapService.enableBoundarySelection()
+        } else if (this.aoiConstraints.hasCoverageConstraint) {
+            // CoveredBy* constraints can aggravate confusion caused by
+            // admin_level based Boundary display, so default to Rectangle
+            this.setSelectionMode(DrawInput.Box)
         }
         this.refreshConstraintState()
         this.beginMapPreparation()

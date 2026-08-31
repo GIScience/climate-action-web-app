@@ -70,6 +70,10 @@ export class AoiConstraintService {
         return this.constraints.find(c => c.constraint_type === 'BoundarySelectionConstraint')
     }
 
+    get hasCoverageConstraint(): boolean {
+        return !!(this.coveredByGeomConstraint || this.coveredByBoundaryConstraint)
+    }
+
     private get coveredByGeomConstraint(): CoveredByGeomConstraint | undefined {
         return this.constraints.find(c => c.constraint_type === 'CoveredByGeomConstraint')
     }

@@ -1567,6 +1567,28 @@ describe('PluginParameterComponent', () => {
             buttons.slice(1).forEach(button => expect(button.disabled).toBe(true))
         })
 
+        it('defaults to Rectangle drawing for a coverage constraint without locking the other tools', () => {
+            jest.spyOn(constraintService, 'hasCoverageConstraint', 'get').mockReturnValue(true)
+            const enableSpy = jest.spyOn(component.mapService, 'enableBoundarySelection')
+            const disableSpy = jest.spyOn(component.mapService, 'disableBoundarySelection')
+            const drawSpy = jest.spyOn(component.mapService, 'startDrawing')
+
+            component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
+            component.ngOnChanges()
+            component.ngOnInit()
+            fixture.detectChanges()
+
+            expect(component.currentSelectionMode).toBe(DrawInput.Box)
+            expect(disableSpy).toHaveBeenCalled()
+            expect(drawSpy).toHaveBeenCalledWith(DrawInput.Box)
+            expect(enableSpy).not.toHaveBeenCalled()
+
+            const buttons = Array.from(
+                (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.draw-button')
+            )
+            buttons.forEach(button => expect(button.disabled).toBe(false))
+        })
+
         it('updates the fog of war and revalidates when constraint geometries arrive', () => {
             const allowed = [selectedFeature(1)]
             jest.spyOn(constraintService, 'allowedGeometries', 'get').mockReturnValue(allowed)
