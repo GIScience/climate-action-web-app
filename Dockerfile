@@ -7,7 +7,6 @@ WORKDIR /ca-web-app
 ENV CYPRESS_INSTALL_BINARY=0
 
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY patches/ ./patches/
 RUN npm install -g pnpm@${PNPM_VERSION}
 RUN pnpm install --frozen-lockfile
 
