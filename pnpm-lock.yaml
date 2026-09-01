@@ -135,8 +135,8 @@ importers:
         specifier: ^20.0.0
         version: 20.0.5(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
       plotly.js-locales:
-        specifier: 3.7.0
-        version: 3.7.0
+        specifier: 4.0.0
+        version: 4.0.0
       plotly.js-strict-dist:
         specifier: ^4.0.0
         version: 4.0.0
@@ -5053,8 +5053,8 @@ packages:
   pkg-types@2.2.0:
     resolution: {integrity: sha512-2SM/GZGAEkPp3KWORxQZns4M+WSeXbC2HEvmOIJe3Cmiv6ieAJvdVhDldtHqM5J1Y7MrR1XhkBT/rMlhh9FdqQ==}
 
-  plotly.js-locales@3.7.0:
-    resolution: {integrity: sha512-ksB7hfy9Pk9SQtkfK1AfpRy2O/2iIh7CxQat8vsk1cCySwyLUuHXltsr4ReUeORScxPjGnyW00aNe97fDivsmA==}
+  plotly.js-locales@4.0.0:
+    resolution: {integrity: sha512-i9PfXeIrygxYdpwU6nAyE+qWfM1Lk+KD00oe4twTO2S9w58cMdaDvJ8zL+RM+n7bCiSHyieFN78knD3HWodONA==}
 
   plotly.js-strict-dist@4.0.0:
     resolution: {integrity: sha512-QqwlOFWF9eOnoabj61oox50TncPlAWBHczuDQmxr1FdpEJl9+JpXYXGOUgznrltRLd36Cd01nn11CoTE5G2Yww==}
@@ -11465,7 +11465,7 @@ snapshots:
       pathe: 2.0.3
     optional: true
 
-  plotly.js-locales@3.7.0: {}
+  plotly.js-locales@4.0.0: {}
 
   plotly.js-strict-dist@4.0.0: {}
 
