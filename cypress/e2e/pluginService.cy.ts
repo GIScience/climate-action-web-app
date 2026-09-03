@@ -115,9 +115,11 @@ describe('pluginService', () => {
                     {
                         correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
                         request_ts: '2024-12-17T08:55:23.807074Z',
-                        status: 'SUCCESS'
+                        status: 'SUCCESS',
+                        aoiName: 'Heidelberg',
+                        flags: [],
+                        state: 'ACTIVE'
                     }
                 ])
             )
@@ -133,7 +135,6 @@ describe('pluginService', () => {
 
         cy.get('.plugin-card').eq(1).click()
         cy.wait('@getPluginBlueprintOffline')
-        cy.wait('@getPluginBlueprintComputation')
 
         cy.get('.plugin-header h1').should('exist').should('contain.text', 'Plugin Blueprint')
         cy.get('.parent-computation').eq(0).should('contain.text', '8649e714')

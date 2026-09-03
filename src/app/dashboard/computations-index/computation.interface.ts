@@ -25,15 +25,20 @@ export interface ComputationMetadata {
 
 export interface ComputationDisplayEntity extends Pick<
     ComputationMetadata,
-    'correlation_uuid' | 'request_ts' | 'language' | 'params' | 'requested_params' | 'status' | 'artifact_errors'
+    'correlation_uuid' | 'request_ts' | 'language' | 'status'
 > {
     artifacts: ArtifactEntity[]
+    params?: ComputationParameters
+    requested_params?: ComputationParameters
+    artifact_errors?: ComputationMetadata['artifact_errors']
     aoiName?: string
     geometry?: ComputationMetadata['aoi']
     pluginName?: Plugin['name']
     pluginId?: ComputationMetadata['plugin_info']['id']
     isExpanded?: boolean
+    loading?: boolean
     keepInDOM?: boolean
+    hydrated?: boolean
     flags?: ComputationFlags
     state?: ComputationItemState
 }

@@ -33,30 +33,43 @@ function compareArtifacts(a: ArtifactEntity, b: ArtifactEntity): number {
         return (a.name || '').localeCompare(b.name || '')
     }
 
-    if (a.icon && b.icon && a.icon in ARTIFACT_ORDER_BY_ICON && b.icon in ARTIFACT_ORDER_BY_ICON) {
-        return ARTIFACT_ORDER_BY_ICON[a.icon] - ARTIFACT_ORDER_BY_ICON[b.icon]
-    }
-    return 0
+    const aOrder = a.icon ? (ARTIFACT_ORDER_BY_ICON[a.icon] ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
+    const bOrder = b.icon ? (ARTIFACT_ORDER_BY_ICON[b.icon] ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
+    return aOrder - bOrder
 }
 
-export function mapComputationMetadata(
-    run: ComputationDatabaseEntity,
+export function mapDatabaseComputation(run: ComputationDatabaseEntity): ComputationDisplayEntity {
+    return {
+        correlation_uuid: run.correlation_uuid,
+        request_ts: run.request_ts,
+        status: run.status,
+        aoiName: run.aoiName,
+        pluginId: run.pluginId,
+        flags: run.flags,
+        state: run.state,
+        artifacts: [],
+        hydrated: false
+    }
+}
+
+export function mapHydratedComputation(
+    computation: ComputationDisplayEntity,
     metadata: ComputationMetadata
 ): ComputationDisplayEntity {
     return {
-        correlation_uuid: run.correlation_uuid,
-        request_ts: metadata.request_ts,
+        ...computation,
         status: metadata.status,
+        request_ts: computation.request_ts ?? metadata.request_ts,
         language: metadata.language,
-        aoiName: metadata.aoi?.properties?.['name'] as string | undefined,
+        aoiName: (metadata.aoi?.properties?.['name'] as string | undefined) ?? computation.aoiName,
         geometry: metadata.aoi,
-        pluginId: metadata.plugin_info?.id,
+        pluginId: metadata.plugin_info?.id ?? computation.pluginId,
         params: metadata.params,
         requested_params: metadata.requested_params,
         artifact_errors: metadata.artifact_errors,
-        flags: run.flags,
         artifacts: Array.isArray(metadata.artifacts)
             ? metadata.artifacts.map(toArtifactEntity).sort(compareArtifacts)
-            : []
+            : [],
+        hydrated: true
     }
 }

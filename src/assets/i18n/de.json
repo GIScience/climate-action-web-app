@@ -95,7 +95,8 @@
         "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
         "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden.",
         "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert.",
-        "errorImportingComputation": "Es gab einen Fehler beim Importieren des Ergebnisses."
+        "errorImportingComputation": "Es gab einen Fehler beim Importieren des Ergebnisses.",
+        "errorLoadingComputation": "Das Ergebnis konnte nicht geladen werden. Bitte versuchen Sie es erneut."
     },
     "computation": {
         "addToReport": "Zum Report hinzufügen",

@@ -74,9 +74,10 @@ describe('mapService', () => {
                     {
                         correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
                         status: 'SUCCESS',
-                        timestamp: '2024-08-07T12:43:08.373768',
+                        flags: [],
+                        state: 'ACTIVE',
+                        request_ts: '2024-08-07T12:43:08.373768',
                         aoiName: '金融街街道'
                     }
                 ])
@@ -91,19 +92,16 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoTiffComputation')
-
         cy.get('.maplibregl-style-list button').eq(1).click()
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoTiffComputation')
         cy.get('.child-computation').eq(0).click()
 
         cy.wait('@getGeoTiff')
 
         cy.reload(true)
-
-        cy.wait('@getGeoTiffComputation')
 
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
@@ -163,9 +161,10 @@ describe('mapService', () => {
                     {
                         correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-08-07T12:43:08.373768',
-                        status: 'SUCCESS'
+                        request_ts: '2024-08-07T12:43:08.373768',
+                        state: 'ACTIVE',
+                        status: 'SUCCESS',
+                        aoiName: '金融街街道'
                     }
                 ])
             )
@@ -179,9 +178,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputationJinrongjie')
-
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoJsonComputationJinrongjie')
         cy.wait(1500)
         cy.get('.child-computation').eq(0).click()
 
@@ -207,16 +205,20 @@ describe('mapService', () => {
                     {
                         correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-08-07T12:43:08.373768',
-                        status: 'SUCCESS'
+                        request_ts: '2024-08-07T12:43:08.373Z',
+                        flags: [],
+                        state: 'ACTIVE',
+                        status: 'SUCCESS',
+                        aoiName: '金融街街道'
                     },
                     {
                         correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2023-05-25T16:57:52+01:00',
-                        status: 'SUCCESS'
+                        request_ts: '2023-05-25T16:57:52Z',
+                        flags: [],
+                        state: 'ACTIVE',
+                        status: 'SUCCESS',
+                        aoiName: '西长安街街道'
                     }
                 ])
             )
@@ -230,9 +232,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputationJinrongjie')
-
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoJsonComputationJinrongjie')
         cy.get('.child-computation').eq(0).realHover()
         cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
 
@@ -240,7 +241,7 @@ describe('mapService', () => {
         cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(1).click()
-        cy.wait(500)
+        cy.wait('@getGeoJsonComputationWestChangan')
         cy.get('.child-computation').eq(0).realHover()
         cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
 
@@ -266,9 +267,11 @@ describe('mapService', () => {
                     {
                         correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-08-07T12:43:08.373768',
-                        status: 'SUCCESS'
+                        request_ts: '2024-08-07T12:43:08.373Z',
+                        flags: [],
+                        state: 'ACTIVE',
+                        status: 'SUCCESS',
+                        aoiName: '金融街街道'
                     }
                 ])
             )
@@ -282,9 +285,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputationJinrongjie')
-
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoJsonComputationJinrongjie')
         cy.get('.child-computation').eq(1).click()
 
         cy.wait('@getGeoJsonDetourFactorsJinrongjie')
@@ -309,9 +311,10 @@ describe('mapService', () => {
                     {
                         correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-08-07T12:43:08.373768',
-                        status: 'SUCCESS'
+                        request_ts: '2024-08-07T12:43:08.373768',
+                        status: 'SUCCESS',
+                        state: 'ACTIVE',
+                        aoiName: '金融街街道'
                     }
                 ])
             )
@@ -325,9 +328,8 @@ describe('mapService', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getSimpleGeoJsonComputation')
-
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getSimpleGeoJsonComputation')
         cy.get('.child-computation').eq(0).click()
 
         cy.wait('@getSimpleGeoJson')

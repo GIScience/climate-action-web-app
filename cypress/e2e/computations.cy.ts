@@ -41,8 +41,6 @@ describe('computations', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getPluginBlueprintComputation')
-
         cy.get('.computations-index-content').should('exist')
     }
 
@@ -50,6 +48,9 @@ describe('computations', () => {
         setupTest()
 
         cy.get('.parent-computation').eq(0).click()
+
+        cy.wait('@getPluginBlueprintComputation')
+
         cy.get('.child-computation').eq(1).click()
 
         cy.wait('@getBlueprintTable')
@@ -62,6 +63,8 @@ describe('computations', () => {
         setupTest()
 
         cy.get('.parent-computation').eq(0).click()
+
+        cy.wait('@getPluginBlueprintComputation')
 
         cy.get('.child-computation').eq(0).realHover()
         cy.get('.child-computation').eq(0).find('.description-btn').should('not.exist')

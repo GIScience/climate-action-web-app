@@ -58,11 +58,11 @@ describe('walkthrough', () => {
 
         cy.wait('@getComputationRunState')
 
-        cy.wait('@getPluginHiWalkComputation')
-
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '6 of 10')
 
         cy.get('.driver-popover-next-btn').click()
+
+        cy.wait('@getPluginHiWalkComputation')
 
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '7 of 10')
 

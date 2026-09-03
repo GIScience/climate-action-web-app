@@ -25,9 +25,11 @@ describe('report builder', () => {
                     {
                         correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2024-12-17T08:55:23.807074Z',
-                        status: 'SUCCESS'
+                        request_ts: '2024-12-17T08:55:23.807074Z',
+                        status: 'SUCCESS',
+                        state: 'ACTIVE',
+                        flags: [],
+                        aoiName: 'Heidelberg'
                     }
                 ])
             )
@@ -41,11 +43,10 @@ describe('report builder', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getPluginBlueprintComputation')
-
         cy.get('.computations-index-content').should('exist')
 
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getPluginBlueprintComputation')
 
         cy.get('.child-computation').eq(0).realHover()
         cy.get('.child-computation').eq(0).find('.add-to-report-btn').click()
@@ -83,9 +84,11 @@ describe('report builder', () => {
                     {
                         correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2023-09-27T16:42:52+01:00',
-                        status: 'SUCCESS'
+                        request_ts: '2023-09-27T16:42:52+01:00',
+                        status: 'SUCCESS',
+                        state: 'ACTIVE',
+                        flags: [],
+                        aoiName: 'Jinrongjie'
                     }
                 ])
             )
@@ -99,11 +102,10 @@ describe('report builder', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputationJinrongjie')
-
         cy.get('.computations-index-content').should('exist')
 
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoJsonComputationJinrongjie')
 
         cy.get('.child-computation').eq(0).click()
 
@@ -143,9 +145,10 @@ describe('report builder', () => {
                     {
                         correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
                         pluginId: 'plugin_blueprint',
-                        pluginName: 'Plugin Blueprint',
-                        timestamp: '2023-09-27T16:42:52+01:00',
-                        status: 'SUCCESS'
+                        request_ts: '2023-09-27T16:42:52+01:00',
+                        status: 'SUCCESS',
+                        flags: [],
+                        aoiName: 'Jinrongjie'
                     }
                 ])
             )
@@ -159,11 +162,10 @@ describe('report builder', () => {
 
         cy.wait('@getPluginBlueprint')
 
-        cy.wait('@getGeoJsonComputationJinrongjie')
-
         cy.get('.computations-index-content').should('exist')
 
         cy.get('.parent-computation').eq(0).click()
+        cy.wait('@getGeoJsonComputationJinrongjie')
 
         cy.window().should(win => {
             const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map

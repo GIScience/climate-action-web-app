@@ -1,6 +1,6 @@
 import { Artifact } from '../artifact/artifact.interface'
 import { ComputationDatabaseEntity, ComputationMetadata } from './computation.interface'
-import { mapComputationMetadata } from './computation.mapper'
+import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
 
 function createArtifact(overrides: Partial<Artifact> = {}): Artifact {
     return {
@@ -18,15 +18,39 @@ function createArtifact(overrides: Partial<Artifact> = {}): Artifact {
 }
 
 describe('computation mappers', () => {
-    describe('mapComputationMetadata', () => {
-        const run: ComputationDatabaseEntity = {
+    describe('mapDatabaseComputation', () => {
+        it('should map a database entity to an unhydrated display entity', () => {
+            const run: ComputationDatabaseEntity = {
+                correlation_uuid: 'test-uuid',
+                request_ts: new Date('2023-09-27T16:42:52+01:00'),
+                status: 'SUCCESS',
+                aoiName: 'Test AOI',
+                pluginId: 'test_plugin',
+                flags: ['NEW']
+            }
+
+            expect(mapDatabaseComputation(run)).toEqual({
+                correlation_uuid: 'test-uuid',
+                request_ts: run.request_ts,
+                status: 'SUCCESS',
+                aoiName: 'Test AOI',
+                pluginId: 'test_plugin',
+                flags: ['NEW'],
+                state: undefined,
+                artifacts: [],
+                hydrated: false
+            })
+        })
+    })
+
+    describe('mapHydratedComputation', () => {
+        const baseComputation = mapDatabaseComputation({
             correlation_uuid: 'test-uuid',
             request_ts: new Date('2023-09-27T16:42:52+01:00'),
             status: 'SUCCESS',
-            aoiName: 'Test AOI',
             pluginId: 'test_plugin',
-            flags: ['NEW']
-        }
+            aoiName: 'Stored AOI'
+        })
 
         const metadata: ComputationMetadata = {
             correlation_uuid: 'test-uuid',
@@ -46,11 +70,13 @@ describe('computation mappers', () => {
             artifact_errors: { Indicator: 'failed' }
         }
 
-        it('should map metadata into a display entity, keeping the run identity and flags', () => {
-            expect(mapComputationMetadata(run, metadata)).toEqual(
+        it('should merge metadata into the computation and mark it hydrated', () => {
+            const hydrated = mapHydratedComputation(baseComputation, metadata)
+
+            expect(hydrated).toEqual(
                 expect.objectContaining({
                     correlation_uuid: 'test-uuid',
-                    request_ts: metadata.request_ts,
+                    request_ts: baseComputation.request_ts,
                     status: 'SUCCESS',
                     aoiName: 'Metadata AOI',
                     geometry: metadata.aoi,
@@ -58,20 +84,31 @@ describe('computation mappers', () => {
                     params: metadata.params,
                     requested_params: metadata.requested_params,
                     artifact_errors: metadata.artifact_errors,
-                    flags: ['NEW'],
-                    artifacts: []
+                    hydrated: true
                 })
             )
         })
 
-        it('should default artifacts to an empty array when metadata provides none', () => {
-            const sparseMetadata = { ...metadata, artifacts: undefined } as unknown as ComputationMetadata
+        it('should fall back to existing values when metadata fields are missing', () => {
+            const sparseMetadata = {
+                ...metadata,
+                request_ts: undefined,
+                aoi: undefined,
+                plugin_info: undefined,
+                artifacts: undefined
+            } as unknown as ComputationMetadata
 
-            expect(mapComputationMetadata(run, sparseMetadata).artifacts).toEqual([])
+            const hydrated = mapHydratedComputation(baseComputation, sparseMetadata)
+
+            expect(hydrated.request_ts).toEqual(baseComputation.request_ts)
+            expect(hydrated.aoiName).toBe('Stored AOI')
+            expect(hydrated.pluginId).toBe('test_plugin')
+            expect(hydrated.artifacts).toEqual([])
+            expect(hydrated.hydrated).toBe(true)
         })
 
         it('should assign icons and order artifacts by modality then name', () => {
-            const mapped = mapComputationMetadata(run, {
+            const hydrated = mapHydratedComputation(baseComputation, {
                 ...metadata,
                 artifacts: [
                     createArtifact({ name: 'Table', modality: 'TABLE' }),
@@ -81,7 +118,7 @@ describe('computation mappers', () => {
                 ]
             })
 
-            expect(mapped.artifacts.map(artifact => [artifact.name, artifact.icon])).toEqual([
+            expect(hydrated.artifacts.map(artifact => [artifact.name, artifact.icon])).toEqual([
                 ['Summary', 'description'],
                 ['Image A', 'image'],
                 ['Image B', 'image'],

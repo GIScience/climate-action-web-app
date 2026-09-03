@@ -1,6 +1,17 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule, NgClass } from '@angular/common'
-import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import {
+    ChangeDetectorRef,
+    Component,
+    computed,
+    inject,
+    Input,
+    OnDestroy,
+    OnInit,
+    signal,
+    TemplateRef,
+    ViewChild
+} from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
@@ -37,7 +48,7 @@ import {
 } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, Subscription } from 'rxjs'
+import { firstValueFrom, Subscription } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
@@ -61,7 +72,24 @@ import {
     ComputationMetadata,
     ComputationParameters
 } from './computation.interface'
-import { mapComputationMetadata } from './computation.mapper'
+import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
+
+const STATUS_RANK: { [status: string]: number } = {
+    PENDING: 0,
+    RETRY: 1,
+    STARTED: 1,
+    SUCCESS: 2,
+    FAILURE: 2,
+    REVOKED: 2
+}
+
+function statusRank(status: string): number {
+    return STATUS_RANK[status] ?? 0
+}
+
+function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
+    return status === 'PENDING' || status === 'STARTED'
+}
 
 @Component({
     selector: 'app-computations-index',
@@ -123,11 +151,15 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private cdr = inject(ChangeDetectorRef)
     private syncService = inject(ComputationSyncService)
 
-    computations: ComputationDisplayEntity[] = []
-    dataChange = new BehaviorSubject<ComputationDisplayEntity[]>([])
-    currentRuns: ComputationDatabaseEntity[] = []
-    scheduledRuns: ComputationDatabaseEntity[] = []
+    readonly runs = signal<ComputationDisplayEntity[]>([])
+    readonly scheduled = computed(() => this.runs().filter(run => isPendingStatus(run.status)))
+    readonly completed = computed(() =>
+        this.runs()
+            .filter(run => run.status === 'SUCCESS')
+            .sort((a, b) => compareDesc(new Date(a.request_ts?.valueOf() || 0), new Date(b.request_ts?.valueOf() || 0)))
+    )
     activeComputation?: ComputationDisplayEntity
+    private activationToken = 0
     archivedComputations: ComputationDatabaseEntity[] = []
     private _activeArtifact?: ArtifactEntity
 
@@ -250,19 +282,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.transitionRunStatus(transition.run, transition.newStatus, transition.message)
         )
 
-        this.dataChange.subscribe(data => {
-            if (data.length > 0) {
-                this.computations = data
-                this.activateArtifact()
-            }
-        })
-
         this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.refreshCurrentAndScheduledRuns()
+            this.refreshRunsFromStorage()
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
-            this.refreshCurrentAndScheduledRuns()
+            this.refreshRunsFromStorage()
             this.startPeriodicSync()
         })
 
@@ -323,26 +348,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private handleActiveRunsResult(documents: ComputationDatabaseEntity[], isInitialLoad: boolean): void {
-        const filteredRuns = documents.filter(run => ['PENDING', 'STARTED', 'SUCCESS'].includes(run.status))
+        this.upsertRuns(documents)
+        this.updateNewRuns(documents)
 
         if (isInitialLoad) {
-            this.currentRuns = filteredRuns
-            this.scheduledRuns = documents.filter(run => ['PENDING', 'STARTED'].includes(run.status))
-
-            this.updateNewRuns(documents)
-
-            if (this.currentRuns.length === 0 && this.hasDemoConfig) {
+            if (this.runs().length === 0 && this.hasDemoConfig) {
                 this.checkAndFetchDemoComputation()
             }
 
-            this.initializeSuccessfulRuns()
             this.startPeriodicSync()
-        } else {
-            this.currentRuns = [...this.currentRuns, ...filteredRuns]
-
-            this.updateNewRuns(documents)
-
-            this.initializeSuccessfulRuns(filteredRuns)
+            this.restoreActiveArtifact()
         }
     }
 
@@ -351,15 +366,41 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.newRuns = [...new Set([...this.newRuns, ...newRunsFromData])]
     }
 
-    private refreshCurrentAndScheduledRuns(): void {
-        this.currentRuns = this.storageService
+    private refreshRunsFromStorage(): void {
+        const stored = this.storageService
             .getComputesByStatus(['PENDING', 'STARTED', 'SUCCESS'])
             .filter(run => run.pluginId === this.pluginId)
-        this.scheduledRuns = this.storageService
-            .getComputesByStatus(['PENDING', 'STARTED'])
-            .filter(run => run.pluginId === this.pluginId)
 
-        this.cdr.markForCheck()
+        this.upsertRuns(stored)
+
+        const storedIds = new Set(stored.map(run => run.correlation_uuid))
+        this.runs.update(list =>
+            list.filter(run => !isPendingStatus(run.status) || storedIds.has(run.correlation_uuid))
+        )
+    }
+
+    private upsertRuns(entities: ComputationDatabaseEntity[]): void {
+        if (entities.length === 0) return
+
+        this.runs.update(list => {
+            const byId = new Map(list.map(run => [run.correlation_uuid, run]))
+            const additions: ComputationDisplayEntity[] = []
+
+            for (const entity of entities) {
+                const existing = byId.get(entity.correlation_uuid)
+                if (existing) {
+                    if (statusRank(entity.status) >= statusRank(existing.status)) {
+                        existing.status = entity.status
+                    }
+                    existing.flags = entity.flags ?? existing.flags
+                    existing.state = entity.state ?? existing.state
+                } else if (isPendingStatus(entity.status) || entity.status === 'SUCCESS') {
+                    additions.push(mapDatabaseComputation(entity))
+                }
+            }
+
+            return [...list, ...additions]
+        })
     }
 
     private async loadInitialPluginRuns(): Promise<void> {
@@ -373,9 +414,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     toggleArchivedView(): void {
         this.showArchived = !this.showArchived
         if (this.showArchived) {
-            this.currentRuns = []
-            this.computations = []
-            this.scheduledRuns = []
+            this.runs.set([])
             this.loadRuns(true, 'ARCHIVED')
         } else {
             this.archivedComputations = []
@@ -401,15 +440,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    initializeSuccessfulRuns(runs?: ComputationDatabaseEntity[]) {
-        const runsToProcess = runs || this.currentRuns
-        runsToProcess
-            .filter(run => run.status === 'SUCCESS')
-            .forEach(run => {
-                this.fetchAndProcessComputations(run)
-            })
-    }
-
     getAppwriteUrl(path: string): string {
         return this.appwriteService.getAppwriteUrl(path)
     }
@@ -426,16 +456,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.pluginService.updateRunStatus(run.correlation_uuid, newStatus)
 
         run.status = newStatus
-        const idx = this.currentRuns.findIndex(r => r.correlation_uuid === run.correlation_uuid)
-        if (idx > -1) this.currentRuns[idx].status = newStatus
-
-        if (newStatus === 'SUCCESS' || newStatus === 'FAILURE') {
-            this.scheduledRuns = this.scheduledRuns.filter(r => r.correlation_uuid !== run.correlation_uuid)
-            this.cdr.markForCheck()
-        }
+        this.upsertRuns([run])
 
         if (newStatus === 'SUCCESS') {
-            this.fetchAndProcessComputations(run)
             this.storageService.markAsNew(run.correlation_uuid)
             if (!this.newRuns.includes(run.correlation_uuid)) {
                 this.newRuns.push(run.correlation_uuid)
@@ -460,26 +483,26 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    fetchAndProcessComputations(run: ComputationDatabaseEntity) {
-        this.pluginService.getComputationMetadata(run.correlation_uuid).subscribe({
-            next: (response: ComputationMetadata) => {
-                if (!response.artifacts) return
-                this.updateComputation(run.correlation_uuid, mapComputationMetadata(run, response))
-            },
-            error: () => {
-                console.error('Error fetching computations for:', run.correlation_uuid)
-            }
-        })
-    }
+    private async ensureHydrated(computation: ComputationDisplayEntity): Promise<ComputationDisplayEntity> {
+        if (computation.hydrated) return computation
 
-    updateComputation(correlation_uuid: string, computation: ComputationDisplayEntity) {
-        if (computation.status === 'PENDING' || computation.status === 'STARTED' || computation.status === 'SUCCESS') {
-            this.computations = this.computations.filter(x => x.correlation_uuid != correlation_uuid)
-            this.computations.push(computation)
-            this.computations.sort((a, b) => {
-                return compareDesc(new Date(a.request_ts?.valueOf() || 0), new Date(b.request_ts?.valueOf() || 0))
+        try {
+            const response = await firstValueFrom(
+                this.pluginService.getComputationMetadata(computation.correlation_uuid)
+            )
+            const hydratedComputation = mapHydratedComputation(computation, response)
+            this.runs.update(runs =>
+                runs.map(run =>
+                    run.correlation_uuid === hydratedComputation.correlation_uuid ? hydratedComputation : run
+                )
+            )
+            return hydratedComputation
+        } catch (error) {
+            console.error('Error fetching computation metadata for:', computation.correlation_uuid, error)
+            this.toastr.error(this.translocoService.translate('computationsIndex.errorLoadingComputation'), '', {
+                timeOut: 5000
             })
-            this.dataChange.next(this.computations)
+            throw error
         }
     }
 
@@ -492,11 +515,12 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.importedRuns = this.importedRuns.filter(id => id !== correlation_uuid)
     }
 
-    toggleComputation(computation: ComputationDisplayEntity) {
+    async toggleComputation(computation: ComputationDisplayEntity) {
         if (this.pluginService.computeState$) {
             this.pluginService.setComputeState('inactive')
         }
         this.pluginService.collapsePluginCatalog()
+        const token = ++this.activationToken
         const previousActiveComputation = this.activeComputation
 
         if (previousActiveComputation) {
@@ -510,30 +534,49 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.activeComputation = undefined
             this._activeArtifact = undefined
             this.mapArtifactManager.setActiveArtifactId(null)
-        } else {
-            computation.keepInDOM = true
-            setTimeout(() => (computation.isExpanded = true), 0)
-            this.activeComputation = computation
+            return
+        }
 
-            if (computation?.geometry) {
-                const extent = this.mapService.highlightAoI(computation.geometry)
+        computation.loading = !computation.hydrated
 
-                if (extent) {
-                    this.mapService.flyToExtent(extent)
-                }
+        try {
+            computation = await this.ensureHydrated(computation)
+        } catch {
+            if (token === this.activationToken) {
+                this.activeComputation = undefined
             }
+            return
+        } finally {
+            computation.loading = false
+        }
 
-            if (this.newRuns.includes(computation.correlation_uuid)) {
-                this.removeNewRunMark(computation.correlation_uuid)
-            }
+        if (token !== this.activationToken) return
 
-            if (this.importedRuns.includes(computation.correlation_uuid)) {
-                this.removeImportedRunMark(computation.correlation_uuid)
+        computation.keepInDOM = true
+        setTimeout(() => (computation.isExpanded = true), 0)
+        this.activeComputation = computation
+
+        if (computation?.geometry) {
+            const extent = this.mapService.highlightAoI(computation.geometry)
+
+            if (extent) {
+                this.mapService.flyToExtent(extent)
             }
         }
+
+        if (this.newRuns.includes(computation.correlation_uuid)) {
+            this.removeNewRunMark(computation.correlation_uuid)
+        }
+
+        if (this.importedRuns.includes(computation.correlation_uuid)) {
+            this.removeImportedRunMark(computation.correlation_uuid)
+        }
+
+        this.cdr.markForCheck()
     }
 
     collapseComputation() {
+        this.activationToken++
         const previousActiveComputation = this.activeComputation
 
         if (previousActiveComputation) {
@@ -580,23 +623,22 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    activateArtifact() {
-        if (this.computations.length == this.currentRuns.length) {
-            const activeArtifactRef = this.storageService.getActiveArtifact()
-            if (activeArtifactRef) {
-                const parentComputation = this.computations.find(
-                    x => x.correlation_uuid === activeArtifactRef.correlation_uuid
-                )
-                if (parentComputation) {
-                    this.toggleComputation(parentComputation)
-                    this._activeArtifact = parentComputation.artifacts.find(
-                        x => x.filename === activeArtifactRef.filename
-                    )
-                    if (this._activeArtifact) {
-                        this.computationComponent.viewArtifact(this._activeArtifact)
-                    }
-                }
-            }
+    private async restoreActiveArtifact(): Promise<void> {
+        const activeArtifactRef = this.storageService.getActiveArtifact()
+        if (!activeArtifactRef) return
+
+        const parentComputation = this.runs().find(x => x.correlation_uuid === activeArtifactRef.correlation_uuid)
+        if (!parentComputation) return
+
+        await this.toggleComputation(parentComputation)
+
+        const hydratedComputation = this.activeComputation
+        if (hydratedComputation?.correlation_uuid !== activeArtifactRef.correlation_uuid) return
+
+        this._activeArtifact = hydratedComputation.artifacts.find(x => x.filename === activeArtifactRef.filename)
+        if (this._activeArtifact) {
+            const artifact = this._activeArtifact
+            setTimeout(() => this.computationComponent?.viewArtifact(artifact), 0)
         }
     }
 
@@ -638,9 +680,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         const isCurrentComputation =
             this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
 
-        this.currentRuns = this.currentRuns.filter(run => run.correlation_uuid !== correlation_uuid)
-        this.computations = this.computations.filter(comp => comp.correlation_uuid !== correlation_uuid)
-        this.dataChange.next(this.computations)
+        this.runs.update(list => list.filter(run => run.correlation_uuid !== correlation_uuid))
 
         if (isCurrentComputation) {
             this.artifactViewerService.closeArtifactViewer()
@@ -648,7 +688,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.activeComputation = undefined
         }
 
-        if (this.currentRuns.length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {
+        if (this.runs().length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {
             this.loadRuns(false, 'ACTIVE')
         }
     }
@@ -668,9 +708,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private startPeriodicSync() {
-        this.syncService.start(() =>
-            this.currentRuns.filter(run => run.status === 'PENDING' || run.status === 'STARTED')
-        )
+        this.syncService.start(() => this.runs().filter(run => isPendingStatus(run.status)))
     }
 
     // Pure parameter-formatting helpers live in computation-parameter.utils.ts.
@@ -680,7 +718,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     formatParameterName = formatParameterName
 
     importComputation(correlationUuid: string): void {
-        if (this.currentRuns.some(run => run.correlation_uuid === correlationUuid)) {
+        if (this.runs().some(run => run.correlation_uuid === correlationUuid)) {
             this.toastr.warning(
                 this.translocoService.translate('computationsIndex.computationAlreadyPresent', {
                     id: this.formatUUID(correlationUuid)
@@ -707,8 +745,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 this.pluginService
                     .storeNewComputes(computation)
                     .then(() => {
-                        this.currentRuns.push(computation)
-                        this.fetchAndProcessComputations(computation)
+                        this.upsertRuns([computation])
                         this.importedRuns = [...this.importedRuns, correlationUuid]
                         this.toastr.success(
                             this.translocoService.translate('computationsIndex.computationImported', {
@@ -769,7 +806,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                                 .storeNewComputes(compute)
                                 .then(() => {
                                     this.demoRuns.push(data.correlation_uuid)
-                                    this.fetchAndProcessComputations(compute)
+                                    this.upsertRuns([compute])
                                 })
                                 .catch(error => {
                                     console.error('Failed to store demo computation:', error)
@@ -820,7 +857,11 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         return Object.entries(artifactErrors)
     }
 
-    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
+    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language' | 'hydrated'>): string | null {
+        if (!computation.hydrated) {
+            return null
+        }
+
         const computationLanguage = computation.language ?? SupportedLanguage.EN
         const currentLanguage = this.translocoService.getActiveLang() as SupportedLanguage
         const pluginLanguage = this.pluginLanguage ?? SupportedLanguage.EN
@@ -847,7 +888,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     // trackBy helpers to reduce DOM churn in lists
-    trackByScheduled(_index: number, run: ComputationDatabaseEntity): string {
+    trackByScheduled(_index: number, run: ComputationDisplayEntity): string {
         return run.correlation_uuid
     }
 

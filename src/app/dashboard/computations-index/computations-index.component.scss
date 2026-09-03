@@ -216,22 +216,6 @@
                 }
             }
 
-            &.not-expandable {
-                cursor: default;
-
-                &:active {
-                    pointer-events: none;
-                }
-
-                .computation-arrow {
-                    visibility: hidden;
-                }
-
-                .computation-actions {
-                    pointer-events: all;
-                }
-            }
-
             .computation-arrow {
                 display: flex;
 
@@ -241,6 +225,12 @@
                     height: rem(28);
                     transition: transform 0.3s ease-in-out;
                     width: rem(28);
+                }
+
+                .arrow-spinner {
+                    animation: spin 1s linear infinite;
+                    color: #666;
+                    display: flex;
                 }
             }
 

@@ -67,5 +67,8 @@ console.error = (...args: any[]) => {
     if (fullMessage.includes('File could not be loaded due to')) {
         return
     }
+    if (fullMessage.includes('Error fetching computation metadata for')) {
+        return
+    }
     originalConsoleError.apply(console, args)
 }

@@ -38,8 +38,8 @@
         @if (!showArchived) {
             <div class="active-runs-container">
                 @if (
-                    (computations | filterByCriteria: pluginId).length === 0 &&
-                    (scheduledRuns | filterByCriteria: pluginId).length === 0 &&
+                    (completed() | filterByCriteria: pluginId).length === 0 &&
+                    (scheduled() | filterByCriteria: pluginId).length === 0 &&
                     !paginationInfo.loading
                 ) {
                     <div class="empty-computations">
@@ -48,7 +48,7 @@
                         }}</span>
                     </div>
                 }
-                @if (paginationInfo.loading && currentRuns.length === 0) {
+                @if (paginationInfo.loading && runs().length === 0) {
                     <div class="skeleton-container">
                         @for (item of [1, 2, 3, 4, 5]; track item) {
                             <div class="skeleton-item">
@@ -62,13 +62,13 @@
                     </div>
                 }
                 @if (
-                    (computations | filterByCriteria: pluginId).length > 0 ||
-                    (scheduledRuns | filterByCriteria: pluginId).length > 0
+                    (completed() | filterByCriteria: pluginId).length > 0 ||
+                    (scheduled() | filterByCriteria: pluginId).length > 0
                 ) {
                     <div class="computations-container">
                         <ng-scrollbar visibility="hover" orientation="vertical">
                             @for (
-                                scheduledRun of scheduledRuns | filterByCriteria: pluginId;
+                                scheduledRun of scheduled() | filterByCriteria: pluginId;
                                 track trackByScheduled($index, scheduledRun)
                             ) {
                                 <div class="scheduled-computation">
@@ -101,7 +101,7 @@
                                 </div>
                             }
                             @for (
-                                computation of computations | filterByCriteria: pluginId;
+                                computation of completed() | filterByCriteria: pluginId;
                                 track trackByComputation($index, computation)
                             ) {
                                 <div
@@ -115,14 +115,18 @@
                                             'parent-computation': true,
                                             'is-new': newRuns.includes(computation.correlation_uuid),
                                             'is-demo': demoRuns.includes(computation.correlation_uuid),
-                                            'is-imported': importedRuns.includes(computation.correlation_uuid),
-                                            'not-expandable': computation.artifacts.length === 0
+                                            'is-imported': importedRuns.includes(computation.correlation_uuid)
                                         }"
                                         (click)="toggleComputation(computation)"
                                         (keyup.enter)="toggleComputation(computation)"
                                         tabindex="0">
                                         <div class="computation-arrow">
-                                            @if (computation.artifacts.length > 0) {
+                                            @if (computation.loading) {
+                                                <i-lucide
+                                                    [img]="LoaderCircle"
+                                                    size="20"
+                                                    class="arrow-spinner"></i-lucide>
+                                            } @else {
                                                 <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
                                             }
                                         </div>
@@ -193,12 +197,17 @@
                                                             <i-lucide [img]="Share2" size="18"></i-lucide>
                                                             {{ 'computationsIndex.actions.share' | transloco }}
                                                         </button>
-                                                        <button
-                                                            (click)="viewParameters(computation, $event)"
-                                                            class="actions-menu__item">
-                                                            <i-lucide [img]="ListTodo" size="18"></i-lucide>
-                                                            {{ 'computationsIndex.actions.viewParameters' | transloco }}
-                                                        </button>
+                                                        @if (computation.hydrated) {
+                                                            <button
+                                                                (click)="viewParameters(computation, $event)"
+                                                                class="actions-menu__item">
+                                                                <i-lucide [img]="ListTodo" size="18"></i-lucide>
+                                                                {{
+                                                                    'computationsIndex.actions.viewParameters'
+                                                                        | transloco
+                                                                }}
+                                                            </button>
+                                                        }
                                                         <div class="actions-menu__divider"></div>
                                                         <button
                                                             (click)="
@@ -227,11 +236,13 @@
                                             </div>
                                         }
                                     </div>
-                                    <app-computation
-                                        [computation]="computation"
-                                        [activeArtifact]="activeArtifact"
-                                        (artifactActivated)="storeActiveArtifact($event)">
-                                    </app-computation>
+                                    @if (computation.hydrated) {
+                                        <app-computation
+                                            [computation]="computation"
+                                            [activeArtifact]="activeArtifact"
+                                            (artifactActivated)="storeActiveArtifact($event)">
+                                        </app-computation>
+                                    }
                                 </div>
                             }
                         </ng-scrollbar>

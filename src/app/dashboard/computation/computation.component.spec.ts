@@ -5,17 +5,49 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, of } from 'rxjs'
+import { BehaviorSubject, of, Subject } from 'rxjs'
 import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
-import { ComputationDisplayEntity, ComputationMetadata } from '../computations-index/computation.interface'
+import { ComputationDatabaseEntity, ComputationDisplayEntity } from '../computations-index/computation.interface'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { StoreService } from '../store/store.service'
 import { ComputationComponent } from './computation.component'
+
+const TEST_UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
+
+function createArtifactEntity(overrides: Partial<ArtifactEntity> = {}): ArtifactEntity {
+    return {
+        name: 'Artifact',
+        modality: 'IMAGE',
+        primary: true,
+        tags: [],
+        correlation_uuid: TEST_UUID,
+        filename: 'artifact-file',
+        sources: [],
+        attachments: {},
+        rank: 1,
+        ...overrides
+    }
+}
+
+function createComputation(artifacts: ArtifactEntity[]): ComputationDisplayEntity {
+    return {
+        correlation_uuid: TEST_UUID,
+        request_ts: new Date('2023-09-27T16:42:52+01:00'),
+        status: 'SUCCESS',
+        pluginId: 'test_plugin',
+        aoiName: 'Test AOI',
+        params: {},
+        artifact_errors: {},
+        artifacts,
+        hydrated: true,
+        isExpanded: true
+    }
+}
 
 describe('ComputationComponent', () => {
     let component: ComputationsIndexComponent
@@ -27,13 +59,21 @@ describe('ComputationComponent', () => {
     let mockMapService: Partial<MapService>
     let mockStoreService: Partial<StoreService>
 
-    let pluginRuns$: BehaviorSubject<ComputationDisplayEntity[]>
+    let pluginRuns$: BehaviorSubject<ComputationDatabaseEntity[]>
+    let syncTasks$: Subject<void>
+
+    function createComputationComponent(artifacts: ArtifactEntity[]): ComputationComponent {
+        const computationFixture = TestBed.createComponent(ComputationComponent)
+        computationFixture.componentInstance.computation = createComputation(artifacts)
+        computationFixture.detectChanges()
+        return computationFixture.componentInstance
+    }
 
     beforeEach(async () => {
-        pluginRuns$ = new BehaviorSubject<ComputationDisplayEntity[]>([])
+        pluginRuns$ = new BehaviorSubject<ComputationDatabaseEntity[]>([])
+        syncTasks$ = new Subject<void>()
 
         mockStorageService = {
-            getPluginRuns: jest.fn(),
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             getPluginRunsPaginated: jest.fn().mockResolvedValue({
                 documents: [],
@@ -41,8 +81,9 @@ describe('ComputationComponent', () => {
                 hasMore: false
             }),
             getNewRuns: jest.fn().mockReturnValue([]),
-            getDemoRuns: jest.fn().mockReturnValue([]),
             getComputesByStatus: jest.fn().mockReturnValue([]),
+            markAsNew: jest.fn(),
+            markAsViewed: jest.fn(),
             getActiveArtifact: jest.fn(),
             saveActiveArtifact: jest.fn(),
             clearActiveArtifact: jest.fn()
@@ -61,7 +102,8 @@ describe('ComputationComponent', () => {
                     plugin_version: '1.0.0'
                 })
             ),
-            syncTasks$: new BehaviorSubject<void>(undefined),
+            storeNewComputes: jest.fn(() => Promise.resolve()),
+            syncTasks$,
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
         }
 
@@ -71,7 +113,10 @@ describe('ComputationComponent', () => {
             raster: new BehaviorSubject(null)
         }
         mockMapService = {
-            initMap: jest.fn()
+            initMap: jest.fn(),
+            highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
+            removeFocusedLayer: jest.fn(),
+            flyToExtent: jest.fn()
         }
         mockStoreService = {
             getArtifactS3Url: jest.fn((correlationUuid: string, filename: string) =>
@@ -112,8 +157,6 @@ describe('ComputationComponent', () => {
     })
 
     beforeEach(fakeAsync(() => {
-        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([])
-
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
 
@@ -136,22 +179,15 @@ describe('ComputationComponent', () => {
     it('should render content for non-expandable computations correctly', fakeAsync(() => {
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([
             {
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                correlation_uuid: TEST_UUID,
                 pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
+                aoiName: 'Test AOI',
                 status: 'SUCCESS',
                 request_ts: new Date('2023-09-27T16:42:52+01:00')
             }
-        ] as ComputationDisplayEntity[])
+        ] as ComputationDatabaseEntity[])
 
-        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
-            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
-                return of()
-            }
-            return of()
-        })
-
-        component.ngOnInit()
+        pluginRuns$.next([])
         fixture.detectChanges()
 
         const metaElements = fixture.debugElement.queryAll(By.css('.card-subtitle'))
@@ -161,185 +197,30 @@ describe('ComputationComponent', () => {
     }))
 
     it('should display only primary children initially', fakeAsync(() => {
-        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([
-            {
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
-                status: 'SUCCESS',
-                request_ts: new Date('2023-09-27T16:42:52+01:00')
-            }
-        ] as ComputationDisplayEntity[])
-
-        mockPluginService.getComputationMetadata = jest.fn().mockImplementation((id: string) => {
-            if (id === '8a897536-c4b4-4e5a-9d70-50430183ac66') {
-                return of({
-                    correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                    request_ts: new Date('2023-09-27T16:42:52+01:00'),
-                    params: {},
-                    aoi: {} as ComputationMetadata['aoi'],
-                    plugin_info: {
-                        id: 'test_plugin',
-                        version: '1.0.0'
-                    },
-                    artifacts: [
-                        {
-                            name: 'Image 1',
-                            modality: 'IMAGE',
-                            summary: 'An image 1.',
-                            description: 'The image 1 is under CC0 license.',
-                            filename: 'image1',
-                            primary: true,
-                            rank: 1,
-                            sources: [],
-                            tags: [],
-                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                            attachments: {}
-                        },
-                        {
-                            name: 'Image 2',
-                            modality: 'IMAGE',
-                            summary: 'An image 2.',
-                            description: 'The image 2 is under CC0 license.',
-                            filename: 'image2',
-                            primary: false,
-                            rank: 1,
-                            sources: [],
-                            tags: [],
-                            correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                            attachments: {}
-                        }
-                    ],
-                    status: 'SUCCESS',
-                    message: '',
-                    artifact_errors: {}
-                } as ComputationMetadata)
-            }
-            return of()
-        })
-
-        component.ngOnInit()
-        fixture.detectChanges()
-
-        component.dataChange.next([
-            {
-                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
-                status: 'SUCCESS',
-                request_ts: new Date('2023-09-27T16:42:52+01:00'),
-                params: {},
-                artifacts: [
-                    {
-                        name: 'Image 1',
-                        modality: 'IMAGE',
-                        summary: 'An image 1.',
-                        description: 'The image 1 is under CC0 license.',
-                        filename: 'image1',
-                        primary: true,
-                        correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                        tags: [],
-                        attachments: {},
-                        rank: 1,
-                        sources: []
-                    },
-                    {
-                        name: 'Image 2',
-                        modality: 'IMAGE',
-
-                        summary: 'An image 2.',
-                        description: 'The image 2 is under CC0 license.',
-                        filename: 'image2',
-                        primary: false,
-                        correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                        tags: [],
-                        attachments: {},
-                        rank: 2,
-                        sources: []
-                    }
-                ],
-                artifact_errors: {}
-            }
+        const computationComponent = createComputationComponent([
+            createArtifactEntity({ name: 'Image 1', primary: true }),
+            createArtifactEntity({ name: 'Image 2', primary: false, filename: 'image2' })
         ])
-        fixture.detectChanges()
 
-        const parentComputation = fixture.debugElement.query(By.css('.parent-computation'))
-        expect(parentComputation).toBeTruthy()
-        parentComputation.triggerEventHandler('click', null)
-        tick()
-        fixture.detectChanges()
+        expect(computationComponent.filteredArtifacts.length).toBe(1)
+        expect(computationComponent.filteredArtifacts[0].primary).toBe(true)
 
         discardPeriodicTasks()
     }))
 
     it('should initialize tag filters and show them when artifacts have tags', fakeAsync(() => {
-        component.ngOnInit()
-        fixture.detectChanges()
-
-        component.dataChange.next([
-            {
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
-                status: 'SUCCESS',
-                request_ts: new Date('2023-09-27T16:42:52+01:00'),
-                artifacts: [
-                    {
-                        name: 'Analysis Result',
-                        primary: true,
-                        tags: ['analysis', 'data'],
-                        modality: 'IMAGE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image1',
-                        attachments: {},
-                        rank: 1,
-                        sources: []
-                    },
-                    {
-                        name: 'Primary No Tags',
-                        primary: true,
-                        tags: [],
-                        modality: 'IMAGE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image2',
-                        attachments: {},
-                        rank: 2,
-                        sources: []
-                    },
-                    {
-                        name: 'Visualization',
-                        primary: false,
-                        tags: ['visualization'],
-                        modality: 'CHART',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image3',
-                        attachments: {},
-                        rank: 3,
-                        sources: []
-                    },
-                    {
-                        name: 'Raw Data',
-                        primary: false,
-                        tags: [],
-                        modality: 'TABLE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image4',
-                        attachments: {},
-                        rank: 4,
-                        sources: []
-                    }
-                ],
-                params: {},
-                artifact_errors: {}
-            }
+        const computationComponent = createComputationComponent([
+            createArtifactEntity({ name: 'Analysis Result', primary: true, tags: ['analysis', 'data'] }),
+            createArtifactEntity({ name: 'Primary No Tags', primary: true, tags: [], filename: 'image2' }),
+            createArtifactEntity({
+                name: 'Visualization',
+                primary: false,
+                tags: ['visualization'],
+                modality: 'CHART',
+                filename: 'image3'
+            }),
+            createArtifactEntity({ name: 'Raw Data', primary: false, tags: [], modality: 'TABLE', filename: 'image4' })
         ])
-        fixture.detectChanges()
-        tick()
-
-        const childComponents = fixture.debugElement.queryAll(By.directive(ComputationComponent))
-        expect(childComponents.length).toBeGreaterThan(0)
-
-        const computationComponent = childComponents[0].componentInstance as ComputationComponent
 
         expect(computationComponent.shouldShowFilters).toBe(true)
         expect(computationComponent.availableTags).toContain('analysis')
@@ -357,51 +238,16 @@ describe('ComputationComponent', () => {
     }))
 
     it('should filter artifacts by selected tag', fakeAsync(() => {
-        component.ngOnInit()
-        fixture.detectChanges()
-
-        component.dataChange.next([
-            {
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
-                status: 'SUCCESS',
-                request_ts: new Date('2023-09-27T16:42:52+01:00'),
-                artifacts: [
-                    {
-                        name: 'Primary Analysis',
-                        primary: true,
-                        tags: ['analysis'],
-                        modality: 'IMAGE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image1',
-                        attachments: {},
-                        rank: 1,
-                        sources: []
-                    },
-                    {
-                        name: 'Secondary Chart',
-                        primary: false,
-                        tags: ['visualization'],
-                        modality: 'CHART',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image2',
-                        attachments: {},
-                        rank: 2,
-                        sources: []
-                    }
-                ],
-                params: {},
-                artifact_errors: {}
-            }
+        const computationComponent = createComputationComponent([
+            createArtifactEntity({ name: 'Primary Analysis', primary: true, tags: ['analysis'] }),
+            createArtifactEntity({
+                name: 'Secondary Chart',
+                primary: false,
+                tags: ['visualization'],
+                modality: 'CHART',
+                filename: 'image2'
+            })
         ])
-        fixture.detectChanges()
-        tick()
-
-        const childComponents = fixture.debugElement.queryAll(By.directive(ComputationComponent))
-        expect(childComponents.length).toBeGreaterThan(0)
-
-        const computationComponent = childComponents[0].componentInstance as ComputationComponent
 
         computationComponent.selectTag('main')
         expect(computationComponent.filteredArtifacts.length).toBe(1)
@@ -415,51 +261,10 @@ describe('ComputationComponent', () => {
     }))
 
     it('should not show filters when all artifacts are untagged and same type', fakeAsync(() => {
-        component.ngOnInit()
-        fixture.detectChanges()
-
-        component.dataChange.next([
-            {
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test_plugin',
-                pluginName: 'Test Plugin',
-                status: 'SUCCESS',
-                request_ts: new Date('2023-09-27T16:42:52+01:00'),
-                artifacts: [
-                    {
-                        name: 'Result 1',
-                        primary: true,
-                        tags: [],
-                        modality: 'IMAGE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image1',
-                        attachments: {},
-                        rank: 1,
-                        sources: []
-                    },
-                    {
-                        name: 'Result 2',
-                        primary: true,
-                        tags: [],
-                        modality: 'IMAGE',
-                        correlation_uuid: 'test-uuid',
-                        filename: 'image2',
-                        attachments: {},
-                        rank: 2,
-                        sources: []
-                    }
-                ],
-                params: {},
-                artifact_errors: {}
-            }
+        const computationComponent = createComputationComponent([
+            createArtifactEntity({ name: 'Result 1', primary: true, tags: [] }),
+            createArtifactEntity({ name: 'Result 2', primary: true, tags: [], filename: 'image2' })
         ])
-        fixture.detectChanges()
-        tick()
-
-        const childComponents = fixture.debugElement.queryAll(By.directive(ComputationComponent))
-        expect(childComponents.length).toBeGreaterThan(0)
-
-        const computationComponent = childComponents[0].componentInstance as ComputationComponent
 
         expect(computationComponent.shouldShowFilters).toBe(false)
 
@@ -470,17 +275,11 @@ describe('ComputationComponent', () => {
         const computationFixture = TestBed.createComponent(ComputationComponent)
         const computationComponent = computationFixture.componentInstance
 
-        const testArtifact = {
+        const testArtifact = createArtifactEntity({
             name: 'Test Image',
-            modality: 'IMAGE',
             correlation_uuid: 'test-uuid',
-            filename: 'sample-image',
-            primary: true,
-            tags: [],
-            attachments: {},
-            rank: 1,
-            sources: []
-        }
+            filename: 'sample-image'
+        })
 
         const fakeAnchor = document.createElement('a')
         jest.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
@@ -488,7 +287,7 @@ describe('ComputationComponent', () => {
         const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
         const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
 
-        computationComponent.downloadContent(testArtifact as ArtifactEntity)
+        computationComponent.downloadContent(testArtifact)
 
         expect(mockStoreService.getArtifactS3Url).toHaveBeenCalledWith('test-uuid', 'sample-image')
         expect(createElementSpy).toHaveBeenCalled()

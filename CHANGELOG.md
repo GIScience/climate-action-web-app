@@ -7,6 +7,10 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased](https://gitlab.heigit.org/climate-action/web-app/-/compare/3.7.0...main)
 
+### Changed
+
+- Computation details (parameters, artifacts, AoI) are now hydrated lazily when a computation is expanded, instead of being fetched upfront
+
 ## [3.7.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.7.0) - 2026-08-31
 
 ### Added
