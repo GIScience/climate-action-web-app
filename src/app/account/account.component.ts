@@ -1,17 +1,16 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
-import { Models } from 'appwrite'
 import {
-    Footprints,
-    LifeBuoy,
-    LogIn,
-    LogOut,
-    LucideAngularModule,
-    Percent,
-    TestTubeDiagonal,
-    User,
-    UserRound
-} from 'lucide-angular'
+    LucideFootprints,
+    LucideLifeBuoy,
+    LucideLogIn,
+    LucideLogOut,
+    LucidePercent,
+    LucideTestTubeDiagonal,
+    LucideUser,
+    LucideUserRound
+} from '@lucide/angular'
+import { Models } from 'appwrite'
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
 import { AppwriteService } from '../auth/appwrite.service'
@@ -21,7 +20,18 @@ import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 
 @Component({
     selector: 'app-account',
-    imports: [LucideAngularModule, TranslocoModule, DropdownMenuDirective],
+    imports: [
+        LucideFootprints,
+        LucideLifeBuoy,
+        LucideLogIn,
+        LucideLogOut,
+        LucidePercent,
+        LucideTestTubeDiagonal,
+        LucideUser,
+        LucideUserRound,
+        TranslocoModule,
+        DropdownMenuDirective
+    ],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
 })
@@ -34,15 +44,6 @@ export class AccountComponent implements OnInit, OnDestroy {
     accountMenuOpen = false
     private userSubscription: Subscription
     readonly environment = environment
-
-    readonly UserRound = UserRound
-    readonly User = User
-    readonly LogIn = LogIn
-    readonly Percent = Percent
-    readonly LifeBuoy = LifeBuoy
-    readonly Logout = LogOut
-    readonly TestTubeDiagonal = TestTubeDiagonal
-    readonly Footprints = Footprints
 
     constructor() {
         this.userSubscription = this.appwriteService._user.subscribe(user => {

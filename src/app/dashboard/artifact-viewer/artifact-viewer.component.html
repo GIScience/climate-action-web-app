@@ -11,16 +11,16 @@
                         : ('artifactViewer.minimize' | transloco)
                 ">
                 @if (artifactViewerService.minimised) {
-                    <i-lucide [img]="Maximize2" size="15"></i-lucide>
+                    <svg lucideMaximize2 size="15"></svg>
                 } @else {
-                    <i-lucide [img]="Minimize2" size="15"></i-lucide>
+                    <svg lucideMinimize2 size="15"></svg>
                 }
             </button>
             <button
                 (click)="closeArtifactViewer()"
                 class="close-btn btn-onlyicon"
                 [tp]="'artifactViewer.close' | transloco">
-                <i-lucide [img]="X" size="15"></i-lucide>
+                <svg lucideX size="15"></svg>
             </button>
         </div>
     </div>

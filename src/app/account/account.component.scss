@@ -33,7 +33,7 @@
             background-color: rgb(0 128 128 / 15%);
         }
 
-        i-lucide {
+        svg {
             color: #666;
             height: rem(30);
             justify-content: center;
@@ -41,7 +41,7 @@
         }
     }
 
-    .profile-button i-lucide {
+    .profile-button svg {
         align-items: center;
         border: rem(2) solid #008080;
         border-radius: 50%;

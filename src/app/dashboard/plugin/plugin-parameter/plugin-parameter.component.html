@@ -8,7 +8,7 @@
                 </p>
                 @if (aoiConstraints.hasConstraints) {
                     <p class="constraint-note" [tp]="constraintDetails" tpPlacement="right">
-                        <i-lucide [img]="Info" size="16"></i-lucide>
+                        <svg lucideInfo size="16"></svg>
                         <span>{{ 'pluginParameter.constraintNote' | transloco }}</span>
                     </p>
                     <ng-template #constraintDetails>
@@ -47,7 +47,7 @@
                         [class.active]="currentSelectionMode === ExternalInput.Boundary"
                         (click)="setSelectionMode(ExternalInput.Boundary)"
                         [title]="'pluginParameter.selectFromBoundaries' | transloco">
-                        <i-lucide [img]="MapPinPlusInside" size="16"></i-lucide>
+                        <svg lucideMapPinPlusInside size="16"></svg>
                         {{ 'pluginParameter.boundary' | transloco }}
                     </button>
                     <button
@@ -57,7 +57,7 @@
                         [class.active]="currentSelectionMode === ExternalInput.File"
                         (click)="setSelectionMode(ExternalInput.File)"
                         [title]="'pluginParameter.selectFile' | transloco">
-                        <i-lucide [img]="File" size="16"></i-lucide>
+                        <svg lucideFile size="16"></svg>
                         {{ 'pluginParameter.file' | transloco }}
                     </button>
                     <button
@@ -67,7 +67,7 @@
                         [class.active]="currentSelectionMode === DrawInput.Circle"
                         (click)="setSelectionMode(DrawInput.Circle)"
                         [title]="'pluginParameter.drawCircle' | transloco">
-                        <i-lucide [img]="CircleDot" size="16"></i-lucide>
+                        <svg lucideCircleDot size="16"></svg>
                         {{ 'pluginParameter.circle' | transloco }}
                     </button>
                     <button
@@ -77,7 +77,7 @@
                         [class.active]="currentSelectionMode === DrawInput.Box"
                         (click)="setSelectionMode(DrawInput.Box)"
                         [title]="'pluginParameter.drawRectangle' | transloco">
-                        <i-lucide [img]="Square" size="16"></i-lucide>
+                        <svg lucideSquare size="16"></svg>
                         {{ 'pluginParameter.rectangle' | transloco }}
                     </button>
                     <button
@@ -87,7 +87,7 @@
                         [class.active]="currentSelectionMode === DrawInput.Polygon"
                         (click)="setSelectionMode(DrawInput.Polygon)"
                         [title]="'pluginParameter.drawPolygon' | transloco">
-                        <i-lucide [img]="Pentagon" size="16"></i-lucide>
+                        <svg lucidePentagon size="16"></svg>
                         {{ 'pluginParameter.polygon' | transloco }}
                     </button>
                 </div>
@@ -100,15 +100,13 @@
                             'message--blocked': banner.level === 'blocked',
                             'message--warning': banner.level === 'warning'
                         }">
-                        <i-lucide
-                            [img]="
-                                banner.level === 'info'
-                                    ? Info
-                                    : banner.level === 'blocked'
-                                      ? TriangleAlert
-                                      : CircleAlert
-                            "
-                            size="20"></i-lucide>
+                        @if (banner.level === 'info') {
+                            <svg lucideInfo size="20"></svg>
+                        } @else if (banner.level === 'blocked') {
+                            <svg lucideTriangleAlert size="20"></svg>
+                        } @else {
+                            <svg lucideCircleAlert size="20"></svg>
+                        }
                         <span>
                             @switch (banner.reason) {
                                 @case ('multiple') {
@@ -193,7 +191,7 @@
                                         class="deselect-region"
                                         [attr.aria-label]="'pluginParameter.removeRegion' | transloco"
                                         (click)="removeSelectedRegion(region)">
-                                        <i-lucide [img]="Trash2" size="16"></i-lucide>
+                                        <svg lucideTrash size="16"></svg>
                                     </button>
                                 </div>
                             } @else {
@@ -214,7 +212,7 @@
                                         class="deselect-region"
                                         [attr.aria-label]="'pluginParameter.removeRegion' | transloco"
                                         (click)="removeSelectedRegion(region)">
-                                        <i-lucide [img]="Trash2" size="16"></i-lucide>
+                                        <svg lucideTrash size="16"></svg>
                                     </button>
                                     <mat-error>{{ 'pluginParameter.areaNameRequired' | transloco }}</mat-error>
                                 </mat-form-field>
@@ -257,7 +255,7 @@
                     appearance="primary"
                     class="btn-primary btn-withtext--after"
                     [disabled]="!user || !form.valid || !hasValidAreaSelection()">
-                    <i-lucide [img]="CirclePlay" size="20"></i-lucide>
+                    <svg lucideCirclePlay size="20"></svg>
                     {{ 'plugin.computeStart' | transloco }}
                 </button>
             </div>

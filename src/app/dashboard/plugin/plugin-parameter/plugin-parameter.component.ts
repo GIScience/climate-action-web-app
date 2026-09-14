@@ -46,6 +46,18 @@ import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attr
 import { ObjectTypeComponent } from '@app/types/object/object.type'
 import { reactiveDateFnsLocale, updateActiveDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import {
+    LucideCircleAlert,
+    LucideCircleDot,
+    LucideCirclePlay,
+    LucideFile,
+    LucideInfo,
+    LucideMapPinPlusInside,
+    LucidePentagon,
+    LucideSquare,
+    LucideTrash,
+    LucideTriangleAlert
+} from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import { FormlyFieldConfig, FormlyForm, FormlyFormOptions, provideFormlyCore } from '@ngx-formly/core'
 import { FormlyJsonschema } from '@ngx-formly/core/json-schema'
@@ -57,21 +69,6 @@ import { Models } from 'appwrite'
 import { format, isValid } from 'date-fns'
 import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes } from 'geojson'
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import {
-    CircleAlert,
-    CircleDot,
-    CirclePlay,
-    CircleX,
-    File,
-    Info,
-    LucideAngularModule,
-    MapPinPlusInside,
-    Pentagon,
-    Square,
-    Trash2,
-    TriangleAlert,
-    UserCheck
-} from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { skip, Subscription } from 'rxjs'
@@ -96,7 +93,16 @@ interface BannerState {
         FormlyForm,
         FormsModule,
         ReactiveFormsModule,
-        LucideAngularModule,
+        LucideCircleAlert,
+        LucideCircleDot,
+        LucideCirclePlay,
+        LucideFile,
+        LucideInfo,
+        LucideMapPinPlusInside,
+        LucidePentagon,
+        LucideSquare,
+        LucideTrash,
+        LucideTriangleAlert,
         CommonModule,
         NgScrollbarModule,
         TippyDirective,
@@ -178,18 +184,6 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     user: Models.User<Models.Preferences> | null = null
 
-    readonly CirclePlay = CirclePlay
-    readonly MapPinPlusInside = MapPinPlusInside
-    readonly TriangleAlert = TriangleAlert
-    readonly CircleAlert = CircleAlert
-    readonly UserCheck = UserCheck
-    readonly CircleX = CircleX
-    readonly CircleDot = CircleDot
-    readonly Square = Square
-    readonly Pentagon = Pentagon
-    readonly File = File
-    readonly Trash2 = Trash2
-    readonly Info = Info
     readonly ExternalInput = ExternalInput
     readonly DrawInput = DrawInput
 

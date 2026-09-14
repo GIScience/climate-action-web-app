@@ -1,7 +1,7 @@
 <div class="region-choice-dialog">
     <h2>{{ 'map.regionChoiceDialog.title' | transloco }}</h2>
     <button (click)="closeDialog()" class="close-dialog">
-        <i-lucide [img]="X" size="25"></i-lucide>
+        <svg lucideX size="25"></svg>
     </button>
 
     <div class="dialog-content">
@@ -16,7 +16,7 @@
                     <span class="choice-level">
                         OSM <code>admin_level</code>: <strong>{{ option.adminLevel }}</strong>
                     </span>
-                    <i-lucide [img]="ChevronRight" size="18"></i-lucide>
+                    <svg lucideChevronRight size="18"></svg>
                 </button>
             }
         </div>

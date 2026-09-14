@@ -147,11 +147,11 @@
         height: rem(33);
         transition: none;
 
-        i-lucide {
+        svg {
             opacity: 0;
         }
 
-        &:hover i-lucide {
+        &:hover svg {
             color: #008080;
         }
 
@@ -166,7 +166,7 @@
             border-top-right-radius: 10px;
         }
 
-        &.layer-unpin-btn i-lucide {
+        &.layer-unpin-btn svg {
             color: #4d0080;
             opacity: 1;
         }
@@ -183,12 +183,12 @@
     background-color: #ffffffbf;
     border-color: unset;
 
-    i-lucide {
+    svg {
         opacity: 1;
     }
 }
 
-.child-computations-wrapper.report-active button.add-to-report-btn i-lucide {
+.child-computations-wrapper.report-active button.add-to-report-btn svg {
     opacity: 1;
 }
 

@@ -4,7 +4,7 @@
         class="optional-attributes-button btn-alt btn-small btn-withtext--after"
         [disabled]="isDisabled"
         (click)="openDialog()">
-        <i-lucide [img]="ListTodo" size="20"></i-lucide>
+        <svg lucideListTodo size="20"></svg>
         {{ field.fieldGroup?.[0]?.props?.label || 'pluginParameter.optionalAttributes' | transloco }}
     </button>
 </div>

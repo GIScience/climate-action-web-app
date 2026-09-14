@@ -5,13 +5,13 @@
             class="toggle-archive btn-small btn-alt btn-withtext--after"
             [tp]="'computationsIndex.createReport' | transloco"
             tpPlacement="bottom">
-            <i-lucide [img]="Clipboard" size="20" color="#008080"></i-lucide>
+            <svg lucideClipboard size="20" color="#008080"></svg>
             {{ 'computationsIndex.reportBuilder' | transloco }}
         </button>
     }
     @if (isReportVisible) {
         <button class="toggle-archive btn-small btn-alt btn-withtext--after" (click)="closeReport()">
-            <i-lucide [img]="CircleX" size="20" color="#008080"></i-lucide>
+            <svg lucideCircleX size="20" color="#008080"></svg>
             {{ 'computationsIndex.exitReportBuilder' | transloco }}
         </button>
     }
@@ -21,13 +21,13 @@
             class="toggle-archive btn-small btn-alt btn-withtext--after"
             [tp]="'computationsIndex.viewArchived' | transloco"
             tpPlacement="bottom">
-            <i-lucide [img]="Archive" size="20" color="#008080"></i-lucide>
+            <svg lucideArchive size="20" color="#008080"></svg>
             {{ 'computationsIndex.archive' | transloco }}
         </button>
     }
     @if (showArchived) {
         <button (click)="toggleArchivedView()" class="toggle-archive btn-small btn-alt btn-withtext--after">
-            <i-lucide [img]="CircleArrowLeft" size="20" [tp]="'computationsIndex.backToAll' | transloco"></i-lucide>
+            <svg lucideCircleArrowLeft size="20" [tp]="'computationsIndex.backToAll' | transloco"></svg>
             <span>{{ 'computationsIndex.backToAll' | transloco }}</span>
         </button>
     }
@@ -81,19 +81,19 @@
                                                 }
                                             </div>
                                             <p class="card-subtitle">
-                                                <i-lucide [img]="Clock" size="15"></i-lucide>
+                                                <svg lucideClock size="15"></svg>
                                                 {{ formatTimestamp(scheduledRun.request_ts) }} •
-                                                <i-lucide [img]="Hash" size="15"></i-lucide>
+                                                <svg lucideHash size="15"></svg>
                                                 {{ formatUUID(scheduledRun.correlation_uuid) }}
                                             </p>
                                         </div>
                                         <div class="computation-status" [ngClass]="scheduledRun.status">
                                             @if (scheduledRun.status === 'PENDING') {
-                                                <i-lucide [img]="Loader" size="15"></i-lucide>
+                                                <svg lucideLoader size="15"></svg>
                                                 {{ 'computationsIndex.status.queued' | transloco }}
                                             }
                                             @if (scheduledRun.status === 'STARTED') {
-                                                <i-lucide [img]="LoaderCircle" size="15"></i-lucide>
+                                                <svg lucideLoaderCircle size="15"></svg>
                                                 {{ 'computationsIndex.status.running' | transloco }}
                                             }
                                         </div>
@@ -122,10 +122,7 @@
                                         tabindex="0">
                                         <div class="computation-arrow">
                                             @if (computation.loading) {
-                                                <i-lucide
-                                                    [img]="LoaderCircle"
-                                                    size="20"
-                                                    class="arrow-spinner"></i-lucide>
+                                                <svg lucideLoaderCircle size="20" class="arrow-spinner"></svg>
                                             } @else {
                                                 <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
                                             }
@@ -134,42 +131,42 @@
                                             <div class="card-title">
                                                 <h3>{{ computation.aoiName }}</h3>
                                                 @if (hasArtifactErrors(computation.artifact_errors)) {
-                                                    <i-lucide
-                                                        [img]="FileWarning"
+                                                    <svg
+                                                        lucideFileExclamationPoint
                                                         size="20"
                                                         color="#ff7800"
                                                         class="artifact-errors"
                                                         [tp]="artifactErrorsTooltip"
                                                         [tpData]="computation.artifact_errors"
-                                                        tpPlacement="right"></i-lucide>
+                                                        tpPlacement="right"></svg>
                                                 }
                                                 @let languageMismatchTooltip = getLanguageMismatchTooltip(computation);
                                                 @if (languageMismatchTooltip) {
-                                                    <i-lucide
-                                                        [img]="MessageSquareWarning"
+                                                    <svg
+                                                        lucideMessageSquareWarning
                                                         size="18"
                                                         color="#9a6700"
                                                         class="language-mismatch"
                                                         [tp]="languageMismatchTooltip"
-                                                        tpPlacement="right"></i-lucide>
+                                                        tpPlacement="right"></svg>
                                                 }
                                                 @if (computation.flags?.includes('IMPORTED')) {
-                                                    <i-lucide
-                                                        [img]="Import"
+                                                    <svg
+                                                        lucideImport
                                                         size="20"
                                                         color="#aaaaaa"
                                                         class="imported-computation"
                                                         [tp]="'computationsIndex.imported' | transloco"
-                                                        tpPlacement="right"></i-lucide>
+                                                        tpPlacement="right"></svg>
                                                 }
                                                 @if (computation.flags?.includes('DEMO')) {
                                                     <span class="demo-badge">DEMO</span>
                                                 }
                                             </div>
                                             <p class="card-subtitle">
-                                                <i-lucide [img]="Clock" size="15"></i-lucide>
+                                                <svg lucideClock size="15"></svg>
                                                 {{ formatTimestamp(computation.request_ts) }} •
-                                                <i-lucide [img]="Hash" size="15"></i-lucide
+                                                <svg lucideHash size="15"></svg
                                                 >{{ formatUUID(computation.correlation_uuid) }}
                                             </p>
                                         </div>
@@ -182,7 +179,7 @@
                                                     (click)="toggleActionsMenu(computation.correlation_uuid, $event)"
                                                     [attr.aria-label]="'computationsIndex.actions.menu' | transloco"
                                                     class="actions-menu-trigger btn-onlyicon">
-                                                    <i-lucide [img]="EllipsisVertical" size="17.5"></i-lucide>
+                                                    <svg lucideEllipsisVertical size="17.5"></svg>
                                                 </button>
                                                 <ng-template
                                                     [appDropdownMenu]="menuTrigger"
@@ -194,14 +191,14 @@
                                                                 shareComputation(computation.correlation_uuid, $event)
                                                             "
                                                             class="actions-menu__item">
-                                                            <i-lucide [img]="Share2" size="18"></i-lucide>
+                                                            <svg lucideShare2 size="18"></svg>
                                                             {{ 'computationsIndex.actions.share' | transloco }}
                                                         </button>
                                                         @if (computation.hydrated) {
                                                             <button
                                                                 (click)="viewParameters(computation, $event)"
                                                                 class="actions-menu__item">
-                                                                <i-lucide [img]="ListTodo" size="18"></i-lucide>
+                                                                <svg lucideListTodo size="18"></svg>
                                                                 {{
                                                                     'computationsIndex.actions.viewParameters'
                                                                         | transloco
@@ -214,7 +211,7 @@
                                                                 archiveComputation(computation.correlation_uuid, $event)
                                                             "
                                                             class="actions-menu__item">
-                                                            <i-lucide [img]="Archive" size="18"></i-lucide>
+                                                            <svg lucideArchive size="18"></svg>
                                                             {{ 'computationsIndex.actions.archive' | transloco }}
                                                         </button>
                                                         <button
@@ -222,7 +219,7 @@
                                                                 deleteComputation(computation.correlation_uuid, $event)
                                                             "
                                                             class="actions-menu__item actions-menu__item--danger">
-                                                            <i-lucide [img]="Trash2" size="18"></i-lucide>
+                                                            <svg lucideTrash size="18"></svg>
                                                             {{ 'computationsIndex.actions.delete' | transloco }}
                                                         </button>
                                                     </div>
@@ -231,7 +228,7 @@
                                         }
                                         @if (newRuns.includes(computation.correlation_uuid)) {
                                             <div class="computation-status" [ngClass]="computation.status">
-                                                <i-lucide [img]="Check" size="15"></i-lucide>
+                                                <svg lucideCheck size="15"></svg>
                                                 {{ 'computationsIndex.status.done' | transloco }}
                                             </div>
                                         }
@@ -259,7 +256,7 @@
                         }
                         @if (paginationInfo.hasMore && paginationInfo.loading) {
                             <div class="loading-indicator">
-                                <i-lucide [img]="LoaderCircle" size="20"></i-lucide>
+                                <svg lucideLoaderCircle size="20"></svg>
                                 <span>{{ 'computationsIndex.loadingMore' | transloco }}</span>
                             </div>
                         }
@@ -305,9 +302,9 @@
                                             <div>
                                                 <h3>{{ archivedComputation.aoiName }}</h3>
                                                 <p class="card-subtitle">
-                                                    <i-lucide [img]="Clock" size="15"></i-lucide>
+                                                    <svg lucideClock size="15"></svg>
                                                     {{ formatTimestamp(archivedComputation.request_ts) }} •
-                                                    <i-lucide [img]="Hash" size="15"></i-lucide
+                                                    <svg lucideHash size="15"></svg
                                                     >{{ formatUUID(archivedComputation.correlation_uuid) }}
                                                 </p>
                                             </div>
@@ -316,7 +313,7 @@
                                                 [attr.aria-label]="'computationsIndex.actions.unarchive' | transloco"
                                                 [tp]="'computationsIndex.actions.unarchive' | transloco"
                                                 class="btn-onlyicon btn-onlyicon--cta">
-                                                <i-lucide [img]="ArchiveRestore" size="17"></i-lucide>
+                                                <svg lucideArchiveRestore size="17"></svg>
                                             </button>
                                         </div>
                                     </li>
@@ -336,7 +333,7 @@
                         }
                         @if (archivedPaginationInfo.hasMore && archivedPaginationInfo.loading) {
                             <div class="loading-indicator">
-                                <i-lucide [img]="LoaderCircle" size="20"></i-lucide>
+                                <svg lucideLoaderCircle size="20"></svg>
                                 <span>{{ 'computationsIndex.loadingMoreArchived' | transloco }}</span>
                             </div>
                         }
@@ -392,7 +389,7 @@
             </div>
         </ng-scrollbar>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="X" size="25"></i-lucide>
+            <svg lucideX size="25"></svg>
         </button>
     </div>
 </ng-template>

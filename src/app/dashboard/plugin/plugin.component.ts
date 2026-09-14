@@ -7,18 +7,17 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import {
+    LucideChevronsDown,
+    LucideChevronsUp,
+    LucideCircleX,
+    LucideCloudOff,
+    LucideDiamondPlus,
+    LucideExternalLink,
+    LucideX
+} from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
-import {
-    ChevronsDown,
-    ChevronsUp,
-    CircleX,
-    CloudOff,
-    DiamondPlus,
-    ExternalLink,
-    LucideAngularModule,
-    X
-} from 'lucide-angular'
 import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap, throwError } from 'rxjs'
@@ -42,7 +41,13 @@ import { PluginService } from './plugin.service'
         PluginParameterComponent,
         TippyDirective,
         NgScrollbarModule,
-        LucideAngularModule,
+        LucideChevronsDown,
+        LucideChevronsUp,
+        LucideCircleX,
+        LucideCloudOff,
+        LucideDiamondPlus,
+        LucideExternalLink,
+        LucideX,
         TranslocoModule
     ],
     animations: [
@@ -92,14 +97,6 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     private reportVisibilitySubscription: Subscription | undefined
 
     user: Models.User<Models.Preferences> | null = null
-
-    readonly ChevronsUp = ChevronsUp
-    readonly ChevronsDown = ChevronsDown
-    readonly DiamondPlus = DiamondPlus
-    readonly CircleX = CircleX
-    readonly X = X
-    readonly CloudOff = CloudOff
-    readonly ExternalLink = ExternalLink
 
     ngAfterViewInit(): void {
         this.loadPluginDetails()

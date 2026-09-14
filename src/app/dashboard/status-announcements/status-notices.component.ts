@@ -1,5 +1,5 @@
 import { Component, OnDestroy, computed, effect, inject, signal, untracked } from '@angular/core'
-import { ChevronLeft, ChevronRight, ExternalLink, LucideAngularModule } from 'lucide-angular'
+import { LucideChevronLeft, LucideChevronRight, LucideExternalLink } from '@lucide/angular'
 import { StatusAnnouncementsService } from './status-announcements.service'
 
 const CYCLE_MS = 7000
@@ -12,7 +12,7 @@ const CYCLE_MS = 7000
         '(mouseenter)': 'pause()',
         '(mouseleave)': 'resume()'
     },
-    imports: [LucideAngularModule]
+    imports: [LucideChevronLeft, LucideChevronRight, LucideExternalLink]
 })
 export class StatusNoticesComponent implements OnDestroy {
     private statusAnnouncements = inject(StatusAnnouncementsService)
@@ -20,10 +20,6 @@ export class StatusNoticesComponent implements OnDestroy {
     readonly notices = this.statusAnnouncements.notices
     readonly index = signal(0)
     readonly current = computed(() => this.notices()[this.index()])
-
-    readonly ChevronLeft = ChevronLeft
-    readonly ChevronRight = ChevronRight
-    readonly ExternalLink = ExternalLink
 
     private timer?: ReturnType<typeof setInterval>
     private paused = false

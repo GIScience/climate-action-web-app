@@ -1,7 +1,7 @@
 <div class="tour-choice-dialog">
     <h2>{{ 'walkthrough.tourChoiceDialog.title' | transloco }}</h2>
     <button (click)="closeDialog()" class="close-dialog">
-        <i-lucide [img]="X" size="25"></i-lucide>
+        <svg lucideX size="25"></svg>
     </button>
 
     <div class="dialog-content">
@@ -11,12 +11,12 @@
 
         <div class="choice-buttons">
             <button class="btn-primary btn-withtext--after" (click)="onLoginClick()">
-                <i-lucide [img]="LogIn" size="20"></i-lucide>
+                <svg lucideLogIn size="20"></svg>
                 {{ 'walkthrough.tourChoiceDialog.loginButton' | transloco }}
             </button>
 
             <button class="btn-alt btn-withtext--after" (click)="onGuestTourClick()">
-                <i-lucide [img]="Play" size="20"></i-lucide>
+                <svg lucidePlay size="20"></svg>
                 {{ 'walkthrough.tourChoiceDialog.guestTourButton' | transloco }}
             </button>
         </div>

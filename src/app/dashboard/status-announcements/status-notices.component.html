@@ -5,7 +5,7 @@
         @if (notice.link) {
             <span class="status-notice__link"
                 ><a [href]="notice.link" target="_blank" rel="noopener"
-                    >See details<i-lucide [img]="ExternalLink" size="16"></i-lucide></a
+                    >See details<svg lucideExternalLink size="16"></svg></a
             ></span>
         }
     </div>
@@ -13,11 +13,11 @@
     @if (notices().length > 1) {
         <div class="status-notices__nav">
             <button type="button" class="status-notices__btn" (click)="prev()" aria-label="Previous notice">
-                <lucide-icon [img]="ChevronLeft" size="18"></lucide-icon>
+                <svg lucideChevronLeft size="18"></svg>
             </button>
             <span class="status-notices__counter">{{ index() + 1 }} / {{ notices().length }}</span>
             <button type="button" class="status-notices__btn" (click)="next()" aria-label="Next notice">
-                <lucide-icon [img]="ChevronRight" size="18"></lucide-icon>
+                <svg lucideChevronRight size="18"></svg>
             </button>
         </div>
     }

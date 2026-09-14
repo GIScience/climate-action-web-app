@@ -45,7 +45,7 @@
                 text-underline-offset: 3px;
             }
 
-            i-lucide {
+            svg {
                 flex: 0 0 auto;
             }
         }
@@ -94,7 +94,7 @@
                     opacity: 0.6;
                 }
 
-                i-lucide {
+                svg {
                     margin-right: rem(3);
                 }
             }
@@ -111,7 +111,7 @@
         padding: rem(8) rem(10);
         width: calc(100% + 1.429rem);
 
-        i-lucide {
+        svg {
             margin-right: rem(8);
         }
 

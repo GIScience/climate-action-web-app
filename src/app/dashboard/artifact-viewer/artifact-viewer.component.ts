@@ -1,25 +1,20 @@
 import { Component, inject } from '@angular/core'
 import { TranslocoModule } from '@jsverse/transloco'
+import { LucideMaximize2, LucideMinimize2, LucideX } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
-import { GripHorizontal, LucideAngularModule, Maximize2, Minimize2, X } from 'lucide-angular'
 import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ArtifactViewerService } from './artifact-viewer.service'
 
 @Component({
     selector: 'app-artifact-viewer',
-    imports: [LucideAngularModule, TippyDirective, ArtifactComponent, TranslocoModule],
+    imports: [LucideMaximize2, LucideMinimize2, LucideX, TippyDirective, ArtifactComponent, TranslocoModule],
     templateUrl: './artifact-viewer.component.html',
     styleUrl: './artifact-viewer.component.scss'
 })
 export class ArtifactViewerComponent {
     artifactViewerService = inject(ArtifactViewerService)
     artifactService = inject(ArtifactService)
-
-    readonly GripHorizontal = GripHorizontal
-    readonly Maximize2 = Maximize2
-    readonly Minimize2 = Minimize2
-    readonly X = X
 
     toggleMinimise(): void {
         this.artifactViewerService.minimised = !this.artifactViewerService.minimised

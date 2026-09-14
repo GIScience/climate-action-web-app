@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
-import { LogIn, LucideAngularModule, Play, X } from 'lucide-angular'
+import { LucideLogIn, LucidePlay, LucideX } from '@lucide/angular'
 import { AppwriteService } from '../../auth/appwrite.service'
 
 export enum TourChoice {
@@ -13,17 +13,13 @@ export enum TourChoice {
 
 @Component({
     selector: 'app-tour-choice-dialog',
-    imports: [MatDialogModule, MatButtonModule, LucideAngularModule, TranslocoModule],
+    imports: [MatDialogModule, MatButtonModule, LucideLogIn, LucidePlay, LucideX, TranslocoModule],
     templateUrl: './tour-choice-dialog.component.html',
     styleUrls: ['./tour-choice-dialog.component.scss']
 })
 export class TourChoiceDialogComponent {
     dialogRef = inject<MatDialogRef<TourChoiceDialogComponent>>(MatDialogRef)
     private appwriteService = inject(AppwriteService)
-
-    readonly X = X
-    readonly LogIn = LogIn
-    readonly Play = Play
 
     closeDialog(): void {
         this.dialogRef.close(TourChoice.CANCEL)

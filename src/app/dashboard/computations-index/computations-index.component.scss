@@ -87,7 +87,7 @@
                 gap: rem(8);
                 justify-content: center;
 
-                i-lucide {
+                svg {
                     animation: spin 1s linear infinite;
                 }
             }
@@ -271,7 +271,7 @@
         gap: rem(1);
         margin: 0;
 
-        i-lucide:first-of-type {
+        svg:first-of-type {
             margin-right: rem(1);
         }
     }
@@ -299,7 +299,7 @@
         &.PENDING {
             background-color: lightgray;
 
-            i-lucide {
+            svg {
                 animation: fadeInOut 1s alternate infinite;
             }
         }
@@ -307,7 +307,7 @@
         &.STARTED {
             background-color: lightblue;
 
-            i-lucide {
+            svg {
                 animation: spin 1s linear infinite;
             }
         }

@@ -13,7 +13,7 @@
                     @if (isMapsLoading) {
                         <span class="export-spinner"></span>
                     } @else {
-                        <i-lucide [img]="FileDown" size="20"></i-lucide>
+                        <svg lucideFileDown size="20"></svg>
                     }
                     {{ 'report.exportToPDF' | transloco }}
                 </button>
@@ -24,14 +24,14 @@
                         [tp]="'report.removeAll' | transloco"
                         tpPlacement="bottom"
                         [disabled]="artifacts.length === 0">
-                        <i-lucide [img]="ListX" size="20"></i-lucide>
+                        <svg lucideListX size="20"></svg>
                     </button>
                     <button
                         class="close-btn btn-onlyicon"
                         (click)="closeReport()"
                         [tp]="'report.exitBuilder' | transloco"
                         tpPlacement="bottom">
-                        <i-lucide [img]="X" size="20"></i-lucide>
+                        <svg lucideX size="20"></svg>
                     </button>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                                     }
                                 </div>
                                 <button class="remove-btn btn-onlyicon" (click)="removeReportItem(artifact)">
-                                    <i-lucide [img]="Minus" size="22.5"></i-lucide>
+                                    <svg lucideMinus size="22.5"></svg>
                                 </button>
                             </div>
                             @if (reportService.isMapArtifact(artifact.modality)) {

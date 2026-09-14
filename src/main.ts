@@ -14,7 +14,6 @@ import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
 import { provideTransloco } from '@jsverse/transloco'
 import { provideTranslocoMessageformat } from '@jsverse/transloco-messageformat'
 import { popperVariation, provideTippyConfig, provideTippyLoader } from '@ngneat/helipopper/config'
-import { CircleUserRound, LucideAngularModule } from 'lucide-angular'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { provideToastr } from 'ngx-toastr'
 import { environment } from './environments/environment'
@@ -88,7 +87,7 @@ bootstrapApplication(AppComponent, {
     providers: [
         provideZoneChangeDetection(),
         provideRouter(routes),
-        importProvidersFrom(BrowserModule, BrowserAnimationsModule, LucideAngularModule.pick({ CircleUserRound })),
+        importProvidersFrom(BrowserModule, BrowserAnimationsModule),
         {
             provide: RouteReuseStrategy,
             useClass: CustomRouteReuseStrategy

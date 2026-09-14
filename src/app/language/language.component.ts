@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core'
 import { DateAdapter } from '@angular/material/core'
 import { TranslocoService } from '@jsverse/transloco'
-import { Languages, LucideAngularModule } from 'lucide-angular'
+import { LucideLanguages } from '@lucide/angular'
 import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 import { StorageService } from '../storage.service'
 import { SupportedLanguage } from '../types/language.types'
@@ -9,7 +9,7 @@ import { getDateFnsLocale, updateActiveDateFnsLocale } from '../utils/locale.uti
 
 @Component({
     selector: 'app-language',
-    imports: [LucideAngularModule, DropdownMenuDirective],
+    imports: [LucideLanguages, DropdownMenuDirective],
     templateUrl: './language.component.html',
     styleUrl: './language.component.scss'
 })
@@ -21,7 +21,6 @@ export class LanguageComponent {
     currentLang: SupportedLanguage
     languageMenuOpen = false
     readonly supportedLanguages = SupportedLanguage
-    readonly Languages = Languages
 
     constructor() {
         const storedPreference = this.storageService.getLanguagePreference()

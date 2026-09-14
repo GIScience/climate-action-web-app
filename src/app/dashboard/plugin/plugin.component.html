@@ -25,12 +25,12 @@
                             </a>
                         }
                         @if (!plugin.online) {
-                            <i-lucide
-                                [img]="CloudOff"
+                            <svg
+                                lucideCloudOff
                                 size="25"
                                 color="#ff7800"
                                 [tp]="'plugin.offline' | transloco"
-                                tpPlacement="bottom"></i-lucide>
+                                tpPlacement="bottom"></svg>
                         }
                     </div>
                     <div class="plugin-meta">
@@ -50,9 +50,11 @@
                                             ? ('plugin.showLess' | transloco)
                                             : ('plugin.readMore' | transloco)
                                     }}
-                                    <i-lucide
-                                        [img]="isPurposeExpanded ? ChevronsUp : ChevronsDown"
-                                        size="15"></i-lucide>
+                                    @if (isPurposeExpanded) {
+                                        <svg lucideChevronsUp size="15"></svg>
+                                    } @else {
+                                        <svg lucideChevronsDown size="15"></svg>
+                                    }
                                 </a>
                             </div>
                         </div>
@@ -82,7 +84,7 @@
                                     <a [href]="plugin.repository" target="_blank" rel="noopener noreferrer">
                                         <button class="btn-light btn-small btn-withtext--before" tabindex="-1">
                                             {{ 'plugin.repository' | transloco }}
-                                            <i-lucide [img]="ExternalLink" size="17" color="#666"></i-lucide>
+                                            <svg lucideExternalLink size="17" color="#666"></svg>
                                         </button>
                                     </a>
                                 </div>
@@ -107,7 +109,7 @@
                                         class="new-compute btn-primary btn-small btn-withtext--after"
                                         (click)="enterComputeState()"
                                         [disabled]="!plugin.online || !user">
-                                        <i-lucide [img]="DiamondPlus" size="20"></i-lucide>
+                                        <svg lucideDiamondPlus size="20"></svg>
                                         {{ 'plugin.newComputation' | transloco }}
                                     </button>
                                 </div>
@@ -123,7 +125,7 @@
                                     class="new-compute btn-light btn-small btn-withtext--after"
                                     (click)="exitComputeState()"
                                     [disabled]="!user">
-                                    <i-lucide [img]="CircleX" size="20"></i-lucide>
+                                    <svg lucideCircleX size="20"></svg>
                                     {{ 'plugin.cancel' | transloco }}
                                 </button>
                             </div>
@@ -174,7 +176,7 @@
             }
         </mat-tab-group>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="X" size="25"></i-lucide>
+            <svg lucideX size="25"></svg>
         </button>
     </div>
 </ng-template>
@@ -198,7 +200,7 @@
             </ul>
         </ng-scrollbar>
         <button (click)="closeDialog()" class="close-dialog">
-            <i-lucide [img]="X" size="25"></i-lucide>
+            <svg lucideX size="25"></svg>
         </button>
     </div>
 </ng-template>

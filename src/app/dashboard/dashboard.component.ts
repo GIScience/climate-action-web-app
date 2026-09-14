@@ -10,7 +10,6 @@ import {
     inject
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
-import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
 import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
@@ -34,8 +33,7 @@ import { SearchComponent } from './search/search.component'
         SearchComponent,
         MapComponent,
         RouterModule,
-        ReportComponent,
-        LucideAngularModule
+        ReportComponent
     ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -53,9 +51,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private collapseTimeout?: number
     private legendRenderVersion = 0
     private renderedLegendKey = ''
-
-    readonly PanelLeftClose = PanelLeftClose
-    readonly PanelLeftOpen = PanelLeftOpen
 
     ngOnInit(): void {
         this.mapArtifactsSubscription = this.mapArtifactManager.activeMapArtifacts$.subscribe(activeArtifacts => {

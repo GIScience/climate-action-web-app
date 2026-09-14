@@ -22,30 +22,29 @@ import { StorageService } from '@app/storage.service'
 import { SupportedLanguage } from '@app/types/language.types'
 import { getDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import {
+    LucideArchive,
+    LucideArchiveRestore,
+    LucideCheck,
+    LucideCircleArrowLeft,
+    LucideCircleX,
+    LucideClipboard,
+    LucideClock,
+    LucideEllipsisVertical,
+    LucideFileExclamationPoint,
+    LucideHash,
+    LucideImport,
+    LucideListTodo,
+    LucideLoader,
+    LucideLoaderCircle,
+    LucideMessageSquareWarning,
+    LucideShare2,
+    LucideTrash,
+    LucideX
+} from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { compareDesc, format } from 'date-fns'
-import {
-    Archive,
-    ArchiveRestore,
-    Check,
-    CircleArrowLeft,
-    CircleX,
-    Clipboard,
-    Clock,
-    EllipsisVertical,
-    FileWarning,
-    Hash,
-    Import,
-    ListTodo,
-    Loader,
-    LoaderCircle,
-    LucideAngularModule,
-    MessageSquareWarning,
-    Share2,
-    Trash2,
-    X
-} from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { firstValueFrom, Subscription } from 'rxjs'
@@ -100,7 +99,24 @@ function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
         CommonModule,
         NgScrollbarModule,
         FilterByCriteriaPipe,
-        LucideAngularModule,
+        LucideArchive,
+        LucideArchiveRestore,
+        LucideCheck,
+        LucideCircleArrowLeft,
+        LucideCircleX,
+        LucideClipboard,
+        LucideClock,
+        LucideEllipsisVertical,
+        LucideFileExclamationPoint,
+        LucideHash,
+        LucideImport,
+        LucideListTodo,
+        LucideLoader,
+        LucideLoaderCircle,
+        LucideMessageSquareWarning,
+        LucideShare2,
+        LucideTrash,
+        LucideX,
         ComputationComponent,
         TranslocoModule,
         DropdownMenuDirective
@@ -178,25 +194,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         hasMore: true,
         loading: false
     }
-
-    readonly Archive = Archive
-    readonly ArchiveRestore = ArchiveRestore
-    readonly CircleArrowLeft = CircleArrowLeft
-    readonly CircleX = CircleX
-    readonly Clock = Clock
-    readonly Hash = Hash
-    readonly ListTodo = ListTodo
-    readonly Share2 = Share2
-    readonly Check = Check
-    readonly Loader = Loader
-    readonly LoaderCircle = LoaderCircle
-    readonly FileWarning = FileWarning
-    readonly MessageSquareWarning = MessageSquareWarning
-    readonly Clipboard = Clipboard
-    readonly Trash2 = Trash2
-    readonly Import = Import
-    readonly X = X
-    readonly EllipsisVertical = EllipsisVertical
 
     openMenuId: string | null = null
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TranslocoModule } from '@jsverse/transloco'
-import { CircleX, LucideAngularModule } from 'lucide-angular'
+import { LucideCircleX } from '@lucide/angular'
 import { NgScrollbar } from 'ngx-scrollbar'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { AutocompleteFeature, MapService } from '../map/map.service'
@@ -9,14 +9,7 @@ import { SearchTermHighlightPipe } from './search-highlight.pipe'
 
 @Component({
     selector: 'app-search',
-    imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        SearchTermHighlightPipe,
-        LucideAngularModule,
-        NgScrollbar,
-        TranslocoModule
-    ],
+    imports: [FormsModule, ReactiveFormsModule, SearchTermHighlightPipe, LucideCircleX, NgScrollbar, TranslocoModule],
     templateUrl: './search.component.html',
     styleUrl: './search.component.scss'
 })
@@ -30,8 +23,6 @@ export class SearchComponent implements OnInit {
     isSearchInputEmpty = true
     isInputFocused = false
     private blurTimeout: ReturnType<typeof setTimeout> | null = null
-
-    readonly CircleX = CircleX
 
     ngOnInit(): void {
         setTimeout(() => {

@@ -16,8 +16,15 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatTabsModule } from '@angular/material/tabs'
 import { formatSourceText } from '@app/utils/source.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import {
+    LucideClipboardPlus,
+    LucideDownload,
+    LucidePin,
+    LucidePinOff,
+    LucideReceiptText,
+    LucideX
+} from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
-import { ClipboardPlus, Download, LucideAngularModule, Pin, PinOff, ReceiptText, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
@@ -42,7 +49,12 @@ const DEFAULT_TAGS = {
     selector: 'app-computation',
     imports: [
         CommonModule,
-        LucideAngularModule,
+        LucideClipboardPlus,
+        LucideDownload,
+        LucidePin,
+        LucidePinOff,
+        LucideReceiptText,
+        LucideX,
         MatIconModule,
         MatTabsModule,
         TippyDirective,
@@ -90,12 +102,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
     tagCounts: Map<string, number> = new Map()
     shouldShowFilters: boolean = false
 
-    readonly ClipboardPlus = ClipboardPlus
-    readonly Download = Download
-    readonly ReceiptText = ReceiptText
-    readonly Pin = Pin
-    readonly PinOff = PinOff
-    readonly X = X
     formatSourceText = formatSourceText
 
     ngOnInit(): void {

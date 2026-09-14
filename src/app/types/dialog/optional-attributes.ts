@@ -1,22 +1,20 @@
 import { Component, DoCheck, ViewContainerRef, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
+import { LucideListTodo } from '@lucide/angular'
 import { FieldType } from '@ngx-formly/core'
-import { ListTodo, LucideAngularModule } from 'lucide-angular'
 import { DialogWindowComponent } from './dialog-window.component'
 @Component({
     selector: 'app-optional-attributes-type',
     templateUrl: './optional-attributes.type.component.html',
     styleUrls: ['./optional-attributes.type.component.scss'],
-    imports: [LucideAngularModule, TranslocoModule]
+    imports: [LucideListTodo, TranslocoModule]
 })
 export class OptionalAttributesTypeComponent extends FieldType implements DoCheck {
     private dialog = inject(MatDialog)
     private viewContainerRef = inject(ViewContainerRef)
 
     isDisabled = false
-
-    readonly ListTodo = ListTodo
 
     ngDoCheck() {
         const currentFormDisabled = this.form && this.form.disabled

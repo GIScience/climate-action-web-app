@@ -13,8 +13,8 @@ import {
 } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
+import { LucideFileDown, LucideListX, LucideMinus, LucideX } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
-import { ClipboardPlus, FileDown, ListX, LucideAngularModule, Minus, Printer, X } from 'lucide-angular'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { ArtifactComponent } from '../artifact/artifact.component'
@@ -30,7 +30,10 @@ import { ReportService } from './report.service'
     imports: [
         ArtifactComponent,
         MatIconModule,
-        LucideAngularModule,
+        LucideFileDown,
+        LucideListX,
+        LucideMinus,
+        LucideX,
         NgScrollbarModule,
         TippyDirective,
         TranslocoModule
@@ -58,13 +61,6 @@ export class ReportComponent implements OnInit {
     isMapsLoading = false
     hasExported = false
     maxArtifacts = this.reportService.MAX_ARTIFACTS
-
-    readonly X = X
-    readonly Minus = Minus
-    readonly ListX = ListX
-    readonly ClipboardPlus = ClipboardPlus
-    readonly Printer = Printer
-    readonly FileDown = FileDown
 
     @ViewChildren('legendContainer', { read: ViewContainerRef })
     legendContainers!: QueryList<ViewContainerRef>

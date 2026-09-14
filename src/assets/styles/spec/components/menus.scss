@@ -28,7 +28,7 @@
         transition: background-color 0.15s;
         width: 100%;
 
-        i-lucide {
+        svg {
             color: #666;
         }
 
@@ -40,7 +40,7 @@
         &.actions-menu__item--danger {
             color: #c62828;
 
-            i-lucide {
+            svg {
                 color: #c62828;
             }
 
@@ -96,7 +96,7 @@
         transition: background-color 0.2s;
         width: 100%;
 
-        i-lucide {
+        svg {
             color: #666;
         }
 
@@ -108,7 +108,7 @@
         &.logout-button {
             color: #d32f2f;
 
-            i-lucide {
+            svg {
                 color: #d32f2f;
             }
 

@@ -24,6 +24,7 @@
         font-variation-settings: 'wght' 600;
         height: rem(45);
         justify-content: center;
+        position: relative;
         transition: all 0.2s;
         width: rem(45);
 
@@ -31,14 +32,22 @@
             background-color: rgb(0 128 128 / 15%);
         }
 
-        i-lucide {
-            align-items: center;
-            border: rem(2) solid #008080;
+        &:before {
+            border: 2px solid #008080;
             border-radius: 50%;
+            content: '';
+            display: inline-block;
+            height: 26px;
+            left: 7.5px;
+            position: absolute;
+            top: 7.5px;
+            width: 26px;
+        }
+
+        svg {
+            align-items: center;
             display: flex;
-            height: rem(30);
             justify-content: center;
-            width: rem(30);
         }
 
         .current-lang {
