@@ -223,8 +223,7 @@ describe('DatabaseService', () => {
                     request_ts: mockDocuments[0].timestamp,
                     status: 'SUCCESS',
                     aoiName: 'Test Area 1',
-                    flags: undefined,
-                    state: undefined
+                    flags: undefined
                 },
                 {
                     correlation_uuid: 'test-uuid-2',
@@ -232,8 +231,7 @@ describe('DatabaseService', () => {
                     request_ts: mockDocuments[1].timestamp,
                     status: 'PENDING',
                     aoiName: 'Test Area 2',
-                    flags: undefined,
-                    state: undefined
+                    flags: undefined
                 }
             ])
             expect(result.hasMore).toBe(true)
@@ -279,8 +277,7 @@ describe('DatabaseService', () => {
                     request_ts: mockDocuments[0].timestamp,
                     status: 'SUCCESS',
                     aoiName: 'Test Area 3',
-                    flags: undefined,
-                    state: undefined
+                    flags: undefined
                 }
             ])
             expect(result.hasMore).toBe(true)
@@ -301,52 +298,6 @@ describe('DatabaseService', () => {
             expect(result.documents).toEqual([])
             expect(result.hasMore).toBe(false)
             expect(result.nextCursor).toBeUndefined()
-        })
-
-        it('should filter by state when provided', async () => {
-            const mockDocuments = [
-                {
-                    $id: 'doc-id-1',
-                    correlation_uuid: 'test-uuid-1',
-                    pluginId: 'test-plugin',
-                    timestamp: new Date().toISOString(),
-                    status: 'SUCCESS',
-                    aoiName: 'Test Area 1',
-                    flags: [],
-                    state: 'ARCHIVED'
-                }
-            ]
-
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: mockDocuments
-            })
-
-            const result = await service.fetchPluginRunsPaginated({
-                limit: 10,
-                pluginId: 'test-plugin',
-                state: 'ARCHIVED'
-            })
-
-            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                expect.arrayContaining([
-                    expect.stringContaining('"method":"equal"'),
-                    expect.stringContaining('"method":"limit"'),
-                    expect.stringContaining('"method":"orderDesc"')
-                ])
-            )
-            expect(result.documents).toEqual([
-                {
-                    correlation_uuid: 'test-uuid-1',
-                    pluginId: 'test-plugin',
-                    request_ts: mockDocuments[0].timestamp,
-                    status: 'SUCCESS',
-                    aoiName: 'Test Area 1',
-                    flags: [],
-                    state: 'ARCHIVED'
-                }
-            ])
         })
     })
 })

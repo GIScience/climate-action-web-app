@@ -19,7 +19,6 @@ import { StatusAnnouncementsService } from './dashboard/status-announcements/sta
 import { StatusNoticesComponent } from './dashboard/status-announcements/status-notices.component'
 import { TourEngine } from './dashboard/walkthrough/tour-engine.service'
 import { LanguageComponent } from './language/language.component'
-import { MigrationService } from './migration.service'
 import { MobileWarningComponent } from './mobile-warning/mobile-warning.component'
 
 @Component({
@@ -53,10 +52,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     private statusAnnouncements = inject(StatusAnnouncementsService)
 
     readonly notices = this.statusAnnouncements.notices
-
-    constructor() {
-        void inject(MigrationService)
-    }
 
     title = 'Climate Action Navigator'
     name = 'HeiGIT'

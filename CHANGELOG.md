@@ -22,6 +22,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Demo computations functionality
 - Archiving and previous (soft)delete action under computations; removing a bookmark now deletes the entry outright
+- Login-time state migration for legacy Appwrite records removed, as all existing ones are considered to be active
 
 ## [3.7.0](https://gitlab.heigit.org/climate-action/web-app/-/releases/3.7.0) - 2026-08-31
 

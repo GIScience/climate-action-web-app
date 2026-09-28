@@ -36,7 +36,6 @@ describe('computation mappers', () => {
                 aoiName: 'Test AOI',
                 pluginId: 'test_plugin',
                 flags: ['NEW'],
-                state: undefined,
                 artifacts: [],
                 hydrated: false
             })

@@ -3,7 +3,7 @@ import { SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
-import { ComputationFlags, ComputationItemState, ComputationRunState } from './dashboard/common/status.types'
+import { ComputationFlags, ComputationRunState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity, DiscoverTab } from './dashboard/computations-index/computation.interface'
 import { DatabaseService, PaginatedResult } from './database.service'
 
@@ -59,18 +59,15 @@ export class StorageService {
 
     async getPluginRunsPaginated(
         pluginId: string,
-        isInitialLoad: boolean = true,
-        state: ComputationItemState = 'ACTIVE'
+        isInitialLoad: boolean = true
     ): Promise<PaginatedResult<ComputationDatabaseEntity>> {
         const { isRealUser } = this.getUserAuthStatus()
 
         if (!isRealUser) {
-            // localStorage fallback for dev/fake users - filter by state locally
+            // localStorage fallback for dev/fake users
             const pluginRuns = this.getPluginRunsFromLocal()
             this.pluginRunsSubject.next(pluginRuns)
-            const localRuns = this.getPluginRuns().filter(
-                run => run.pluginId === pluginId && (run.state || 'ACTIVE') === state
-            )
+            const localRuns = this.getPluginRuns().filter(run => run.pluginId === pluginId)
             return {
                 documents: localRuns,
                 hasMore: false
@@ -89,8 +86,7 @@ export class StorageService {
             const result = await this.databaseService.fetchPluginRunsPaginated({
                 limit: this.DEFAULT_PAGE_SIZE,
                 cursor,
-                pluginId,
-                state
+                pluginId
             })
 
             this.paginationState[pluginId] = {
@@ -113,10 +109,8 @@ export class StorageService {
             return result
         } catch (error) {
             console.error('Error loading paginated runs from Appwrite, falling back to localStorage:', error)
-            // On error, fallback to localStorage - filter by state
-            const localRuns = this.getPluginRuns().filter(
-                run => run.pluginId === pluginId && (run.state || 'ACTIVE') === state
-            )
+            // On error, fallback to localStorage
+            const localRuns = this.getPluginRuns().filter(run => run.pluginId === pluginId)
             return {
                 documents: localRuns,
                 hasMore: false
@@ -182,9 +176,7 @@ export class StorageService {
     }
 
     getComputesByStatus(statuses: ComputationRunState[]): ComputationDatabaseEntity[] {
-        return this.getPluginRuns().filter(
-            run => statuses.includes(run.status as ComputationRunState) && (run.state || 'ACTIVE') === 'ACTIVE'
-        )
+        return this.getPluginRuns().filter(run => statuses.includes(run.status as ComputationRunState))
     }
 
     // New runs tracking
@@ -336,7 +328,7 @@ export class StorageService {
         const { isRealUser } = this.getUserAuthStatus()
 
         if (!isRealUser) {
-            return this.getPluginRuns().filter(run => (run.state || 'ACTIVE') === 'ACTIVE').length
+            return this.getPluginRuns().length
         }
 
         try {
@@ -353,9 +345,9 @@ export class StorageService {
         const { isRealUser } = this.getUserAuthStatus()
 
         if (!isRealUser) {
-            const activeComputations = this.getPluginRuns()
-                .filter(run => (run.state || 'ACTIVE') === 'ACTIVE')
-                .sort((a, b) => new Date(b.request_ts).getTime() - new Date(a.request_ts).getTime())
+            const activeComputations = [...this.getPluginRuns()].sort(
+                (a, b) => new Date(b.request_ts).getTime() - new Date(a.request_ts).getTime()
+            )
 
             return activeComputations.length > 0 ? activeComputations[0] : null
         }

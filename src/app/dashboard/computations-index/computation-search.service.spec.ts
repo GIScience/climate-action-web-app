@@ -76,9 +76,12 @@ describe('ComputationSearchService', () => {
         expect(loadedIds()).toEqual(['a', 'b'])
         expect(service.hasMore()).toBe(false)
 
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
         service.loadMore()
 
         expect(mockPluginService.getSearch).toHaveBeenCalledTimes(2)
+        expect(warnSpy).toHaveBeenCalledTimes(1)
+        warnSpy.mockRestore()
     })
 
     it('should cache the loaded page until marked stale or the plugin changes', () => {

@@ -354,7 +354,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                         existing.status = entity.status
                     }
                     existing.flags = entity.flags ?? existing.flags
-                    existing.state = entity.state ?? existing.state
                 } else if (isPendingStatus(entity.status) || entity.status === 'SUCCESS') {
                     additions.push(mapDatabaseComputation(entity))
                 }

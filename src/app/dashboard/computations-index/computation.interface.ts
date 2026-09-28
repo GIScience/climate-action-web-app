@@ -1,7 +1,7 @@
 import { SupportedLanguage } from '@app/types/language.types'
 import type { FeatureCollection, Feature as GeoJSONFeature, MultiPolygon, Point } from 'geojson'
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
-import { ComputationFlags, ComputationItemState, ComputationRunState } from '../common/status.types'
+import { ComputationFlags, ComputationRunState } from '../common/status.types'
 import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
 
 export type DiscoverTab = 'discover' | 'bookmarks'
@@ -67,12 +67,11 @@ export interface ComputationDisplayEntity extends Pick<
     keepInDOM?: boolean
     hydrated?: boolean
     flags?: ComputationFlags
-    state?: ComputationItemState
 }
 
 export type ComputationDatabaseEntity = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'language' | 'flags' | 'state'
+    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'language' | 'flags'
 >
 
 export type ComputationBasicInfo = Pick<

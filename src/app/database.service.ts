@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core'
 import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
 import { environment } from '../environments/environment'
 import { AppwriteService } from './auth/appwrite.service'
-import { ComputationItemState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
 
 export interface BasicKeyInfo extends Models.Document {
@@ -23,7 +22,6 @@ export interface PaginationParams {
     limit: number
     cursor?: string
     pluginId: string
-    state?: ComputationItemState
 }
 
 export interface PaginatedResult<T> {
@@ -70,9 +68,6 @@ export class DatabaseService {
                 Query.orderDesc('timestamp')
             ]
 
-            const stateFilter = params.state || 'ACTIVE'
-            queries.push(Query.equal('state', stateFilter))
-
             if (params.cursor) {
                 queries.push(Query.cursorAfter(params.cursor))
             }
@@ -88,7 +83,6 @@ export class DatabaseService {
                     ({
                         correlation_uuid: doc.correlation_uuid,
                         flags: doc.flags,
-                        state: doc.state,
                         pluginId: doc.pluginId,
                         request_ts: doc.timestamp,
                         status: doc.status,
@@ -202,7 +196,6 @@ export class DatabaseService {
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
                 Query.equal('user_id', this.user_id),
-                Query.equal('state', 'ACTIVE'),
                 Query.limit(1) // We only need the total count, not the documents
             ])
 
@@ -220,12 +213,7 @@ export class DatabaseService {
             const response = await this.databases.listDocuments<ComputationDocument>(
                 this.DATABASE_ID,
                 this.RUNS_COLLECTION_ID,
-                [
-                    Query.equal('user_id', this.user_id),
-                    Query.equal('state', 'ACTIVE'),
-                    Query.orderDesc('timestamp'),
-                    Query.limit(1)
-                ]
+                [Query.equal('user_id', this.user_id), Query.orderDesc('timestamp'), Query.limit(1)]
             )
 
             if (response.documents.length === 0) return null
@@ -234,7 +222,6 @@ export class DatabaseService {
             return {
                 correlation_uuid: doc.correlation_uuid,
                 flags: doc.flags,
-                state: doc.state,
                 pluginId: doc.pluginId,
                 request_ts: doc.timestamp,
                 status: doc.status,
@@ -244,60 +231,6 @@ export class DatabaseService {
         } catch (error) {
             this.logError('Error fetching latest active computation:', error)
             return null
-        }
-    }
-
-    // TODO: Temporary migration script, remove after all users run states have been migrated
-    async migrateComputationsToStateField(): Promise<void> {
-        try {
-            if (!this.user_id) {
-                console.log('No user logged in, skipping migration')
-                return
-            }
-
-            console.log('Starting migration of computations to state field...')
-
-            const allDocuments = await this.databases.listDocuments<ComputationDocument>(
-                this.DATABASE_ID,
-                this.RUNS_COLLECTION_ID,
-                [Query.equal('user_id', this.user_id), Query.limit(1000)]
-            )
-
-            console.log(`Found ${allDocuments.documents.length} documents to migrate`)
-
-            let migratedCount = 0
-            let archivedCount = 0
-            let activeCount = 0
-
-            for (const doc of allDocuments.documents) {
-                const flags = doc.flags || []
-                const hasArchivedFlag = flags.includes('ARCHIVED')
-
-                const newState: ComputationItemState = hasArchivedFlag ? 'ARCHIVED' : 'ACTIVE'
-
-                if (!doc.state || doc.state !== newState) {
-                    const cleanedFlags = flags.filter(flag => flag !== 'ARCHIVED')
-
-                    await this.databases.updateDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, doc.$id, {
-                        state: newState,
-                        flags: cleanedFlags
-                    })
-
-                    migratedCount++
-                    if (newState === 'ARCHIVED') {
-                        archivedCount++
-                    } else {
-                        activeCount++
-                    }
-                }
-            }
-
-            console.log(`Migration complete: ${migratedCount} documents updated`)
-            console.log(`- Set to ACTIVE: ${activeCount}`)
-            console.log(`- Set to ARCHIVED: ${archivedCount}`)
-        } catch (error) {
-            this.logError('Error during migration:', error)
-            throw error
         }
     }
 }

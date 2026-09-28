@@ -52,7 +52,6 @@ export function mapDatabaseComputation(run: ComputationDatabaseEntity): Computat
         pluginId: run.pluginId,
         language: run.language,
         flags: run.flags,
-        state: run.state,
         artifacts: [],
         hydrated: false
     }
