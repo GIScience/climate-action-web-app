@@ -37,6 +37,7 @@ import { PluginService } from '../plugin/plugin.service'
 import { MapArtifactLayer, MapArtifactManagerService } from './map-artifact-manager.service'
 import { MapDrawingService } from './map-drawing.service'
 import { FoWGeometryType, MapFoWManagerService } from './map-fow-manager.service'
+import { MapSearchManagerService } from './map-search-manager.service'
 import { RegionChoiceDialogComponent, RegionChoiceOption } from './region-choice-dialog/region-choice-dialog.component'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
@@ -139,6 +140,7 @@ export class MapService {
     storageService = inject(StorageService)
     private translocoService = inject(TranslocoService)
     private fowManager = inject(MapFoWManagerService)
+    private mapSearchManager = inject(MapSearchManagerService)
     private router = inject(Router, { optional: true })
     private mapDrawingService = inject(MapDrawingService, { optional: true })
     private mapArtifactManager = inject(MapArtifactManagerService, { optional: true })
@@ -184,6 +186,12 @@ export class MapService {
     private static readonly HEIDELBERG_COORDS: [number, number] = [8.6759928, 49.4187355]
 
     constructor() {
+        const storedStyle = this.storageService.getSelectedMapLayer('')
+        if (isBasemapStyleName(storedStyle)) {
+            this.currentBasemapStyle = storedStyle
+            this.styleChangeSubject.next(storedStyle)
+        }
+
         this.isOnLanding = this.router?.url === '/dashboard'
 
         if (this.router) {
@@ -229,10 +237,6 @@ export class MapService {
     initMap(targetId: string, isReportMap: boolean = false) {
         this.mapId = targetId
 
-        const storedStyle = this.storageService.getSelectedMapLayer('')
-        this.currentBasemapStyle = isBasemapStyleName(storedStyle) ? storedStyle : BasemapStyleName.Colorful
-        this.styleChangeSubject.next(this.currentBasemapStyle)
-
         this.map = new MaplibreMap({
             container: targetId,
             style: this.getStyleFor(this.currentBasemapStyle),
@@ -247,6 +251,10 @@ export class MapService {
 
         // Initialize FoW manager with the map
         this.fowManager.setMap(this.map, !isReportMap)
+
+        if (!isReportMap) {
+            this.mapSearchManager.setMap(this.map, () => this.calculateMapPadding())
+        }
 
         if (!isReportMap && this.mapArtifactManager) {
             this.mapArtifactManager.setMapInstance(this.map, this)
@@ -450,6 +458,10 @@ export class MapService {
                     const features = this.map.queryRenderedFeatures(e.point, { layers: existingLayers })
                     showPointer = features.length > 0
                 }
+            }
+
+            if (!showPointer) {
+                showPointer = this.mapSearchManager.isInteractiveFeatureAt(e.point)
             }
 
             this.map.getCanvas().style.cursor = showPointer ? 'pointer' : ''
@@ -1018,6 +1030,13 @@ export class MapService {
             }
         }
 
+        // Pass through optional source properties when present
+        const passthroughProperties = ['min_zoom']
+        for (const key of passthroughProperties) {
+            const value = feature.properties?.[key]
+            if (value !== undefined) processedFeature.properties![key] = value
+        }
+
         // Calculate area after feature is created
         if (feature.geometry) {
             const { default: area } = await import('@turf/area')
@@ -1203,6 +1222,8 @@ export class MapService {
     private createRasterStyle(): StyleSpecification {
         return {
             version: 8,
+            // required for symbol layers (e.g. search cluster counts)
+            glyphs: 'https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf',
             sources: {
                 'raster-tiles': {
                     type: 'raster',

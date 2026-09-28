@@ -27,7 +27,6 @@ export interface Plugin {
     sources: Array<Source> | null
     assets: PluginAssets
     operator_schema: JSONSchema7
-    demo_config: DemoConfig | null
     library_version: string
     language?: SupportedLanguage
     status?: 'active' | 'unavailable' | 'releasing-soon'
@@ -71,12 +70,6 @@ export interface ComputeRequest {
     params: Record<string, unknown>
 }
 
-export interface DemoConfig {
-    aoi: MultiPolygon
-    name?: string
-    params: Record<string, unknown>
-}
-
 export type ComputeState = 'inactive' | 'compute-ready'
 
 export enum ExternalInput {
@@ -89,3 +82,13 @@ export enum DrawInput {
     Polygon = 'polygon'
 }
 export type GeometryInputMode = ExternalInput | DrawInput
+
+export const AOI_ORIGINAL_TYPES = {
+    [ExternalInput.Boundary]: 'Boundary',
+    [ExternalInput.File]: 'File',
+    [DrawInput.Circle]: 'Circle',
+    [DrawInput.Box]: 'Box',
+    [DrawInput.Polygon]: 'Polygon'
+} as const
+
+export type AoiOriginalType = (typeof AOI_ORIGINAL_TYPES)[GeometryInputMode]

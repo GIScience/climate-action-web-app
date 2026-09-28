@@ -123,6 +123,7 @@ describe('pluginService', () => {
                     }
                 ])
             )
+            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
         })
 
         cy.reload(true)

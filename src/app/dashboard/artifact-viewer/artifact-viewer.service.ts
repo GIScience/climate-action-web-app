@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
-import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 
 @Injectable({
@@ -8,7 +7,6 @@ import { ArtifactService } from '../artifact/artifact.service'
 })
 export class ArtifactViewerService {
     private artifactService = inject(ArtifactService)
-    private storageService = inject(StorageService)
 
     private isViewerVisibleSubject = new BehaviorSubject<boolean>(false)
     isViewerVisible$ = this.isViewerVisibleSubject.asObservable()
@@ -30,7 +28,6 @@ export class ArtifactViewerService {
 
     closeArtifactViewer(): void {
         this.artifactService.resetAllSubjects()
-        this.storageService.clearActiveArtifact()
         this.isViewerVisible = false
     }
 }

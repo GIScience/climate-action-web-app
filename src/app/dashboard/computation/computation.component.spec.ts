@@ -77,16 +77,14 @@ describe('ComputationComponent', () => {
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             getPluginRunsPaginated: jest.fn().mockResolvedValue({
                 documents: [],
-                total: 0,
                 hasMore: false
             }),
             getNewRuns: jest.fn().mockReturnValue([]),
             getComputesByStatus: jest.fn().mockReturnValue([]),
             markAsNew: jest.fn(),
             markAsViewed: jest.fn(),
-            getActiveArtifact: jest.fn(),
-            saveActiveArtifact: jest.fn(),
-            clearActiveArtifact: jest.fn()
+            getActiveTab: jest.fn().mockReturnValue('bookmarks'),
+            saveActiveTab: jest.fn()
         }
 
         mockPluginService = {
@@ -102,6 +100,16 @@ describe('ComputationComponent', () => {
                     plugin_version: '1.0.0'
                 })
             ),
+            getSearch: jest.fn().mockReturnValue(
+                of({
+                    items: [],
+                    current_page: null,
+                    current_page_backwards: null,
+                    previous_page: null,
+                    next_page: null
+                })
+            ),
+            getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
             storeNewComputes: jest.fn(() => Promise.resolve()),
             syncTasks$,
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())

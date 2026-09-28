@@ -28,7 +28,6 @@ export interface PaginationParams {
 
 export interface PaginatedResult<T> {
     documents: T[]
-    total: number
     hasMore: boolean
     nextCursor?: string
 }
@@ -61,7 +60,7 @@ export class DatabaseService {
     async fetchPluginRunsPaginated(params: PaginationParams): Promise<PaginatedResult<ComputationDatabaseEntity>> {
         try {
             if (!this.user_id) {
-                return { documents: [], total: 0, hasMore: false }
+                return { documents: [], hasMore: false }
             }
 
             const queries = [
@@ -93,7 +92,8 @@ export class DatabaseService {
                         pluginId: doc.pluginId,
                         request_ts: doc.timestamp,
                         status: doc.status,
-                        aoiName: doc.aoiName
+                        aoiName: doc.aoiName,
+                        language: doc.language
                     }) as ComputationDatabaseEntity
             )
 
@@ -105,13 +105,12 @@ export class DatabaseService {
 
             return {
                 documents,
-                total: response.total,
                 hasMore,
                 nextCursor
             }
         } catch (error) {
             this.logError('Error fetching paginated plugin runs from Appwrite:', error)
-            return { documents: [], total: 0, hasMore: false }
+            return { documents: [], hasMore: false }
         }
     }
 
@@ -119,7 +118,11 @@ export class DatabaseService {
         try {
             if (!this.user_id) return null
 
-            const permissions = [Permission.read(Role.user(this.user_id)), Permission.update(Role.user(this.user_id))]
+            const permissions = [
+                Permission.read(Role.user(this.user_id)),
+                Permission.update(Role.user(this.user_id)),
+                Permission.delete(Role.user(this.user_id))
+            ]
 
             const { request_ts, ...rest } = run
             const response = await this.databases.createDocument(
@@ -167,27 +170,30 @@ export class DatabaseService {
         }
     }
 
-    getBasicKey(): Promise<BasicKeyInfo | null> {
-        if (!this.user_id) return Promise.resolve(null)
-        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
-    }
-
-    async hasDemoComputations(pluginId: string): Promise<boolean> {
+    async deletePluginRun(correlationId: string): Promise<boolean> {
         try {
             if (!this.user_id) return false
 
             const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+                Query.equal('correlation_uuid', correlationId),
                 Query.equal('user_id', this.user_id),
-                Query.equal('pluginId', pluginId),
-                Query.contains('flags', 'DEMO'),
                 Query.limit(1)
             ])
 
-            return response.documents.length > 0
+            if (response.documents.length === 0) return false
+
+            await this.databases.deleteDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, response.documents[0].$id)
+
+            return true
         } catch (error) {
-            this.logError('Error checking for demo computations:', error)
+            this.logError('Error deleting plugin run in Appwrite:', error)
             return false
         }
+    }
+
+    getBasicKey(): Promise<BasicKeyInfo | null> {
+        if (!this.user_id) return Promise.resolve(null)
+        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
     }
 
     async getTotalActiveComputationsCount(): Promise<number> {
@@ -232,7 +238,8 @@ export class DatabaseService {
                 pluginId: doc.pluginId,
                 request_ts: doc.timestamp,
                 status: doc.status,
-                aoiName: doc.aoiName
+                aoiName: doc.aoiName,
+                language: doc.language
             } as ComputationDatabaseEntity
         } catch (error) {
             this.logError('Error fetching latest active computation:', error)

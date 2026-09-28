@@ -7,6 +7,10 @@ import {
 
 describe('computations', () => {
     beforeEach(() => {
+        cy.window().then(win => {
+            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
+        })
+
         cy.visit('/')
     })
 
@@ -44,20 +48,22 @@ describe('computations', () => {
         cy.get('.computations-index-content').should('exist')
     }
 
-    it('should display the selected artifact even after a reload', () => {
-        setupTest()
+    /// TODO: Restore in MR !469
 
-        cy.get('.parent-computation').eq(0).click()
-
-        cy.wait('@getPluginBlueprintComputation')
-
-        cy.get('.child-computation').eq(1).click()
-
-        cy.wait('@getBlueprintTable')
-
-        cy.reload(true)
-        cy.get('.table-artifact-item').should('exist')
-    })
+    // it('should display the selected artifact even after a reload', () => {
+    //     setupTest()
+    //
+    //     cy.get('.parent-computation').eq(0).click()
+    //
+    //     cy.wait('@getPluginBlueprintComputation')
+    //
+    //     cy.get('.child-computation').eq(1).click()
+    //
+    //     cy.wait('@getBlueprintTable')
+    //
+    //     cy.reload(true)
+    //     cy.get('.table-artifact-item').should('exist')
+    // })
 
     it('should display the detailed description for an artifact when available', () => {
         setupTest()
@@ -84,8 +90,7 @@ describe('computations', () => {
         })
 
         cy.get('.parent-computation').eq(0).realHover()
-        cy.get('.parent-computation .computation-actions').find('button').first().click()
-        cy.get('.actions-menu__item').contains('Share').click()
+        cy.get('button.share-trigger').click()
 
         cy.get('@writeText').should(
             'have.been.calledOnceWith',

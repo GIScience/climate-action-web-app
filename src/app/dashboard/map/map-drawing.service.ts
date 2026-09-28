@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { DrawInput } from '@app/dashboard/plugin/plugin.interface'
+import { AOI_ORIGINAL_TYPES, DrawInput } from '@app/dashboard/plugin/plugin.interface'
 import { TranslocoService } from '@jsverse/transloco'
 import area from '@turf/area'
 import distance from '@turf/distance'
@@ -25,7 +25,6 @@ export class MapDrawingService {
     private readonly SQM_TO_SQKM_FACTOR = 1e-6
     private formatRadius = (radius: number) =>
         radius >= 1000 ? `${(radius / 1000).toFixed(2)} km` : `${radius.toFixed(0)} m`
-    private readonly TYPE_MAP = { circle: 'Circle', rectangle: 'Box', polygon: 'Polygon' } as const
     private readonly TOOLTIP_OFFSET: [number, number] = [0, -15]
     private readonly TOOLTIP_STYLES =
         'padding:4px 8px;background:rgba(0,0,0,0.8);color:white;font-size:12px;border-radius:3px;white-space:pre-line;'
@@ -259,7 +258,7 @@ export class MapDrawingService {
         const geometry = { type: 'MultiPolygon' as const, coordinates: [drawnFeature.geometry.coordinates] }
         const properties = {
             name: 'Custom Area',
-            original_type: this.TYPE_MAP[currentMode],
+            original_type: AOI_ORIGINAL_TYPES[currentMode],
             id: featureId,
             area: Number((area({ type: 'Feature', geometry, properties: {} }) * this.SQM_TO_SQKM_FACTOR).toFixed(2))
         }

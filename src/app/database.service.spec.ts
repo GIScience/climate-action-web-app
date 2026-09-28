@@ -172,7 +172,6 @@ describe('DatabaseService', () => {
 
             expect(result).toEqual({
                 documents: [],
-                total: 0,
                 hasMore: false
             })
             expect(mockDatabases.listDocuments).not.toHaveBeenCalled()

@@ -3,14 +3,17 @@ import { SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
-import { ActiveArtifactRef } from './dashboard/artifact/artifact.interface'
 import { ComputationFlags, ComputationItemState, ComputationRunState } from './dashboard/common/status.types'
-import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
+import { ComputationDatabaseEntity, DiscoverTab } from './dashboard/computations-index/computation.interface'
 import { DatabaseService, PaginatedResult } from './database.service'
 
 interface MapPreferences {
     selectedLayer?: string
     layerSwitcherCollapsed?: boolean
+}
+
+interface UiPreferences {
+    activeTab?: DiscoverTab
 }
 
 /**
@@ -28,8 +31,8 @@ export class StorageService {
 
     private readonly STORAGE_KEYS = {
         PLUGIN_RUNS: 'plugin_runs',
-        ACTIVE_ARTIFACT: 'active_artifact',
         MAP_PREFERENCES: 'map_prefs',
+        UI_PREFERENCES: 'ui_prefs',
         LANGUAGE_PREFERENCE: 'language_pref',
         TOUR_AFTER_LOGIN: 'start_tour_after_login'
     }
@@ -70,7 +73,6 @@ export class StorageService {
             )
             return {
                 documents: localRuns,
-                total: localRuns.length,
                 hasMore: false
             }
         }
@@ -78,7 +80,7 @@ export class StorageService {
         const currentState = this.paginationState[pluginId] || { hasMore: true }
 
         if (!isInitialLoad && !currentState.hasMore) {
-            return { documents: [], total: 0, hasMore: false }
+            return { documents: [], hasMore: false }
         }
 
         const cursor = isInitialLoad ? undefined : currentState.cursor
@@ -117,7 +119,6 @@ export class StorageService {
             )
             return {
                 documents: localRuns,
-                total: localRuns.length,
                 hasMore: false
             }
         }
@@ -165,26 +166,25 @@ export class StorageService {
         this.addComputeToLocalStorage(compute)
     }
 
+    async deleteComputation(correlationId: string): Promise<void> {
+        const { isRealUser } = this.getUserAuthStatus()
+
+        if (isRealUser) {
+            try {
+                await this.databaseService.deletePluginRun(correlationId)
+            } catch (error) {
+                console.warn('Failed to delete from Appwrite, will remove locally only:', error)
+            }
+        }
+
+        const runs = this.getPluginRuns().filter(run => run.correlation_uuid !== correlationId)
+        this.syncLocalStorage(runs)
+    }
+
     getComputesByStatus(statuses: ComputationRunState[]): ComputationDatabaseEntity[] {
         return this.getPluginRuns().filter(
             run => statuses.includes(run.status as ComputationRunState) && (run.state || 'ACTIVE') === 'ACTIVE'
         )
-    }
-
-    // Archived runs
-
-    async archiveComputation(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { state: 'ARCHIVED' })
-    }
-
-    async unarchiveComputation(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { state: 'ACTIVE' })
-    }
-
-    // Delete runs
-
-    async deleteComputation(correlationId: string): Promise<void> {
-        await this.updateComputation(correlationId, { state: 'DELETED' })
     }
 
     // New runs tracking
@@ -201,14 +201,6 @@ export class StorageService {
 
     async markAsViewed(correlationId: string): Promise<void> {
         await this.removeFlag(correlationId, 'NEW')
-    }
-
-    // Demo runs tracking
-
-    getDemoRuns(pluginId: string): string[] {
-        return this.getPluginRuns()
-            .filter(run => run.flags?.includes('DEMO') && run.pluginId === pluginId)
-            .map(run => run.correlation_uuid)
     }
 
     // Helper method for updating computation properties
@@ -283,20 +275,6 @@ export class StorageService {
         }
     }
 
-    // Active artifact
-
-    getActiveArtifact(): ActiveArtifactRef | null {
-        return this.getItem(this.STORAGE_KEYS.ACTIVE_ARTIFACT, null)
-    }
-
-    saveActiveArtifact(artifact: ActiveArtifactRef): void {
-        this.setItem(this.STORAGE_KEYS.ACTIVE_ARTIFACT, artifact)
-    }
-
-    clearActiveArtifact(): void {
-        this.setItem(this.STORAGE_KEYS.ACTIVE_ARTIFACT, [])
-    }
-
     // Map preferences
 
     private getMapPreferences(): MapPreferences {
@@ -327,6 +305,27 @@ export class StorageService {
         const prefs = this.getMapPreferences()
         prefs.layerSwitcherCollapsed = isCollapsed
         this.saveMapPreferences(prefs)
+    }
+
+    // UI preferences
+
+    private getUiPreferences(): UiPreferences {
+        return this.getItem<UiPreferences>(this.STORAGE_KEYS.UI_PREFERENCES, {})
+    }
+
+    private saveUiPreferences(prefs: UiPreferences): void {
+        this.setItem(this.STORAGE_KEYS.UI_PREFERENCES, prefs)
+    }
+
+    getActiveTab(defaultTab: DiscoverTab): DiscoverTab {
+        const prefs = this.getUiPreferences()
+        return prefs.activeTab || defaultTab
+    }
+
+    saveActiveTab(tab: DiscoverTab): void {
+        const prefs = this.getUiPreferences()
+        prefs.activeTab = tab
+        this.saveUiPreferences(prefs)
     }
 
     // Landing page data

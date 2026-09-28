@@ -310,6 +310,32 @@
             animation: popup-fade-in 0.2s ease;
         }
     }
+
+    &.discover-popup {
+        .discover-popup__content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .discover-popup__title {
+            font-size: 14px;
+        }
+
+        .discover-popup__uuid {
+            color: #777;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+        }
+
+        .discover-popup__divider {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 6px 0;
+            width: 100%;
+        }
+    }
 }
 
 @keyframes popup-fade-in {

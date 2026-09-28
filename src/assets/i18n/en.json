@@ -54,36 +54,32 @@
     "computationsIndex": {
         "reportBuilder": "Report Builder",
         "exitReportBuilder": "Exit Report Builder",
-        "archive": "Archive",
-        "backToAll": "Back to all computations",
         "createReport": "Create a PDF report by collating multiple results",
-        "viewArchived": "View archived computations",
+        "tabs": {
+            "discover": "Discover",
+            "bookmarks": "Bookmarks"
+        },
         "noComputations": "No computations to show yet.",
+        "noComputationSearchResults": "No results found.",
         "loadMore": "Load More",
         "loadingMore": "Loading more computations...",
-        "archived": "Archived",
-        "noArchived": "No archived computations to display.",
-        "loadingMoreArchived": "Loading more archived computations...",
         "status": {
             "queued": "Queued",
             "running": "Running",
             "done": "Done"
         },
         "actions": {
-            "menu": "Actions",
             "share": "Share Computation",
             "viewParameters": "View Parameters",
-            "archive": "Archive Computation",
-            "unarchive": "Un-archive Computation",
-            "delete": "Delete Computation"
+            "bookmark": "Save to Bookmarks",
+            "removeBookmark": "Remove Bookmark"
         },
         "login": {
-            "prompt": "Prefer to request your own computation?",
-            "action": "Login",
-            "suffix": "to proceed."
+            "prompt": "Request your own computations for any area of interest.",
+            "syncPrompt": "Your bookmarks are only saved in this browser — sync with your account to keep them safe.",
+            "action": "Log in to continue"
         },
         "imported": "Imported Computation",
-        "demo": "Demo",
         "artifactErrors": "Some results could not be computed.",
         "languageMismatch": "This computation was generated in {{ language }}. Request a new computation if you need it in {{ currentLanguage }}.",
         "languageMismatchPluginOnly": "This computation was generated in {{ language }}. This Assessment Tool is not available in {{ currentLanguage }} currently.",
@@ -92,11 +88,13 @@
             "noParams": "This computation used no parameters.",
             "userDefined": "User-defined parameter"
         },
-        "deleteConfirmation": "Are you sure you want to delete this computation? This action cannot be undone.",
         "computationAlreadyPresent": "Computation ID #{{ id }} is already present",
         "computationImported": "Computation ID #{{ id }} imported",
         "errorImportingComputation": "Error importing computation",
-        "errorLoadingComputation": "Couldn't load this computation. Please try again."
+        "errorLoadingComputation": "Couldn't load this computation. Please try again.",
+        "bookmarkAdded": "Saved to Bookmarks",
+        "bookmarkRemoved": "Removed from Bookmarks",
+        "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
     },
     "computation": {
         "addToReport": "Add to Report",

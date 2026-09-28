@@ -1,5 +1,10 @@
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
-import { ComputationDatabaseEntity, ComputationDisplayEntity, ComputationMetadata } from './computation.interface'
+import {
+    ComputationDatabaseEntity,
+    ComputationDisplayEntity,
+    ComputationMetadata,
+    SearchEntry
+} from './computation.interface'
 
 const ARTIFACT_ICON_BY_MODALITY: Record<Artifact['modality'], string> = {
     IMAGE: 'image',
@@ -45,8 +50,22 @@ export function mapDatabaseComputation(run: ComputationDatabaseEntity): Computat
         status: run.status,
         aoiName: run.aoiName,
         pluginId: run.pluginId,
+        language: run.language,
         flags: run.flags,
         state: run.state,
+        artifacts: [],
+        hydrated: false
+    }
+}
+
+export function mapSearchComputation(entry: SearchEntry): ComputationDisplayEntity {
+    return {
+        correlation_uuid: entry.correlation_uuid,
+        request_ts: entry.request_ts,
+        status: 'SUCCESS',
+        aoiName: entry.aoi_name,
+        pluginId: entry.plugin_id,
+        language: entry.language,
         artifacts: [],
         hydrated: false
     }
@@ -59,7 +78,7 @@ export function mapHydratedComputation(
     return {
         ...computation,
         status: metadata.status,
-        request_ts: computation.request_ts ?? metadata.request_ts,
+        request_ts: metadata.request_ts ?? computation.request_ts,
         language: metadata.language,
         aoiName: (metadata.aoi?.properties?.['name'] as string | undefined) ?? computation.aoiName,
         geometry: metadata.aoi,

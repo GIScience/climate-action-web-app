@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
 import { TranslocoService } from '@jsverse/transloco'
@@ -11,7 +11,9 @@ import { ComputationRunState, ComputationRunStateInfo } from '../common/status.t
 import {
     ComputationDatabaseEntity,
     ComputationID,
-    ComputationMetadata
+    ComputationMetadata,
+    SearchCentroidCollection,
+    SearchPage
 } from '../computations-index/computation.interface'
 import { ComputeState, Plugin } from './plugin.interface'
 
@@ -69,10 +71,17 @@ export class PluginService {
         })
     }
 
-    computeDemo(pluginId: string): Observable<ComputationID> {
-        return this.http.get<ComputationID>(`${this.apiUrl}/plugin/${pluginId}/demo`, {
-            params: { lang: this.translocoService.getActiveLang() }
-        })
+    getSearch(pluginId: string, cursor: string | null = null, pageSize: number = 10): Observable<SearchPage> {
+        let params = new HttpParams().set('plugin_id', pluginId).set('page_size', String(pageSize))
+        if (cursor) {
+            params = params.set('cursor', cursor)
+        }
+        return this.http.get<SearchPage>(`${this.apiUrl}/computation/search`, { params })
+    }
+
+    getSearchCentroids(pluginId: string): Observable<SearchCentroidCollection> {
+        const params = new HttpParams().set('plugin_id', pluginId)
+        return this.http.get<SearchCentroidCollection>(`${this.apiUrl}/computation/search/centroids`, { params })
     }
 
     getComputationRunState(id: string): Observable<ComputationRunStateInfo> {

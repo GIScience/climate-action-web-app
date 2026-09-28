@@ -12,9 +12,16 @@ import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.m
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
 import { ArtifactService } from '../artifact/artifact.service'
+import { MapSearchManagerService } from '../map/map-search-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
-import { ComputationDatabaseEntity, ComputationDisplayEntity, ComputationMetadata } from './computation.interface'
+import {
+    ComputationDatabaseEntity,
+    ComputationDisplayEntity,
+    ComputationMetadata,
+    SearchEntry,
+    SearchPage
+} from './computation.interface'
 import { ComputationsIndexComponent } from './computations-index.component'
 
 const TEST_UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
@@ -85,6 +92,16 @@ function createMetadata(overrides: Partial<ComputationMetadata> = {}): Computati
     }
 }
 
+function createSearchPage(items: SearchEntry[], nextPage: string | null = null): SearchPage {
+    return {
+        items,
+        current_page: null,
+        current_page_backwards: null,
+        previous_page: null,
+        next_page: nextPage
+    }
+}
+
 describe('ComputationsIndexComponent', () => {
     let component: ComputationsIndexComponent
     let fixture: ComponentFixture<ComputationsIndexComponent>
@@ -93,6 +110,7 @@ describe('ComputationsIndexComponent', () => {
     let mockStorageService: Partial<StorageService>
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
+    let mockmapSearchManager: Partial<MapSearchManagerService>
     let mockMatDialog: { open: jest.Mock; closeAll: jest.Mock }
     let translocoService: TranslocoService
     let toastrService: ToastrService
@@ -124,18 +142,15 @@ describe('ComputationsIndexComponent', () => {
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             getPluginRunsPaginated: jest.fn().mockResolvedValue({
                 documents: [],
-                total: 0,
                 hasMore: false
             }),
             getComputesByStatus: jest.fn().mockReturnValue([]),
-            archiveComputation: jest.fn(),
-            unarchiveComputation: jest.fn(),
             getNewRuns: jest.fn().mockReturnValue([]),
-            getActiveArtifact: jest.fn(),
-            saveActiveArtifact: jest.fn(),
-            clearActiveArtifact: jest.fn(),
             markAsNew: jest.fn(),
-            markAsViewed: jest.fn()
+            markAsViewed: jest.fn(),
+            deleteComputation: jest.fn(() => Promise.resolve()),
+            getActiveTab: jest.fn().mockReturnValue('bookmarks'),
+            saveActiveTab: jest.fn()
         }
 
         mockPluginService = {
@@ -145,15 +160,15 @@ describe('ComputationsIndexComponent', () => {
             getComputationRunState: jest.fn().mockReturnValue(of({ state: 'PENDING' })),
             collapsePluginCatalog: jest.fn(),
             getPluginNameById: jest.fn((id: string) => id),
+            getSearch: jest.fn().mockReturnValue(of(createSearchPage([]))),
+            getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
             syncTasks$,
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            computeDemo: jest.fn(),
             storeNewComputes: jest.fn(() => Promise.resolve())
         }
 
         mockArtifactService = {
             getImage: jest.fn(),
-            resetAllSubjects: jest.fn(),
             vector: new BehaviorSubject(null),
             raster: new BehaviorSubject(null)
         }
@@ -162,6 +177,11 @@ describe('ComputationsIndexComponent', () => {
             highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
             removeFocusedLayer: jest.fn(),
             flyToExtent: jest.fn()
+        }
+        mockmapSearchManager = {
+            showSearchLayers: jest.fn(),
+            hideSearchLayers: jest.fn(),
+            clearSearchLayers: jest.fn()
         }
         mockMatDialog = {
             open: jest.fn(),
@@ -181,6 +201,7 @@ describe('ComputationsIndexComponent', () => {
                 { provide: StorageService, useValue: mockStorageService },
                 { provide: ArtifactService, useValue: mockArtifactService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: MapSearchManagerService, useValue: mockmapSearchManager },
                 { provide: MatDialog, useValue: mockMatDialog },
                 { provide: ToastrService, useClass: MockToastrService },
                 {
@@ -227,20 +248,12 @@ describe('ComputationsIndexComponent', () => {
 
     it('given no runs should create an empty computation index view', () => {
         expect(component).toBeTruthy()
+        expect(component.activeTab).toBe('bookmarks')
         expect(mockPluginService.updateRunStatus).not.toHaveBeenCalled()
 
         expect(fixture.debugElement.queryAll(By.css('.parent-computation')).length).toBe(0)
         expect(fixture.debugElement.queryAll(By.css('.child-computation')).length).toBe(0)
         expect(fixture.debugElement.query(By.css('.empty-computations'))).toBeTruthy()
-    })
-
-    it('given a completed run should list it without fetching its metadata', () => {
-        seedStoredRuns([createTestRun()])
-
-        expect(fixture.debugElement.queryAll(By.css('.parent-computation')).length).toBe(1)
-        expect(fixture.debugElement.queryAll(By.css('.child-computation')).length).toBe(0)
-        expect(component.runs()[0].hydrated).toBe(false)
-        expect(mockPluginService.getComputationMetadata).not.toHaveBeenCalled()
     })
 
     it('given a completed run should hydrate and expand the computation on click', async () => {
@@ -256,18 +269,6 @@ describe('ComputationsIndexComponent', () => {
         expect(mockMapService.flyToExtent).toHaveBeenCalled()
     })
 
-    it('should not refetch metadata when re-expanding a hydrated computation', async () => {
-        seedStoredRuns([createTestRun()])
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(createMetadata()))
-
-        await expandFirstComputation()
-        await expandFirstComputation()
-        await expandFirstComputation()
-
-        expect(mockPluginService.getComputationMetadata).toHaveBeenCalledTimes(1)
-        expect(component.activeComputation?.correlation_uuid).toBe(TEST_UUID)
-    })
-
     it('should surface a toast and stay collapsed when hydration fails', async () => {
         seedStoredRuns([createTestRun()])
         mockPluginService.getComputationMetadata = jest
@@ -277,35 +278,8 @@ describe('ComputationsIndexComponent', () => {
         await expandFirstComputation()
 
         expect(component.activeComputation).toBeUndefined()
-        expect(component.runs()[0].hydrated).toBe(false)
-        expect(component.runs()[0].loading).toBe(false)
         expect(toastrService.error).toHaveBeenCalled()
         expect(fixture.debugElement.queryAll(By.css('.child-computation')).length).toBe(0)
-    })
-
-    it('should ignore an in-flight hydration once a newer click supersedes it', async () => {
-        const first = createTestRun()
-        const second = createTestRun({ correlation_uuid: 'second-uuid', aoiName: 'Second AOI' })
-        seedStoredRuns([first, second])
-
-        const firstMetadata$ = new Subject<ComputationMetadata>()
-        mockPluginService.getComputationMetadata = jest
-            .fn()
-            .mockImplementation((id: string) =>
-                id === TEST_UUID ? firstMetadata$ : of(createMetadata({ correlation_uuid: 'second-uuid' }))
-            )
-
-        const [firstRun, secondRun] = component.runs()
-        const firstToggle = component.toggleComputation(firstRun)
-        await component.toggleComputation(secondRun)
-
-        firstMetadata$.next(createMetadata())
-        firstMetadata$.complete()
-        await firstToggle
-        fixture.detectChanges()
-
-        expect(component.activeComputation?.correlation_uuid).toBe('second-uuid')
-        expect(component.runs().find(run => run.correlation_uuid === TEST_UUID)?.hydrated).toBe(true)
     })
 
     it('should display artifact errors next to the computation', async () => {
@@ -362,61 +336,85 @@ describe('ComputationsIndexComponent', () => {
         expect(languageMismatchIcon).toBeTruthy()
     })
 
-    it('should not display a language mismatch icon before the computation is hydrated', () => {
-        translocoService.setActiveLang(SupportedLanguage.DE)
+    it('should load and display the search results when switching to the discover tab', () => {
+        const entry: SearchEntry = {
+            correlation_uuid: 'dir-1',
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
+            plugin_id: 'test_plugin',
+            aoi_name: 'Test AoI'
+        }
+        mockPluginService.getSearch = jest.fn().mockReturnValue(of(createSearchPage([entry])))
 
-        seedStoredRuns([createTestRun()])
+        component.switchTab('discover')
+        fixture.detectChanges()
 
-        const languageMismatchIcon = fixture.debugElement.query(By.css('.language-mismatch'))
-        expect(languageMismatchIcon).toBeFalsy()
+        expect(mockStorageService.saveActiveTab).toHaveBeenCalledWith('discover')
+        expect(fixture.debugElement.queryAll(By.css('.parent-computation')).length).toBe(1)
+        expect(mockmapSearchManager.showSearchLayers).toHaveBeenCalled()
     })
 
-    it('should archive a computation and update the list', () => {
-        seedStoredRuns([createTestRun()])
+    it('should hydrate a search computation on toggle and hide the search map layer', async () => {
+        const entry: SearchEntry = {
+            correlation_uuid: 'dir-1',
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
+            plugin_id: 'test_plugin',
+            aoi_name: 'Test AoI'
+        }
+        mockPluginService.getSearch = jest.fn().mockReturnValue(of(createSearchPage([entry])))
+        mockPluginService.getComputationMetadata = jest
+            .fn()
+            .mockReturnValue(of(createMetadata({ correlation_uuid: 'dir-1' })))
 
-        component.archiveComputation(TEST_UUID)
+        component.switchTab('discover')
+        fixture.detectChanges()
 
-        expect(mockStorageService.archiveComputation).toHaveBeenCalledWith(TEST_UUID)
-        expect(component.runs()).toHaveLength(0)
+        await expandFirstComputation()
+
+        expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith('dir-1')
+        expect(component.searchComputations()[0].hydrated).toBe(true)
+        expect(mockmapSearchManager.hideSearchLayers).toHaveBeenCalled()
     })
 
-    it('should unarchive a computation and update the list', () => {
-        const archivedRun = createTestRun()
-        component.archivedComputations = [archivedRun]
+    it('should bookmark a computation and add it to the runs list', async () => {
+        const computation = {
+            correlation_uuid: 'dir-1',
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
+            aoiName: 'Test AoI',
+            pluginId: 'test_plugin',
+            status: 'SUCCESS',
+            artifacts: []
+        } as ComputationDisplayEntity
 
-        component.unarchiveComputation(archivedRun.correlation_uuid)
-
-        expect(mockStorageService.unarchiveComputation).toHaveBeenCalledWith(archivedRun.correlation_uuid)
-        expect(component.archivedComputations).toHaveLength(0)
-    })
-
-    it('should fetch a demo computation when no demos exist and the plugin is configured for demos', async () => {
-        component.hasDemoConfig = true
-        component.demoRuns = []
-        component.pluginId = 'test_plugin'
-
-        mockPluginService.computeDemo = jest.fn().mockReturnValue(of({ correlation_uuid: 'demo-uuid-123' }))
-        mockPluginService.getComputationRunState = jest.fn().mockReturnValue(of({ state: 'SUCCESS' }))
-
-        component.fetchDemoComputation()
+        component.toggleBookmark(computation, new Event('click'))
         await flushPromises()
 
-        expect(mockPluginService.computeDemo).toHaveBeenCalledWith('test_plugin')
-
-        const expectedCompute = {
-            correlation_uuid: 'demo-uuid-123',
-            pluginId: 'test_plugin',
-            request_ts: expect.any(Date),
-            aoiName: 'Demo',
-            status: 'SUCCESS',
-            flags: ['DEMO']
-        }
-        expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expect.objectContaining(expectedCompute))
-        expect(component.demoRuns).toContain('demo-uuid-123')
-        expect(component.runs()[0]).toEqual(
-            expect.objectContaining({ correlation_uuid: 'demo-uuid-123', hydrated: false })
+        expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(
+            expect.objectContaining({
+                correlation_uuid: 'dir-1',
+                status: 'SUCCESS',
+                aoiName: 'Test AoI'
+            })
         )
-        expect(mockPluginService.getComputationMetadata).not.toHaveBeenCalled()
+        expect(component.isBookmarked('dir-1')).toBe(true)
+        expect(toastrService.success).toHaveBeenCalled()
+    })
+
+    it('should remove a bookmark and drop the run from the list', async () => {
+        seedStoredRuns([createTestRun()])
+        expect(component.isBookmarked(TEST_UUID)).toBe(true)
+
+        const computation = {
+            correlation_uuid: TEST_UUID,
+            request_ts: new Date('2023-09-27T16:42:52+01:00'),
+            status: 'SUCCESS',
+            artifacts: []
+        } as ComputationDisplayEntity
+
+        component.toggleBookmark(computation, new Event('click'))
+        await flushPromises()
+
+        expect(mockStorageService.deleteComputation).toHaveBeenCalledWith(TEST_UUID)
+        expect(component.isBookmarked(TEST_UUID)).toBe(false)
     })
 
     it('should successfully import a new computation', async () => {
@@ -450,11 +448,11 @@ describe('ComputationsIndexComponent', () => {
         expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith(TEST_UUID)
         expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expectedComputation)
         expect(component.runs()).toHaveLength(1)
-        expect(component.runs()[0]).toEqual(expect.objectContaining({ ...expectedComputation, hydrated: false }))
+        expect(component.runs()[0]).toEqual(expect.objectContaining(expectedComputation))
         expect(component.importedRuns).toContain(TEST_UUID)
     })
 
-    it('should warn instead of importing an already present computation', () => {
+    it('should warn instead of importing an already bookmarked computation', () => {
         seedStoredRuns([createTestRun()])
 
         component.importComputation(TEST_UUID)

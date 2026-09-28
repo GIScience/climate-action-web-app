@@ -16,21 +16,14 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
-import { DatabaseService } from '@app/database.service'
-import { DropdownMenuDirective } from '@app/shared/dropdown-menu.directive'
 import { StorageService } from '@app/storage.service'
 import { SupportedLanguage } from '@app/types/language.types'
 import { getDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
-    LucideArchive,
-    LucideArchiveRestore,
+    LucideBookmark,
     LucideCheck,
-    LucideCircleArrowLeft,
-    LucideCircleX,
-    LucideClipboard,
     LucideClock,
-    LucideEllipsisVertical,
     LucideFileExclamationPoint,
     LucideHash,
     LucideImport,
@@ -39,7 +32,6 @@ import {
     LucideLoaderCircle,
     LucideMessageSquareWarning,
     LucideShare2,
-    LucideTrash,
     LucideX
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -53,7 +45,7 @@ import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
-import { DemoConfig, Plugin } from '../plugin/plugin.interface'
+import { AOI_ORIGINAL_TYPES, ExternalInput, Plugin } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
@@ -64,12 +56,14 @@ import {
     hasUserRequestedParams,
     isUserRequestedParam
 } from './computation-parameter.utils'
+import { ComputationSearchService } from './computation-search.service'
 import { ComputationSyncService } from './computation-sync.service'
 import {
     ComputationDatabaseEntity,
     ComputationDisplayEntity,
     ComputationMetadata,
-    ComputationParameters
+    ComputationParameters,
+    DiscoverTab
 } from './computation.interface'
 import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
 
@@ -99,14 +93,9 @@ function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
         CommonModule,
         NgScrollbarModule,
         FilterByCriteriaPipe,
-        LucideArchive,
-        LucideArchiveRestore,
+        LucideBookmark,
         LucideCheck,
-        LucideCircleArrowLeft,
-        LucideCircleX,
-        LucideClipboard,
         LucideClock,
-        LucideEllipsisVertical,
         LucideFileExclamationPoint,
         LucideHash,
         LucideImport,
@@ -115,11 +104,9 @@ function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
         LucideLoaderCircle,
         LucideMessageSquareWarning,
         LucideShare2,
-        LucideTrash,
         LucideX,
         ComputationComponent,
-        TranslocoModule,
-        DropdownMenuDirective
+        TranslocoModule
     ],
     animations: [
         trigger('expandCollapse', [
@@ -148,13 +135,14 @@ function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
     ],
     templateUrl: './computations-index.component.html',
     styleUrl: './computations-index.component.scss',
-    providers: [ComputationSyncService]
+    providers: [ComputationSearchService, ComputationSyncService]
 })
 export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private pluginService = inject(PluginService)
     artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
+    private searchService = inject(ComputationSearchService)
     private route = inject(ActivatedRoute)
     private shareService = inject(ShareService)
     private toastr = inject(ToastrService)
@@ -162,7 +150,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private storageService = inject(StorageService)
     private appwriteService = inject(AppwriteService)
     private reportService = inject(ReportService)
-    private databaseService = inject(DatabaseService)
     private translocoService = inject(TranslocoService)
     private cdr = inject(ChangeDetectorRef)
     private syncService = inject(ComputationSyncService)
@@ -174,33 +161,27 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .filter(run => run.status === 'SUCCESS')
             .sort((a, b) => compareDesc(new Date(a.request_ts?.valueOf() || 0), new Date(b.request_ts?.valueOf() || 0)))
     )
+    private readonly bookmarkedIds = computed(() => new Set(this.runs().map(run => run.correlation_uuid)))
     activeComputation?: ComputationDisplayEntity
     private activationToken = 0
-    archivedComputations: ComputationDatabaseEntity[] = []
     private _activeArtifact?: ArtifactEntity
 
-    showArchived = false
     newRuns: string[] = []
-    demoRuns: string[] = []
     importedRuns: string[] = []
     isReportVisible = false
 
-    paginationInfo: { hasMore: boolean; loading: boolean; total?: number } = {
+    paginationInfo: { hasMore: boolean; loading: boolean } = {
         hasMore: true,
         loading: false
     }
 
-    archivedPaginationInfo: { hasMore: boolean; loading: boolean; total?: number } = {
-        hasMore: true,
-        loading: false
-    }
-
-    openMenuId: string | null = null
+    activeTab: DiscoverTab = this.storageService.getActiveTab('discover')
+    readonly searchComputations = this.searchService.computations
+    readonly searchLoading = this.searchService.loading
+    readonly searchHasMore = this.searchService.hasMore
 
     @Input() pluginId: string = ''
     @Input() plugin?: Plugin
-    @Input() hasDemoConfig: boolean = true
-    demoConfig: DemoConfig | null = null
     pluginLanguage: SupportedLanguage = SupportedLanguage.EN
 
     @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
@@ -210,8 +191,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     @ViewChild('artifactErrorsTooltip') artifactErrorsTooltip!: TemplateRef<{
         artifactErrors: ComputationDisplayEntity['artifact_errors']
     }>
-
-    @ViewChild(ComputationComponent) computationComponent!: ComputationComponent
 
     get activeArtifact(): ArtifactEntity | undefined {
         return this._activeArtifact
@@ -263,11 +242,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.hasDemoConfig = !!this.plugin?.demo_config
-        this.demoConfig = this.plugin?.demo_config ?? null
         this.pluginLanguage = this.plugin?.language ?? SupportedLanguage.EN
 
         this.loadInitialPluginRuns()
+
+        if (this.activeTab === 'discover') {
+            this.searchService.ensureLoaded(this.pluginId)
+            this.searchService.showSearchLayers(this.pluginId)
+        }
 
         this.shareService.onComputationToImport().subscribe(computationId => {
             if (computationId) {
@@ -284,6 +266,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
 
         this.pluginService.syncTasks$.subscribe(() => {
+            this.switchTab('bookmarks')
             this.refreshRunsFromStorage()
             this.startPeriodicSync()
         })
@@ -314,33 +297,19 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
-    private async loadRuns(isInitialLoad: boolean = true, state: 'ACTIVE' | 'ARCHIVED' = 'ACTIVE'): Promise<void> {
-        const isActive = state === 'ACTIVE'
-        const paginationInfo = isActive ? this.paginationInfo : this.archivedPaginationInfo
-
-        if (!isInitialLoad && (!paginationInfo.hasMore || paginationInfo.loading)) return
+    private async loadRuns(isInitialLoad: boolean = true): Promise<void> {
+        if (!isInitialLoad && (!this.paginationInfo.hasMore || this.paginationInfo.loading)) return
 
         try {
-            // Set loading state
-            if (isActive) this.paginationInfo = { hasMore: true, loading: true }
-            else this.archivedPaginationInfo = { hasMore: true, loading: true }
+            this.paginationInfo = { hasMore: true, loading: true }
 
-            const result = await this.storageService.getPluginRunsPaginated(this.pluginId, isInitialLoad, state)
+            const result = await this.storageService.getPluginRunsPaginated(this.pluginId, isInitialLoad)
 
-            // Update pagination state
-            const newPaginationInfo = { hasMore: result.hasMore, loading: false, total: result.total }
-            if (isActive) this.paginationInfo = newPaginationInfo
-            else this.archivedPaginationInfo = newPaginationInfo
+            this.paginationInfo = { hasMore: result.hasMore, loading: false }
 
-            // Handle results based on state
-            if (isActive) {
-                this.handleActiveRunsResult(result.documents, isInitialLoad)
-            } else {
-                if (isInitialLoad) this.archivedComputations = result.documents
-                else this.archivedComputations = [...this.archivedComputations, ...result.documents]
-            }
+            this.handleActiveRunsResult(result.documents, isInitialLoad)
         } catch (error) {
-            console.error(`Error loading ${isInitialLoad ? 'initial' : 'more'} ${state.toLowerCase()} runs:`, error)
+            console.error(`Error loading ${isInitialLoad ? 'initial' : 'more'} runs:`, error)
         }
     }
 
@@ -349,12 +318,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.updateNewRuns(documents)
 
         if (isInitialLoad) {
-            if (this.runs().length === 0 && this.hasDemoConfig) {
-                this.checkAndFetchDemoComputation()
-            }
-
             this.startPeriodicSync()
-            this.restoreActiveArtifact()
         }
     }
 
@@ -401,27 +365,23 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private async loadInitialPluginRuns(): Promise<void> {
-        await this.loadRuns(true, 'ACTIVE')
+        await this.loadRuns(true)
     }
 
-    async loadMoreRuns(): Promise<void> {
-        await this.loadRuns(false, 'ACTIVE')
-    }
+    readonly loadMoreBookmarks = () => void this.loadRuns(false)
+    readonly loadMoreSearch = () => this.searchService.loadMore()
 
-    toggleArchivedView(): void {
-        this.showArchived = !this.showArchived
-        if (this.showArchived) {
-            this.runs.set([])
-            this.loadRuns(true, 'ARCHIVED')
+    switchTab(tab: DiscoverTab): void {
+        if (tab === this.activeTab) return
+        this.collapseComputation()
+        this.activeTab = tab
+        this.storageService.saveActiveTab(tab)
+        if (tab === 'discover') {
+            this.searchService.ensureLoaded(this.pluginId)
+            this.searchService.showSearchLayers(this.pluginId)
         } else {
-            this.archivedComputations = []
-            this.archivedPaginationInfo = { hasMore: true, loading: false }
-            this.loadInitialPluginRuns()
+            this.searchService.hideSearchLayers()
         }
-    }
-
-    async loadMoreArchivedRuns(): Promise<void> {
-        await this.loadRuns(false, 'ARCHIVED')
     }
 
     ngOnDestroy() {
@@ -456,6 +416,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.upsertRuns([run])
 
         if (newStatus === 'SUCCESS') {
+            this.searchService.markStale()
             this.storageService.markAsNew(run.correlation_uuid)
             if (!this.newRuns.includes(run.correlation_uuid)) {
                 this.newRuns.push(run.correlation_uuid)
@@ -493,6 +454,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     run.correlation_uuid === hydratedComputation.correlation_uuid ? hydratedComputation : run
                 )
             )
+            this.searchService.updateComputation(hydratedComputation)
             return hydratedComputation
         } catch (error) {
             console.error('Error fetching computation metadata for:', computation.correlation_uuid, error)
@@ -531,6 +493,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.activeComputation = undefined
             this._activeArtifact = undefined
             this.mapArtifactManager.setActiveArtifactId(null)
+            if (this.activeTab === 'discover') {
+                this.searchService.showSearchLayers(this.pluginId)
+            }
             return
         }
 
@@ -541,6 +506,9 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         } catch {
             if (token === this.activationToken) {
                 this.activeComputation = undefined
+                if (this.activeTab === 'discover') {
+                    this.searchService.showSearchLayers(this.pluginId)
+                }
             }
             return
         } finally {
@@ -552,6 +520,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         computation.keepInDOM = true
         setTimeout(() => (computation.isExpanded = true), 0)
         this.activeComputation = computation
+
+        if (this.activeTab === 'discover') {
+            this.searchService.hideSearchLayers()
+        }
 
         if (computation?.geometry) {
             const extent = this.mapService.highlightAoI(computation.geometry)
@@ -582,21 +554,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.artifactViewerService.closeArtifactViewer()
             this.mapService.removeFocusedLayer()
             this.activeComputation = undefined
+            if (this.activeTab === 'discover') {
+                this.searchService.showSearchLayers(this.pluginId)
+            }
         }
     }
-
-    toggleActionsMenu(correlation_uuid: string, event: Event) {
-        event.stopPropagation()
-        this.openMenuId = this.openMenuId === correlation_uuid ? null : correlation_uuid
-    }
-
-    closeActionsMenu() {
-        this.openMenuId = null
-    }
-
     shareComputation(correlation_uuid: string, event: Event) {
         event.stopPropagation()
-        this.closeActionsMenu()
 
         const shareLink = this.shareService.getShareUrl(correlation_uuid)
 
@@ -605,43 +569,80 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             timeOut: 4000
         })
     }
+    isBookmarked(correlation_uuid: string): boolean {
+        return this.bookmarkedIds().has(correlation_uuid)
+    }
+
+    toggleBookmark(computation: ComputationDisplayEntity, event: Event): void {
+        event.stopPropagation()
+        if (this.isBookmarked(computation.correlation_uuid)) {
+            if (
+                this.isCustomAoi(computation) &&
+                !confirm(this.translocoService.translate('computationsIndex.unbookmarkCustomAoiConfirm'))
+            ) {
+                return
+            }
+            this.removeBookmark(computation.correlation_uuid)
+        } else {
+            this.addBookmark(computation)
+        }
+    }
+
+    private isCustomAoi(computation: ComputationDisplayEntity): boolean {
+        if (computation.flags?.includes('CUSTOM_AOI')) return true
+
+        // Older boundary computations lack original_type entirely,
+        // so absence counts as a boundary.
+        const originalType = computation.geometry?.properties?.['original_type']
+        return !!originalType && originalType !== AOI_ORIGINAL_TYPES[ExternalInput.Boundary]
+    }
+
+    private async addBookmark(computation: ComputationDisplayEntity): Promise<void> {
+        if (this.isBookmarked(computation.correlation_uuid)) return
+
+        const entity: ComputationDatabaseEntity = {
+            correlation_uuid: computation.correlation_uuid,
+            request_ts: computation.request_ts,
+            status: 'SUCCESS',
+            aoiName: computation.aoiName,
+            pluginId: computation.pluginId,
+            language: computation.language
+        }
+
+        await this.pluginService.storeNewComputes(entity)
+        this.upsertRuns([entity])
+        this.toastr.success(this.translocoService.translate('computationsIndex.bookmarkAdded'), '', {
+            timeOut: 3000
+        })
+    }
+
+    private async removeBookmark(correlation_uuid: string): Promise<void> {
+        if (this.activeComputation?.correlation_uuid === correlation_uuid) {
+            this.collapseComputation()
+        }
+
+        await this.storageService.deleteComputation(correlation_uuid)
+
+        this.runs.update(list => list.filter(run => run.correlation_uuid !== correlation_uuid))
+        this.newRuns = this.newRuns.filter(id => id !== correlation_uuid)
+        this.importedRuns = this.importedRuns.filter(id => id !== correlation_uuid)
+
+        this.toastr.info(this.translocoService.translate('computationsIndex.bookmarkRemoved'), '', {
+            timeOut: 3000
+        })
+    }
 
     storeActiveArtifact(artifact: ArtifactEntity) {
         if (artifact) {
             this._activeArtifact = artifact
             this.mapArtifactManager.setActiveArtifactId(artifact)
-
-            this.storageService.saveActiveArtifact({
-                correlation_uuid: artifact.correlation_uuid,
-                filename: artifact.filename
-            })
         } else {
-            console.error('Cannot persist active artifact: ', artifact)
-        }
-    }
-
-    private async restoreActiveArtifact(): Promise<void> {
-        const activeArtifactRef = this.storageService.getActiveArtifact()
-        if (!activeArtifactRef) return
-
-        const parentComputation = this.runs().find(x => x.correlation_uuid === activeArtifactRef.correlation_uuid)
-        if (!parentComputation) return
-
-        await this.toggleComputation(parentComputation)
-
-        const hydratedComputation = this.activeComputation
-        if (hydratedComputation?.correlation_uuid !== activeArtifactRef.correlation_uuid) return
-
-        this._activeArtifact = hydratedComputation.artifacts.find(x => x.filename === activeArtifactRef.filename)
-        if (this._activeArtifact) {
-            const artifact = this._activeArtifact
-            setTimeout(() => this.computationComponent?.viewArtifact(artifact), 0)
+            console.error('Cannot set active artifact: ', artifact)
         }
     }
 
     viewParameters(computation: ComputationDisplayEntity, event?: Event) {
         event?.stopPropagation()
-        this.closeActionsMenu()
         this.dialog.open(this.parametersDialog, {
             data: {
                 params: computation.params,
@@ -655,55 +656,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.dialog.closeAll()
     }
 
-    archiveComputation(correlation_uuid: string, event?: Event): void {
-        event?.stopPropagation()
-        this.closeActionsMenu()
-        this.storageService.archiveComputation(correlation_uuid)
-        this.removeComputationFromView(correlation_uuid)
-    }
-
-    deleteComputation(correlation_uuid: string, event?: Event): void {
-        event?.stopPropagation()
-        this.closeActionsMenu()
-
-        const confirmed = confirm(this.translocoService.translate('computationsIndex.deleteConfirmation'))
-        if (!confirmed) return
-
-        this.storageService.deleteComputation(correlation_uuid)
-        this.removeComputationFromView(correlation_uuid)
-    }
-
-    private removeComputationFromView(correlation_uuid: string): void {
-        const isCurrentComputation =
-            this.activeComputation && this.activeComputation.correlation_uuid === correlation_uuid
-
-        this.runs.update(list => list.filter(run => run.correlation_uuid !== correlation_uuid))
-
-        if (isCurrentComputation) {
-            this.artifactViewerService.closeArtifactViewer()
-            this.mapService.removeFocusedLayer()
-            this.activeComputation = undefined
-        }
-
-        if (this.runs().length === 0 && this.paginationInfo.hasMore && !this.paginationInfo.loading) {
-            this.loadRuns(false, 'ACTIVE')
-        }
-    }
-
-    unarchiveComputation(correlation_uuid: string): void {
-        this.storageService.unarchiveComputation(correlation_uuid)
-
-        this.archivedComputations = this.archivedComputations.filter(comp => comp.correlation_uuid !== correlation_uuid)
-
-        if (
-            this.archivedComputations.length === 0 &&
-            this.archivedPaginationInfo.hasMore &&
-            !this.archivedPaginationInfo.loading
-        ) {
-            this.loadRuns(false, 'ARCHIVED')
-        }
-    }
-
     private startPeriodicSync() {
         this.syncService.start(() => this.runs().filter(run => isPendingStatus(run.status)))
     }
@@ -715,7 +667,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     formatParameterName = formatParameterName
 
     importComputation(correlationUuid: string): void {
-        if (this.runs().some(run => run.correlation_uuid === correlationUuid)) {
+        if (this.isBookmarked(correlationUuid)) {
             this.toastr.warning(
                 this.translocoService.translate('computationsIndex.computationAlreadyPresent', {
                     id: this.formatUUID(correlationUuid)
@@ -728,6 +680,8 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             return
         }
 
+        this.switchTab('bookmarks')
+
         this.pluginService.getComputationMetadata(correlationUuid).subscribe({
             next: (response: ComputationMetadata) => {
                 const computation: ComputationDatabaseEntity = {
@@ -736,6 +690,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     request_ts: response.request_ts,
                     status: 'SUCCESS',
                     aoiName: response.aoi?.properties?.['name'] as string | undefined,
+                    language: response.language,
                     flags: ['IMPORTED']
                 }
 
@@ -774,67 +729,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
-    private async checkAndFetchDemoComputation(): Promise<void> {
-        try {
-            const hasExistingDemo = await this.databaseService.hasDemoComputations(this.pluginId)
-            if (!hasExistingDemo) {
-                this.fetchDemoComputation()
-            }
-        } catch (error) {
-            console.error('Error checking for existing demo computations:', error)
-        }
-    }
-
-    fetchDemoComputation(): void {
-        this.pluginService.computeDemo(this.pluginId).subscribe({
-            next: data => {
-                this.pluginService.getComputationRunState(data.correlation_uuid).subscribe({
-                    next: stateInfo => {
-                        if (stateInfo.state === 'SUCCESS') {
-                            const compute: ComputationDatabaseEntity = {
-                                correlation_uuid: data.correlation_uuid,
-                                pluginId: this.pluginId,
-                                request_ts: new Date(),
-                                aoiName: this.demoConfig?.name || 'Demo',
-                                status: stateInfo.state,
-                                flags: ['DEMO']
-                            }
-                            this.pluginService
-                                .storeNewComputes(compute)
-                                .then(() => {
-                                    this.demoRuns.push(data.correlation_uuid)
-                                    this.upsertRuns([compute])
-                                })
-                                .catch(error => {
-                                    console.error('Failed to store demo computation:', error)
-                                })
-                        } else {
-                            const compute: ComputationDatabaseEntity = {
-                                correlation_uuid: data.correlation_uuid,
-                                pluginId: this.pluginId,
-                                request_ts: new Date(),
-                                aoiName: this.demoConfig?.name || 'Demo',
-                                status: stateInfo.state,
-                                flags: ['DEMO']
-                            }
-                            this.pluginService
-                                .storeNewComputes(compute)
-                                .then(() => {
-                                    this.pluginService.triggerSyncTasks()
-                                })
-                                .catch(error => {
-                                    console.error('Failed to store demo computation:', error)
-                                })
-                        }
-                    }
-                })
-            },
-            error: () => {
-                console.warn('Could not fetch a demo computation for', this.pluginId)
-            }
-        })
-    }
-
     openReport() {
         this.reportService.openReport()
     }
@@ -854,11 +748,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         return Object.entries(artifactErrors)
     }
 
-    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language' | 'hydrated'>): string | null {
-        if (!computation.hydrated) {
-            return null
-        }
-
+    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
         const computationLanguage = computation.language ?? SupportedLanguage.EN
         const currentLanguage = this.translocoService.getActiveLang() as SupportedLanguage
         const pluginLanguage = this.pluginLanguage ?? SupportedLanguage.EN
@@ -882,18 +772,5 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             currentLanguage: getLanguageLabel(currentLanguage),
             pluginLanguage: getLanguageLabel(pluginLanguage)
         })
-    }
-
-    // trackBy helpers to reduce DOM churn in lists
-    trackByScheduled(_index: number, run: ComputationDisplayEntity): string {
-        return run.correlation_uuid
-    }
-
-    trackByComputation(_index: number, comp: ComputationDisplayEntity): string {
-        return comp.correlation_uuid
-    }
-
-    trackByArchived(_index: number, run: ComputationDatabaseEntity): string {
-        return run.correlation_uuid
     }
 }

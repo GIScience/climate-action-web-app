@@ -30,11 +30,12 @@ import {
     typeValidationMessage
 } from '@app/app.validation-messages'
 import { AppwriteService } from '@app/auth/appwrite.service'
-import { ComputationRunState } from '@app/dashboard/common/status.types'
+import { ComputationFlags, ComputationRunState } from '@app/dashboard/common/status.types'
 import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
 import { Extent, MapService } from '@app/dashboard/map/map.service'
 import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
 import {
+    AOI_ORIGINAL_TYPES,
     ComputeRequest,
     DrawInput,
     ExternalInput,
@@ -43,6 +44,7 @@ import {
 } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
+import { SupportedLanguage } from '@app/types/language.types'
 import { ObjectTypeComponent } from '@app/types/object/object.type'
 import { reactiveDateFnsLocale, updateActiveDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -416,9 +418,16 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private requestCompute(model: FormlyModel) {
         const aoi = this.mapService.getSelectedRegion()
-        if (this.currentSelectionMode !== ExternalInput.Boundary && aoi?.properties) {
-            aoi.properties['name'] =
-                this.areaLabelControl.value || this.translocoService.translate('pluginParameter.customArea')
+        if (aoi?.properties) {
+            if (this.currentSelectionMode === ExternalInput.Boundary) {
+                aoi.properties['original_type'] = AOI_ORIGINAL_TYPES[ExternalInput.Boundary]
+            } else {
+                aoi.properties['name'] =
+                    this.areaLabelControl.value || this.translocoService.translate('pluginParameter.customArea')
+                if (this.currentSelectionMode === ExternalInput.File) {
+                    aoi.properties['original_type'] = AOI_ORIGINAL_TYPES[ExternalInput.File]
+                }
+            }
         }
         const aoiName = aoi?.properties?.['name']
 
@@ -447,7 +456,11 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                     pluginId: this.plugin.id,
                     aoiName: aoiName,
                     status: 'PENDING' as ComputationRunState,
-                    request_ts: new Date()
+                    request_ts: new Date(),
+                    language: this.translocoService.getActiveLang() as SupportedLanguage,
+                    ...(this.currentSelectionMode !== ExternalInput.Boundary
+                        ? { flags: ['CUSTOM_AOI'] as ComputationFlags }
+                        : {})
                 }
 
                 try {

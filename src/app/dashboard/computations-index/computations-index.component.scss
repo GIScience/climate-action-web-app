@@ -1,13 +1,37 @@
 @use 'spec/tools/rem' as *;
+.computations-tabs-container {
+    padding-top: 5px;
 
-.computations-index-toolbar {
-    background-color: #dcdcdc;
-    box-shadow: 0 0 10px -5px #666 inset;
-    display: flex;
-    gap: rem(5);
-    margin-left: rem(-20);
-    padding: rem(10) rem(20);
-    width: calc(100% + 2.857rem);
+    .computations-tabs {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        display: inline-flex;
+        justify-content: space-evenly;
+        padding: rem(8);
+        width: 100%;
+    }
+
+    .computations-tab {
+        background: transparent;
+        border: none;
+        border-radius: 20px;
+        color: #333;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: rem(14);
+        font-variation-settings: 'wght' 500;
+        padding: rem(8) rem(40);
+        transition: all 0.2s ease;
+
+        &:hover:not(.active) {
+            color: #333;
+        }
+
+        &.active {
+            background: #cfe3ff;
+        }
+    }
 }
 
 .computations-index {
@@ -93,23 +117,9 @@
             }
         }
 
-        .active-runs-container {
+        .bookmarks-container,
+        .discover-container {
             width: 100%;
-
-            .empty-computations {
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-                height: 20vh;
-                justify-content: center;
-                padding: rem(20) 0;
-                text-align: center;
-                width: 100%;
-
-                .empty-computations__message {
-                    font-variation-settings: 'wght' 500;
-                }
-            }
 
             .computations-container {
                 animation: fadeIn 0.5s ease-out;
@@ -122,12 +132,32 @@
                 }
             }
         }
+
+        .empty-computations {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            height: 20vh;
+            justify-content: center;
+            padding: rem(20) 0;
+            text-align: center;
+            width: 100%;
+
+            .empty-computations__message {
+                font-variation-settings: 'wght' 500;
+            }
+        }
     }
 
     .prompt-container {
-        color: #999;
-        padding: rem(25) rem(10);
+        background-color: #f0f0f0;
+        border-top: 1px dotted #ccc;
+        box-shadow: inset 0px 5px 10px -8px #666;
+        color: #666;
+        margin-left: rem(-20);
+        padding: rem(10);
         text-align: center;
+        width: calc(100% + 2.857rem);
 
         a {
             color: #008080;
@@ -182,11 +212,6 @@
             }
         }
 
-        &.menu-active {
-            position: relative;
-            z-index: 10;
-        }
-
         .parent-computation {
             align-items: center;
             border-radius: 10px;
@@ -210,10 +235,6 @@
 
             &:hover {
                 background-color: #def0ff;
-
-                .computation-actions {
-                    visibility: visible;
-                }
             }
 
             .computation-arrow {
@@ -235,18 +256,28 @@
             }
 
             .computation-actions {
-                margin-left: auto;
-                position: relative;
-                visibility: hidden;
+                display: flex;
 
-                &.menu-open {
-                    visibility: visible;
+                .bookmark-toggle,
+                .share-trigger,
+                .params-trigger {
+                    background: transparent;
+                    border: none;
+
+                    &:hover {
+                        background-color: rgba(0, 128, 128, 0.1);
+                    }
                 }
 
-                .actions-menu-trigger {
-                    border-radius: 50%;
-                    height: rem(32);
-                    width: rem(32);
+                .bookmark-toggle {
+                    &.bookmarked {
+                        color: #008080;
+
+                        svg {
+                            fill: #008080;
+                            stroke: #008080;
+                        }
+                    }
                 }
             }
         }
@@ -274,16 +305,6 @@
         svg:first-of-type {
             margin-right: rem(1);
         }
-    }
-
-    .demo-badge {
-        border: 2px solid #1f88bc;
-        border-radius: 5px;
-        color: #1f88bc;
-        font-size: 0.8rem;
-        font-variation-settings: 'wght' 600;
-        padding: rem(1) rem(5);
-        text-transform: uppercase;
     }
 
     .computation-status {
@@ -372,61 +393,6 @@
         }
         100% {
             background-position: 200% 0;
-        }
-    }
-
-    .archive-container {
-        position: relative;
-        width: 100%;
-
-        .empty-archive {
-            align-items: center;
-            display: flex;
-            height: 20vh;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .ng-scrollbar {
-            max-height: 45vh;
-            min-height: 20vh;
-        }
-
-        .archived-header {
-            background: #818181;
-            color: #fff;
-            letter-spacing: rem(20);
-            margin-left: rem(-20);
-            padding: rem(5) rem(5) rem(5) rem(25);
-            text-align: center;
-            text-transform: uppercase;
-            width: rem(425);
-
-            h3 {
-                margin: 0;
-            }
-        }
-
-        .archived-computation {
-            border-bottom: 1px solid #ddd;
-            padding: rem(10) rem(20);
-            width: 100%;
-
-            .archived-item {
-                align-items: center;
-                display: flex;
-                justify-content: space-between;
-
-                h3 {
-                    margin-bottom: rem(5);
-                    margin-top: 0;
-                }
-
-                button {
-                    cursor: pointer;
-                    margin-left: rem(15);
-                }
-            }
         }
     }
 }

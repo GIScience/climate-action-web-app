@@ -1,13 +1,40 @@
 import { SupportedLanguage } from '@app/types/language.types'
-import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
+import type { FeatureCollection, Feature as GeoJSONFeature, MultiPolygon, Point } from 'geojson'
 import { Artifact, ArtifactEntity } from '../artifact/artifact.interface'
 import { ComputationFlags, ComputationItemState, ComputationRunState } from '../common/status.types'
 import { Plugin, PluginBaseInfo } from '../plugin/plugin.interface'
+
+export type DiscoverTab = 'discover' | 'bookmarks'
 
 export interface ComputationParameters {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any
 }
+
+export interface SearchEntry {
+    correlation_uuid: string
+    request_ts: Date
+    plugin_id: string
+    aoi_name: string
+    language?: SupportedLanguage
+}
+
+export interface SearchPage {
+    items: SearchEntry[]
+    current_page: string | null
+    current_page_backwards: string | null
+    previous_page: string | null
+    next_page: string | null
+}
+
+// Shared by the search centroids endpoint and the aoi_boundary vector tiles
+export interface AoiFeatureProperties {
+    correlation_uuid: string
+    aoi_name: string
+    min_zoom?: number
+}
+
+export type SearchCentroidCollection = FeatureCollection<Point, AoiFeatureProperties>
 
 export interface ComputationMetadata {
     correlation_uuid: string
@@ -45,7 +72,7 @@ export interface ComputationDisplayEntity extends Pick<
 
 export type ComputationDatabaseEntity = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'flags' | 'state'
+    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'language' | 'flags' | 'state'
 >
 
 export type ComputationBasicInfo = Pick<

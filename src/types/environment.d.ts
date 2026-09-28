@@ -4,6 +4,7 @@ export interface Environment {
     geocodeUrl: string
     geocodeAPIKey: string
     heigitMapsUrl: string
+    validComputationsTilesUrl: string
     appwriteProjectId: string
     appwriteEndpoint: string
     appwriteWebsiteUrl: string
@@ -24,6 +25,7 @@ declare global {
             GEOCODE_URL?: string
             GEOCODE_API_KEY?: string
             HEIGIT_MAPS_URL?: string
+            VALID_COMPUTATIONS_TILES_URL?: string
             APPWRITE_PROJECT_ID?: string
             APPWRITE_ENDPOINT?: string
             APPWRITE_WEBSITE_URL?: string

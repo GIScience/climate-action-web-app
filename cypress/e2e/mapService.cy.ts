@@ -15,6 +15,10 @@ import { beforeCompareSnapshots } from '../support/pre-test-cleanup'
 
 describe('mapService', () => {
     beforeEach(() => {
+        cy.window().then(win => {
+            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
+        })
+
         cy.visit('/')
     })
 

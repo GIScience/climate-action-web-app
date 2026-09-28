@@ -6,6 +6,7 @@
     window['env']['GEOCODE_URL'] = '${GEOCODE_URL}'
     window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
     window['env']['HEIGIT_MAPS_URL'] = '${HEIGIT_MAPS_URL}'
+    window['env']['VALID_COMPUTATIONS_TILES_URL'] = '${VALID_COMPUTATIONS_TILES_URL}'
     window['env']['APPWRITE_PROJECT_ID'] = '${APPWRITE_PROJECT_ID}'
     window['env']['APPWRITE_ENDPOINT'] = '${APPWRITE_ENDPOINT}'
     window['env']['APPWRITE_WEBSITE_URL'] = '${APPWRITE_WEBSITE_URL}'

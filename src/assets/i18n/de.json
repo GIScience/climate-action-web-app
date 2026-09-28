@@ -54,36 +54,32 @@
     "computationsIndex": {
         "reportBuilder": "Report erstellen",
         "exitReportBuilder": "Report schließen",
-        "archive": "Archiv",
-        "backToAll": "Zurück zu deinen Ergebnissen",
         "createReport": "Erstelle eine PDF-Zusammenfassung, indem du verschiedene Ergebnisse kombinierst.",
-        "viewArchived": "Archivierte Ergebnisse anzeigen",
+        "tabs": {
+            "discover": "Entdecken",
+            "bookmarks": "Lesezeichen"
+        },
         "noComputations": "Du hast noch keine Ergebnisse.",
+        "noComputationSearchResults": "Keine Ergebnisse gefunden.",
         "loadMore": "Weitere Ergebnisse laden",
         "loadingMore": "Lade weitere Ergebnisse ...",
-        "archived": "Archiv",
-        "noArchived": "Du hast noch keine archivierten Ergebnisse.",
-        "loadingMoreArchived": "Lade weitere archivierte Ergebnisse.",
         "status": {
             "queued": "In der Warteschlange",
             "running": "Berechne",
             "done": "Fertig"
         },
         "actions": {
-            "menu": "Aktionen",
             "share": "Ergebnis teilen",
             "viewParameters": "Einstellungen anzeigen",
-            "archive": "Ergebnis archivieren",
-            "unarchive": "Ergebnis wiederherstellen",
-            "delete": "Ergebnis löschen"
+            "bookmark": "Zu Lesezeichen hinzufügen",
+            "removeBookmark": "Lesezeichen entfernen"
         },
         "login": {
-            "prompt": "Möchtest du lieber deine eigenen Ergebnisse erstellen?",
-            "action": "Anmelden",
-            "suffix": "um fortzufahren."
+            "prompt": "Fordere eigene Ergebnisse für beliebige Gebiete an.",
+            "syncPrompt": "Deine Lesezeichen sind nur in diesem Browser gespeichert – synchronisiere sie mit deinem Konto.",
+            "action": "Anmelden und fortfahren"
         },
         "imported": "Ergebnis importiert",
-        "demo": "Demo",
         "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
         "languageMismatch": "Diese Berechnung wurde auf {{ language }} erstellt. Fordere eine neue Berechnung an, wenn du sie auf {{ currentLanguage }} benötigst.",
         "languageMismatchPluginOnly": "Diese Berechnung wurde auf {{ language }} erstellt. Dieses Analysewerkzeug ist derzeit nicht auf {{ currentLanguage }} verfügbar.",
@@ -92,11 +88,13 @@
             "noParams": "Es wurden keine Einstellungsparameter angegeben.",
             "userDefined": "Benutzerdefinierter Parameter"
         },
-        "deleteConfirmation": "Willst du dieses Ergebnis wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
         "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden.",
         "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert.",
         "errorImportingComputation": "Es gab einen Fehler beim Importieren des Ergebnisses.",
-        "errorLoadingComputation": "Das Ergebnis konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+        "errorLoadingComputation": "Das Ergebnis konnte nicht geladen werden. Bitte versuche es erneut.",
+        "bookmarkAdded": "Zu Lesezeichen hinzugefügt",
+        "bookmarkRemoved": "Aus Lesezeichen entfernt",
+        "unbookmarkCustomAoiConfirm": "Diese Berechnung verwendet ein benutzerdefiniertes Gebiet und erscheint nicht im „Entdecken“-Tab. Wenn du sie entfernst, verlierst du den Zugriff auf die Ergebnisse und musst die Berechnung erneut ausführen. Soll sie trotzdem entfernt werden?"
     },
     "computation": {
         "addToReport": "Zum Report hinzufügen",
@@ -167,7 +165,7 @@
         "understand": "Trotzdem fortfahren"
     },
     "pageNotFound": {
-        "message": "Es scheint, als hätten Sie unbekanntes Terrain betreten.",
+        "message": "Es scheint, als hättest du unbekanntes Terrain betreten.",
         "returnToDashboard": "Zurück zum Dashboard"
     },
     "app": {

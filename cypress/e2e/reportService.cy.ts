@@ -9,6 +9,10 @@ import {
 
 describe('report builder', () => {
     beforeEach(() => {
+        cy.window().then(win => {
+            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
+        })
+
         cy.visit('/')
     })
 

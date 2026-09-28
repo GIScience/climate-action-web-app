@@ -78,7 +78,7 @@ function createFakeMap(): MaplibreMap {
 describe('PluginParameterComponent', () => {
     let component: PluginParameterComponent
     let fixture: ComponentFixture<PluginParameterComponent>
-    const test_plugin = { demo_config: { aoi: {}, params: {} } } as Plugin
+    const test_plugin = {} as Plugin
 
     beforeEach(() => {
         TestBed.configureTestingModule({

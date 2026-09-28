@@ -70,8 +70,6 @@ export interface PlotlyChartData {
     layout: Partial<Layout>
 }
 
-export type ActiveArtifactRef = Pick<Artifact, 'correlation_uuid' | 'filename'>
-
 export interface ArtifactData extends Artifact {
     url: string // Contains the presigned url for the artifact
 }
