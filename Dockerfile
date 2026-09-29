@@ -1,6 +1,6 @@
 FROM node:22-slim AS build
 
-ARG PNPM_VERSION=11.13.0
+ARG PNPM_VERSION=12.6.0
 
 WORKDIR /ca-web-app
 

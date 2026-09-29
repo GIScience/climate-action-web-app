@@ -5,7 +5,7 @@ stages:
 
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
-    PNPM_VERSION: '11.13.0'
+    PNPM_VERSION: '12.6.0'
 
 test_jest_and_lint:
     stage: test
