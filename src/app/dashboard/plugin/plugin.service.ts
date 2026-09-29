@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
 import { TranslocoService } from '@jsverse/transloco'
 import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
-import { BehaviorSubject, map, Observable, of, Subject, throwError } from 'rxjs'
+import { BehaviorSubject, map, Observable, of, throwError } from 'rxjs'
 import { catchError, concatMap, delay, retryWhen, tap, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
 import { derivePluginNameFromId } from '../../utils/string.utils'
@@ -28,10 +28,8 @@ export class PluginService {
     private apiUrl = environment.climateActionApiUrl
 
     private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
-    private syncTasksSubject = new Subject<void>()
 
     public computeState$ = this.computeStateSubject.asObservable()
-    public syncTasks$ = this.syncTasksSubject.asObservable()
 
     private catalogToggleInput!: HTMLInputElement
 
@@ -159,9 +157,5 @@ export class PluginService {
 
     async updateRunStatus(correlationId: string, newStatus: ComputationRunState) {
         await this.storageService.updateComputation(correlationId, { status: newStatus })
-    }
-
-    triggerSyncTasks() {
-        this.syncTasksSubject.next()
     }
 }

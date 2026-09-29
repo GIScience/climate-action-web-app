@@ -7,7 +7,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router'
 import { TranslocoService } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, of, Subject, throwError } from 'rxjs'
+import { BehaviorSubject, of, throwError } from 'rxjs'
 import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
@@ -116,7 +116,6 @@ describe('ComputationsIndexComponent', () => {
     let toastrService: ToastrService
 
     let pluginRuns$: BehaviorSubject<ComputationDatabaseEntity[]>
-    let syncTasks$: Subject<void>
 
     function seedStoredRuns(runs: ComputationDatabaseEntity[]): void {
         mockStorageService.getComputesByStatus = jest.fn().mockReturnValue(runs)
@@ -136,7 +135,6 @@ describe('ComputationsIndexComponent', () => {
 
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<ComputationDatabaseEntity[]>([])
-        syncTasks$ = new Subject<void>()
 
         mockStorageService = {
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
@@ -162,13 +160,13 @@ describe('ComputationsIndexComponent', () => {
             getPluginNameById: jest.fn((id: string) => id),
             getSearch: jest.fn().mockReturnValue(of(createSearchPage([]))),
             getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
-            syncTasks$,
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
             storeNewComputes: jest.fn(() => Promise.resolve())
         }
 
         mockArtifactService = {
             getImage: jest.fn(),
+            resetAllSubjects: jest.fn(),
             vector: new BehaviorSubject(null),
             raster: new BehaviorSubject(null)
         }

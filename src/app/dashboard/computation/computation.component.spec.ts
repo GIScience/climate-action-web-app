@@ -5,7 +5,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, of, Subject } from 'rxjs'
+import { BehaviorSubject, of } from 'rxjs'
 import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
@@ -60,7 +60,6 @@ describe('ComputationComponent', () => {
     let mockStoreService: Partial<StoreService>
 
     let pluginRuns$: BehaviorSubject<ComputationDatabaseEntity[]>
-    let syncTasks$: Subject<void>
 
     function createComputationComponent(artifacts: ArtifactEntity[]): ComputationComponent {
         const computationFixture = TestBed.createComponent(ComputationComponent)
@@ -71,7 +70,6 @@ describe('ComputationComponent', () => {
 
     beforeEach(async () => {
         pluginRuns$ = new BehaviorSubject<ComputationDatabaseEntity[]>([])
-        syncTasks$ = new Subject<void>()
 
         mockStorageService = {
             getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
@@ -111,7 +109,6 @@ describe('ComputationComponent', () => {
             ),
             getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
             storeNewComputes: jest.fn(() => Promise.resolve()),
-            syncTasks$,
             getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
         }
 

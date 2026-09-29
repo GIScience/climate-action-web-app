@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     computed,
+    DestroyRef,
     inject,
     Input,
     OnDestroy,
@@ -12,6 +13,7 @@ import {
     TemplateRef,
     ViewChild
 } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute } from '@angular/router'
@@ -39,9 +41,10 @@ import { Models } from 'appwrite'
 import { compareDesc, format } from 'date-fns'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { firstValueFrom, Subscription } from 'rxjs'
+import { firstValueFrom } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
+import { isPendingStatus, statusRank } from '../common/status-rank.util'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
@@ -66,23 +69,6 @@ import {
     DiscoverTab
 } from './computation.interface'
 import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
-
-const STATUS_RANK: { [status: string]: number } = {
-    PENDING: 0,
-    RETRY: 1,
-    STARTED: 1,
-    SUCCESS: 2,
-    FAILURE: 2,
-    REVOKED: 2
-}
-
-function statusRank(status: string): number {
-    return STATUS_RANK[status] ?? 0
-}
-
-function isPendingStatus(status: ComputationDisplayEntity['status']): boolean {
-    return status === 'PENDING' || status === 'STARTED'
-}
 
 @Component({
     selector: 'app-computations-index',
@@ -153,6 +139,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private translocoService = inject(TranslocoService)
     private cdr = inject(ChangeDetectorRef)
     private syncService = inject(ComputationSyncService)
+    private destroyRef = inject(DestroyRef)
 
     readonly runs = signal<ComputationDisplayEntity[]>([])
     readonly scheduled = computed(() => this.runs().filter(run => isPendingStatus(run.status)))
@@ -197,21 +184,16 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     user: Models.User<Models.Preferences> | null = null
-    scheduledRunsSubscription: Subscription = new Subscription()
-    userSubscription: Subscription
-    private syncTransitionsSub?: Subscription
-    private reportVisibilitySubscription: Subscription = new Subscription()
-    private mapArtifactsSubscription?: Subscription
 
     constructor() {
-        this.userSubscription = this.appwriteService._user.subscribe(user => {
+        this.appwriteService._user.pipe(takeUntilDestroyed()).subscribe(user => {
             this.user = user
         })
 
         this.pluginId = this.route.snapshot.params['name']
 
         if (this.pluginService.computeState$) {
-            this.pluginService.computeState$.subscribe(value => {
+            this.pluginService.computeState$.pipe(takeUntilDestroyed()).subscribe(value => {
                 if (value === 'compute-ready') {
                     this.collapseComputation()
                 }
@@ -251,38 +233,38 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.searchService.showSearchLayers(this.pluginId)
         }
 
-        this.shareService.onComputationToImport().subscribe(computationId => {
-            if (computationId) {
-                this.importComputation(computationId)
-            }
-        })
+        this.shareService
+            .onComputationToImport()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(computationId => {
+                if (computationId) {
+                    this.importComputation(computationId)
+                }
+            })
 
-        this.syncTransitionsSub = this.syncService.transitions$.subscribe(transition =>
-            this.transitionRunStatus(transition.run, transition.newStatus, transition.message)
-        )
+        this.syncService.transitions$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(transition => this.transitionRunStatus(transition.run, transition.newStatus, transition.message))
 
-        this.scheduledRunsSubscription = this.pluginService.getPluginRuns().subscribe(() => {
-            this.refreshRunsFromStorage()
-        })
+        this.pluginService
+            .getPluginRuns()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.refreshRunsFromStorage()
+            })
 
-        this.pluginService.syncTasks$.subscribe(() => {
-            this.switchTab('bookmarks')
-            this.refreshRunsFromStorage()
-            this.startPeriodicSync()
-        })
-
-        this.reportService.isVisible$.subscribe(isVisible => {
+        this.reportService.isVisible$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(isVisible => {
             this.isReportVisible = isVisible
         })
 
-        this.artifactViewerService.isViewerVisible$.subscribe(isVisible => {
+        this.artifactViewerService.isViewerVisible$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(isVisible => {
             if (!isVisible && this._activeArtifact) {
                 this._activeArtifact = undefined
                 this.mapArtifactManager.setActiveArtifactId(null)
             }
         })
 
-        this.mapArtifactsSubscription = this.mapArtifactManager.activeMapArtifacts$.subscribe(layers => {
+        this.mapArtifactManager.activeMapArtifacts$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(layers => {
             if (this._activeArtifact) {
                 const stillOnMap = layers.some(
                     l =>
@@ -295,6 +277,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 }
             }
         })
+    }
+
+    ngOnDestroy(): void {
+        if (this.activeComputation) {
+            this.artifactViewerService.closeArtifactViewer()
+            this.mapService.removeFocusedLayer()
+        }
     }
 
     private async loadRuns(isInitialLoad: boolean = true): Promise<void> {
@@ -380,19 +369,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             this.searchService.showSearchLayers(this.pluginId)
         } else {
             this.searchService.hideSearchLayers()
-        }
-    }
-
-    ngOnDestroy() {
-        if (this.scheduledRunsSubscription) this.scheduledRunsSubscription.unsubscribe()
-        if (this.syncTransitionsSub) {
-            this.syncTransitionsSub.unsubscribe()
-        }
-        if (this.reportVisibilitySubscription) {
-            this.reportVisibilitySubscription.unsubscribe()
-        }
-        if (this.mapArtifactsSubscription) {
-            this.mapArtifactsSubscription.unsubscribe()
         }
     }
 

@@ -43,6 +43,7 @@ import {
     Plugin
 } from '@app/dashboard/plugin/plugin.interface'
 import { PluginService } from '@app/dashboard/plugin/plugin.service'
+import { StorageService } from '@app/storage.service'
 import { OptionalAttributesTypeComponent } from '@app/types/dialog/optional-attributes'
 import { SupportedLanguage } from '@app/types/language.types'
 import { ObjectTypeComponent } from '@app/types/object/object.type'
@@ -165,6 +166,7 @@ interface BannerState {
 })
 export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     private pluginService = inject(PluginService)
+    private storageService = inject(StorageService)
     private toastr = inject(ToastrService)
     mapService = inject(MapService)
     private ngZone = inject(NgZone)
@@ -466,7 +468,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 try {
                     await this.pluginService.storeNewComputes(compute)
 
-                    this.pluginService.triggerSyncTasks()
+                    this.storageService.saveActiveTab('bookmarks')
                     this.pluginService.setComputeState('inactive')
 
                     this.toastr.info(this.translocoService.translate('pluginParameter.computeRequestSent'), '', {

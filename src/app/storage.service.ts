@@ -3,6 +3,7 @@ import { SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AppwriteService } from './auth/appwrite.service'
+import { isRealUser } from './auth/user.utils'
 import { ComputationFlags, ComputationRunState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity, DiscoverTab } from './dashboard/computations-index/computation.interface'
 import { DatabaseService, PaginatedResult } from './database.service'
@@ -51,8 +52,7 @@ export class StorageService {
 
     private getUserAuthStatus(): { user: Models.User<Models.Preferences> | null; isRealUser: boolean } {
         const user = this.appwriteService._user.getValue()
-        const isRealUser = !!(user && user.$id !== 'fake-user-id')
-        return { user, isRealUser }
+        return { user, isRealUser: isRealUser(user) }
     }
 
     // Pagination
