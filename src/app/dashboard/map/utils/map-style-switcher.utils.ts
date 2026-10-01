@@ -2,7 +2,6 @@ import { TranslocoService } from '@jsverse/transloco'
 import {
     AllPaintProperties,
     ControlPosition,
-    ExpressionSpecification,
     IControl,
     LayerSpecification,
     Map as MaplibreMap,
@@ -27,7 +26,6 @@ export class MapStyleSwitcherControl implements IControl {
     private styleMap = new Map<string, StyleSpecification>()
     private baseLayerIds = new Set<string>()
     private isExpanded: boolean = true
-    private readonly styleDataListener = () => this.updateMapLabelsLanguage()
     private baseMapsHeading?: HTMLHeadingElement
     private layersHeading?: HTMLHeadingElement
     private subscriptions: Subscription[] = []
@@ -63,17 +61,12 @@ export class MapStyleSwitcherControl implements IControl {
         this.map = map
         const container = this.createContainer()
         this.setupTranslations()
-        this.map?.on('styledata', this.styleDataListener)
-        this.updateMapLabelsLanguage()
         return (this.controlContainer = container)
     }
 
     onRemove(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe())
         this.subscriptions = []
-        if (this.map) {
-            this.map.off('styledata', this.styleDataListener)
-        }
         this.styleMap.clear()
         this.controlContainer?.remove()
         this.map = undefined
@@ -97,12 +90,6 @@ export class MapStyleSwitcherControl implements IControl {
                 if (this.layersHeading) {
                     this.layersHeading.textContent = translation
                 }
-            })
-        )
-
-        this.subscriptions.push(
-            this.translocoService.langChanges$.subscribe(() => {
-                this.updateMapLabelsLanguage()
             })
         )
     }
@@ -166,6 +153,27 @@ export class MapStyleSwitcherControl implements IControl {
         const style = this.styleMap.get(title)
         if (!style) return
 
+        this.applyStyle(style)
+
+        this.mapStyleContainer!.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
+        button.classList.add('active')
+        this.onStyleChange?.(button.dataset['title']!)
+    }
+
+    setStyles(styles: MapStyle[]): void {
+        this.styles = styles
+        styles.forEach(s => {
+            this.styleMap.set(s.title, s.style)
+            s.style.layers?.forEach(l => this.baseLayerIds.add(l.id))
+        })
+
+        if (!this.map || !this.isVectorStyleActive()) return
+        const activeButton = this.mapStyleContainer?.querySelector('.active') as HTMLButtonElement | null
+        const style = activeButton?.dataset['title'] ? this.styleMap.get(activeButton.dataset['title']) : undefined
+        if (style) this.applyStyle(style)
+    }
+
+    private applyStyle(style: StyleSpecification): void {
         this.map!.setStyle(style, {
             transformStyle: (previousStyle, nextStyle) => {
                 if (!previousStyle || !nextStyle) {
@@ -182,8 +190,8 @@ export class MapStyleSwitcherControl implements IControl {
                     const replacement = nextLayerMap.get(layer.id)
                     if (replacement) {
                         nextLayerMap.delete(layer.id)
-                        // Only swap paint; keep current layout (preserves localized labels etc.)
-                        return [{ ...layer, paint: replacement.paint } as LayerSpecification]
+                        // Take the next style's layer wholesale — labels carry the language there
+                        return [replacement]
                     }
                     return this.baseLayerIds.has(layer.id) ? [] : [layer]
                 })
@@ -209,49 +217,12 @@ export class MapStyleSwitcherControl implements IControl {
                 }
             }
         })
-
-        this.mapStyleContainer!.querySelectorAll('.active').forEach(el => el.classList.remove('active'))
-        button.classList.add('active')
-        this.onStyleChange?.(button.dataset['title']!)
     }
 
     private createLayerControlsContainer(): HTMLDivElement {
         return Object.assign(document.createElement('div'), {
             className: 'maplibregl-layer-controls',
             style: 'display:none;'
-        })
-    }
-
-    private updateMapLabelsLanguage(): void {
-        if (!this.map) return
-
-        const currentLang = this.translocoService.getActiveLang()
-        const langSuffix = currentLang === 'en' ? '_en' : currentLang === 'de' ? '_de' : '_en'
-        const localizedField = `name${langSuffix}`
-        const currentStyle = this.map.getStyle()
-
-        if (!currentStyle?.layers || !this.isVectorStyleActive()) return
-
-        const localizedExpression: ExpressionSpecification = [
-            'case',
-            ['to-boolean', ['get', localizedField]],
-            ['get', localizedField],
-            ['get', 'name']
-        ]
-
-        currentStyle.layers.forEach(layer => {
-            if (!('layout' in layer) || !layer.layout) return
-            const textField = (layer.layout as Record<string, unknown>)['text-field']
-            if (!Array.isArray(textField)) return
-
-            const isGetName =
-                textField[0] === 'get' && typeof textField[1] === 'string' && /^name(_en|_de)?$/.test(textField[1])
-            const isCaseName =
-                textField[0] === 'case' && Array.isArray(textField.at(-1)) && textField.at(-1)[1] === 'name'
-
-            if (isGetName || isCaseName) {
-                this.map!.setLayoutProperty(layer.id, 'text-field', localizedExpression)
-            }
         })
     }
 

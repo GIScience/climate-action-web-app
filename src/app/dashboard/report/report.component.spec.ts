@@ -77,7 +77,7 @@ interface MockArtifactService {
 
 jest.mock('../map/map.service', () => ({
     MapService: jest.fn().mockImplementation(() => ({
-        initMap: jest.fn(),
+        initMap: jest.fn(() => Promise.resolve()),
         highlightAoI: jest.fn(),
         addGeoJsonLayer: jest.fn(),
         addGeoTiffLayer: jest.fn()

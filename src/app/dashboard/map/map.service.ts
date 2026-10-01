@@ -8,7 +8,7 @@ import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import bbox from '@turf/bbox'
-import { colorful, graybeard } from '@versatiles/style'
+import { inlineSources, osm } from '@versatiles/style'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type {
     BBox,
@@ -226,6 +226,7 @@ export class MapService {
             if (this.map) {
                 this.mapDrawingService?.destroyTerraDrawControl()
                 updateMaplibreLocale(this.map, lang)
+                this.refreshBasemapStyles().catch(error => console.warn('Failed to update basemap language:', error))
             }
         })
 
@@ -234,12 +235,14 @@ export class MapService {
         })
     }
 
-    initMap(targetId: string, isReportMap: boolean = false) {
+    async initMap(targetId: string, isReportMap: boolean = false) {
         this.mapId = targetId
+
+        const style = await this.getStyleFor(this.currentBasemapStyle)
 
         this.map = new MaplibreMap({
             container: targetId,
-            style: this.getStyleFor(this.currentBasemapStyle),
+            style,
             zoom: 3,
             minZoom: 2,
             maxZoom: 20,
@@ -273,8 +276,6 @@ export class MapService {
         this.map!.addControl(MapControlsUtils.createZoomToZeroControl(this.translocoService), 'top-right')
         this.map!.addControl(new maplibregl.ScaleControl({ maxWidth: 200, unit: 'metric' }), 'top-right')
 
-        this.addLayerSwitcher()
-
         if (!isReportMap) {
             this.map!.scrollZoom.enable()
         } else {
@@ -301,6 +302,8 @@ export class MapService {
                 this.fitToUserLocale().catch(error => console.warn('Failed to fit to user locale on init:', error))
             }
         })
+
+        await this.addLayerSwitcher()
 
         if (environment.environmentType === 'testing' || environment.environmentType === 'development') {
             ;(window as Window & { map?: MaplibreMap }).map = this.map
@@ -1248,26 +1251,39 @@ export class MapService {
         }
     }
 
-    private getStyleFor(style: BasemapStyleName): StyleSpecification {
-        const baseUrl = 'https://tiles.versatiles.org'
+    private async getStyleFor(style: BasemapStyleName): Promise<StyleSpecification> {
+        const baseOptions = {
+            urls: { base: 'https://tiles.versatiles.org' },
+            // All basemaps share a Mercator baseline (ESRI is implicitly Mercator; v6 vector styles
+            // default to globe, hence the pin) — MapGlobeUtils alone opts main maps into globe.
+            projection: 'mercator',
+            // Basemap labels follow the app language; styles are rebuilt on language change.
+            text: { language: this.translocoService.getActiveLang() === 'de' ? 'de' : 'en' }
+        } as const
         switch (style) {
             case BasemapStyleName.Colorful:
-                return colorful({ baseUrl }) as StyleSpecification
+                return (await inlineSources(osm({ ...baseOptions, theme: 'colorful' }))) as StyleSpecification
             case BasemapStyleName.Graybeard:
-                return graybeard({ baseUrl }) as StyleSpecification
+                return (await inlineSources(osm({ ...baseOptions, theme: 'gray' }))) as StyleSpecification
             case BasemapStyleName.EsriWorldImagery:
                 return this.createRasterStyle()
         }
     }
 
-    private getMapStyles(): MapStyle[] {
-        return ALL_BASEMAPS.map(title => ({ title, style: this.getStyleFor(title) }))
+    private getMapStyles(): Promise<MapStyle[]> {
+        return Promise.all(ALL_BASEMAPS.map(async title => ({ title, style: await this.getStyleFor(title) })))
     }
 
-    private addLayerSwitcher(): void {
+    // Rebuild the basemap styles (labels carry the language) and re-apply the active one.
+    private async refreshBasemapStyles(): Promise<void> {
+        if (!this.layerSwitcherControl) return
+        this.layerSwitcherControl.setStyles(await this.getMapStyles())
+    }
+
+    private async addLayerSwitcher(): Promise<void> {
         if (!this.map) return
 
-        const styles: MapStyle[] = this.getMapStyles()
+        const styles: MapStyle[] = await this.getMapStyles()
 
         const initialExpanded = !this.storageService.getLayerSwitcherCollapsed()
 

@@ -17,7 +17,7 @@ describe('DashboardComponent', () => {
 
     beforeEach(() => {
         mockMapService = {
-            initMap: jest.fn(),
+            initMap: jest.fn(() => Promise.resolve()),
             highlightAoI: jest.fn(),
             removeFocusedLayer: jest.fn()
         }

@@ -10,7 +10,7 @@ describe('MapComponent', () => {
 
     beforeEach(async () => {
         mockMapService = {
-            initMap: jest.fn()
+            initMap: jest.fn<MapService['initMap']>().mockResolvedValue(undefined)
         } as unknown as jest.Mocked<MapService>
 
         await TestBed.configureTestingModule({

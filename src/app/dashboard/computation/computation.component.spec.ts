@@ -118,7 +118,7 @@ describe('ComputationComponent', () => {
             raster: new BehaviorSubject(null)
         }
         mockMapService = {
-            initMap: jest.fn(),
+            initMap: jest.fn(() => Promise.resolve()),
             highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
             removeFocusedLayer: jest.fn(),
             flyToExtent: jest.fn()

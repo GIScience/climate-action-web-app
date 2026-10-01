@@ -83,13 +83,13 @@ export class ReportService {
         if (this.isMapArtifact(artifactInstance.modality)) {
             this.markArtifactLoading(artifactKey)
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 const mapId = `report-map-${artifactKey}`
 
                 const mapService = runInInjectionContext(this.injector, () => new MapService())
                 const mapElement = document.getElementById(mapId)
                 if (mapElement) {
-                    mapService.initMap(mapId, true)
+                    await mapService.initMap(mapId, true)
 
                     // @ts-ignore: Store map instance globally for PDF export
                     window[`maplibre_map_${artifactKey}`] = mapService.map

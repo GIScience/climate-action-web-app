@@ -11,6 +11,6 @@ export class MapComponent implements AfterViewInit {
     private mapService = inject(MapService)
 
     ngAfterViewInit(): void {
-        this.mapService.initMap('main-map')
+        this.mapService.initMap('main-map').catch(error => console.error('Failed to initialize map:', error))
     }
 }

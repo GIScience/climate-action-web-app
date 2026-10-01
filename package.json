@@ -53,7 +53,7 @@
         "@turf/buffer": "^7.3.5",
         "@turf/distance": "^7.3.4",
         "@turf/mask": "^7.3.1",
-        "@versatiles/style": "^5.9.4",
+        "@versatiles/style": "^6.0.0",
         "@watergis/maplibre-gl-terradraw": "^1.4.0",
         "@xmldom/xmldom": "^0.9.10",
         "appwrite": "~24.2.0",
