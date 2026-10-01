@@ -99,7 +99,7 @@
         "@types/remarkable": "^2.0.8",
         "@typescript-eslint/eslint-plugin": "^8.33.1",
         "@typescript-eslint/parser": "^8.33.1",
-        "cypress": "^15.0.0",
+        "cypress": "^16.0.0",
         "cypress-fail-fast": "^8.1.0",
         "cypress-file-upload": "^5.0.8",
         "cypress-real-events": "^1.14.0",

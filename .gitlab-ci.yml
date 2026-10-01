@@ -63,7 +63,7 @@ test_cypress:
         CYPRESS_INSTALL_BINARY: '0'
     needs: ['test_jest_and_lint']
     image:
-        name: cypress/included:cypress-15.21.1-node-24.20.0-chrome-152.0.7977.64-1-ff-154.0.1-edge-151.0.4129.107-1
+        name: cypress/included:cypress-16.1.1-node-24.21.0-chrome-154.0.8037.92-1-ff-157.0-edge-154.0.4258.48-1
         entrypoint: ['']
     before_script:
         - |
