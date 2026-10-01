@@ -218,11 +218,11 @@ importers:
         specifier: ^13.0.0
         version: 13.1.2(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))
       '@ngx-formly/core':
-        specifier: ^7.0.0
-        version: 7.1.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)
+        specifier: ^8.0.0
+        version: 8.0.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)
       '@ngx-formly/material':
-        specifier: ^7.0.0
-        version: 7.1.0(@angular/material@21.2.14(2804bb743a756fd3299a14e42c4ffae3))(@ngx-formly/core@7.1.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2))
+        specifier: ^8.0.0
+        version: 8.0.0(@angular/material@21.2.14(2804bb743a756fd3299a14e42c4ffae3))(@ngx-formly/core@8.0.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2))
       '@tmcw/togeojson':
         specifier: ^7.1.2
         version: 7.1.2
@@ -345,8 +345,8 @@ importers:
         specifier: ^30.0.5
         version: 30.5.0(supports-color@8.1.1)
       '@ngx-formly/schematics':
-        specifier: ^7.0.0
-        version: 7.1.0
+        specifier: ^8.0.0
+        version: 8.0.0
       '@stylistic/eslint-plugin':
         specifier: ^5.0.0
         version: 5.10.0(eslint@9.39.5(supports-color@8.1.1))
@@ -1925,20 +1925,20 @@ packages:
     peerDependencies:
       '@angular/core': '>=21'
 
-  '@ngx-formly/core@7.1.0':
-    resolution: {integrity: sha512-uyHibGYEW0MBEvWdMm39cUWrs/oWwUOKL5v24EDAEeh0oG1LJS0avAcpUBrMMcXT2TU1yCx5E1dJ6ihTsDZOcw==}
+  '@ngx-formly/core@8.0.0':
+    resolution: {integrity: sha512-VGWzHuWMg8vNQ26tnS43AjkDG4kQfGvFosrnxKjiTXA4GqXV8Af42CSuFqm2ZPZIFKQJ1FjJWPdcXq+HyXFZIA==}
     peerDependencies:
-      '@angular/forms': '>=13.2.0'
+      '@angular/forms': '>=19.0.0'
       rxjs: ^6.5.3 || ^7.0.0
 
-  '@ngx-formly/material@7.1.0':
-    resolution: {integrity: sha512-mrTvPyogIHDX/VRDVZjBSs88JHQm7KWQo2bvgNj8YDL9cn00VroAb+HWZa8LaX15kqaGj30PSDFTHqlGKBb9+w==}
+  '@ngx-formly/material@8.0.0':
+    resolution: {integrity: sha512-iDr4KcW4Yyq8az479LQGSaLg026ao4P0tS9QTUWDJUP7nhTdZayC5jiuRlPlTt6UxikOkwgvU4BSHlTCQ6TIow==}
     peerDependencies:
-      '@angular/material': '>=16.0.0'
-      '@ngx-formly/core': 7.1.0
+      '@angular/material': '>=19.0.0'
+      '@ngx-formly/core': 8.0.0
 
-  '@ngx-formly/schematics@7.1.0':
-    resolution: {integrity: sha512-8DhpNEc/SjR7AtKJNnBkVwCrG3FQSmTpbPTiXIiCu/VsOUXk4mkMk1RG0aIgthj0G3oKjnAyx3BuIuKiZNqjQg==}
+  '@ngx-formly/schematics@8.0.0':
+    resolution: {integrity: sha512-f47Wk3VCmHrw9rQmZanWAflf/P09rZP+x7v/4u0u6qPR5rRhlijLOE5g0N4a9/kJJSpe8hfNXyoVr72doUgVWQ==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2900,11 +2900,6 @@ packages:
 
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
-    peerDependencies:
-      ajv: ^8.0.0
-    peerDependenciesMeta:
-      ajv:
-        optional: true
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
@@ -6364,7 +6359,7 @@ snapshots:
   '@angular-devkit/core@13.3.11':
     dependencies:
       ajv: 8.9.0
-      ajv-formats: 2.1.1(ajv@8.9.0)
+      ajv-formats: 2.1.1
       fast-json-stable-stringify: 2.1.0
       magic-string: 0.25.7
       rxjs: 6.6.7
@@ -7884,19 +7879,19 @@ snapshots:
       '@angular/core': 21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)
       tslib: 2.8.1
 
-  '@ngx-formly/core@7.1.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)':
+  '@ngx-formly/core@8.0.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)':
     dependencies:
       '@angular/forms': 21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@ngx-formly/material@7.1.0(@angular/material@21.2.14(2804bb743a756fd3299a14e42c4ffae3))(@ngx-formly/core@7.1.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2))':
+  '@ngx-formly/material@8.0.0(@angular/material@21.2.14(2804bb743a756fd3299a14e42c4ffae3))(@ngx-formly/core@8.0.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2))':
     dependencies:
       '@angular/material': 21.2.14(2804bb743a756fd3299a14e42c4ffae3)
-      '@ngx-formly/core': 7.1.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngx-formly/core': 8.0.0(@angular/forms@21.2.22(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@21.2.22(@angular/animations@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@21.2.22(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@21.2.22(@angular/compiler@21.2.22)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2))(rxjs@7.8.2)
       tslib: 2.8.1
 
-  '@ngx-formly/schematics@7.1.0':
+  '@ngx-formly/schematics@8.0.0':
     dependencies:
       '@angular-devkit/core': 13.3.11
       '@angular-devkit/schematics': 13.3.11
@@ -8842,8 +8837,8 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ajv-formats@2.1.1(ajv@8.9.0):
-    optionalDependencies:
+  ajv-formats@2.1.1:
+    dependencies:
       ajv: 8.9.0
 
   ajv-formats@3.0.1(ajv@8.18.0):
