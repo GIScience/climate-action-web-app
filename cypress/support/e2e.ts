@@ -19,22 +19,49 @@ beforeEach(() => {
     cy.intercept({ resourceType: /xhr|fetch/ }, { log: false })
 })
 
-Cypress.Commands.add('waitForRenderComplete', () => {
-    cy.window().then(win => {
+Cypress.Commands.add('waitForAppStable', () => {
+    cy.window({ log: false }).then({ timeout: 15000 }, win => {
         return new Cypress.Promise(resolve => {
+            const testability = (win as any).getAllAngularTestabilities?.()[0]
+            if (!testability) {
+                resolve()
+                return
+            }
+
             const timeout = setTimeout(() => {
                 resolve()
-            }, 4000)
+            }, 10000)
 
-            const map = (win as any).map
-            if (map && typeof map.once === 'function') {
-                map.once('idle', () => {
-                    clearTimeout(timeout)
-                    resolve()
-                })
-            } else {
+            testability.whenStable(() => {
                 clearTimeout(timeout)
                 resolve()
+            })
+        })
+    })
+})
+
+Cypress.Commands.add('waitForRenderComplete', () => {
+    cy.waitForAppStable()
+
+    cy.window().then({ timeout: 15000 }, win => {
+        return new Cypress.Promise(resolve => {
+            const map = (win as any).map
+            if (!map || typeof map.once !== 'function') {
+                resolve()
+                return
+            }
+
+            const timeout = setTimeout(() => {
+                resolve()
+            }, 10000)
+
+            map.once('idle', () => {
+                clearTimeout(timeout)
+                resolve()
+            })
+
+            if (typeof map.triggerRepaint === 'function') {
+                map.triggerRepaint()
             }
         })
     })

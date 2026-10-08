@@ -110,10 +110,11 @@ describe('report builder', () => {
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
+        cy.waitForRenderComplete()
 
         cy.get('.child-computation').eq(0).click()
-
         cy.wait('@getGeoJsonJinrongjie')
+        cy.waitForRenderComplete()
 
         const layerPrefix = 'geojson-Connectivity-'
         cy.window().should(win => {
@@ -170,6 +171,7 @@ describe('report builder', () => {
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
+        cy.waitForRenderComplete()
 
         cy.window().should(win => {
             const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map
@@ -178,8 +180,8 @@ describe('report builder', () => {
         })
 
         cy.get('.child-computation').eq(0).click()
-
         cy.wait('@getGeoJsonJinrongjie')
+        cy.waitForRenderComplete()
 
         cy.get('.child-computation').eq(0).realHover()
         cy.get('.child-computation').eq(0).find('.add-to-report-btn').click()

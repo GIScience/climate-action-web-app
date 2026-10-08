@@ -18,11 +18,7 @@ describe('walkthrough', () => {
 
         cy.visit('/')
 
-        cy.wait(1000)
-
         cy.wait('@getPlugins')
-
-        cy.wait(1000)
 
         cy.clickFakeUserButtonUntilGone()
 
@@ -63,6 +59,8 @@ describe('walkthrough', () => {
         cy.get('.driver-popover-next-btn').click()
 
         cy.wait('@getPluginHiWalkComputation')
+
+        cy.waitForRenderComplete()
 
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '7 of 10')
 

@@ -23,6 +23,7 @@ describe('mapService', () => {
     })
 
     it('display the layerswitcher', () => {
+        cy.waitForAppStable()
         cy.get('.maplibregl-style-switcher-container').should('exist')
 
         const expectedTexts = ['Graybeard', 'Colorful', 'ESRI World Imagery']
@@ -43,12 +44,14 @@ describe('mapService', () => {
         mockPluginBlueprint()
 
         cy.visit('dashboard/plugin/plugin_blueprint')
+        cy.waitForAppStable()
 
         cy.get('.maplibregl-style-list button').eq(1).click()
 
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.reload(true)
+        cy.waitForAppStable()
 
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
@@ -91,19 +94,23 @@ describe('mapService', () => {
         cy.reload(true)
 
         cy.wait('@getPlugins')
+        cy.waitForAppStable()
 
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.wait('@getPluginBlueprint')
+        cy.waitForAppStable()
 
         cy.get('.maplibregl-style-list button').eq(1).click()
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoTiffComputation')
-        cy.get('.child-computation').eq(0).click()
+        cy.waitForRenderComplete()
 
+        cy.get('.child-computation').eq(0).click()
         cy.wait('@getGeoTiff')
+        cy.waitForRenderComplete()
 
         cy.reload(true)
 
@@ -127,6 +134,7 @@ describe('mapService', () => {
         mockPluginBlueprint()
 
         cy.visit('dashboard/plugin/plugin_blueprint')
+        cy.waitForAppStable()
 
         cy.get('.maplibregl-style-switcher').click()
 
@@ -140,10 +148,8 @@ describe('mapService', () => {
 
         cy.location('origin').then(origin => {
             cy.getAllLocalStorage().then(result => {
-                cy.getAllLocalStorage().then(result => {
-                    const mapPrefs = JSON.parse(result[origin].map_prefs)
-                    expect(mapPrefs.layerSwitcherCollapsed).to.equal(true)
-                })
+                const mapPrefs = JSON.parse(result[origin].map_prefs)
+                expect(mapPrefs.layerSwitcherCollapsed).to.equal(true)
             })
         })
     })
@@ -177,19 +183,20 @@ describe('mapService', () => {
         cy.reload(true)
 
         cy.wait('@getPlugins')
+        cy.waitForAppStable()
 
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.wait('@getPluginBlueprint')
+        cy.waitForAppStable()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
-        cy.wait(1500)
-        cy.get('.child-computation').eq(0).click()
+        cy.waitForRenderComplete()
 
+        cy.get('.child-computation').eq(0).click()
         cy.wait('@getGeoJsonJinrongjie')
         cy.waitForRenderComplete()
-        cy.wait(500)
 
         cy.compareSnapshot('geojson', 0.05)
     })
@@ -231,27 +238,29 @@ describe('mapService', () => {
         cy.reload(true)
 
         cy.wait('@getPlugins')
+        cy.waitForAppStable()
 
         cy.visit('dashboard/plugin/plugin_blueprint')
 
         cy.wait('@getPluginBlueprint')
+        cy.waitForAppStable()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
-        cy.get('.child-computation').eq(0).realHover()
-        cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
+        cy.waitForRenderComplete()
 
+        cy.get('.child-computation').eq(0).realHover()
+        cy.get('.child-computation').eq(0).find('.layer-pin-btn').eq(0).click()
         cy.wait('@getGeoJsonJinrongjie')
         cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(1).click()
         cy.wait('@getGeoJsonComputationWestChangan')
+        cy.waitForRenderComplete()
         cy.get('.child-computation').eq(0).realHover()
-        cy.get('.child-computation').eq(0).get('.layer-pin-btn').eq(0).click()
-
+        cy.get('.child-computation').eq(0).find('.layer-pin-btn').eq(0).click()
         cy.wait('@getGeoJsonWestChangan')
         cy.waitForRenderComplete()
-        cy.wait(500)
 
         cy.get('.maplibregl-layer-controls .map-layer').should('have.length', 2)
 
@@ -291,13 +300,14 @@ describe('mapService', () => {
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
-        cy.get('.child-computation').eq(1).click()
+        cy.waitForRenderComplete()
 
+        cy.get('.child-computation').eq(1).click()
         cy.wait('@getGeoJsonDetourFactorsJinrongjie')
         cy.waitForRenderComplete()
 
         cy.get('.discrete-legend ul li').should('have.length', 3)
-        cy.get('.discrete-legend ul li').eq(0).get('input').should('be.checked')
+        cy.get('.discrete-legend ul li').eq(0).find('input').should('be.checked')
 
         // TODO: add snapshot comparison, persistance of 'checked' during rebuild (pinning), ID collisions (same artifact filename), toggles still activating after returning from report instantiation
     })
@@ -334,26 +344,41 @@ describe('mapService', () => {
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getSimpleGeoJsonComputation')
-        cy.get('.child-computation').eq(0).click()
-
-        cy.wait('@getSimpleGeoJson')
-
         cy.waitForRenderComplete()
 
-        cy.window().then(win => {
-            const map = win.ng.getComponent(win.document.querySelector('app-map')).mapService.map
-            const lng = (12952933.57136454 * 180) / 20037508.34
-            const lat = (Math.atan(Math.exp((4853791.28861462 * Math.PI) / 20037508.34)) * 360) / Math.PI - 90
-            const point = map.project([lng, lat])
+        cy.get('.child-computation').eq(0).click()
+        cy.wait('@getSimpleGeoJson')
+        cy.waitForRenderComplete()
 
-            map.fire('mousemove', {
-                type: 'mousemove',
-                target: map,
-                originalEvent: new MouseEvent('mousemove', { clientX: point.x, clientY: point.y, bubbles: true }),
-                point: { x: point.x, y: point.y },
-                lngLat: map.unproject([point.x, point.y])
+        const fireTooltipMouseMove = (attemptsLeft: number) => {
+            cy.window().then(win => {
+                const map = win.ng.getComponent(win.document.querySelector('app-map')).mapService.map
+                const lng = (12952933.57136454 * 180) / 20037508.34
+                const lat = (Math.atan(Math.exp((4853791.28861462 * Math.PI) / 20037508.34)) * 360) / Math.PI - 90
+                const point = map.project([lng, lat])
+
+                map.fire('mousemove', {
+                    type: 'mousemove',
+                    target: map,
+                    originalEvent: new MouseEvent('mousemove', {
+                        clientX: point.x,
+                        clientY: point.y,
+                        bubbles: true
+                    }),
+                    point: { x: point.x, y: point.y },
+                    lngLat: map.unproject([point.x, point.y])
+                })
             })
-        })
+
+            cy.get('body').then($body => {
+                if ($body.find('.maplibregl-popup-content').length === 0 && attemptsLeft > 0) {
+                    cy.wait(500)
+                    fireTooltipMouseMove(attemptsLeft - 1)
+                }
+            })
+        }
+
+        fireTooltipMouseMove(5)
 
         cy.get('.maplibregl-popup-content').should('be.visible')
         cy.get('.maplibregl-popup-content').should('contain.text', 'Connectivity: 0.0167')
@@ -408,8 +433,6 @@ describe('mapService', () => {
                 mapService.regionLayer.visible = true
             }
         })
-
-        cy.wait(2000)
 
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -500,7 +523,7 @@ describe('mapService', () => {
 
         cy.get('.draw-button').eq(2).click()
 
-        cy.wait(2500)
+        cy.waitForRenderComplete()
 
         cy.get('canvas.maplibregl-canvas').click(800, 425, { force: true })
         cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })
@@ -544,7 +567,6 @@ describe('mapService', () => {
         cy.get('input[id="aoiFile"][type="file"]').attachFile('sample_gpx_aoi.gpx')
 
         cy.waitForRenderComplete()
-        cy.wait(1000)
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService

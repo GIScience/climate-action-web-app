@@ -55,7 +55,7 @@ describe('Search', () => {
 
         cy.get('.location-suggestion__item').first().click()
 
-        cy.wait(1500)
+        cy.waitForRenderComplete()
 
         cy.get('.maplibregl-canvas')
             .should('be.visible')

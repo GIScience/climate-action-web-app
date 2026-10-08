@@ -21,14 +21,11 @@ describe('pluginService', () => {
         cy.wait('@getPluginBlueprintIcon')
         cy.wait('@getPluginWalkabilityIcon')
 
-        expect(
-            cy
-                .get('.plugins-list .plugin-card')
-                .first()
-                .find('img')
-                .should('have.attr', 'src')
-                .and('not.include', 'fallback.jpg')
-        )
+        cy.get('.plugins-list .plugin-card')
+            .first()
+            .find('img')
+            .should('have.attr', 'src')
+            .and('not.include', 'fallback.jpg')
     })
 
     it('read and render the operator schema correctly', () => {
@@ -89,8 +86,6 @@ describe('pluginService', () => {
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
-
-        cy.wait(500)
 
         cy.waitForRenderComplete()
 

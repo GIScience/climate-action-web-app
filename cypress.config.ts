@@ -12,6 +12,7 @@ export default defineConfig({
     e2e: {
         baseUrl: 'http://localhost:4200',
         expose: {
+            // Update the base snapshot by running `pnpm cy:run --expose visualRegressionUpdateSnapshots=true`
             visualRegressionType: 'regression'
         },
         screenshotsFolder: './cypress/snapshots/actual',
