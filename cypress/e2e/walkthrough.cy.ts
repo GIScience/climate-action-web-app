@@ -22,8 +22,6 @@ describe('walkthrough', () => {
 
         cy.wait('@getPlugins')
 
-        cy.wait(1000)
-
         cy.clickFakeUserButtonUntilGone()
 
         cy.get('.welcome-content .cta-section .btn-primary').click()

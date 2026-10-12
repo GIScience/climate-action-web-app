@@ -39,8 +39,6 @@ describe('pluginService', () => {
 
         cy.clickFakeUserButtonUntilGone()
 
-        cy.wait(500)
-
         cy.get('button.new-compute').click()
 
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -69,8 +67,6 @@ describe('pluginService', () => {
         cy.wait('@getPluginShowcaseWithConstraints')
 
         cy.clickFakeUserButtonUntilGone()
-
-        cy.wait(500)
 
         cy.get('button.new-compute').click()
 

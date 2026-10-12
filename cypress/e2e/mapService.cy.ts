@@ -324,11 +324,7 @@ describe('mapService', () => {
 
         cy.clickFakeUserButtonUntilGone()
 
-        cy.wait(1000)
-
         cy.get('.new-compute').click()
-
-        cy.wait(500)
 
         cy.window()
             .then(win => {
@@ -354,8 +350,6 @@ describe('mapService', () => {
                 mapService.regionLayer.visible = true
             }
         })
-
-        cy.wait(2000)
 
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -427,11 +421,7 @@ describe('mapService', () => {
 
         cy.clickFakeUserButtonUntilGone()
 
-        cy.wait(1000)
-
         cy.get('.new-compute').click()
-
-        cy.wait(500)
 
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -447,7 +437,6 @@ describe('mapService', () => {
         cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })
 
         cy.waitForRenderComplete()
-        cy.wait(500)
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService
@@ -468,11 +457,7 @@ describe('mapService', () => {
 
         cy.clickFakeUserButtonUntilGone()
 
-        cy.wait(1000)
-
         cy.get('.new-compute').click()
-
-        cy.wait(500)
 
         cy.get('.draw-button').eq(1).click()
 

@@ -1320,8 +1320,7 @@ export class MapService {
         this.map.flyTo({
             center: MapService.HEIDELBERG_COORDS,
             zoom: 4.5,
-            duration: 2000,
-            essential: true
+            duration: 2000
         })
     }
 

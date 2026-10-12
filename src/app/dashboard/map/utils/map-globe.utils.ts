@@ -70,8 +70,7 @@ export class MapGlobeUtils {
             center: [0, 0],
             zoom: 3,
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
-            duration: 2000,
-            essential: true
+            duration: 2000
         })
     }
 

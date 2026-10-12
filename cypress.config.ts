@@ -27,7 +27,8 @@ export default defineConfig({
                         '--disable-blink-features=AutomationControlled',
                         '--force-device-scale-factor=1',
                         '--force-color-profile=srgb',
-                        '--font-render-hinting=none'
+                        '--font-render-hinting=none',
+                        '--force-prefers-reduced-motion'
                     )
 
                     if (browser.isHeadless) {
