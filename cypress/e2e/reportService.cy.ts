@@ -6,46 +6,26 @@ import {
     mockPluginBlueprintComputation,
     mockPluginsList
 } from '../support/interceptors'
+import { visitPluginPage } from '../support/visit'
 
 describe('report builder', () => {
-    beforeEach(() => {
-        cy.window().then(win => {
-            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
-        })
-
-        cy.visit('/')
-    })
-
     it('the report builder should work correctly', () => {
         mockPluginsList()
         mockPluginBlueprint()
         mockPluginBlueprintComputation()
         mockBlueprintTable()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-12-17T08:55:23.807074Z',
-                        status: 'SUCCESS',
-                        state: 'ACTIVE',
-                        flags: [],
-                        aoiName: 'Heidelberg'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-12-17T08:55:23.807074Z',
+                status: 'SUCCESS',
+                state: 'ACTIVE',
+                flags: [],
+                aoiName: 'Heidelberg'
+            }
+        ])
 
         cy.get('.computations-index-content').should('exist')
 
@@ -81,32 +61,20 @@ describe('report builder', () => {
         mockGeoJsonComputationJinrongjie()
         mockGeoJsonJinrongjie()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2023-09-27T16:42:52+01:00',
-                        status: 'SUCCESS',
-                        state: 'ACTIVE',
-                        flags: [],
-                        aoiName: 'Jinrongjie'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2023-09-27T16:42:52+01:00',
+                status: 'SUCCESS',
+                state: 'ACTIVE',
+                flags: [],
+                aoiName: 'Jinrongjie'
+            }
+        ])
 
         cy.get('.computations-index-content').should('exist')
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
@@ -143,31 +111,19 @@ describe('report builder', () => {
         mockGeoJsonComputationJinrongjie()
         mockGeoJsonJinrongjie()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2023-09-27T16:42:52+01:00',
-                        status: 'SUCCESS',
-                        flags: [],
-                        aoiName: 'Jinrongjie'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2023-09-27T16:42:52+01:00',
+                status: 'SUCCESS',
+                flags: [],
+                aoiName: 'Jinrongjie'
+            }
+        ])
 
         cy.get('.computations-index-content').should('exist')
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')

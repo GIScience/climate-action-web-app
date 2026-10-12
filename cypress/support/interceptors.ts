@@ -2259,3 +2259,32 @@ export const interceptWalkthroughORS = () => {
         }
     }).as('openRouteServiceWalkthroughRequest')
 }
+
+// Map network stubs
+
+const OGC_FEATURES_PATTERN =
+    'https://maps.heigit.org/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/*'
+const GEOJSON_HEADERS = { 'content-type': 'application/geo+json' }
+
+export const stubMapNetwork = () => {
+    cy.intercept('https://tiles.versatiles.org/tiles/osm/tiles.json', { fixture: 'tiles.json' }).as('tileJson')
+    cy.intercept('https://tiles.versatiles.org/tiles/osm/*/*/*', { statusCode: 204 })
+    cy.intercept('https://tiles.versatiles.org/assets/**', { statusCode: 204 })
+    cy.intercept('https://server.arcgisonline.com/**', { statusCode: 204 })
+
+    cy.intercept('https://maps.heigit.org/vector/tiles/public.admin_boundaries_layer/*/*/*.pbf', {
+        fixture: 'boundary_tile.pbf,null',
+        headers: { 'content-type': 'application/x-protobuf' }
+    })
+
+    // Every boundary click hits the stub tile's single feature, so the id in the url is always the
+    // same. Tests that click a boundary must call it; this guard keeps an unmocked click off the network.
+    cy.intercept(OGC_FEATURES_PATTERN, {
+        statusCode: 404,
+        body: { error: 'Boundary click not mocked in Cypress test, call mockRegionSelection()' }
+    }).as('blockUnmockedRegionSelection')
+}
+
+export const mockRegionSelection = (fixture: string) => {
+    cy.intercept(OGC_FEATURES_PATTERN, { fixture, headers: GEOJSON_HEADERS }).as('ogcFeature')
+}

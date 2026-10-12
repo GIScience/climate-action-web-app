@@ -4,46 +4,26 @@ import {
     mockPluginBlueprintComputation,
     mockPluginsList
 } from '../support/interceptors'
+import { visitPluginPage } from '../support/visit'
 
 describe('computations', () => {
-    beforeEach(() => {
-        cy.window().then(win => {
-            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
-        })
-
-        cy.visit('/')
-    })
-
     const setupTest = () => {
         mockPluginsList()
         mockPluginBlueprint()
         mockPluginBlueprintComputation()
         mockBlueprintTable()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        aoiName: 'Test Area',
-                        correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                        flags: [],
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-12-17T08:55:23.807074Z',
-                        state: 'ACTIVE',
-                        status: 'SUCCESS'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                aoiName: 'Test Area',
+                correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                flags: [],
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-12-17T08:55:23.807074Z',
+                state: 'ACTIVE',
+                status: 'SUCCESS'
+            }
+        ])
 
         cy.get('.computations-index-content').should('exist')
     }

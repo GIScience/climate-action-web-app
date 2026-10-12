@@ -3,11 +3,17 @@ import 'cypress-file-upload'
 import 'cypress-real-events'
 import { addCompareSnapshotCommand } from 'cypress-visual-regression/dist/command'
 import { cypressEnvironment } from './cypress-environment'
+import { stubMapNetwork } from './interceptors'
 
 addCompareSnapshotCommand()
 
 beforeEach(() => {
     cy.intercept(`${cypressEnvironment.cachetUrl}/**`, { body: { data: [], included: [] } }).as('blockCachetCalls')
+
+    cy.intercept('**/v1/account', {
+        statusCode: 401,
+        body: { message: 'User (role: guests) missing scope (account)', code: 401, type: 'general_unauthorized_scope' }
+    }).as('blockAppwriteSessionCheck')
 
     cy.intercept(`**/${cypressEnvironment.apiBasePath}/**`, {
         statusCode: 404,
@@ -16,40 +22,18 @@ beforeEach(() => {
         }
     }).as('blockUnmockedApiCalls')
 
+    stubMapNetwork()
+
+    // Keep this one last: it only switches logging off and passes requests on to the stubs above.
     cy.intercept({ resourceType: /xhr|fetch/ }, { log: false })
 })
 
-Cypress.Commands.add('waitForAppStable', () => {
-    cy.window({ log: false }).then({ timeout: 15000 }, win => {
-        return new Cypress.Promise(resolve => {
-            const testability = (win as any).getAllAngularTestabilities?.()[0]
-            if (!testability) {
-                resolve()
-                return
-            }
-
-            const timeout = setTimeout(() => {
-                resolve()
-            }, 10000)
-
-            testability.whenStable(() => {
-                clearTimeout(timeout)
-                resolve()
-            })
-        })
-    })
-})
-
 Cypress.Commands.add('waitForRenderComplete', () => {
-    cy.waitForAppStable()
+    cy.window({ log: false, timeout: 15000 }).should('have.property', 'map')
 
     cy.window().then({ timeout: 15000 }, win => {
         return new Cypress.Promise(resolve => {
             const map = (win as any).map
-            if (!map || typeof map.once !== 'function') {
-                resolve()
-                return
-            }
 
             const timeout = setTimeout(() => {
                 resolve()
@@ -60,6 +44,7 @@ Cypress.Commands.add('waitForRenderComplete', () => {
                 resolve()
             })
 
+            // An already-idle map never emits 'idle' again on its own; force one frame so it does.
             if (typeof map.triggerRepaint === 'function') {
                 map.triggerRepaint()
             }

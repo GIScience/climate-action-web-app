@@ -8,22 +8,17 @@ import {
     mockGeoTiffComputation,
     mockPluginBlueprint,
     mockPluginsList,
+    mockRegionSelection,
     mockSimpleGeoJson,
     mockSimpleGeoJsonComputation
 } from '../support/interceptors'
 import { beforeCompareSnapshots } from '../support/pre-test-cleanup'
+import { seedLocalStorage, visitPluginPage } from '../support/visit'
 
 describe('mapService', () => {
-    beforeEach(() => {
-        cy.window().then(win => {
-            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
-        })
-
-        cy.visit('/')
-    })
-
     it('display the layerswitcher', () => {
-        cy.waitForAppStable()
+        cy.visit('/', { onBeforeLoad: seedLocalStorage() })
+
         cy.get('.maplibregl-style-switcher-container').should('exist')
 
         const expectedTexts = ['Graybeard', 'Colorful', 'ESRI World Imagery']
@@ -43,15 +38,13 @@ describe('mapService', () => {
         mockPluginsList()
         mockPluginBlueprint()
 
-        cy.visit('dashboard/plugin/plugin_blueprint')
-        cy.waitForAppStable()
+        visitPluginPage()
 
         cy.get('.maplibregl-style-list button').eq(1).click()
 
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
         cy.reload(true)
-        cy.waitForAppStable()
 
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
 
@@ -74,32 +67,18 @@ describe('mapService', () => {
         mockGeoTiffComputation()
         mockGeoTiff()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
-                        pluginId: 'plugin_blueprint',
-                        status: 'SUCCESS',
-                        flags: [],
-                        state: 'ACTIVE',
-                        request_ts: '2024-08-07T12:43:08.373768',
-                        aoiName: '金融街街道'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-        cy.waitForAppStable()
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
-        cy.waitForAppStable()
+        visitPluginPage([
+            {
+                correlation_uuid: '8a897536-c4b4-4e5a-9d70-50430183ac66',
+                pluginId: 'plugin_blueprint',
+                status: 'SUCCESS',
+                flags: [],
+                state: 'ACTIVE',
+                request_ts: '2024-08-07T12:43:08.373768',
+                aoiName: '金融街街道'
+            }
+        ])
+        cy.waitForRenderComplete()
 
         cy.get('.maplibregl-style-list button').eq(1).click()
         cy.get('.maplibregl-style-list button').eq(1).should('have.class', 'active')
@@ -133,8 +112,7 @@ describe('mapService', () => {
         mockPluginsList()
         mockPluginBlueprint()
 
-        cy.visit('dashboard/plugin/plugin_blueprint')
-        cy.waitForAppStable()
+        visitPluginPage()
 
         cy.get('.maplibregl-style-switcher').click()
 
@@ -164,31 +142,17 @@ describe('mapService', () => {
             'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
         )
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-08-07T12:43:08.373768',
-                        state: 'ACTIVE',
-                        status: 'SUCCESS',
-                        aoiName: '金融街街道'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-        cy.waitForAppStable()
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
-        cy.waitForAppStable()
+        visitPluginPage([
+            {
+                correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-08-07T12:43:08.373768',
+                state: 'ACTIVE',
+                status: 'SUCCESS',
+                aoiName: '金融街街道'
+            }
+        ])
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
@@ -209,41 +173,27 @@ describe('mapService', () => {
         mockGeoJsonJinrongjie()
         mockGeoJsonWestChangan()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-08-07T12:43:08.373Z',
-                        flags: [],
-                        state: 'ACTIVE',
-                        status: 'SUCCESS',
-                        aoiName: '金融街街道'
-                    },
-                    {
-                        correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2023-05-25T16:57:52Z',
-                        flags: [],
-                        state: 'ACTIVE',
-                        status: 'SUCCESS',
-                        aoiName: '西长安街街道'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-        cy.waitForAppStable()
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
-        cy.waitForAppStable()
+        visitPluginPage([
+            {
+                correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-08-07T12:43:08.373Z',
+                flags: [],
+                state: 'ACTIVE',
+                status: 'SUCCESS',
+                aoiName: '金融街街道'
+            },
+            {
+                correlation_uuid: '0f4552a1-79c4-452c-9e01-3c33a9bae0e8',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2023-05-25T16:57:52Z',
+                flags: [],
+                state: 'ACTIVE',
+                status: 'SUCCESS',
+                aoiName: '西长安街街道'
+            }
+        ])
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
@@ -273,30 +223,18 @@ describe('mapService', () => {
         mockGeoJsonComputationJinrongjie()
         mockGeoJsonDetourFactorsJinrongjie()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-08-07T12:43:08.373Z',
-                        flags: [],
-                        state: 'ACTIVE',
-                        status: 'SUCCESS',
-                        aoiName: '金融街街道'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                correlation_uuid: '3495b256-6ebc-4cd1-a2f5-8216f57f7f85',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-08-07T12:43:08.373Z',
+                flags: [],
+                state: 'ACTIVE',
+                status: 'SUCCESS',
+                aoiName: '金融街街道'
+            }
+        ])
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getGeoJsonComputationJinrongjie')
@@ -318,29 +256,17 @@ describe('mapService', () => {
         mockSimpleGeoJsonComputation()
         mockSimpleGeoJson()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-08-07T12:43:08.373768',
-                        status: 'SUCCESS',
-                        state: 'ACTIVE',
-                        aoiName: '金融街街道'
-                    }
-                ])
-            )
-        })
-
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage([
+            {
+                correlation_uuid: '1cfd2634-1724-43a2-ab1e-6466ba433364',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-08-07T12:43:08.373768',
+                status: 'SUCCESS',
+                state: 'ACTIVE',
+                aoiName: '金融街街道'
+            }
+        ])
+        cy.waitForRenderComplete()
 
         cy.get('.parent-computation').eq(0).click()
         cy.wait('@getSimpleGeoJsonComputation')
@@ -387,19 +313,14 @@ describe('mapService', () => {
     it('should read boundaries from ohsome api, display them, validate geometry, and allow deselection', () => {
         mockPluginsList()
         mockPluginBlueprint()
+        mockRegionSelection('baden-wuerttemberg_ogc_wfs.geojson')
 
         let currentRegionName = ''
         let newRegionName = ''
         let currentSelectedFeaturesCount = 0
         let newSelectedFeaturesCount = 0
 
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage()
 
         cy.clickFakeUserButtonUntilGone()
 
@@ -433,6 +354,8 @@ describe('mapService', () => {
                 mapService.regionLayer.visible = true
             }
         })
+
+        cy.wait(2000)
 
         cy.get('.maplibregl-ctrl-zoom-in').click()
         cy.get('.maplibregl-ctrl-zoom-in').click()
@@ -468,6 +391,7 @@ describe('mapService', () => {
         })
 
         // Test selecting a different region
+        mockRegionSelection('bavaria_ogc_wfs.geojson')
         cy.get('canvas.maplibregl-canvas').click(1000, 300)
 
         cy.wait(1000)
@@ -499,13 +423,7 @@ describe('mapService', () => {
         mockPluginsList()
         mockPluginBlueprint()
 
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage()
 
         cy.clickFakeUserButtonUntilGone()
 
@@ -523,7 +441,7 @@ describe('mapService', () => {
 
         cy.get('.draw-button').eq(2).click()
 
-        cy.waitForRenderComplete()
+        cy.wait(2500)
 
         cy.get('canvas.maplibregl-canvas').click(800, 425, { force: true })
         cy.get('canvas.maplibregl-canvas').click(850, 550, { force: true })
@@ -546,13 +464,7 @@ describe('mapService', () => {
         mockPluginsList()
         mockPluginBlueprint()
 
-        cy.reload(true)
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage()
 
         cy.clickFakeUserButtonUntilGone()
 
@@ -567,6 +479,7 @@ describe('mapService', () => {
         cy.get('input[id="aoiFile"][type="file"]').attachFile('sample_gpx_aoi.gpx')
 
         cy.waitForRenderComplete()
+        cy.wait(1000)
 
         cy.window().then(win => {
             const mapService = win.ng.getComponent(win.document.querySelector('app-map')).mapService

@@ -18,14 +18,9 @@ describe('translations', () => {
     })
 
     it('prefer the local storage language if present and load it', () => {
-        cy.window().then(win => {
-            win.localStorage.setItem('language_pref', '"en"')
-        })
-
-        cy.reload(true)
-
         cy.visit('/', {
             onBeforeLoad(win: Cypress.AUTWindow) {
+                win.localStorage.setItem('language_pref', '"en"')
                 Object.defineProperty(win.navigator, 'language', { value: 'de-DE' })
             }
         })

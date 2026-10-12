@@ -4,7 +4,8 @@ import {
     mockPluginHiWalk,
     mockPluginHiWalkComputation,
     mockPluginsList,
-    mockPostPluginRun
+    mockPostPluginRun,
+    mockRegionSelection
 } from '../support/interceptors'
 
 describe('walkthrough', () => {
@@ -15,10 +16,13 @@ describe('walkthrough', () => {
         mockPostPluginRun()
         mockPluginHiWalkComputation()
         interceptWalkthroughORS()
+        mockRegionSelection('ventotene_ogc_wfs.geojson')
 
         cy.visit('/')
 
         cy.wait('@getPlugins')
+
+        cy.wait(1000)
 
         cy.clickFakeUserButtonUntilGone()
 

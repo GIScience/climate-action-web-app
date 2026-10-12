@@ -6,8 +6,10 @@ import {
     mockPluginShowcaseWithConstraints,
     mockPluginWalkabilitytIcon,
     mockPluginsList,
-    mockPluginsListWithoutBlueprint
+    mockPluginsListWithoutBlueprint,
+    mockRegionSelection
 } from '../support/interceptors'
+import { seedLocalStorage, visitPluginPage } from '../support/visit'
 
 describe('pluginService', () => {
     it('fetch and display the plugin icon', () => {
@@ -31,14 +33,9 @@ describe('pluginService', () => {
     it('read and render the operator schema correctly', () => {
         mockPluginsList()
         mockPluginBlueprint()
+        mockRegionSelection('baden-wuerttemberg_ogc_wfs.geojson')
 
-        cy.visit('/')
-
-        cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_blueprint')
-
-        cy.wait('@getPluginBlueprint')
+        visitPluginPage()
 
         cy.clickFakeUserButtonUntilGone()
 
@@ -64,13 +61,11 @@ describe('pluginService', () => {
     it('read and validate the AoI constraints correctly', () => {
         mockPluginsList()
         mockPluginShowcaseWithConstraints()
+        mockRegionSelection('baden-wuerttemberg_ogc_wfs.geojson')
 
-        cy.visit('/')
+        cy.visit('dashboard/plugin/plugin_showcase', { onBeforeLoad: seedLocalStorage() })
 
         cy.wait('@getPlugins')
-
-        cy.visit('dashboard/plugin/plugin_showcase')
-
         cy.wait('@getPluginShowcaseWithConstraints')
 
         cy.clickFakeUserButtonUntilGone()
@@ -103,27 +98,19 @@ describe('pluginService', () => {
         mockPluginBlueprintOffline()
         mockPluginBlueprintComputation()
 
-        cy.window().then(win => {
-            win.localStorage.setItem(
-                'plugin_runs',
-                JSON.stringify([
-                    {
-                        correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                        pluginId: 'plugin_blueprint',
-                        request_ts: '2024-12-17T08:55:23.807074Z',
-                        status: 'SUCCESS',
-                        aoiName: 'Heidelberg',
-                        flags: [],
-                        state: 'ACTIVE'
-                    }
-                ])
-            )
-            win.localStorage.setItem('ui_prefs', JSON.stringify({ activeTab: 'bookmarks' }))
+        cy.visit('/', {
+            onBeforeLoad: seedLocalStorage([
+                {
+                    correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                    pluginId: 'plugin_blueprint',
+                    request_ts: '2024-12-17T08:55:23.807074Z',
+                    status: 'SUCCESS',
+                    aoiName: 'Heidelberg',
+                    flags: [],
+                    state: 'ACTIVE'
+                }
+            ])
         })
-
-        cy.reload(true)
-
-        cy.visit('/')
 
         cy.wait('@getPluginsWithoutBlueprint')
         cy.wait('@getPluginWalkabilityIcon')
