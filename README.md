@@ -135,6 +135,38 @@ To update the fallback maintenance announcements, simply edit the hosted documen
 ]
 ```
 
+## Map Layers Sources
+
+The Web App currently uses various sources for fetching the map layers that it has to display, all of which are outlined below:
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart RL
+ subgraph s1["maps.heigit.org"]
+        n7["pg_tileserv"]
+        n8["GeoServer"]
+  end
+    n2["Climate Action Database"] --> n6["CA API Gateway"]
+    n6 -- Centroids<br>(from the Search endpoint<br>used to display all<br>cached computations) --> n3["CAN Web App"]
+    n1["Ohsome Boundaries<br>Database"] --> n7 & n8
+    n7 -- "Vector Tiles<br>(used for AoI selection under<br>Admin. Boundaries mode)" --> n3
+    n8 -- OGC WFS<br>(Individual Feature(s) used<br>in the computation request) --> n3
+    n9["Versatiles"] -- Vector Basemaps --> n3
+    n10["ArcGIS"] -- Raster Basemap<br>(ESRI World Imagery) --> n3
+
+    n7@{ shape: diam}
+    n8@{ shape: diam}
+    n2@{ shape: db}
+    n6@{ shape: diam}
+    n3@{ shape: hex}
+    n1@{ shape: db}
+    n9@{ shape: diam}
+    n10@{ shape: diam}
+```
+
 ## Tests
 
 Run `pnpm test:all` to execute the unit & integration tests on [Jest](https://jestjs.io/) and E2E tests on [Cypress](https://www.cypress.io/).
