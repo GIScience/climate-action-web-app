@@ -7,6 +7,8 @@ import { stubMapNetwork } from './interceptors'
 
 addCompareSnapshotCommand()
 
+const RUNS_DB_NAME = 'climate_action_local'
+
 beforeEach(() => {
     cy.intercept(`${cypressEnvironment.cachetUrl}/**`, { body: { data: [], included: [] } }).as('blockCachetCalls')
 
@@ -26,6 +28,43 @@ beforeEach(() => {
 
     // Keep this one last: it only switches logging off and passes requests on to the stubs above.
     cy.intercept({ resourceType: /xhr|fetch/ }, { log: false })
+
+    // Unlike localStorage, IndexedDB is not cleared by Cypress between tests
+    cy.wrap(
+        new Cypress.Promise<void>(resolve => {
+            const request = indexedDB.deleteDatabase(RUNS_DB_NAME)
+            request.onsuccess = request.onerror = request.onblocked = () => resolve()
+        }),
+        { log: false }
+    )
+})
+
+// Replaces the runs saved in IndexedDB, which the app loads on startup. Runs on the spec frame's
+// IndexedDB, which shares the app's origin, so it works before the first visit.
+Cypress.Commands.add('seedPluginRuns', runs => {
+    cy.wrap(
+        new Cypress.Promise<void>((resolve, reject) => {
+            const request = indexedDB.open(RUNS_DB_NAME, 1)
+            // Mirrors the schema in RunsDbService, in case the app has not created it yet
+            request.onupgradeneeded = () => {
+                request.result.createObjectStore('runs', { keyPath: 'correlation_uuid' })
+                request.result.createObjectStore('outbox', { autoIncrement: true })
+            }
+            request.onerror = () => reject(request.error)
+            request.onsuccess = () => {
+                const db = request.result
+                const tx = db.transaction('runs', 'readwrite')
+                tx.objectStore('runs').clear()
+                runs.forEach(run => tx.objectStore('runs').put(run))
+                tx.onerror = () => reject(tx.error)
+                tx.oncomplete = () => {
+                    db.close()
+                    resolve()
+                }
+            }
+        }),
+        { log: false }
+    )
 })
 
 Cypress.Commands.add('waitForRenderComplete', () => {

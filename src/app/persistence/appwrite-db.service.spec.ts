@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing'
+import { AppwriteService } from '@app/auth/appwrite.service'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
-import { AppwriteService } from './auth/appwrite.service'
-import { DatabaseService } from './database.service'
+import { AppwriteDbService } from './appwrite-db.service'
 
 const originalConsoleError = console.error
 beforeAll(() => {
@@ -17,6 +17,7 @@ interface MockDatabase {
     listDocuments: jest.Mock
     createDocument: jest.Mock
     updateDocument: jest.Mock
+    deleteDocument: jest.Mock
 }
 
 interface MockAppwriteService extends Partial<AppwriteService> {
@@ -24,8 +25,8 @@ interface MockAppwriteService extends Partial<AppwriteService> {
     _user: BehaviorSubject<Models.User<Models.Preferences> | null>
 }
 
-describe('DatabaseService', () => {
-    let service: DatabaseService
+describe('AppwriteDbService', () => {
+    let service: AppwriteDbService
     let mockAppwriteService: MockAppwriteService
     let mockDatabases: MockDatabase
     let userSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
@@ -55,7 +56,8 @@ describe('DatabaseService', () => {
         mockDatabases = {
             listDocuments: jest.fn(),
             createDocument: jest.fn(),
-            updateDocument: jest.fn()
+            updateDocument: jest.fn(),
+            deleteDocument: jest.fn()
         }
 
         mockAppwriteService = {
@@ -64,100 +66,110 @@ describe('DatabaseService', () => {
         }
 
         TestBed.configureTestingModule({
-            providers: [DatabaseService, { provide: AppwriteService, useValue: mockAppwriteService }]
+            providers: [AppwriteDbService, { provide: AppwriteService, useValue: mockAppwriteService }]
         })
 
-        service = TestBed.inject(DatabaseService)
+        service = TestBed.inject(AppwriteDbService)
     })
 
-    describe('createPluginRun', () => {
-        it('should return null if no user is logged in', async () => {
+    const testRun = {
+        correlation_uuid: 'test-uuid',
+        pluginId: 'test-plugin',
+        status: 'PENDING' as const,
+        request_ts: new Date(),
+        flags: [],
+        aoiName: 'Test Area'
+    }
+
+    describe('ensurePluginRun', () => {
+        it('should throw if no user is logged in', async () => {
             userSubject.next(null)
 
-            const result = await service.createPluginRun({
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test-plugin',
-                status: 'PENDING',
-                request_ts: new Date(),
-                flags: [],
-                aoiName: 'Test Area'
-            })
-
-            expect(result).toBeNull()
-            expect(mockDatabases.createDocument).not.toHaveBeenCalled()
-        })
-
-        it('should create a plugin run in Appwrite', async () => {
-            mockDatabases.createDocument.mockResolvedValue({ $id: 'new-doc-id' })
-
-            const result = await service.createPluginRun({
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test-plugin',
-                status: 'PENDING',
-                request_ts: new Date(),
-                flags: [],
-                aoiName: 'Test Area'
-            })
-
-            expect(mockDatabases.createDocument).toHaveBeenCalled()
-            expect(result).toBe('new-doc-id')
-        })
-
-        it('should handle errors and return null', async () => {
-            mockDatabases.createDocument.mockRejectedValue(new Error('Test error'))
-
-            const result = await service.createPluginRun({
-                correlation_uuid: 'test-uuid',
-                pluginId: 'test-plugin',
-                status: 'PENDING',
-                request_ts: new Date(),
-                flags: [],
-                aoiName: 'Test Area'
-            })
-
-            expect(result).toBeNull()
-        })
-    })
-
-    describe('updatePluginRun', () => {
-        it('should return false if no user is logged in', async () => {
-            userSubject.next(null)
-
-            const result = await service.updatePluginRun('test-uuid', { status: 'SUCCESS' })
-
-            expect(result).toBe(false)
+            await expect(service.ensurePluginRun(testRun)).rejects.toThrow()
             expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
         })
 
-        it('should update a plugin run in Appwrite', async () => {
+        it('should create the document when none exists for the run', async () => {
+            mockDatabases.listDocuments.mockResolvedValue({ documents: [] })
+            mockDatabases.createDocument.mockResolvedValue({ $id: 'new-doc-id' })
+
+            await service.ensurePluginRun(testRun)
+
+            expect(mockDatabases.updateDocument).not.toHaveBeenCalled()
+            expect(mockDatabases.createDocument).toHaveBeenCalledWith(
+                'climate_action',
+                'staging-dashboard_data',
+                expect.any(String),
+                expect.objectContaining({
+                    correlation_uuid: 'test-uuid',
+                    timestamp: testRun.request_ts,
+                    user_id: 'test-user-id'
+                }),
+                expect.any(Array)
+            )
+        })
+
+        it('should update the existing document when one exists for the run', async () => {
             mockDatabases.listDocuments.mockResolvedValue({
                 documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
             })
             mockDatabases.updateDocument.mockResolvedValue({})
 
-            const result = await service.updatePluginRun('test-uuid', { status: 'SUCCESS' })
+            await service.ensurePluginRun({ ...testRun, status: 'SUCCESS' })
 
-            expect(mockDatabases.listDocuments).toHaveBeenCalled()
-            expect(mockDatabases.updateDocument).toHaveBeenCalled()
-            expect(result).toBe(true)
+            expect(mockDatabases.createDocument).not.toHaveBeenCalled()
+            expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
+                'climate_action',
+                'staging-dashboard_data',
+                'doc-id',
+                expect.objectContaining({ status: 'SUCCESS', timestamp: testRun.request_ts })
+            )
         })
 
-        it('should return false if document not found', async () => {
+        it('should propagate transport errors so the outbox retries', async () => {
+            mockDatabases.listDocuments.mockRejectedValue(new Error('Network down'))
+
+            await expect(service.ensurePluginRun(testRun)).rejects.toThrow('Network down')
+        })
+    })
+
+    describe('removePluginRun', () => {
+        it('should throw if no user is logged in', async () => {
+            userSubject.next(null)
+
+            await expect(service.removePluginRun('test-uuid')).rejects.toThrow()
+            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
+        })
+
+        it('should delete the document when it exists', async () => {
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
+            })
+            mockDatabases.deleteDocument.mockResolvedValue({})
+
+            await service.removePluginRun('test-uuid')
+
+            expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
+                'climate_action',
+                'staging-dashboard_data',
+                'doc-id'
+            )
+        })
+
+        it('should treat an already-missing document as success', async () => {
             mockDatabases.listDocuments.mockResolvedValue({ documents: [] })
 
-            const result = await service.updatePluginRun('test-uuid', { status: 'SUCCESS' })
-
-            expect(mockDatabases.listDocuments).toHaveBeenCalled()
-            expect(mockDatabases.updateDocument).not.toHaveBeenCalled()
-            expect(result).toBe(false)
+            await expect(service.removePluginRun('test-uuid')).resolves.toBeUndefined()
+            expect(mockDatabases.deleteDocument).not.toHaveBeenCalled()
         })
 
-        it('should handle errors and return false', async () => {
-            mockDatabases.listDocuments.mockRejectedValue(new Error('Test error'))
+        it('should propagate transport errors so the outbox retries', async () => {
+            mockDatabases.listDocuments.mockResolvedValue({
+                documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
+            })
+            mockDatabases.deleteDocument.mockRejectedValue(new Error('Network down'))
 
-            const result = await service.updatePluginRun('test-uuid', { status: 'SUCCESS' })
-
-            expect(result).toBe(false)
+            await expect(service.removePluginRun('test-uuid')).rejects.toThrow('Network down')
         })
     })
 

@@ -1,6 +1,25 @@
+import 'fake-indexeddb/auto'
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
+import { deserialize, serialize } from 'node:v8'
+
+// jest's jsdom environment lacks structuredClone,
+// which fake-indexeddb needs to clone stored values
+if (typeof globalThis.structuredClone === 'undefined') {
+    globalThis.structuredClone = (<T>(value: T): T => deserialize(serialize(value))) as typeof structuredClone
+}
 
 setupZoneTestEnv()
+
+if (!('locks' in navigator)) {
+    Object.defineProperty(navigator, 'locks', {
+        value: {
+            request: async (name: string, optionsOrCallback: unknown, grantedCallback?: unknown) => {
+                const callback = (grantedCallback ?? optionsOrCallback) as (lock: Lock) => Promise<unknown>
+                return callback({ name, mode: 'exclusive' })
+            }
+        }
+    })
+}
 
 // Polyfill for fetch API in tests (required for Appwrite SDK v19+)
 {

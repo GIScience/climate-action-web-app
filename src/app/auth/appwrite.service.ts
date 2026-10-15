@@ -4,6 +4,14 @@ import { Account, Client, Databases, Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
 import { getCurrentCanonicalUrl } from '../utils/url.utils'
 
+export interface BasicKeyInfo extends Models.Document {
+    hash: string
+    tyk_user_id: string
+    ors_policy: string
+    policy_upgrade_requests: string[]
+    key: string
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -13,6 +21,7 @@ export class AppwriteService {
     private databases = new Databases(this.client)
     public _user = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
     public onLogout = new EventEmitter<void>()
+    private beforeLogoutHooks: Array<() => Promise<void>> = []
 
     constructor() {
         this.client.setEndpoint(environment.appwriteEndpoint + '/v1').setProject(environment.appwriteProjectId)
@@ -22,6 +31,12 @@ export class AppwriteService {
 
     getDatabases(): Databases {
         return this.databases
+    }
+
+    getBasicKey(): Promise<BasicKeyInfo | null> {
+        const userId = this._user.value?.$id
+        if (!userId) return Promise.resolve(null)
+        return this.databases.getDocument('tyk_integration', 'basic_keys', userId) as Promise<BasicKeyInfo>
     }
 
     getAppwriteUrl(path: string): string {
@@ -66,7 +81,33 @@ export class AppwriteService {
         return false
     }
 
+    // Registers a hook to run before logout, while the session is still valid
+    // (e.g. to upload pending changes). Hooks are awaited, for up to 3 seconds
+    // in total. onLogout handlers, in contrast, run after the session is
+    // deleted and are not awaited.
+    registerBeforeLogout(hook: () => Promise<void>): void {
+        this.beforeLogoutHooks.push(hook)
+    }
+
+    private async runBeforeLogoutHooks(): Promise<void> {
+        let timer: ReturnType<typeof setTimeout> | undefined
+        try {
+            await Promise.race([
+                Promise.allSettled(this.beforeLogoutHooks.map(hook => hook())),
+                new Promise(resolve => {
+                    timer = setTimeout(resolve, 3000)
+                })
+            ])
+        } catch (error) {
+            // Hooks must never block logout
+            console.warn('Error running before-logout hooks:', error)
+        } finally {
+            clearTimeout(timer)
+        }
+    }
+
     async tryToLogout() {
+        await this.runBeforeLogoutHooks()
         try {
             await this.account.deleteSession('current')
             this.onLogout.emit()

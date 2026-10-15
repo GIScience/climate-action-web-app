@@ -19,18 +19,18 @@ export class LandingComponent implements OnInit {
     private cdr = inject(ChangeDetectorRef)
     private tourEngine = inject(TourEngine)
 
-    totalActiveComputations = 0
+    totalComputations = 0
     latestComputation: ComputationDatabaseEntity | null = null
     loading = true
 
     async ngOnInit() {
         try {
             const [totalCount, latestComp] = await Promise.all([
-                this.storageService.getTotalActiveComputationsCount(),
-                this.storageService.getLatestActiveComputation()
+                this.storageService.getTotalComputationsCount(),
+                this.storageService.getLatestComputation()
             ])
 
-            this.totalActiveComputations = totalCount
+            this.totalComputations = totalCount
             this.latestComputation = latestComp
         } catch (error) {
             console.error('Error loading landing page data:', error)

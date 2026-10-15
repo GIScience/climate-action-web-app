@@ -54,4 +54,19 @@
             </ng-template>
         </div>
     }
+    @if (syncBadge(); as badge) {
+        @if (syncState() === 'error') {
+            <button
+                class="sync-badge sync-badge--error"
+                type="button"
+                [tp]="badge.labelKey | transloco"
+                (click)="retrySync()">
+                <svg [lucideIcon]="badge.icon" size="13" strokeWidth="3"></svg>
+            </button>
+        } @else {
+            <span [class]="'sync-badge sync-badge--' + syncState()" [tp]="badge.labelKey | transloco">
+                <svg [lucideIcon]="badge.icon" size="13" strokeWidth="3"></svg>
+            </span>
+        }
+    }
 </div>

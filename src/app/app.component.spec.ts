@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { ToastrService } from 'ngx-toastr'
@@ -8,6 +8,7 @@ import { AppComponent } from './app.component'
 import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
 import { MapService } from './dashboard/map/map.service'
 import { ReportService } from './dashboard/report/report.service'
+import { RunSyncService, SyncState } from './persistence/run-sync.service'
 
 jest.mock(
     'src/environments/environment',
@@ -65,7 +66,17 @@ describe('AppComponent', () => {
                 { provide: ArtifactViewerService, useValue: mockArtifactViewerService },
                 { provide: MapService, useValue: mockMapService },
                 { provide: ReportService, useValue: mockReportService },
-                { provide: ToastrService, useClass: MockToastrService }
+                { provide: ToastrService, useClass: MockToastrService },
+                {
+                    provide: RunSyncService,
+                    useValue: {
+                        syncState: signal<SyncState>('idle'),
+                        retrySync: jest.fn(),
+                        scheduleDrain: jest.fn(),
+                        commit: jest.fn().mockResolvedValue(undefined),
+                        drainNow: jest.fn().mockResolvedValue(undefined)
+                    }
+                }
             ]
         }).compileComponents()
 

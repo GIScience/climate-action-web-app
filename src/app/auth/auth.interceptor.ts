@@ -3,12 +3,10 @@ import { Injectable, inject } from '@angular/core'
 import { environment } from '@environments/environment'
 import { Observable, from, lastValueFrom } from 'rxjs'
 import { default as packageInfo } from '../../../package.json'
-import { DatabaseService } from '../database.service'
 import { AppwriteService } from './appwrite.service'
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    private databaseService = inject(DatabaseService)
     private appwriteService = inject(AppwriteService)
 
     private apiKey: string | null = null
@@ -66,7 +64,7 @@ export class AuthInterceptor implements HttpInterceptor {
         // Fetch and cache
         this.keyLoadPromise = (async () => {
             try {
-                const keyInfo = await this.databaseService.getBasicKey()
+                const keyInfo = await this.appwriteService.getBasicKey()
                 this.apiKey = keyInfo?.key || null
                 if (this.apiKey && this.currentUserId) {
                     sessionStorage.setItem(

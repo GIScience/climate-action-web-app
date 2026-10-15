@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core'
+import { importProvidersFrom, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core'
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy, Routes, provideRouter } from '@angular/router'
@@ -9,6 +9,7 @@ import { AuthInterceptor } from '@app/auth/auth.interceptor'
 import { DashboardComponent } from '@app/dashboard/dashboard.component'
 import { MapService } from '@app/dashboard/map/map.service'
 import { PageNotFoundComponent } from '@app/page-not-found/page-not-found.component'
+import { StorageService } from '@app/storage.service'
 import { SUPPORTED_LANGUAGES, SupportedLanguage, isValidLanguage } from '@app/types/language.types'
 import { tooltipVariation } from '@app/utils/tooltip-variations.utils'
 import { provideTransloco } from '@jsverse/transloco'
@@ -86,6 +87,7 @@ const routes: Routes = [
 bootstrapApplication(AppComponent, {
     providers: [
         provideZoneChangeDetection(),
+        provideAppInitializer(() => inject(StorageService).ready),
         provideRouter(routes),
         importProvidersFrom(BrowserModule, BrowserAnimationsModule),
         {

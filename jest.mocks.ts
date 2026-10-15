@@ -1,7 +1,15 @@
 import '@angular/compiler'
 import { TranslocoTestingModule, TranslocoTestingOptions } from '@jsverse/transloco'
+import { setImmediate as nodeSetImmediate } from 'node:timers'
 
 // Mock browser APIs that might not be available in test environment
+
+// jest's jsdom environment has no setImmediate, which fake-indexeddb relies on.
+// Provide Node's real one. Specs that use fake timers must leave it unfaked
+// (see `doNotFake` in run-sync.service.spec.ts).
+if (typeof globalThis.setImmediate === 'undefined') {
+    globalThis.setImmediate = nodeSetImmediate as unknown as typeof setImmediate
+}
 
 // Mock URL.createObjectURL used by Plotly Maps
 if (typeof window !== 'undefined') {

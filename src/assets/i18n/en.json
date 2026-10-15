@@ -96,6 +96,11 @@
         "bookmarkRemoved": "Removed from Bookmarks",
         "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
     },
+    "syncIndicator": {
+        "syncing": "Synchronising Bookmarks…",
+        "pending": "Bookmarks saved on this device, not synchronised yet",
+        "error": "Synchronisation failed, click to retry"
+    },
     "computation": {
         "addToReport": "Add to Report",
         "add": "Add »",
@@ -180,7 +185,8 @@
             "version": "Version: {{ version }}",
             "iconsByIcons8": "Icons by Icons8",
             "reportMapProblem": "Report a problem with the map"
-        }
+        },
+        "storageUnavailable": "Saving of Bookmarks isn't working on this device. Recent changes may be lost."
     },
     "walkthrough": {
         "tourChoiceDialog": {

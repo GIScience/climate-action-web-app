@@ -1,7 +1,12 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, computed, inject } from '@angular/core'
+import { RunSyncService, SyncState } from '@app/persistence/run-sync.service'
 import { TranslocoModule } from '@jsverse/transloco'
 import {
+    LucideCloudAlert,
+    LucideCloudUpload,
+    LucideDynamicIcon,
     LucideFootprints,
+    LucideIcon,
     LucideLifeBuoy,
     LucideLogIn,
     LucideLogOut,
@@ -10,6 +15,7 @@ import {
     LucideUser,
     LucideUserRound
 } from '@lucide/angular'
+import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { Subscription } from 'rxjs'
 import { environment } from '../../environments/environment'
@@ -18,9 +24,16 @@ import { DashboardService } from '../dashboard/dashboard.service'
 import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
 import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
 
+const SYNC_BADGES: Partial<Record<SyncState, { icon: LucideIcon; labelKey: string }>> = {
+    pending: { icon: LucideCloudUpload, labelKey: 'syncIndicator.pending' },
+    syncing: { icon: LucideCloudUpload, labelKey: 'syncIndicator.syncing' },
+    error: { icon: LucideCloudAlert, labelKey: 'syncIndicator.error' }
+}
+
 @Component({
     selector: 'app-account',
     imports: [
+        LucideDynamicIcon,
         LucideFootprints,
         LucideLifeBuoy,
         LucideLogIn,
@@ -30,7 +43,8 @@ import { DropdownMenuDirective } from '../shared/dropdown-menu.directive'
         LucideUser,
         LucideUserRound,
         TranslocoModule,
-        DropdownMenuDirective
+        DropdownMenuDirective,
+        TippyDirective
     ],
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
@@ -39,6 +53,10 @@ export class AccountComponent implements OnInit, OnDestroy {
     private appwriteService = inject(AppwriteService)
     private tourEngine = inject(TourEngine)
     private dashboardService = inject(DashboardService)
+    private runSync = inject(RunSyncService)
+
+    readonly syncState = this.runSync.syncState
+    readonly syncBadge = computed(() => SYNC_BADGES[this.syncState()] ?? null)
 
     user: Models.User<Models.Preferences> | null = null
     accountMenuOpen = false
@@ -80,6 +98,10 @@ export class AccountComponent implements OnInit, OnDestroy {
         this.accountMenuOpen = false
         this.dashboardService.clearDashboardState()
         this.tourEngine.initializeTour()
+    }
+
+    retrySync(): void {
+        this.runSync.retrySync()
     }
 
     toggleAccountMenu() {

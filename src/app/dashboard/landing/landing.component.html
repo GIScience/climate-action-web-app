@@ -2,9 +2,9 @@
     <div class="bg bg1"></div>
     <div class="bg bg2"></div>
 
-    @if (!loading && totalActiveComputations > 0) {
+    @if (!loading && totalComputations > 0) {
         <div class="welcome-content__revisit">
-            <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalActiveComputations } }}</h2>
+            <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalComputations } }}</h2>
             @if (latestComputation) {
                 <div class="latest-computation">
                     <h3>{{ 'landing.revisit.latestComputation' | transloco }}</h3>
@@ -33,7 +33,7 @@
         </div>
     }
 
-    @if (!loading && totalActiveComputations === 0) {
+    @if (!loading && totalComputations === 0) {
         <div class="welcome-content__new">
             <div class="intro-section">
                 <h1>{{ 'landing.welcome.title' | transloco }}</h1>

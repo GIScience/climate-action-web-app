@@ -11,12 +11,14 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 
 - Computation details (parameters, artifacts, AoI) are now hydrated lazily when a computation is expanded, instead of being fetched upfront
 - Own computations are now managed under the new 'Bookmarks' tab, and entries from the pre-computed set (see 'Discover' mode below) can be bookmarked into (and removed from) your personal list ([#354](https://gitlab.heigit.org/climate-action/web-app/-/issues/354))
+- Computation runs are now local-first: stored in IndexedDB (instead of a localStorage) and replicated to Appwrite in the background via a persisted outbox
 
 ### Added
 
 - New 'Discover' mode that is the default entrypoint:
     - Sidebar lists all valid pre-computed results of the selected plugin, fetched from the search endpoint with cursor-based pagination.
     - Pre-computed results are shown on the map as clustered centroids, which transition to boundary polygons upon zooming in ([#244](https://gitlab.heigit.org/climate-action/web-app/-/issues/244))
+- Bookmarks saved are kept locally and uploaded automatically once user logs in
 
 ### Removed
 

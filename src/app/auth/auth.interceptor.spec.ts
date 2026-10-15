@@ -4,14 +4,12 @@ import { environment } from '@environments/environment'
 import { jest } from '@jest/globals'
 import { Models } from 'appwrite'
 import { BehaviorSubject, Observable, of } from 'rxjs'
-import { BasicKeyInfo, DatabaseService } from '../database.service'
-import { AppwriteService } from './appwrite.service'
+import { AppwriteService, BasicKeyInfo } from './appwrite.service'
 import { AuthInterceptor } from './auth.interceptor'
 
 describe('AuthInterceptor', () => {
     let interceptor: AuthInterceptor
     let mockAppwriteService: Partial<AppwriteService>
-    let mockDatabaseService: Partial<DatabaseService>
     let mockHttpHandler: HttpHandler
     let mockUserSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
     let mockHandleFunction: jest.Mock
@@ -46,10 +44,7 @@ describe('AuthInterceptor', () => {
 
         mockAppwriteService = {
             _user: mockUserSubject,
-            tryToLogin: () => Promise.resolve(true)
-        }
-
-        mockDatabaseService = {
+            tryToLogin: () => Promise.resolve(true),
             getBasicKey: () => Promise.resolve(mockKeyInfo)
         }
 
@@ -60,14 +55,10 @@ describe('AuthInterceptor', () => {
         }
 
         jest.spyOn(mockAppwriteService, 'tryToLogin')
-        jest.spyOn(mockDatabaseService, 'getBasicKey')
+        jest.spyOn(mockAppwriteService, 'getBasicKey')
 
         TestBed.configureTestingModule({
-            providers: [
-                AuthInterceptor,
-                { provide: AppwriteService, useValue: mockAppwriteService },
-                { provide: DatabaseService, useValue: mockDatabaseService }
-            ]
+            providers: [AuthInterceptor, { provide: AppwriteService, useValue: mockAppwriteService }]
         })
 
         interceptor = TestBed.inject(AuthInterceptor)
@@ -124,7 +115,7 @@ describe('AuthInterceptor', () => {
         it('should handle errors when fetching API key', done => {
             mockUserSubject.next(mockUser)
 
-            jest.spyOn(mockDatabaseService, 'getBasicKey').mockImplementation(() => {
+            jest.spyOn(mockAppwriteService, 'getBasicKey').mockImplementation(() => {
                 return Promise.reject(new Error('Key fetch error'))
             })
 

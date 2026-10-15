@@ -1,4 +1,6 @@
+import { WritableSignal, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { RunSyncService, SyncState } from '@app/persistence/run-sync.service'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
 import { getTranslocoTestingModule } from '../../../jest.mocks'
@@ -13,6 +15,8 @@ describe('AccountComponent', () => {
     let appwriteService: Partial<AppwriteService>
     let dashboardService: Partial<DashboardService>
     let tourEngine: Partial<TourEngine>
+    let syncState: WritableSignal<SyncState>
+    let runSyncService: Partial<RunSyncService>
     let userSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
 
     const mockUser: Models.User<Models.Preferences> = {
@@ -45,12 +49,19 @@ describe('AccountComponent', () => {
             initializeTour: jest.fn()
         }
 
+        syncState = signal<SyncState>('idle')
+        runSyncService = {
+            syncState,
+            retrySync: jest.fn()
+        }
+
         await TestBed.configureTestingModule({
             imports: [AccountComponent, getTranslocoTestingModule()],
             providers: [
                 { provide: AppwriteService, useValue: appwriteService },
                 { provide: DashboardService, useValue: dashboardService },
-                { provide: TourEngine, useValue: tourEngine }
+                { provide: TourEngine, useValue: tourEngine },
+                { provide: RunSyncService, useValue: runSyncService }
             ]
         }).compileComponents()
 

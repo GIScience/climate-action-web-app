@@ -94,19 +94,19 @@ describe('pluginService', () => {
         mockPluginBlueprintOffline()
         mockPluginBlueprintComputation()
 
-        cy.visit('/', {
-            onBeforeLoad: seedLocalStorage([
-                {
-                    correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
-                    pluginId: 'plugin_blueprint',
-                    request_ts: '2024-12-17T08:55:23.807074Z',
-                    status: 'SUCCESS',
-                    aoiName: 'Heidelberg',
-                    flags: [],
-                    state: 'ACTIVE'
-                }
-            ])
-        })
+        cy.seedPluginRuns([
+            {
+                correlation_uuid: '8649e714-f29d-423f-85ce-cd55f4e5022a',
+                pluginId: 'plugin_blueprint',
+                request_ts: '2024-12-17T08:55:23.807074Z',
+                status: 'SUCCESS',
+                aoiName: 'Heidelberg',
+                flags: [],
+                state: 'ACTIVE'
+            }
+        ])
+
+        cy.visit('/', { onBeforeLoad: seedLocalStorage() })
 
         cy.wait('@getPluginsWithoutBlueprint')
         cy.wait('@getPluginWalkabilityIcon')

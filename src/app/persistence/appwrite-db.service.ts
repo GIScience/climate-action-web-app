@@ -1,16 +1,8 @@
 import { Injectable, inject } from '@angular/core'
+import { AppwriteService } from '@app/auth/appwrite.service'
+import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/computation.interface'
+import { environment } from '@environments/environment'
 import { Databases, ID, Models, Permission, Query, Role } from 'appwrite'
-import { environment } from '../environments/environment'
-import { AppwriteService } from './auth/appwrite.service'
-import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
-
-export interface BasicKeyInfo extends Models.Document {
-    hash: string
-    tyk_user_id: string
-    ors_policy: string
-    policy_upgrade_requests: string[]
-    key: string
-}
 
 // Map request_ts to timestamp to maintain Appwrite compatibility
 export interface ComputationDocument extends Models.Document, Omit<ComputationDatabaseEntity, 'request_ts'> {
@@ -33,7 +25,9 @@ export interface PaginatedResult<T> {
 @Injectable({
     providedIn: 'root'
 })
-export class DatabaseService {
+
+// Appwrite side of the runs storage: the user's documents in the runs collection.
+export class AppwriteDbService {
     private appwriteService = inject(AppwriteService)
 
     private readonly DATABASE_ID = 'climate_action'
@@ -108,89 +102,54 @@ export class DatabaseService {
         }
     }
 
-    async createPluginRun(run: ComputationDatabaseEntity): Promise<string | null> {
-        try {
-            if (!this.user_id) return null
+    private async findRunDocumentId(correlationId: string, userId: string): Promise<string | null> {
+        const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
+            Query.equal('correlation_uuid', correlationId),
+            Query.equal('user_id', userId),
+            Query.limit(1)
+        ])
 
-            const permissions = [
-                Permission.read(Role.user(this.user_id)),
-                Permission.update(Role.user(this.user_id)),
-                Permission.delete(Role.user(this.user_id))
-            ]
+        return response.documents.length > 0 ? response.documents[0].$id : null
+    }
 
-            const { request_ts, ...rest } = run
-            const response = await this.databases.createDocument(
-                this.DATABASE_ID,
-                this.RUNS_COLLECTION_ID,
-                ID.unique(),
-                {
-                    ...rest,
-                    timestamp: request_ts,
-                    user_id: this.user_id
-                },
-                permissions
-            )
+    // Creates the run's document, or updates it if it already exists, so it
+    // is safe to repeat. Used by the outbox drain. Unlike the paginated fetch,
+    // this throws on failure so the outbox retries.
+    async ensurePluginRun(run: ComputationDatabaseEntity): Promise<void> {
+        if (!this.user_id) throw new Error('Cannot sync plugin run without a logged-in user')
 
-            return response.$id
-        } catch (error) {
-            this.logError('Error creating plugin run in Appwrite:', error)
-            return null
+        const { request_ts, ...rest } = run
+        const data = { ...rest, timestamp: request_ts }
+        const documentId = await this.findRunDocumentId(run.correlation_uuid, this.user_id)
+
+        if (documentId) {
+            await this.databases.updateDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, documentId, data)
+            return
         }
+
+        const role = Role.user(this.user_id)
+        await this.databases.createDocument(
+            this.DATABASE_ID,
+            this.RUNS_COLLECTION_ID,
+            ID.unique(),
+            { ...data, user_id: this.user_id },
+            [Permission.read(role), Permission.update(role), Permission.delete(role)]
+        )
     }
 
-    async updatePluginRun(correlationId: string, updates: Partial<ComputationDatabaseEntity>): Promise<boolean> {
-        try {
-            if (!this.user_id) return false
+    // Deletes the run's document. Used by the outbox drain.
+    // A missing document counts as success (already deleted, or never
+    // uploaded). Throws on failure so the outbox retries.
+    async removePluginRun(correlationId: string): Promise<void> {
+        if (!this.user_id) throw new Error('Cannot delete plugin run without a logged-in user')
 
-            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('correlation_uuid', correlationId),
-                Query.equal('user_id', this.user_id),
-                Query.limit(1)
-            ])
+        const documentId = await this.findRunDocumentId(correlationId, this.user_id)
+        if (!documentId) return
 
-            if (response.documents.length === 0) return false
-
-            await this.databases.updateDocument(
-                this.DATABASE_ID,
-                this.RUNS_COLLECTION_ID,
-                response.documents[0].$id,
-                updates
-            )
-
-            return true
-        } catch (error) {
-            this.logError('Error updating plugin run in Appwrite:', error)
-            return false
-        }
+        await this.databases.deleteDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, documentId)
     }
 
-    async deletePluginRun(correlationId: string): Promise<boolean> {
-        try {
-            if (!this.user_id) return false
-
-            const response = await this.databases.listDocuments(this.DATABASE_ID, this.RUNS_COLLECTION_ID, [
-                Query.equal('correlation_uuid', correlationId),
-                Query.equal('user_id', this.user_id),
-                Query.limit(1)
-            ])
-
-            if (response.documents.length === 0) return false
-
-            await this.databases.deleteDocument(this.DATABASE_ID, this.RUNS_COLLECTION_ID, response.documents[0].$id)
-
-            return true
-        } catch (error) {
-            this.logError('Error deleting plugin run in Appwrite:', error)
-            return false
-        }
-    }
-
-    getBasicKey(): Promise<BasicKeyInfo | null> {
-        if (!this.user_id) return Promise.resolve(null)
-        return this.databases.getDocument('tyk_integration', 'basic_keys', this.user_id) as Promise<BasicKeyInfo>
-    }
-
-    async getTotalActiveComputationsCount(): Promise<number> {
+    async getTotalComputationsCount(): Promise<number> {
         try {
             if (!this.user_id) return 0
 
@@ -201,12 +160,12 @@ export class DatabaseService {
 
             return response.total
         } catch (error) {
-            this.logError('Error fetching total active computations count:', error)
+            this.logError('Error fetching total computations count:', error)
             return 0
         }
     }
 
-    async getLatestActiveComputation(): Promise<ComputationDatabaseEntity | null> {
+    async getLatestComputation(): Promise<ComputationDatabaseEntity | null> {
         try {
             if (!this.user_id) return null
 
@@ -229,7 +188,7 @@ export class DatabaseService {
                 language: doc.language
             } as ComputationDatabaseEntity
         } catch (error) {
-            this.logError('Error fetching latest active computation:', error)
+            this.logError('Error fetching latest computation:', error)
             return null
         }
     }
