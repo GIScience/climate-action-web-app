@@ -28,7 +28,7 @@ describe('AuthInterceptor', () => {
         $createdAt: new Date().toISOString(),
         $updatedAt: new Date().toISOString(),
         $permissions: [],
-        $collectionId: 'basic_keys',
+        $tableId: 'basic_keys',
         $databaseId: 'tyk_integration',
         $sequence: '0',
         hash: 'test-hash',

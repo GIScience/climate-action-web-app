@@ -78,8 +78,8 @@ export class StorageService {
             this.setItem(this.STORAGE_KEYS.RUNS_OWNER, user.$id)
             if (previousOwner && previousOwner !== user.$id) {
                 await this.ready
-                await this.runsDb.clearAll()
                 this.pluginRunsSubject.next([])
+                await this.runsDb.clearAll()
             }
         })
     }

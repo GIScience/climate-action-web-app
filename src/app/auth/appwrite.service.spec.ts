@@ -38,10 +38,8 @@ jest.mock('appwrite', () => ({
         setEndpoint: jest.fn().mockReturnThis(),
         setProject: jest.fn().mockReturnThis()
     })),
-    Databases: jest.fn().mockImplementation(() => ({
-        listDocuments: jest.fn().mockResolvedValue({ documents: [] }),
-        createDocument: jest.fn().mockResolvedValue({ $id: 'mock-document-id' }),
-        updateDocument: jest.fn().mockResolvedValue({})
+    TablesDB: jest.fn().mockImplementation(() => ({
+        getRow: jest.fn().mockResolvedValue({ $id: 'mock-row-id' })
     })),
     ID: {
         unique: jest.fn().mockReturnValue('unique-mock-id')
@@ -143,10 +141,10 @@ describe('AppwriteService', () => {
         })
     })
 
-    describe('getDatabases', () => {
-        it('should return the databases instance', () => {
-            const databases = service.getDatabases()
-            expect(databases).toBeDefined()
+    describe('getTablesDB', () => {
+        it('should return the TablesDB instance', () => {
+            const tablesDB = service.getTablesDB()
+            expect(tablesDB).toBeDefined()
         })
     })
 })

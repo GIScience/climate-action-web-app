@@ -13,22 +13,22 @@ afterAll(() => {
     console.error = originalConsoleError
 })
 
-interface MockDatabase {
-    listDocuments: jest.Mock
-    createDocument: jest.Mock
-    updateDocument: jest.Mock
-    deleteDocument: jest.Mock
+interface MockTablesDB {
+    listRows: jest.Mock
+    createRow: jest.Mock
+    updateRow: jest.Mock
+    deleteRow: jest.Mock
 }
 
 interface MockAppwriteService extends Partial<AppwriteService> {
-    getDatabases: jest.Mock
+    getTablesDB: jest.Mock
     _user: BehaviorSubject<Models.User<Models.Preferences> | null>
 }
 
 describe('AppwriteDbService', () => {
     let service: AppwriteDbService
     let mockAppwriteService: MockAppwriteService
-    let mockDatabases: MockDatabase
+    let mockTablesDB: MockTablesDB
     let userSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
 
     const mockUser = {
@@ -53,15 +53,15 @@ describe('AppwriteDbService', () => {
     beforeEach(() => {
         userSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(mockUser)
 
-        mockDatabases = {
-            listDocuments: jest.fn(),
-            createDocument: jest.fn(),
-            updateDocument: jest.fn(),
-            deleteDocument: jest.fn()
+        mockTablesDB = {
+            listRows: jest.fn(),
+            createRow: jest.fn(),
+            updateRow: jest.fn(),
+            deleteRow: jest.fn()
         }
 
         mockAppwriteService = {
-            getDatabases: jest.fn().mockReturnValue(mockDatabases),
+            getTablesDB: jest.fn().mockReturnValue(mockTablesDB),
             _user: userSubject
         }
 
@@ -86,48 +86,48 @@ describe('AppwriteDbService', () => {
             userSubject.next(null)
 
             await expect(service.ensurePluginRun(testRun)).rejects.toThrow()
-            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
+            expect(mockTablesDB.listRows).not.toHaveBeenCalled()
         })
 
         it('should create the document when none exists for the run', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({ documents: [] })
-            mockDatabases.createDocument.mockResolvedValue({ $id: 'new-doc-id' })
+            mockTablesDB.listRows.mockResolvedValue({ rows: [] })
+            mockTablesDB.createRow.mockResolvedValue({ $id: 'new-doc-id' })
 
             await service.ensurePluginRun(testRun)
 
-            expect(mockDatabases.updateDocument).not.toHaveBeenCalled()
-            expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                expect.any(String),
-                expect.objectContaining({
+            expect(mockTablesDB.updateRow).not.toHaveBeenCalled()
+            expect(mockTablesDB.createRow).toHaveBeenCalledWith({
+                databaseId: 'climate_action',
+                tableId: 'staging-dashboard_data',
+                rowId: expect.any(String),
+                data: expect.objectContaining({
                     correlation_uuid: 'test-uuid',
                     timestamp: testRun.request_ts,
                     user_id: 'test-user-id'
                 }),
-                expect.any(Array)
-            )
+                permissions: expect.any(Array)
+            })
         })
 
         it('should update the existing document when one exists for the run', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
             })
-            mockDatabases.updateDocument.mockResolvedValue({})
+            mockTablesDB.updateRow.mockResolvedValue({})
 
             await service.ensurePluginRun({ ...testRun, status: 'SUCCESS' })
 
-            expect(mockDatabases.createDocument).not.toHaveBeenCalled()
-            expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                'doc-id',
-                expect.objectContaining({ status: 'SUCCESS', timestamp: testRun.request_ts })
-            )
+            expect(mockTablesDB.createRow).not.toHaveBeenCalled()
+            expect(mockTablesDB.updateRow).toHaveBeenCalledWith({
+                databaseId: 'climate_action',
+                tableId: 'staging-dashboard_data',
+                rowId: 'doc-id',
+                data: expect.objectContaining({ status: 'SUCCESS', timestamp: testRun.request_ts })
+            })
         })
 
         it('should propagate transport errors so the outbox retries', async () => {
-            mockDatabases.listDocuments.mockRejectedValue(new Error('Network down'))
+            mockTablesDB.listRows.mockRejectedValue(new Error('Network down'))
 
             await expect(service.ensurePluginRun(testRun)).rejects.toThrow('Network down')
         })
@@ -138,36 +138,36 @@ describe('AppwriteDbService', () => {
             userSubject.next(null)
 
             await expect(service.removePluginRun('test-uuid')).rejects.toThrow()
-            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
+            expect(mockTablesDB.listRows).not.toHaveBeenCalled()
         })
 
         it('should delete the document when it exists', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
             })
-            mockDatabases.deleteDocument.mockResolvedValue({})
+            mockTablesDB.deleteRow.mockResolvedValue({})
 
             await service.removePluginRun('test-uuid')
 
-            expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                'doc-id'
-            )
+            expect(mockTablesDB.deleteRow).toHaveBeenCalledWith({
+                databaseId: 'climate_action',
+                tableId: 'staging-dashboard_data',
+                rowId: 'doc-id'
+            })
         })
 
         it('should treat an already-missing document as success', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({ documents: [] })
+            mockTablesDB.listRows.mockResolvedValue({ rows: [] })
 
             await expect(service.removePluginRun('test-uuid')).resolves.toBeUndefined()
-            expect(mockDatabases.deleteDocument).not.toHaveBeenCalled()
+            expect(mockTablesDB.deleteRow).not.toHaveBeenCalled()
         })
 
         it('should propagate transport errors so the outbox retries', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: [{ $id: 'doc-id', correlation_uuid: 'test-uuid' }]
             })
-            mockDatabases.deleteDocument.mockRejectedValue(new Error('Network down'))
+            mockTablesDB.deleteRow.mockRejectedValue(new Error('Network down'))
 
             await expect(service.removePluginRun('test-uuid')).rejects.toThrow('Network down')
         })
@@ -186,7 +186,7 @@ describe('AppwriteDbService', () => {
                 documents: [],
                 hasMore: false
             })
-            expect(mockDatabases.listDocuments).not.toHaveBeenCalled()
+            expect(mockTablesDB.listRows).not.toHaveBeenCalled()
         })
 
         it('should return paginated results for first page', async () => {
@@ -209,8 +209,8 @@ describe('AppwriteDbService', () => {
                 }
             ]
 
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: mockDocuments
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: mockDocuments
             })
 
             const result = await service.fetchPluginRunsPaginated({
@@ -218,16 +218,16 @@ describe('AppwriteDbService', () => {
                 pluginId: 'test-plugin'
             })
 
-            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                expect.arrayContaining([
+            expect(mockTablesDB.listRows).toHaveBeenCalledWith({
+                databaseId: 'climate_action',
+                tableId: 'staging-dashboard_data',
+                queries: expect.arrayContaining([
                     expect.stringContaining('"method":"equal"'),
                     expect.stringContaining('"method":"limit"'),
                     expect.stringContaining('"method":"orderDesc"'),
                     expect.stringContaining('"attribute":"pluginId"')
                 ])
-            )
+            })
             expect(result.documents).toEqual([
                 {
                     correlation_uuid: 'test-uuid-1',
@@ -262,8 +262,8 @@ describe('AppwriteDbService', () => {
                 }
             ]
 
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: mockDocuments
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: mockDocuments
             })
 
             const result = await service.fetchPluginRunsPaginated({
@@ -272,16 +272,16 @@ describe('AppwriteDbService', () => {
                 pluginId: 'test-plugin'
             })
 
-            expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                'climate_action',
-                'staging-dashboard_data',
-                expect.arrayContaining([
+            expect(mockTablesDB.listRows).toHaveBeenCalledWith({
+                databaseId: 'climate_action',
+                tableId: 'staging-dashboard_data',
+                queries: expect.arrayContaining([
                     expect.stringContaining('"method":"equal"'),
                     expect.stringContaining('"method":"limit"'),
                     expect.stringContaining('"method":"orderDesc"'),
                     expect.stringContaining('"method":"cursorAfter"')
                 ])
-            )
+            })
             expect(result.documents).toEqual([
                 {
                     correlation_uuid: 'test-uuid-3',
@@ -297,8 +297,8 @@ describe('AppwriteDbService', () => {
         })
 
         it('should handle last page correctly', async () => {
-            mockDatabases.listDocuments.mockResolvedValue({
-                documents: []
+            mockTablesDB.listRows.mockResolvedValue({
+                rows: []
             })
 
             const result = await service.fetchPluginRunsPaginated({

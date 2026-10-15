@@ -1,10 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core'
 import { environment } from '@environments/environment'
-import { Account, Client, Databases, Models } from 'appwrite'
+import { Account, Client, Models, TablesDB } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
 import { getCurrentCanonicalUrl } from '../utils/url.utils'
 
-export interface BasicKeyInfo extends Models.Document {
+export interface BasicKeyInfo extends Models.Row {
     hash: string
     tyk_user_id: string
     ors_policy: string
@@ -18,7 +18,7 @@ export interface BasicKeyInfo extends Models.Document {
 export class AppwriteService {
     private client = new Client()
     private account = new Account(this.client)
-    private databases = new Databases(this.client)
+    private tablesDB = new TablesDB(this.client)
     public _user = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
     public onLogout = new EventEmitter<void>()
     private beforeLogoutHooks: Array<() => Promise<void>> = []
@@ -29,14 +29,18 @@ export class AppwriteService {
         this.tryToLogin()
     }
 
-    getDatabases(): Databases {
-        return this.databases
+    getTablesDB(): TablesDB {
+        return this.tablesDB
     }
 
     getBasicKey(): Promise<BasicKeyInfo | null> {
         const userId = this._user.value?.$id
         if (!userId) return Promise.resolve(null)
-        return this.databases.getDocument('tyk_integration', 'basic_keys', userId) as Promise<BasicKeyInfo>
+        return this.tablesDB.getRow<BasicKeyInfo>({
+            databaseId: 'tyk_integration',
+            tableId: 'basic_keys',
+            rowId: userId
+        })
     }
 
     getAppwriteUrl(path: string): string {
