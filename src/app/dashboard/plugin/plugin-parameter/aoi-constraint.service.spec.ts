@@ -97,18 +97,13 @@ describe('AoiConstraintService', () => {
             expect(service.validate(feature(square(8.2, 49.2, 8.8, 49.8)))).toBeNull()
         })
 
-        it('accepts a selection identical to the geom (sliver tolerance)', () => {
+        it('accepts a selection identical to the geom', () => {
             expect(service.validate(feature(allowed))).toBeNull()
         })
 
-        it('tolerates a meters-wide overshoot along the border (mismatched border generalizations)', () => {
+        it('rejects even a meters-wide overshoot along the border (no tolerance for the custom geom)', () => {
             // Extends by ~36m
-            expect(service.validate(feature(square(8, 49, 9.0005, 50)))).toBeNull()
-        })
-
-        it('rejects an overshoot beyond the coverage tolerance', () => {
-            // Extends by ~215m
-            expect(service.validate(feature(square(8, 49, 9.003, 50)))).toEqual({ kind: 'outside-region' })
+            expect(service.validate(feature(square(8, 49, 9.0005, 50)))).toEqual({ kind: 'outside-region' })
         })
 
         it('rejects a partially overlapping selection', () => {
@@ -154,6 +149,20 @@ describe('AoiConstraintService', () => {
             httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
             httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
             expect(service.validate(feature(square(8.5, 49.2, 10.5, 49.8)))).toEqual({ kind: 'outside-region' })
+        })
+
+        it('tolerates a meters-wide overshoot along the border (mismatched border generalizations)', () => {
+            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
+            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            // Extends by ~36m
+            expect(service.validate(feature(square(8, 49, 10.0005, 50)))).toBeNull()
+        })
+
+        it('rejects an overshoot beyond the coverage tolerance', () => {
+            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
+            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            // Extends by ~215m
+            expect(service.validate(feature(square(8, 49, 10.003, 50)))).toEqual({ kind: 'outside-region' })
         })
 
         it('fails closed when all boundary fetches fail', () => {

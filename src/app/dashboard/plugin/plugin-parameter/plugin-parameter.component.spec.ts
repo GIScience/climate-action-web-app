@@ -1567,8 +1567,12 @@ describe('PluginParameterComponent', () => {
             buttons.slice(1).forEach(button => expect(button.disabled).toBe(true))
         })
 
-        it('defaults to Rectangle drawing for a coverage constraint without locking the other tools', () => {
-            jest.spyOn(constraintService, 'hasCoverageConstraint', 'get').mockReturnValue(true)
+        it('defaults to Rectangle drawing for a CoveredByGeomConstraint without locking the other tools', () => {
+            jest.spyOn(constraintService, 'coveredByGeomConstraint', 'get').mockReturnValue({
+                constraint_type: 'CoveredByGeomConstraint',
+                geom: { type: 'MultiPolygon', coordinates: [] },
+                description: 'Heidelberg'
+            })
             const enableSpy = jest.spyOn(component.mapService, 'enableBoundarySelection')
             const disableSpy = jest.spyOn(component.mapService, 'disableBoundarySelection')
             const drawSpy = jest.spyOn(component.mapService, 'startDrawing')

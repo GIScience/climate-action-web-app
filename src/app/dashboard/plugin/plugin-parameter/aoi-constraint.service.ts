@@ -39,7 +39,7 @@ export class AoiConstraintService {
 
     private constraints: AoiConstraint[] = []
     private boundaryGeometries = new Map<number, GeoJSONFeature>()
-    private dilatedOutersCache = new Map<AoiConstraint, (Polygon | MultiPolygon)[]>()
+    private dilatedOutersCache = new Map<CoveredByBoundaryConstraint, (Polygon | MultiPolygon)[]>()
     private fetchSubscription?: Subscription
     private _loadState: ConstraintLoadState = 'ready'
 
@@ -70,11 +70,7 @@ export class AoiConstraintService {
         return this.constraints.find(c => c.constraint_type === 'BoundarySelectionConstraint')
     }
 
-    get hasCoverageConstraint(): boolean {
-        return !!(this.coveredByGeomConstraint || this.coveredByBoundaryConstraint)
-    }
-
-    private get coveredByGeomConstraint(): CoveredByGeomConstraint | undefined {
+    get coveredByGeomConstraint(): CoveredByGeomConstraint | undefined {
         return this.constraints.find(c => c.constraint_type === 'CoveredByGeomConstraint')
     }
 
@@ -139,12 +135,15 @@ export class AoiConstraintService {
                 return null
             }
             case 'CoveredByGeomConstraint': {
-                return this.isCoveredWithTolerance(feature.geometry, constraint) ? null : { kind: 'outside-region' }
+                // The inline geom is definitive, so the AoI must fit inside it exactly
+                const inner = feature.geometry as Polygon | MultiPolygon
+                return MapGeoJsonUtils.isCoveredBy(inner, [constraint.geom]) ? null : { kind: 'outside-region' }
             }
             case 'CoveredByBoundaryConstraint': {
                 if (this._loadState === 'loading') return { kind: 'loading' }
                 if (this._loadState === 'error') return { kind: 'load-failed' }
-                // The AoI must fit entirely within the union of the boundaries (spanning is fine)
+                // The AoI must fit entirely within the union of the boundaries (spanning is fine),
+                // with some tolerance since selected and constraint boundaries may differ in generalisation
                 return this.isCoveredWithTolerance(feature.geometry, constraint) ? null : { kind: 'outside-region' }
             }
             case 'BoundarySelectionConstraint': {
@@ -157,18 +156,12 @@ export class AoiConstraintService {
 
     // Dilating the outers is expensive but they are fixed per activation,
     // so compute lazily on the first path check and reuse across validations
-    private isCoveredWithTolerance(
-        geometry: Geometry,
-        constraint: CoveredByGeomConstraint | CoveredByBoundaryConstraint
-    ): boolean {
+    private isCoveredWithTolerance(geometry: Geometry, constraint: CoveredByBoundaryConstraint): boolean {
         const inner = geometry as Polygon | MultiPolygon
-        const outers =
-            constraint.constraint_type === 'CoveredByGeomConstraint'
-                ? [constraint.geom]
-                : constraint.osm_ids
-                      .map(id => this.boundaryGeometries.get(id)?.geometry)
-                      .filter(MapGeoJsonUtils.isPolygonal)
-        return MapGeoJsonUtils.isCoveredBy(inner, outers, () => {
+        const outers = constraint.osm_ids
+            .map(id => this.boundaryGeometries.get(id)?.geometry)
+            .filter(MapGeoJsonUtils.isPolygonal)
+        return MapGeoJsonUtils.isCoveredByWithTolerance(inner, outers, () => {
             let dilated = this.dilatedOutersCache.get(constraint)
             if (!dilated) {
                 dilated = MapGeoJsonUtils.dilateForCoverage(outers)

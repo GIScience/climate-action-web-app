@@ -229,9 +229,13 @@ export class MapGeoJsonUtils {
         }
     }
 
-    // Distance by which the allowed regions are buffered for the coverage check,
+    // Distance by which the allowed regions are buffered for the tolerant coverage check,
     // to allow for minor mismatches in the border geometry.
     private static readonly COVERAGE_TOLERANCE_METERS = 50
+
+    private static toPolyclipGeom(geom: Polygon | MultiPolygon): PolyclipGeom {
+        return this.toMultiPolygon(geom).coordinates as PolyclipGeom
+    }
 
     static dilateForCoverage(outers: (Polygon | MultiPolygon)[]): (Polygon | MultiPolygon)[] {
         return outers
@@ -244,22 +248,25 @@ export class MapGeoJsonUtils {
             .filter(MapGeoJsonUtils.isPolygonal)
     }
 
-    // Check if `inner` lies fully inside the union of the `outers`, within COVERAGE_TOLERANCE_METERS
-    static isCoveredBy(
+    // Check if `inner` lies exactly inside the union of the `outers`
+    static isCoveredBy(inner: Polygon | MultiPolygon, outers: (Polygon | MultiPolygon)[]): boolean {
+        if (outers.length === 0) return false
+        return difference(this.toPolyclipGeom(inner), ...outers.map(g => this.toPolyclipGeom(g))).length === 0
+    }
+
+    // Check if `inner` lies inside the union of the `outers`, within COVERAGE_TOLERANCE_METERS
+    static isCoveredByWithTolerance(
         inner: Polygon | MultiPolygon,
         outers: (Polygon | MultiPolygon)[],
         getDilatedOuters?: () => (Polygon | MultiPolygon)[]
     ): boolean {
         if (outers.length === 0) return false
 
-        const toPolyclipGeom = (geom: Polygon | MultiPolygon): PolyclipGeom =>
-            this.toMultiPolygon(geom).coordinates as PolyclipGeom
-
         // Fast path: exactly inside the union, no buffering needed
-        if (difference(toPolyclipGeom(inner), ...outers.map(toPolyclipGeom)).length === 0) return true
+        if (this.isCoveredBy(inner, outers)) return true
 
         const dilatedOuters = getDilatedOuters?.() ?? this.dilateForCoverage(outers)
-        const remainder = difference(toPolyclipGeom(inner), ...dilatedOuters.map(toPolyclipGeom))
+        const remainder = difference(this.toPolyclipGeom(inner), ...dilatedOuters.map(g => this.toPolyclipGeom(g)))
         if (remainder.length === 0) return true
 
         // Ignore leftover clipping artifacts below 1m² resulting from rounding errors
