@@ -12,6 +12,7 @@ import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.m
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
 import { ArtifactService } from '../artifact/artifact.service'
+import { ComputationParametersDialogComponent } from '../common/computation-parameters-dialog/computation-parameters-dialog.component'
 import { MapSearchManagerService } from '../map/map-search-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
@@ -473,7 +474,7 @@ describe('ComputationsIndexComponent', () => {
         component.viewParameters(computation)
 
         expect(mockMatDialog.open).toHaveBeenCalledWith(
-            component.parametersDialog,
+            ComputationParametersDialogComponent,
             expect.objectContaining({
                 data: {
                     params: computation.params,
@@ -482,28 +483,5 @@ describe('ComputationsIndexComponent', () => {
                 autoFocus: false
             })
         )
-    })
-
-    it('should format values and handle nested structures', () => {
-        const entries = component.getParameterEntries({
-            enabled: true,
-            names: ['alpha', 'beta'],
-            config: { max_value: 3 }
-        })
-
-        expect(entries).toEqual([
-            { key: 'enabled', value: 'Yes' },
-            { key: 'names', value: 'alpha, beta' },
-            { key: 'config', value: 'Max Value: 3' }
-        ])
-    })
-
-    it('requested param helpers should detect requested params', () => {
-        const params = { foo: 1, bar: 2 }
-        const requested = { bar: 2 }
-
-        expect(component.hasUserRequestedParams(params, requested)).toBe(true)
-        expect(component.isUserRequestedParam('bar', requested)).toBe(true)
-        expect(component.isUserRequestedParam('foo', requested)).toBe(false)
     })
 })

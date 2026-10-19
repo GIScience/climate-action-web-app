@@ -287,43 +287,6 @@
     </div>
 </ng-template>
 
-<ng-template #parametersDialog let-data>
-    <div class="parameters-dialog">
-        <h3>{{ 'computationsIndex.parameters.title' | transloco }}</h3>
-        <ng-scrollbar orientation="vertical" class="parameters-dialog__scrollbar">
-            <div class="parameters-dialog__content">
-                @if (hasUserRequestedParams(data.params, data.requestedParams)) {
-                    <p class="parameters-legend">
-                        <span class="user-defined-indicator"></span>
-                        {{ 'computationsIndex.parameters.userDefined' | transloco }}
-                    </p>
-                }
-                @let entries = getParameterEntries(data.params);
-                @if (entries.length > 0) {
-                    <table class="parameters-table">
-                        <tbody>
-                            @for (entry of entries; track entry.key) {
-                                <tr
-                                    [ngClass]="{
-                                        'user-defined': isUserRequestedParam(entry.key, data.requestedParams)
-                                    }">
-                                    <td class="parameter-name">{{ formatParameterName(entry.key) }}</td>
-                                    <td class="parameter-value">{{ entry.value }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                } @else {
-                    <p class="no-params-message">{{ 'computationsIndex.parameters.noParams' | transloco }}</p>
-                }
-            </div>
-        </ng-scrollbar>
-        <button (click)="closeDialog()" class="close-dialog">
-            <svg lucideX size="25"></svg>
-        </button>
-    </div>
-</ng-template>
-
 <ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
     <div class="artifact-errors-tooltip">
         <h3 class="tooltip-title">{{ 'computationsIndex.artifactErrors' | transloco }}</h3>

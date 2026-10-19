@@ -20,7 +20,6 @@ import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
 import { SupportedLanguage } from '@app/types/language.types'
-import { getDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
@@ -33,17 +32,20 @@ import {
     LucideLoader,
     LucideLoaderCircle,
     LucideMessageSquareWarning,
-    LucideShare2,
-    LucideX
+    LucideShare2
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
-import { compareDesc, format } from 'date-fns'
+import { compareDesc } from 'date-fns'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { firstValueFrom } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
+import {
+    ComputationParametersDialogComponent,
+    ComputationParametersDialogData
+} from '../common/computation-parameters-dialog/computation-parameters-dialog.component'
 import { isPendingStatus, statusRank } from '../common/status-rank.util'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
@@ -53,19 +55,13 @@ import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
-import {
-    formatParameterName,
-    getParameterEntries,
-    hasUserRequestedParams,
-    isUserRequestedParam
-} from './computation-parameter.utils'
+import { formatComputationTimestamp, formatShortUUID, getLanguageMismatchTooltip } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
 import { ComputationSyncService } from './computation-sync.service'
 import {
     ComputationDatabaseEntity,
     ComputationDisplayEntity,
     ComputationMetadata,
-    ComputationParameters,
     DiscoverTab
 } from './computation.interface'
 import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
@@ -90,7 +86,6 @@ import { mapDatabaseComputation, mapHydratedComputation } from './computation.ma
         LucideLoaderCircle,
         LucideMessageSquareWarning,
         LucideShare2,
-        LucideX,
         ComputationComponent,
         TranslocoModule
     ],
@@ -171,10 +166,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     @Input() plugin?: Plugin
     pluginLanguage: SupportedLanguage = SupportedLanguage.EN
 
-    @ViewChild('parametersDialog') parametersDialog!: TemplateRef<{
-        params: ComputationParameters
-    }>
-
     @ViewChild('artifactErrorsTooltip') artifactErrorsTooltip!: TemplateRef<{
         artifactErrors: ComputationDisplayEntity['artifact_errors']
     }>
@@ -202,26 +193,10 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     formatTimestamp(timestamp: Date | string) {
-        const date =
-            typeof timestamp === 'string'
-                ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z')
-                : timestamp
-        const lang = this.translocoService.getActiveLang()
-        return format(date, this.getDatePattern(lang), { locale: getDateFnsLocale(lang) })
+        return formatComputationTimestamp(timestamp, this.translocoService.getActiveLang())
     }
 
-    private getDatePattern(lang: string): string {
-        switch (lang) {
-            case SupportedLanguage.DE:
-                return 'd. MMM yyyy, HH:mm'
-            default:
-                return 'd MMM yyyy, h:mm a'
-        }
-    }
-
-    formatUUID(correlation_uuid: string): string {
-        return correlation_uuid.substring(0, 8)
-    }
+    formatUUID = formatShortUUID
 
     ngOnInit(): void {
         this.pluginLanguage = this.plugin?.language ?? SupportedLanguage.EN
@@ -618,28 +593,21 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     viewParameters(computation: ComputationDisplayEntity, event?: Event) {
         event?.stopPropagation()
-        this.dialog.open(this.parametersDialog, {
-            data: {
-                params: computation.params,
-                requestedParams: computation.requested_params
-            },
-            autoFocus: false
-        })
-    }
-
-    closeDialog() {
-        this.dialog.closeAll()
+        this.dialog.open<ComputationParametersDialogComponent, ComputationParametersDialogData>(
+            ComputationParametersDialogComponent,
+            {
+                data: {
+                    params: computation.params,
+                    requestedParams: computation.requested_params
+                },
+                autoFocus: false
+            }
+        )
     }
 
     private startPeriodicSync() {
         this.syncService.start(() => this.runs().filter(run => isPendingStatus(run.status)))
     }
-
-    // Pure parameter-formatting helpers live in computation-parameter.utils.ts.
-    getParameterEntries = getParameterEntries
-    isUserRequestedParam = isUserRequestedParam
-    hasUserRequestedParams = hasUserRequestedParams
-    formatParameterName = formatParameterName
 
     importComputation(correlationUuid: string): void {
         if (this.isBookmarked(correlationUuid)) {
@@ -724,28 +692,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
-        const computationLanguage = computation.language ?? SupportedLanguage.EN
-        const currentLanguage = this.translocoService.getActiveLang() as SupportedLanguage
-        const pluginLanguage = this.pluginLanguage ?? SupportedLanguage.EN
-
-        if (computationLanguage === currentLanguage) {
-            return null
-        }
-
-        const getLanguageLabel = (language: SupportedLanguage): string => {
-            const displayNames = new Intl.DisplayNames([currentLanguage], { type: 'language' })
-            return displayNames.of(language) ?? language
-        }
-
-        const translationKey =
-            pluginLanguage === currentLanguage
-                ? 'computationsIndex.languageMismatch'
-                : 'computationsIndex.languageMismatchPluginOnly'
-
-        return this.translocoService.translate(translationKey, {
-            language: getLanguageLabel(computationLanguage),
-            currentLanguage: getLanguageLabel(currentLanguage),
-            pluginLanguage: getLanguageLabel(pluginLanguage)
-        })
+        return getLanguageMismatchTooltip(computation, this.pluginLanguage, this.translocoService)
     }
 }

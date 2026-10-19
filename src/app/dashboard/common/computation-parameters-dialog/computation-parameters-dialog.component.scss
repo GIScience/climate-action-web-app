@@ -1,0 +1,91 @@
+@use 'spec/tools/rem' as *;
+
+.parameters-dialog {
+    padding: rem(20) rem(30);
+    position: relative;
+
+    h3 {
+        margin-top: 0;
+    }
+
+    .parameters-legend {
+        align-items: center;
+        color: #666;
+        display: flex;
+        font-size: 0.85rem;
+        gap: rem(8);
+        margin-bottom: rem(15);
+        margin-top: 0;
+
+        .user-defined-indicator {
+            background-color: #008080;
+            border-radius: 2px;
+            display: inline-block;
+            height: rem(12);
+            width: rem(4);
+        }
+    }
+
+    .parameters-dialog__scrollbar {
+        max-height: 50vh;
+    }
+
+    .parameters-dialog__content {
+        max-width: rem(650);
+        min-width: rem(500);
+        position: relative;
+
+        .parameters-table {
+            border-collapse: collapse;
+            width: 100%;
+
+            tr.user-defined {
+                td {
+                    background-color: rgba(0, 128, 128, 0.08);
+
+                    &.parameter-name {
+                        border-left: 4px solid #008080;
+                        color: #006666;
+                    }
+                }
+            }
+
+            td {
+                border-bottom: 1px solid #ccc;
+                padding: rem(8) rem(12);
+
+                &.parameter-name {
+                    border-left: 4px solid transparent;
+                    border-right: 1px solid #ccc;
+                    color: #666;
+                    font-variation-settings: 'wght' 500;
+                    width: 40%;
+                }
+
+                &.parameter-value {
+                    word-break: break-word;
+                }
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+        }
+
+        .no-params-message {
+            padding: rem(20);
+            text-align: center;
+        }
+    }
+
+    button.close-dialog {
+        background: #fff;
+        border: none;
+        border-radius: 50%;
+        color: #666;
+        cursor: pointer;
+        position: absolute;
+        right: rem(5);
+        top: rem(15);
+    }
+}
