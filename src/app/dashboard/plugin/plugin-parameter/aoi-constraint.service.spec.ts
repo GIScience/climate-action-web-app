@@ -1,12 +1,23 @@
+import { HttpRequest } from '@angular/common/http'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
-import { TestBed } from '@angular/core/testing'
+import { fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { Plugin } from '@app/dashboard/plugin/plugin.interface'
-import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
+import type { FeatureCollection, Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { environment } from 'src/environments/environment'
 import { AoiConstraintService } from './aoi-constraint.service'
 
-const ogcItemUrl = (id: number) =>
-    `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${id}`
+const collectionUrl = `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items`
+
+// The single CQL-filtered request for the given ids
+const boundaryRequest =
+    (...ids: number[]) =>
+    (req: HttpRequest<unknown>) =>
+        req.url === collectionUrl &&
+        req.params.get('limit') === String(ids.length) &&
+        req.params.get('filter') === `id IN (${ids.map(id => `'${id}'`).join(', ')})` &&
+        req.params.get('filter-lang') === 'cql2-text'
+
+const collection = (...features: GeoJSONFeature[]): FeatureCollection => ({ type: 'FeatureCollection', features })
 
 const square = (west: number, south: number, east: number, north: number): MultiPolygon => ({
     type: 'MultiPolygon',
@@ -116,8 +127,10 @@ describe('AoiConstraintService', () => {
     })
 
     describe('CoveredByBoundaryConstraint', () => {
-        const boundaryA = feature(square(8, 49, 9, 50), { name: 'Region A', name_de: 'Gebiet A' })
-        const boundaryB = feature(square(9, 49, 10, 50), { name: 'Region B' })
+        const boundaryA = feature(square(8, 49, 9, 50), { id: -90689, name: 'Region A', name_de: 'Gebiet A' })
+        const boundaryB = feature(square(9, 49, 10, 50), { id: -90690, name: 'Region B' })
+        const flushBoundaries = (...features: GeoJSONFeature[]) =>
+            httpMock.expectOne(boundaryRequest(-90689, -90690)).flush(collection(...features))
 
         beforeEach(() => {
             service.activate(
@@ -128,54 +141,51 @@ describe('AoiConstraintService', () => {
         it('reports loading until the boundary geometries arrive', () => {
             expect(service.loadState).toBe('loading')
             expect(service.validate(feature(square(8.2, 49.2, 8.8, 49.8)))).toEqual({ kind: 'loading' })
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
         })
 
         it('accepts a selection inside a single boundary', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             expect(service.loadState).toBe('ready')
             expect(service.validate(feature(square(8.2, 49.2, 8.8, 49.8)))).toBeNull()
         })
 
         it('accepts a selection spanning two adjacent boundaries (their union)', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             expect(service.validate(feature(square(8.5, 49.2, 9.5, 49.8)))).toBeNull()
         })
 
         it('rejects a selection extending beyond the union of the boundaries', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             expect(service.validate(feature(square(8.5, 49.2, 10.5, 49.8)))).toEqual({ kind: 'outside-region' })
         })
 
         it('tolerates a meters-wide overshoot along the border (mismatched border generalizations)', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             // Extends by ~36m
             expect(service.validate(feature(square(8, 49, 10.0005, 50)))).toBeNull()
         })
 
         it('rejects an overshoot beyond the coverage tolerance', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             // Extends by ~215m
             expect(service.validate(feature(square(8, 49, 10.003, 50)))).toEqual({ kind: 'outside-region' })
         })
 
-        it('fails closed when all boundary fetches fail', () => {
-            httpMock.expectOne(ogcItemUrl(-90689)).error(new ProgressEvent('error'))
-            httpMock.expectOne(ogcItemUrl(-90690)).error(new ProgressEvent('error'))
+        it('retries a failed fetch and fails closed once the retries are exhausted', fakeAsync(() => {
+            httpMock.expectOne(boundaryRequest(-90689, -90690)).error(new ProgressEvent('error'))
+            tick(400)
+            httpMock.expectOne(boundaryRequest(-90689, -90690)).error(new ProgressEvent('error'))
+            tick(400)
+            expect(service.loadState).toBe('loading')
+            httpMock.expectOne(boundaryRequest(-90689, -90690)).error(new ProgressEvent('error'))
             expect(service.loadState).toBe('error')
             expect(service.validate(feature(square(8.2, 49.2, 8.8, 49.8)))).toEqual({ kind: 'load-failed' })
-        })
+        }))
 
-        it('validates against the successful subset when some fetches fail', () => {
+        it('validates against the returned subset when some boundaries are missing from the response', () => {
             const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).error(new ProgressEvent('error'))
+            flushBoundaries(boundaryA)
             expect(service.loadState).toBe('ready')
             expect(warnSpy).toHaveBeenCalled()
             expect(service.validate(feature(square(8.2, 49.2, 8.8, 49.8)))).toBeNull()
@@ -185,8 +195,7 @@ describe('AoiConstraintService', () => {
 
         it('describes the constraint with the localized names of the loaded boundaries', () => {
             expect(service.describeConstraints('en')).toEqual([{ kind: 'covered-by-boundary', names: [] }])
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             expect(service.describeConstraints('en')).toEqual([
                 { kind: 'covered-by-boundary', names: ['Region A', 'Region B'] }
             ])
@@ -195,11 +204,10 @@ describe('AoiConstraintService', () => {
             ])
         })
 
-        it('emits geometriesChanged$ when the fetches settle', () => {
+        it('emits geometriesChanged$ when the fetch settles', () => {
             const emitted = jest.fn()
             service.geometriesChanged$.subscribe(emitted)
-            httpMock.expectOne(ogcItemUrl(-90689)).flush(boundaryA)
-            httpMock.expectOne(ogcItemUrl(-90690)).flush(boundaryB)
+            flushBoundaries(boundaryA, boundaryB)
             expect(emitted).toHaveBeenCalledTimes(1)
         })
     })
@@ -209,8 +217,14 @@ describe('AoiConstraintService', () => {
             service.activate(
                 pluginWith([[{ constraint_type: 'BoundarySelectionConstraint', osm_ids: [-11674964, -14320076] }]])
             )
-            httpMock.expectOne(ogcItemUrl(-11674964)).flush(feature(square(8, 49, 9, 50)))
-            httpMock.expectOne(ogcItemUrl(-14320076)).flush(feature(square(9, 49, 10, 50)))
+            httpMock
+                .expectOne(boundaryRequest(-11674964, -14320076))
+                .flush(
+                    collection(
+                        feature(square(8, 49, 9, 50), { id: -11674964 }),
+                        feature(square(9, 49, 10, 50), { id: -14320076 })
+                    )
+                )
         })
 
         it('matches allowed ids whether the feature id is a string or a number', () => {
@@ -260,10 +274,10 @@ describe('AoiConstraintService', () => {
         ])
     })
 
-    it('cancels in-flight fetches and resets state on deactivate', () => {
+    it('cancels the in-flight fetch and resets state on deactivate', () => {
         service.activate(pluginWith([[{ constraint_type: 'CoveredByBoundaryConstraint', osm_ids: [-90689] }]]))
         service.deactivate()
-        httpMock.expectOne(ogcItemUrl(-90689))
+        expect(httpMock.expectOne(boundaryRequest(-90689)).cancelled).toBe(true)
         expect(service.hasConstraints).toBe(false)
         expect(service.loadState).toBe('ready')
         expect(service.allowedGeometries).toHaveLength(0)

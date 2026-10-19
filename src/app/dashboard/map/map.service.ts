@@ -583,6 +583,19 @@ export class MapService {
         this.map.fitBounds(bounds, fitOptions)
     }
 
+    // Whether the user is already looking at (part of) the extent:
+    // zoomed in beyond `minZoom` with a viewport that overlaps it
+    isExtentInView(extent: Extent, minZoom: number): boolean {
+        if (!this.map || this.map.getZoom() <= minZoom) return false
+        const view = this.map.getBounds()
+        return (
+            extent[0] <= view.getEast() &&
+            extent[2] >= view.getWest() &&
+            extent[1] <= view.getNorth() &&
+            extent[3] >= view.getSouth()
+        )
+    }
+
     // Fly to extent with smooth animation - handles coordinates, bounding boxes, and features
     flyToExtent(target: Extent | AutocompleteFeature | LngLatLike, options?: maplibregl.FlyToOptions) {
         if (!this.map) return

@@ -1593,19 +1593,30 @@ describe('PluginParameterComponent', () => {
             buttons.forEach(button => expect(button.disabled).toBe(false))
         })
 
-        it('updates the fog of war and revalidates when constraint geometries arrive', () => {
+        it('flies to the allowed regions and revalidates when constraint geometries arrive', () => {
             const allowed = [selectedFeature(1)]
             jest.spyOn(constraintService, 'allowedGeometries', 'get').mockReturnValue(allowed)
+            const loadState = jest.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
             const validateSpy = jest.spyOn(constraintService, 'validate').mockReturnValue(null)
             const fowSpy = jest.spyOn(component.mapService, 'updateFoWGeometries')
+            const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+            const inViewSpy = jest.spyOn(component.mapService, 'isExtentInView').mockReturnValue(false)
 
             selectFeature(selectedFeature(2))
             validateSpy.mockClear()
 
+            loadState.mockReturnValue('ready')
             constraintService.geometriesChanged$.next()
 
             expect(fowSpy).toHaveBeenCalledWith(allowed, 'constraint')
+            expect(inViewSpy).toHaveBeenCalledWith([0, 0, 1, 1], 7)
+            expect(flySpy).toHaveBeenCalledWith([0, 0, 1, 1])
             expect(validateSpy).toHaveBeenCalled()
+
+            inViewSpy.mockReturnValue(true)
+            flySpy.mockClear()
+            constraintService.geometriesChanged$.next()
+            expect(flySpy).not.toHaveBeenCalled()
         })
 
         it('overlays the panel while constraint geometries load and hides it once the map settles', async () => {

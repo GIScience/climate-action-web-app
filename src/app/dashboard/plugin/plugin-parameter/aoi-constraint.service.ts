@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { MapGeoJsonUtils } from '@app/dashboard/map/utils/map-geojson.utils'
 import {
@@ -10,8 +10,8 @@ import {
     Plugin
 } from '@app/dashboard/plugin/plugin.interface'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
-import type { Feature as GeoJSONFeature, Geometry, MultiPolygon, Polygon } from 'geojson'
-import { catchError, forkJoin, of, Subject, Subscription } from 'rxjs'
+import type { FeatureCollection, Feature as GeoJSONFeature, Geometry, MultiPolygon, Polygon } from 'geojson'
+import { catchError, of, retry, Subject, Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
 
 export type AoiViolationKind = 'area' | 'outside-region' | 'not-allowed-boundary' | 'load-failed' | 'loading'
@@ -29,6 +29,11 @@ export interface AoiConstraintDescription {
 }
 
 export type ConstraintLoadState = 'loading' | 'ready' | 'error'
+
+const BOUNDARY_COLLECTION_URL = `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items`
+
+const RETRY_COUNT = 2
+const RETRY_DELAY_MS = 400
 
 @Injectable()
 export class AoiConstraintService {
@@ -184,32 +189,41 @@ export class AoiConstraintService {
         }
 
         this._loadState = 'loading'
-        const requests = osmIds.map(id =>
-            this.http
-                .get<GeoJSONFeature>(
-                    `${environment.heigitMapsUrl}/vector/service/ohsome/ogc/features/v1/collections/admin_world_water/items/${id}`,
-                    { headers: { Accept: 'application/geo+json' } }
-                )
-                .pipe(catchError(() => of(null)))
-        )
 
-        this.fetchSubscription = forkJoin(requests).subscribe(features => {
-            features.forEach((feature, index) => {
-                if (feature?.geometry) {
-                    this.boundaryGeometries.set(osmIds[index], feature)
-                }
-            })
-            this.dilatedOutersCache.clear()
-
-            if (this.boundaryGeometries.size === 0) {
-                this._loadState = 'error'
-            } else {
-                if (this.boundaryGeometries.size < osmIds.length) {
-                    console.warn('Some AoI constraint boundaries could not be loaded; validating against the subset')
-                }
-                this._loadState = 'ready'
+        // A single CQL-filtered request for all boundaries
+        const params = new HttpParams({
+            fromObject: {
+                limit: String(osmIds.length),
+                filter: `id IN (${osmIds.map(id => `'${id}'`).join(', ')})`,
+                'filter-lang': 'cql2-text'
             }
-            this.geometriesChanged$.next()
         })
+        this.fetchSubscription = this.http
+            .get<FeatureCollection>(BOUNDARY_COLLECTION_URL, { params, headers: { Accept: 'application/geo+json' } })
+            .pipe(
+                retry({ count: RETRY_COUNT, delay: RETRY_DELAY_MS }),
+                catchError(() => of(null))
+            )
+            .subscribe(collection => {
+                for (const feature of collection?.features ?? []) {
+                    const osmId = Number(feature.properties?.['id'])
+                    if (feature.geometry && osmIds.includes(osmId)) {
+                        this.boundaryGeometries.set(osmId, feature)
+                    }
+                }
+                this.dilatedOutersCache.clear()
+
+                if (this.boundaryGeometries.size === 0) {
+                    this._loadState = 'error'
+                } else {
+                    if (this.boundaryGeometries.size < osmIds.length) {
+                        console.warn(
+                            'Some AoI constraint boundaries could not be loaded; validating against the subset'
+                        )
+                    }
+                    this._loadState = 'ready'
+                }
+                this.geometriesChanged$.next()
+            })
     }
 }

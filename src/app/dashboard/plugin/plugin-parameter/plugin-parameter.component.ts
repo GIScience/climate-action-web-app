@@ -210,6 +210,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
 
     private bufferSourceFeature?: GeoJSONFeature
     protected readonly defaultBufferRadius = 10
+    private readonly constraintFlyMaxZoom = 7
 
     constructor() {
         this.highlightedFeaturesSubscription = this.mapService.selectedFeatures$.subscribe(() => {
@@ -604,9 +605,19 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private refreshConstraintState(): void {
-        this.mapService.updateFoWGeometries(this.aoiConstraints.allowedGeometries, 'constraint')
+        const allowed = this.aoiConstraints.allowedGeometries
+        this.mapService.updateFoWGeometries(allowed, 'constraint')
         this.constraintDescriptions = this.aoiConstraints.describeConstraints(this.translocoService.getActiveLang())
         this.updateConstraintViolation()
+
+        // Bring the allowed regions into view once they are complete. Skipped if the user
+        // is already zoomed in on (part of) them, so as not to override their choice.
+        if (allowed.length > 0 && this.aoiConstraints.loadState !== 'loading') {
+            const extent = bbox({ type: 'FeatureCollection', features: allowed }) as Extent
+            if (!this.mapService.isExtentInView(extent, this.constraintFlyMaxZoom)) {
+                this.mapService.flyToExtent(extent)
+            }
+        }
     }
 
     private updateConstraintViolation(): void {
