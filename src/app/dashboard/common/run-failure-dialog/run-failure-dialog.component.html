@@ -1,0 +1,41 @@
+<div class="run-failure-dialog">
+    <h3>
+        {{
+            (data.revoked ? 'computationsIndex.runFailure.revokedTitle' : 'computationsIndex.runFailure.failedTitle')
+                | transloco
+        }}
+    </h3>
+    <p>
+        {{
+            (data.revoked
+                ? 'computationsIndex.runFailure.revokedDescription'
+                : 'computationsIndex.runFailure.failedDescription'
+            ) | transloco: { plugin: data.pluginName, aoi: data.aoiName }
+        }}
+    </p>
+    @if (data.message) {
+        <p class="run-failure-dialog__message">{{ data.message }}</p>
+    }
+    <p class="run-failure-dialog__hint">{{ 'computationsIndex.runFailure.supportHint' | transloco }}</p>
+    <div class="run-failure-dialog__id">
+        <code>{{ data.correlationUuid }}</code>
+        <button class="btn-alt btn-small btn-withtext--after" (click)="copyRunId()">
+            @if (copied()) {
+                <svg lucideCheck size="16"></svg>
+                {{ 'computationsIndex.runFailure.copied' | transloco }}
+            } @else {
+                <svg lucideCopy size="16"></svg>
+                {{ 'computationsIndex.runFailure.copyId' | transloco }}
+            }
+        </button>
+    </div>
+    <div class="run-failure-dialog__actions">
+        <button class="btn-primary btn-withtext--after" (click)="contactSupport()">
+            <svg lucideMail size="18"></svg>
+            {{ 'computationsIndex.runFailure.contactSupport' | transloco }}
+        </button>
+    </div>
+    <button (click)="close()" class="close-dialog">
+        <svg lucideX size="25"></svg>
+    </button>
+</div>

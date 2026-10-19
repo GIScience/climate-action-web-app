@@ -42,7 +42,7 @@
                         <svg lucideFootprints size="20"></svg>
                         {{ 'account.startWalkthrough' | transloco }}
                     </button>
-                    <a href="mailto:climateactionnavigator@heigit.org" class="account-menu__item" target="_blank">
+                    <a [href]="'mailto:' + environment.supportEmail" class="account-menu__item" target="_blank">
                         <svg lucideLifeBuoy size="20"></svg>
                         {{ 'account.support' | transloco }}
                     </a>

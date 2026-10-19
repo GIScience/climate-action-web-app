@@ -15,4 +15,5 @@
     window['env']['CACHET_WATCHED_COMPONENTS'] = '${CACHET_WATCHED_COMPONENTS}'
     window['env']['SCHEDULE_LOOKAHEAD_DAYS'] = '${SCHEDULE_LOOKAHEAD_DAYS}'
     window['env']['FALLBACK_SCHEDULES_URL'] = '${FALLBACK_SCHEDULES_URL}'
+    window['env']['SUPPORT_EMAIL'] = '${SUPPORT_EMAIL}'
 })(this)

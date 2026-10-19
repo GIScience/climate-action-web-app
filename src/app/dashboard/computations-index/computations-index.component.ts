@@ -20,6 +20,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
 import { SupportedLanguage } from '@app/types/language.types'
+import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
@@ -46,6 +47,10 @@ import {
     ComputationParametersDialogComponent,
     ComputationParametersDialogData
 } from '../common/computation-parameters-dialog/computation-parameters-dialog.component'
+import {
+    RunFailureDialogComponent,
+    RunFailureDialogData
+} from '../common/run-failure-dialog/run-failure-dialog.component'
 import { isPendingStatus, statusRank } from '../common/status-rank.util'
 import { ComputationComponent } from '../computation/computation.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
@@ -57,7 +62,7 @@ import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import { formatComputationTimestamp, formatShortUUID, getLanguageMismatchTooltip } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
-import { ComputationSyncService } from './computation-sync.service'
+import { ComputationSyncService, RunStateTransition } from './computation-sync.service'
 import {
     ComputationDatabaseEntity,
     ComputationDisplayEntity,
@@ -219,7 +224,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         this.syncService.transitions$
             .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(transition => this.transitionRunStatus(transition.run, transition.newStatus, transition.message))
+            .subscribe(transition => this.transitionRunStatus(transition))
 
         this.pluginService
             .getPluginRuns()
@@ -355,11 +360,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         return this.appwriteService.getRedirectUrl()
     }
 
-    private transitionRunStatus(
-        run: ComputationDatabaseEntity,
-        newStatus: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE',
-        message?: string
-    ) {
+    private transitionRunStatus({ run, newStatus, message }: RunStateTransition) {
         this.pluginService.updateRunStatus(run.correlation_uuid, newStatus)
 
         run.status = newStatus
@@ -379,16 +380,33 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     enableHtml: true
                 }
             )
-        } else if (newStatus === 'FAILURE') {
-            this.toastr.error(
-                `Error while computing <strong>${this.pluginService.getPluginNameById(run.pluginId || '')}</strong> for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)})${message ? ' - ' + message : ''}.`,
-                '',
-                {
-                    disableTimeOut: true,
-                    enableHtml: true
-                }
-            )
+        } else if (newStatus === 'FAILURE' || newStatus === 'REVOKED') {
+            this.openRunFailureDialog(run, newStatus === 'REVOKED', message)
         }
+    }
+
+    private openRunFailureDialog(run: ComputationDatabaseEntity, revoked: boolean, message?: string) {
+        const pluginName = this.pluginService.getPluginNameById(run.pluginId || '')
+        const subject = this.translocoService.translate('computationsIndex.runFailure.emailSubject', {
+            id: this.formatUUID(run.correlation_uuid)
+        })
+        const body = this.translocoService.translate('computationsIndex.runFailure.emailBody', {
+            plugin: pluginName,
+            id: run.correlation_uuid
+        })
+        const query = `subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        const data: RunFailureDialogData = {
+            revoked,
+            pluginName,
+            aoiName: run.aoiName,
+            correlationUuid: run.correlation_uuid,
+            message,
+            mailto: `mailto:${environment.supportEmail}?${query}`
+        }
+        this.dialog.open<RunFailureDialogComponent, RunFailureDialogData>(RunFailureDialogComponent, {
+            data,
+            autoFocus: false
+        })
     }
 
     private async ensureHydrated(computation: ComputationDisplayEntity): Promise<ComputationDisplayEntity> {

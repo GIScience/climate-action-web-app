@@ -39,18 +39,22 @@ describe('ComputationSyncService', () => {
         service.stop()
     })
 
-    it('should emit a transition per non-pending state and carry the failure message', fakeAsync(() => {
+    it('should emit a transition only when the state changed', fakeAsync(() => {
         const runs = [
             createRun({ correlation_uuid: 'started-run' }),
             createRun({ correlation_uuid: 'success-run' }),
             createRun({ correlation_uuid: 'failed-run' }),
-            createRun({ correlation_uuid: 'pending-run' })
+            createRun({ correlation_uuid: 'revoked-run' }),
+            createRun({ correlation_uuid: 'pending-run' }),
+            createRun({ correlation_uuid: 'still-started-run', status: 'STARTED' })
         ]
         const stateByUuid: Record<string, { state: string; message?: string }> = {
             'started-run': { state: 'STARTED' },
             'success-run': { state: 'SUCCESS' },
             'failed-run': { state: 'FAILURE', message: 'out of memory' },
-            'pending-run': { state: 'PENDING' }
+            'revoked-run': { state: 'REVOKED', message: 'cancelled' },
+            'pending-run': { state: 'PENDING' },
+            'still-started-run': { state: 'STARTED' }
         }
         mockPluginService.getComputationRunState = jest.fn((uuid: string) => of(stateByUuid[uuid]))
 
@@ -59,7 +63,8 @@ describe('ComputationSyncService', () => {
         expect(transitions).toEqual([
             { run: runs[0], newStatus: 'STARTED' },
             { run: runs[1], newStatus: 'SUCCESS' },
-            { run: runs[2], newStatus: 'FAILURE', message: 'out of memory' }
+            { run: runs[2], newStatus: 'FAILURE', message: 'out of memory' },
+            { run: runs[3], newStatus: 'REVOKED', message: 'cancelled' }
         ])
 
         service.stop()

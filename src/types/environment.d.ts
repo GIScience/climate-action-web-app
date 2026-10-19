@@ -13,6 +13,7 @@ export interface Environment {
     cachetWatchedComponents: string
     scheduleLookaheadDays: string
     fallbackSchedulesUrl: string
+    supportEmail: string
 }
 
 export type EnvironmentType = 'testing' | 'development' | 'staging' | 'production'
@@ -34,6 +35,7 @@ declare global {
             CACHET_WATCHED_COMPONENTS?: string
             SCHEDULE_LOOKAHEAD_DAYS?: string
             FALLBACK_SCHEDULES_URL?: string
+            SUPPORT_EMAIL?: string
         }
     }
 }

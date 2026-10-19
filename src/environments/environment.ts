@@ -14,5 +14,6 @@ export const environment: Environment = {
     cachetUrl: window.env?.CACHET_URL || 'https://status.heigit.org',
     cachetWatchedComponents: window.env?.CACHET_WATCHED_COMPONENTS || 'Climate Action: Climate Action Navigator',
     scheduleLookaheadDays: window.env?.SCHEDULE_LOOKAHEAD_DAYS || '7',
-    fallbackSchedulesUrl: window.env?.FALLBACK_SCHEDULES_URL || ''
+    fallbackSchedulesUrl: window.env?.FALLBACK_SCHEDULES_URL || '',
+    supportEmail: window.env?.SUPPORT_EMAIL || 'climateactionnavigator@heigit.org'
 }

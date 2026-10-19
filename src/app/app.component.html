@@ -47,9 +47,7 @@
                 'app.footer.sourceCode' | transloco
             }}</a>
             |
-            <a href="mailto:climateactionnavigator@heigit.org" target="_blank">{{
-                'app.footer.partnerWithUs' | transloco
-            }}</a>
+            <a [href]="'mailto:' + supportEmail" target="_blank">{{ 'app.footer.partnerWithUs' | transloco }}</a>
             | <a href="https://heigit.org/imprint" target="_blank">{{ 'app.footer.imprint' | transloco }}</a> |
             <a href="https://heigit.org/privacy-policy" target="_blank">{{ 'app.footer.privacyPolicy' | transloco }}</a>
             |

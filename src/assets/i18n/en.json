@@ -88,6 +88,18 @@
             "noParams": "This computation used no parameters.",
             "userDefined": "User-defined parameter"
         },
+        "runFailure": {
+            "failedTitle": "Computation failed",
+            "revokedTitle": "Computation cancelled",
+            "failedDescription": "The computation in the '{{ plugin }}' tool for the area '{{ aoi }}' could not be completed.",
+            "revokedDescription": "The computation in the '{{ plugin }}' tool for the area '{{ aoi }}' was stopped before completion, likely because the maximum calculation time was exceeded. The platform may be busy right now; please try again later.",
+            "supportHint": "If this keeps happening, contact support and include the computation ID below so we can look into it.",
+            "copyId": "Copy ID",
+            "copied": "Copied",
+            "contactSupport": "Contact support",
+            "emailSubject": "Climate Action Navigator: Computation #{{ id }} failed",
+            "emailBody": "Hello,\n\nmy computation in the '{{ plugin }}' tool did not complete.\n\nComputation ID: {{ id }}\n\n"
+        },
         "computationAlreadyPresent": "Computation ID #{{ id }} is already present",
         "computationImported": "Computation ID #{{ id }} imported",
         "errorImportingComputation": "Error importing computation",

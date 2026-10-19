@@ -56,6 +56,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     title = 'Climate Action Navigator'
     name = 'HeiGIT'
     version: string = packageInfo.version
+    supportEmail = environment.supportEmail
 
     ngOnInit(): void {
         if (environment.environmentType !== 'production') {

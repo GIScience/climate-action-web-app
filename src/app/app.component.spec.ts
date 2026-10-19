@@ -24,7 +24,8 @@ jest.mock(
             appwriteWebsiteUrl: 'mock-appwrite-website-url',
             cachetUrl: 'http://mock-cachet-url',
             cachetWatchedComponents: 'Climate Action: Climate Action Navigator',
-            scheduleLookaheadDays: '7'
+            scheduleLookaheadDays: '7',
+            supportEmail: 'support@example.org'
         }
     }),
     { virtual: true }

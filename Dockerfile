@@ -39,6 +39,7 @@ ENV CACHET_URL=""
 ENV CACHET_WATCHED_COMPONENTS=""
 ENV SCHEDULE_LOOKAHEAD_DAYS=""
 ENV FALLBACK_SCHEDULES_URL=""
+ENV SUPPORT_EMAIL=""
 
 EXPOSE 80
 CMD ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]

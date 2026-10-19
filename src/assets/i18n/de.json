@@ -88,6 +88,18 @@
             "noParams": "Es wurden keine Einstellungsparameter angegeben.",
             "userDefined": "Benutzerdefinierter Parameter"
         },
+        "runFailure": {
+            "failedTitle": "Berechnung fehlgeschlagen",
+            "revokedTitle": "Berechnung abgebrochen",
+            "failedDescription": "Die Berechnung im Modul '{{ plugin }}' für die Region '{{ aoi }}' konnte nicht abgeschlossen werden.",
+            "revokedDescription": "Die Berechnung im Modul '{{ plugin }}' für die Region '{{ aoi }}' wurde vor dem Abschluss abgebrochen, wahrscheinlich da die maximale Berechnungsdauer überschritten wurde. Möglicherweise ist die Platform gerade ausgelastet, bitte versuche es später nocheinmal.",
+            "supportHint": "Falls das wiederholt passiert, wende dich an den Support und gib dabei die unten stehende Berechnungs-ID an, damit wir das prüfen können.",
+            "copyId": "ID kopieren",
+            "copied": "Kopiert",
+            "contactSupport": "Support kontaktieren",
+            "emailSubject": "Climate Action Navigator: Berechnung #{{ id }} fehlgeschlagen",
+            "emailBody": "Hallo,\n\nmeine Berechnung im Modul '{{ plugin }}' ist fehlgeschlagen.\n\nBerechnungs-ID: {{ id }}\n\n"
+        },
         "computationAlreadyPresent": "Das Ergebnis mit der Identifikationsnummer #{{ id }} ist bereits vorhanden.",
         "computationImported": "Das Ergebnis mit der Identifikationsnummer #{{ id }} wurde importiert.",
         "errorImportingComputation": "Es gab einen Fehler beim Importieren des Ergebnisses.",

@@ -5,7 +5,7 @@ import { ComputationDatabaseEntity } from './computation.interface'
 
 export interface RunStateTransition {
     run: ComputationDatabaseEntity
-    newStatus: 'STARTED' | 'SUCCESS' | 'FAILURE'
+    newStatus: 'STARTED' | 'SUCCESS' | 'FAILURE' | 'REVOKED'
     message?: string
 }
 
@@ -86,6 +86,8 @@ export class ComputationSyncService implements OnDestroy {
         this.getPendingRuns().forEach(run => {
             this.pluginService.getComputationRunState(run.correlation_uuid).subscribe({
                 next: stateInfo => {
+                    if (stateInfo.state === run.status) return
+
                     switch (stateInfo.state) {
                         case 'STARTED':
                             this.transitions.next({ run, newStatus: 'STARTED' })
@@ -95,6 +97,9 @@ export class ComputationSyncService implements OnDestroy {
                             break
                         case 'FAILURE':
                             this.transitions.next({ run, newStatus: 'FAILURE', message: stateInfo.message })
+                            break
+                        case 'REVOKED':
+                            this.transitions.next({ run, newStatus: 'REVOKED', message: stateInfo.message })
                             break
                         case 'PENDING':
                         default:
