@@ -14,6 +14,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computation runs are now local-first: stored in IndexedDB (instead of a localStorage) and replicated to Appwrite in the background via a persisted outbox
 - Computation failure notices are surfaced in a persistent dialog now instead of the toast, with the option given to contact support
 - Toggling a computation opens it in a dedicated detail view, instead of expanding it in place within the list
+- Legacy `?share-id=` links are redirected to the new deep link route
 
 ### Added
 
@@ -22,6 +23,8 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
     - Pre-computed results are shown on the map as clustered centroids, which transition to boundary polygons upon zooming in ([#244](https://gitlab.heigit.org/climate-action/web-app/-/issues/244))
 - Bookmarks saved are kept locally and uploaded automatically once user logs in
 - Acknowledge and handle REVOKED state in computations ([#482](https://gitlab.heigit.org/climate-action/web-app/-/issues/482))
+- Computations and artifacts now have shareable deep links, that update the address bar dynamically
+- In 'Discover' mode, hovering a boundary highlights it with a tooltip and clicking it opens the computation directly (overlapping boundaries show a list to pick from)
 
 ### Removed
 

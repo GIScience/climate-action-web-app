@@ -28,22 +28,20 @@ describe('computations', () => {
         cy.get('.computations-index-content').should('exist')
     }
 
-    /// TODO: Restore in MR !469
+    it('should display the selected artifact even after a reload', () => {
+        setupTest()
 
-    // it('should display the selected artifact even after a reload', () => {
-    //     setupTest()
-    //
-    //     cy.get('.parent-computation').eq(0).click()
-    //
-    //     cy.wait('@getPluginBlueprintComputation')
-    //
-    //     cy.get('.child-computation').eq(1).click()
-    //
-    //     cy.wait('@getBlueprintTable')
-    //
-    //     cy.reload(true)
-    //     cy.get('.table-artifact-item').should('exist')
-    // })
+        cy.get('.parent-computation').eq(0).click()
+
+        cy.wait('@getPluginBlueprintComputation')
+
+        cy.get('.child-computation').eq(1).click()
+
+        cy.wait('@getBlueprintTable')
+
+        cy.reload(true)
+        cy.get('.table-artifact-item').should('exist')
+    })
 
     it('should display the detailed description for an artifact when available', () => {
         setupTest()
@@ -74,11 +72,11 @@ describe('computations', () => {
 
         cy.get('@writeText').should(
             'have.been.calledOnceWith',
-            'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
+            'http://localhost:4200/dashboard/plugin/plugin_blueprint/computation/8649e714-f29d-423f-85ce-cd55f4e5022a'
         )
     })
 
-    it('should import a computation when visiting the share link', () => {
+    it('should handle a legacy share link', () => {
         setupTest()
 
         cy.window().then(win => {
@@ -93,6 +91,6 @@ describe('computations', () => {
             'http://localhost:4200/dashboard/plugin/plugin_blueprint?share-id=8649e714-f29d-423f-85ce-cd55f4e5022a'
         )
 
-        cy.get('.parent-computation').should('exist').should('have.length', 1)
+        cy.get('.computation-detail').should('exist').should('have.length', 1)
     })
 })

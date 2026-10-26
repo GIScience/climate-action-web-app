@@ -78,5 +78,8 @@ console.error = (...args: any[]) => {
     if (fullMessage.includes('Error fetching computation metadata for')) {
         return
     }
+    if (fullMessage.includes('Error loading computation:')) {
+        return
+    }
     originalConsoleError.apply(console, args)
 }

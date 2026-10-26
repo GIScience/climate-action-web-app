@@ -27,7 +27,7 @@
                 }
                 @if (bookmarkedRuns.length > 0) {
                     <div class="computations-container">
-                        <ng-scrollbar visibility="hover" orientation="vertical">
+                        <ng-scrollbar visibility="hover" appearance="compact" orientation="vertical">
                             @for (
                                 scheduledRun of scheduled() | filterByCriteria: pluginId;
                                 track scheduledRun.correlation_uuid
@@ -114,7 +114,7 @@
                 }
                 @if (searchComputations().length > 0) {
                     <div class="computations-container">
-                        <ng-scrollbar visibility="hover" orientation="vertical">
+                        <ng-scrollbar visibility="hover" appearance="compact" orientation="vertical">
                             @for (computation of searchComputations(); track computation.correlation_uuid) {
                                 <ng-container
                                     *ngTemplateOutlet="
@@ -206,10 +206,10 @@
             @if (!isReportVisible) {
                 <div class="computation-actions">
                     <button
-                        (click)="shareComputation(computation.correlation_uuid, $event)"
-                        [tp]="'computationsIndex.actions.share' | transloco"
+                        (click)="copyShareLink(computation, $event)"
+                        [tp]="'computationDetail.copyLink' | transloco"
                         tpPlacement="left"
-                        [attr.aria-label]="'computationsIndex.actions.share' | transloco"
+                        [attr.aria-label]="'computationDetail.copyLink' | transloco"
                         class="share-trigger btn-onlyicon">
                         <svg lucideShare2 size="18"></svg>
                     </button>

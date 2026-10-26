@@ -60,6 +60,14 @@
                         <svg lucideListTodo size="18"></svg>
                     </button>
                     <button
+                        (click)="copyShareLink($event)"
+                        [tp]="'computationDetail.copyLink' | transloco"
+                        tpPlacement="left"
+                        [attr.aria-label]="'computationDetail.copyLink' | transloco"
+                        class="share-trigger btn-onlyicon">
+                        <svg lucideShare2 size="18"></svg>
+                    </button>
+                    <button
                         (click)="toggleBookmark($event)"
                         [class.bookmarked]="isBookmarked()"
                         [tp]="
@@ -86,7 +94,9 @@
                 <app-computation
                     [computation]="computation"
                     [activeArtifact]="activeArtifact"
-                    (artifactActivated)="onArtifactActivated($event)">
+                    (activeArtifactChange)="onActiveArtifactChange($event)"
+                    [selectedTag]="selectedTag"
+                    (selectedTagChange)="onSelectedTagChange($event)">
                 </app-computation>
             </ng-scrollbar>
         </div>

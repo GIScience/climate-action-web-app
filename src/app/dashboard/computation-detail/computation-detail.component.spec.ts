@@ -7,7 +7,7 @@ import { ActivatedRoute, convertToParamMap, Router, RouterModule } from '@angula
 import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, of, throwError } from 'rxjs'
+import { BehaviorSubject, of, Subject, throwError } from 'rxjs'
 import { MockToastrService } from '../../../../jest.mocks'
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
@@ -17,9 +17,14 @@ import { ComputationParametersDialogComponent } from '../common/computation-para
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
+import { ShareService } from '../share/share.service'
 import { ComputationDetailComponent } from './computation-detail.component'
 
 const UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
+
+function flushPromises(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve))
+}
 
 function buildMetadata(pluginId: string = 'test_plugin') {
     return {
@@ -74,11 +79,14 @@ describe('ComputationDetailComponent', () => {
     let mockMapArtifactManager: Partial<MapArtifactManagerService>
     let mockArtifactViewerService: Partial<ArtifactViewerService>
     let mockArtifactService: Partial<ArtifactService>
+    let mockShareService: Partial<ShareService>
     let mockMatDialog: { open: jest.Mock; closeAll: jest.Mock }
     let router: Router
+    let navigateSpy: jest.SpyInstance
     let translocoService: TranslocoService
 
     let paramMap$: BehaviorSubject<ReturnType<typeof convertToParamMap>>
+    let snapshotStub: { queryParamMap: ReturnType<typeof convertToParamMap> }
     let routeStub: ActivatedRoute
     let pluginRuns$: BehaviorSubject<unknown[]>
     let viewerVisible$: BehaviorSubject<boolean>
@@ -90,7 +98,12 @@ describe('ComputationDetailComponent', () => {
         viewerVisible$ = new BehaviorSubject<boolean>(false)
         mapArtifacts$ = new BehaviorSubject<unknown[]>([])
 
-        routeStub = { paramMap: paramMap$.asObservable() } as unknown as ActivatedRoute
+        snapshotStub = { queryParamMap: convertToParamMap({}) }
+        routeStub = {
+            paramMap: paramMap$.asObservable(),
+            snapshot: snapshotStub,
+            parent: { snapshot: { params: { name: 'test_plugin' } } }
+        } as unknown as ActivatedRoute
 
         mockPluginService = {
             getComputationMetadata: jest.fn().mockReturnValue(of(buildMetadata())),
@@ -109,6 +122,7 @@ describe('ComputationDetailComponent', () => {
         }
 
         mockMapService = {
+            mapReady$: of(undefined),
             highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
             flyToExtent: jest.fn(),
             removeFocusedLayer: jest.fn(),
@@ -142,6 +156,10 @@ describe('ComputationDetailComponent', () => {
             getLegend: jest.fn()
         } as unknown as Partial<ArtifactService>
 
+        mockShareService = {
+            copyShareLink: jest.fn()
+        }
+
         mockMatDialog = { open: jest.fn(), closeAll: jest.fn() }
 
         await TestBed.configureTestingModule({
@@ -160,6 +178,7 @@ describe('ComputationDetailComponent', () => {
                 { provide: MapArtifactManagerService, useValue: mockMapArtifactManager },
                 { provide: ArtifactViewerService, useValue: mockArtifactViewerService },
                 { provide: ArtifactService, useValue: mockArtifactService },
+                { provide: ShareService, useValue: mockShareService },
                 { provide: ToastrService, useClass: MockToastrService },
                 { provide: MatDialog, useValue: mockMatDialog },
                 provideTippyLoader(() => import('tippy.js')),
@@ -175,8 +194,9 @@ describe('ComputationDetailComponent', () => {
 
         translocoService = TestBed.inject(TranslocoService)
         router = TestBed.inject(Router)
-        // The ActivatedRoute stub lacks router internals, so real navigation must never run in tests
-        jest.spyOn(router, 'navigate').mockResolvedValue(true)
+        // The ActivatedRoute stub lacks router internals, so real navigation
+        // (e.g. the ?artifact= query param sync) must never run in tests
+        navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true)
     })
 
     function createComponent(): void {
@@ -209,6 +229,22 @@ describe('ComputationDetailComponent', () => {
         expect(fixture.debugElement.queryAll(By.css('.child-computation')).length).toBe(1)
     }))
 
+    it('should defer the AoI focus until the map is ready', fakeAsync(() => {
+        const mapReady$ = new Subject<void>()
+        mockMapService.mapReady$ = mapReady$.asObservable()
+
+        createComponent()
+        tick()
+
+        expect(component.state).toBe('ready')
+        expect(mockMapService.highlightAoI).not.toHaveBeenCalled()
+
+        mapReady$.next()
+
+        expect(mockMapService.highlightAoI).toHaveBeenCalled()
+        expect(mockMapService.flyToExtent).toHaveBeenCalledWith([0, 0, 1, 1])
+    }))
+
     it('should show the not-found panel when the metadata fetch 404s', fakeAsync(() => {
         mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(throwError(() => ({ status: 404 })))
 
@@ -237,6 +273,87 @@ describe('ComputationDetailComponent', () => {
 
         expect(component.state).toBe('ready')
     }))
+
+    it('should redirect to the owning plugin when the URL names the wrong one', fakeAsync(() => {
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(buildMetadata('other_plugin')))
+
+        createComponent()
+        tick()
+
+        expect(navigateSpy).toHaveBeenCalledWith(
+            ['/dashboard/plugin', 'other_plugin', 'computation', UUID],
+            expect.objectContaining({ replaceUrl: true, queryParamsHandling: 'preserve' })
+        )
+        expect(component.state).toBe('loading')
+    }))
+
+    it('should auto-open the artifact named in the query param', fakeAsync(() => {
+        snapshotStub.queryParamMap = convertToParamMap({ artifact: 'blueprint_image.png' })
+
+        createComponent()
+        tick()
+        fixture.detectChanges()
+
+        expect(component.activeArtifact?.filename).toBe('blueprint_image.png')
+    }))
+
+    it('should warn about and strip an unknown ?artifact= param instead of opening anything', fakeAsync(() => {
+        snapshotStub.queryParamMap = convertToParamMap({ artifact: 'missing.png' })
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+        createComponent()
+        tick()
+
+        expect(component.activeArtifact).toBeUndefined()
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('missing.png'))
+        expect(navigateSpy).toHaveBeenCalledWith(
+            [],
+            expect.objectContaining({ queryParams: { artifact: null }, queryParamsHandling: 'merge', replaceUrl: true })
+        )
+    }))
+
+    it('should clear the active artifact and its URL param when the viewer closes', fakeAsync(() => {
+        snapshotStub.queryParamMap = convertToParamMap({ artifact: 'blueprint_image.png' })
+
+        createComponent()
+        tick()
+        expect(component.activeArtifact?.filename).toBe('blueprint_image.png')
+        navigateSpy.mockClear()
+
+        viewerVisible$.next(false)
+
+        expect(component.activeArtifact).toBeUndefined()
+        expect(mockMapArtifactManager.setActiveArtifactId).toHaveBeenLastCalledWith(null)
+        expect(navigateSpy).toHaveBeenCalledWith([], expect.objectContaining({ queryParams: { artifact: null } }))
+    }))
+
+    it('should write the default tag to the URL on load, then merge user selections and share them', async () => {
+        const metadata = buildMetadata()
+        metadata.artifacts.push({ ...metadata.artifacts[0], name: 'Chart', filename: 'chart.png', primary: false })
+        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(metadata))
+
+        createComponent()
+        await flushPromises()
+        fixture.detectChanges()
+
+        expect(component.selectedTag).toBe('main')
+        expect(navigateSpy).toHaveBeenCalledWith([], expect.objectContaining({ queryParams: { tag: 'main' } }))
+        navigateSpy.mockClear()
+
+        component.onSelectedTagChange('visualization')
+
+        expect(navigateSpy).toHaveBeenCalledWith(
+            [],
+            expect.objectContaining({
+                queryParams: { tag: 'visualization' },
+                queryParamsHandling: 'merge',
+                replaceUrl: true
+            })
+        )
+
+        component.copyShareLink()
+        expect(mockShareService.copyShareLink).toHaveBeenCalledWith('test_plugin', UUID, undefined, 'visualization')
+    })
 
     it('should display the artifact errors icon when the computation has artifact errors', fakeAsync(() => {
         mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(

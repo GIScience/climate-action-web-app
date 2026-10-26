@@ -4,9 +4,11 @@ import {
     Component,
     EventEmitter,
     Input,
+    OnChanges,
     OnDestroy,
     OnInit,
     Output,
+    SimpleChanges,
     TemplateRef,
     ViewChild,
     inject
@@ -27,7 +29,7 @@ import {
 import { TippyDirective } from '@ngneat/helipopper'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription } from 'rxjs'
+import { Observable, Subscription, take } from 'rxjs'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { ArtifactData, ArtifactEntity, ChartData, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -71,7 +73,7 @@ const DEFAULT_TAGS = {
     templateUrl: './computation.component.html',
     styleUrls: ['./computation.component.scss']
 })
-export class ComputationComponent implements OnInit, OnDestroy {
+export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
     artifactService = inject(ArtifactService)
     private pluginService = inject(PluginService)
     private mapService = inject(MapService)
@@ -84,8 +86,12 @@ export class ComputationComponent implements OnInit, OnDestroy {
     private dialog = inject(MatDialog)
 
     @Input() computation!: ComputationDisplayEntity
+
     @Input() activeArtifact?: ArtifactEntity
-    @Output() artifactActivated = new EventEmitter<ArtifactEntity>()
+    @Output() activeArtifactChange = new EventEmitter<ArtifactEntity>()
+
+    @Input() selectedTag?: string
+    @Output() selectedTagChange = new EventEmitter<string | undefined>()
 
     @ViewChild('descriptionDialog') descriptionDialog!: TemplateRef<{
         description: string
@@ -95,8 +101,9 @@ export class ComputationComponent implements OnInit, OnDestroy {
     private artifactFetchSubscription: Subscription | undefined
     private reportVisibilitySubscription: Subscription | undefined
     isReportVisible = false
+    // What this component itself opened; stops the host's echo of it from re-opening it
+    private openedArtifact?: ArtifactEntity
 
-    selectedTag: string = ''
     availableTags: string[] = []
     filteredArtifacts: ArtifactEntity[] = []
     tagCounts: Map<string, number> = new Map()
@@ -109,6 +116,12 @@ export class ComputationComponent implements OnInit, OnDestroy {
             this.isReportVisible = isVisible
         })
         this.initializeTagsAndFiltering()
+        this.openRequestedArtifact()
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['selectedTag']?.firstChange === false) this.applySelectedTag()
+        if (changes['activeArtifact']?.firstChange === false) this.openRequestedArtifact()
     }
 
     ngOnDestroy(): void {
@@ -219,16 +232,6 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
         this.pluginService.collapsePluginCatalog()
 
-        const waitForMapRender = (artifact: ArtifactEntity): Promise<void> => {
-            return new Promise<void>(resolve => {
-                this.mapService.map?.once('idle', () => {
-                    this.artifactService.getLegend(artifact)
-                    artifact.isLoading = false
-                    resolve()
-                })
-            })
-        }
-
         // Allow for any type of report
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const waitForArtifactFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {
@@ -263,7 +266,15 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
         if (artifact.modality === 'VECTOR_MAP_LAYER' || artifact.modality === 'RASTER_MAP_LAYER') {
             this.artifactViewerService.isViewerVisible = false
-            waitForMapRender(artifact)
+            artifact.isLoading = true
+
+            this.mapService.mapReady$.pipe(take(1)).subscribe(() => {
+                this.mapService.map?.once('idle', () => {
+                    this.artifactService.getLegend(artifact)
+                    artifact.isLoading = false
+                })
+                this.artifactService.fetchArtifact(artifact)
+            })
         } else if (
             artifact.modality === 'CHART' ||
             artifact.modality === 'CHART_PLOTLY' ||
@@ -275,17 +286,23 @@ export class ComputationComponent implements OnInit, OnDestroy {
             this.artifactViewerService.minimised = false
             const { observable, check } = artifactTypeMap[artifact.modality]
             waitForArtifactFetch(observable, check)
+            this.artifactService.fetchArtifact(artifact, { setLoading: true })
         }
 
         this.artifactViewerService.setName(artifact.name)
-
-        this.artifactService.fetchArtifact(artifact, { setLoading: true })
 
         if (!isMapArtifact || this.mapArtifactManager.getActiveMapArtifacts().length === 0) {
             this.artifactService.clearLegend()
         }
 
-        this.artifactActivated.emit(artifact)
+        this.openedArtifact = artifact
+        this.activeArtifactChange.emit(artifact)
+    }
+
+    private openRequestedArtifact(): void {
+        const requested = this.activeArtifact
+        if (!requested || (this.openedArtifact && this.isSameArtifact(this.openedArtifact, requested))) return
+        this.viewArtifact(requested)
     }
 
     addToReport(artifact: ArtifactEntity) {
@@ -334,9 +351,9 @@ export class ComputationComponent implements OnInit, OnDestroy {
 
     private initializeTagsAndFiltering(): void {
         if (!this.computation?.artifacts) {
-            this.filteredArtifacts = []
             this.availableTags = []
             this.shouldShowFilters = false
+            this.applySelectedTag()
             return
         }
 
@@ -384,16 +401,23 @@ export class ComputationComponent implements OnInit, OnDestroy {
         this.availableTags.push(DEFAULT_TAGS.ALL)
         this.tagCounts.set(DEFAULT_TAGS.ALL, this.computation.artifacts.length)
 
-        if (this.availableTags.length > 0) {
-            this.selectedTag = this.availableTags[0]
-        }
-
-        this.filterArtifacts()
+        this.applySelectedTag()
     }
 
     selectTag(tag: string): void {
         this.selectedTag = tag
         this.filterArtifacts()
+        this.selectedTagChange.emit(tag)
+    }
+
+    // Show the requested pill if it exists, else the default one
+    private applySelectedTag(): void {
+        const requested = this.selectedTag
+        const tag = requested && this.availableTags.includes(requested) ? requested : this.availableTags[0]
+        this.selectedTag = tag
+        this.filterArtifacts()
+        const reported = this.shouldShowFilters ? tag : undefined
+        if (reported !== requested) queueMicrotask(() => this.selectedTagChange.emit(reported))
     }
 
     isDefaultTag(tag: string): boolean {
@@ -418,10 +442,10 @@ export class ComputationComponent implements OnInit, OnDestroy {
                     artifact => (!artifact.tags || artifact.tags.length === 0) && !artifact.primary
                 )
                 break
-            default:
-                this.filteredArtifacts = this.computation.artifacts.filter(artifact =>
-                    artifact.tags?.includes(this.selectedTag)
-                )
+            default: {
+                const tag = this.selectedTag
+                this.filteredArtifacts = tag ? this.computation.artifacts.filter(a => a.tags?.includes(tag)) : []
+            }
         }
     }
 

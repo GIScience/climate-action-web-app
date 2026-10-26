@@ -69,7 +69,6 @@
             "done": "Done"
         },
         "actions": {
-            "share": "Share Computation",
             "viewParameters": "View Parameters",
             "bookmark": "Save to Bookmarks",
             "removeBookmark": "Remove Bookmark"
@@ -100,15 +99,14 @@
             "emailSubject": "Climate Action Navigator: Computation #{{ id }} failed",
             "emailBody": "Hello,\n\nmy computation in the '{{ plugin }}' tool did not complete.\n\nComputation ID: {{ id }}\n\n"
         },
-        "computationAlreadyPresent": "Computation ID #{{ id }} is already present",
-        "computationImported": "Computation ID #{{ id }} imported",
-        "errorImportingComputation": "Error importing computation",
         "bookmarkAdded": "Saved to Bookmarks",
         "bookmarkRemoved": "Removed from Bookmarks",
         "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
     },
     "computationDetail": {
         "back": "All computations",
+        "linkCopied": "Computation link copied to clipboard",
+        "copyLink": "Copy Link",
         "notFoundTitle": "Computation not found",
         "notFoundMessage": "This computation no longer exists or the link is invalid.",
         "errorTitle": "Couldn't load this computation",
@@ -339,6 +337,11 @@
         "unpinLayer": "Unpin layer",
         "pinLayer": "Pin layer",
         "removeLayer": "Remove from map",
+        "discover": {
+            "viewComputation": "View Computation for",
+            "multipleComputations": "Multiple Computations here",
+            "selectComputation": "Select a Computation"
+        },
         "drawing": {
             "radius": "Radius",
             "area": "Area",

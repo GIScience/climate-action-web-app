@@ -37,12 +37,7 @@ import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import { formatComputationTimestamp, formatShortUUID } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
 import { ComputationSyncService, RunStateTransition } from './computation-sync.service'
-import {
-    ComputationDatabaseEntity,
-    ComputationDisplayEntity,
-    ComputationMetadata,
-    DiscoverTab
-} from './computation.interface'
+import { ComputationDatabaseEntity, ComputationDisplayEntity, DiscoverTab } from './computation.interface'
 import { mapDatabaseComputation } from './computation.mapper'
 
 @Component({
@@ -73,7 +68,6 @@ export class ComputationsIndexComponent implements OnInit {
     private searchService = inject(ComputationSearchService)
     private route = inject(ActivatedRoute)
     private router = inject(Router)
-    private shareService = inject(ShareService)
     private toastr = inject(ToastrService)
     private dialog = inject(MatDialog)
     private storageService = inject(StorageService)
@@ -81,6 +75,7 @@ export class ComputationsIndexComponent implements OnInit {
     private reportService = inject(ReportService)
     private translocoService = inject(TranslocoService)
     private syncService = inject(ComputationSyncService)
+    private shareService = inject(ShareService)
     private destroyRef = inject(DestroyRef)
 
     readonly runs = signal<ComputationDisplayEntity[]>([])
@@ -139,15 +134,6 @@ export class ComputationsIndexComponent implements OnInit {
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe(() => this.syncSearchLayersWithRoute())
-
-        this.shareService
-            .onComputationToImport()
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(computationId => {
-                if (computationId) {
-                    this.importComputation(computationId)
-                }
-            })
 
         this.syncService.transitions$
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -313,17 +299,6 @@ export class ComputationsIndexComponent implements OnInit {
         })
     }
 
-    shareComputation(correlation_uuid: string, event: Event) {
-        event.stopPropagation()
-
-        const shareLink = this.shareService.getShareUrl(correlation_uuid)
-
-        navigator.clipboard.writeText(shareLink)
-        this.toastr.info('Computation link copied to clipboard', '', {
-            timeOut: 4000
-        })
-    }
-
     isBookmarked(correlation_uuid: string): boolean {
         return this.bookmarkedIds().has(correlation_uuid)
     }
@@ -341,6 +316,11 @@ export class ComputationsIndexComponent implements OnInit {
         } else {
             this.addBookmark(computation)
         }
+    }
+
+    copyShareLink(computation: ComputationDisplayEntity, event: Event): void {
+        event.stopPropagation()
+        this.shareService.copyShareLink(this.pluginId, computation.correlation_uuid)
     }
 
     private isCustomAoi(computation: ComputationDisplayEntity): boolean {
@@ -391,67 +371,5 @@ export class ComputationsIndexComponent implements OnInit {
 
     private startPeriodicSync() {
         this.syncService.start(() => this.runs().filter(run => isPendingStatus(run.status)))
-    }
-
-    importComputation(correlationUuid: string): void {
-        if (this.isBookmarked(correlationUuid)) {
-            this.toastr.warning(
-                this.translocoService.translate('computationsIndex.computationAlreadyPresent', {
-                    id: this.formatUUID(correlationUuid)
-                }),
-                '',
-                {
-                    timeOut: 4000
-                }
-            )
-            return
-        }
-
-        this.switchTab('bookmarks')
-
-        this.pluginService.getComputationMetadata(correlationUuid).subscribe({
-            next: (response: ComputationMetadata) => {
-                const computation: ComputationDatabaseEntity = {
-                    correlation_uuid: correlationUuid,
-                    pluginId: response.plugin_info?.id,
-                    request_ts: response.request_ts,
-                    status: 'SUCCESS',
-                    aoiName: response.aoi?.properties?.['name'] as string | undefined,
-                    language: response.language,
-                    flags: ['IMPORTED']
-                }
-
-                this.pluginService
-                    .storeNewComputes(computation)
-                    .then(() => {
-                        this.upsertRuns([computation])
-                        this.toastr.success(
-                            this.translocoService.translate('computationsIndex.computationImported', {
-                                id: this.formatUUID(correlationUuid)
-                            }),
-                            '',
-                            {
-                                timeOut: 4000
-                            }
-                        )
-                    })
-                    .catch(error => {
-                        console.error('Failed to store imported computation:', error)
-                        this.toastr.error(
-                            this.translocoService.translate('computationsIndex.errorImportingComputation'),
-                            '',
-                            {
-                                disableTimeOut: true
-                            }
-                        )
-                    })
-            },
-            error: error => {
-                console.error('Error importing computation:', error)
-                this.toastr.error(this.translocoService.translate('computationsIndex.errorImportingComputation'), '', {
-                    disableTimeOut: true
-                })
-            }
-        })
     }
 }

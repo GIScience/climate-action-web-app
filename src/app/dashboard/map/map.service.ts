@@ -30,7 +30,7 @@ import {
     StyleSpecification
 } from 'maplibre-gl'
 import { updateMaplibreLocale } from 'maplibre-ui-translations'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment'
 import { PluginService } from '../plugin/plugin.service'
@@ -159,6 +159,10 @@ export class MapService {
     currentBasemapStyle: BasemapStyleName = BasemapStyleName.Colorful
     private styleChangeSubject = new BehaviorSubject<BasemapStyleName>(BasemapStyleName.Colorful)
     public styleChange$ = this.styleChangeSubject.asObservable()
+
+    // Emits once the main map exists, its first style has loaded and the initial camera is set
+    private mapReadySubject = new ReplaySubject<void>(1)
+    public mapReady$ = this.mapReadySubject.asObservable()
 
     // Window & Display Properties
     windowWidth?: number
@@ -301,6 +305,10 @@ export class MapService {
             } else if (!isReportMap) {
                 this.fitToUserLocale().catch(error => console.warn('Failed to fit to user locale on init:', error))
             }
+
+            if (!isReportMap) {
+                this.mapReadySubject.next()
+            }
         })
 
         await this.addLayerSwitcher()
@@ -308,6 +316,12 @@ export class MapService {
         if (environment.environmentType === 'testing' || environment.environmentType === 'development') {
             ;(window as Window & { map?: MaplibreMap }).map = this.map
         }
+    }
+
+    private isReadyForLayers(artifactName?: string): this is this & { map: MaplibreMap } {
+        if (this.map && this.layersInitialized) return true
+        console.warn(`Map not ready, skipping layer${artifactName ? ` "${artifactName}"` : ''}`)
+        return false
     }
 
     private setupLayers() {
@@ -662,7 +676,7 @@ export class MapService {
     }
 
     async addPmtilesLayer(url: string, artifactName: string): Promise<VectorLayerGroup | undefined> {
-        if (!this.map) return undefined
+        if (!this.isReadyForLayers(artifactName)) return undefined
 
         const layerId = `pmtiles-${artifactName}-${Date.now()}`
         const sourceId = `source-${layerId}`
@@ -688,7 +702,7 @@ export class MapService {
     }
 
     addGeoJsonLayer(data: FeatureCollection, artifactName: string): VectorLayerGroup | undefined {
-        if (!this.map) return undefined
+        if (!this.isReadyForLayers(artifactName)) return undefined
 
         const layerId = `geojson-${artifactName}-${Date.now()}`
         const sourceId = `source-${layerId}`
@@ -855,7 +869,7 @@ export class MapService {
     }
 
     async addGeoTiffLayer(sourceURL: string, artifactName?: string) {
-        if (!this.map) return undefined
+        if (!this.isReadyForLayers(artifactName)) return undefined
 
         const { cogProtocol } = await import('@geomatico/maplibre-cog-protocol')
         maplibregl.addProtocol('cog', cogProtocol)

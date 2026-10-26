@@ -13,13 +13,8 @@ import { ArtifactService } from '../artifact/artifact.service'
 import { MapSearchManagerService } from '../map/map-search-manager.service'
 import { MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
-import {
-    ComputationDatabaseEntity,
-    ComputationDisplayEntity,
-    ComputationMetadata,
-    SearchEntry,
-    SearchPage
-} from './computation.interface'
+import { ShareService } from '../share/share.service'
+import { ComputationDatabaseEntity, ComputationDisplayEntity, SearchEntry, SearchPage } from './computation.interface'
 import { ComputationsIndexComponent } from './computations-index.component'
 
 const TEST_UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
@@ -35,57 +30,6 @@ function createTestRun(overrides: Partial<ComputationDatabaseEntity> = {}): Comp
         aoiName: 'Test AOI',
         status: 'SUCCESS',
         request_ts: new Date('2023-09-27T16:42:52+01:00'),
-        ...overrides
-    }
-}
-
-function createMetadata(overrides: Partial<ComputationMetadata> = {}): ComputationMetadata {
-    return {
-        correlation_uuid: TEST_UUID,
-        request_ts: new Date('2023-09-27T16:42:52+01:00'),
-        params: {},
-        aoi: {
-            type: 'Feature',
-            geometry: {
-                type: 'MultiPolygon',
-                coordinates: [
-                    [
-                        [
-                            [0, 0],
-                            [1, 0],
-                            [1, 1],
-                            [0, 1],
-                            [0, 0]
-                        ]
-                    ]
-                ]
-            },
-            properties: {
-                name: 'Test AOI'
-            }
-        },
-        artifacts: [
-            {
-                name: 'Image',
-                modality: 'IMAGE',
-                primary: true,
-                tags: [],
-                summary: 'An image.',
-                description: 'The image is under CC0 license.',
-                correlation_uuid: TEST_UUID,
-                filename: '09c8eabf-4b73-452c-b3bc-47310a91eaa7_blueprint_image.png',
-                sources: [],
-                attachments: {},
-                rank: 1
-            }
-        ],
-        plugin_info: {
-            id: 'test_plugin',
-            version: '1.0.0'
-        },
-        status: 'SUCCESS',
-        message: '',
-        artifact_errors: {},
         ...overrides
     }
 }
@@ -109,6 +53,7 @@ describe('ComputationsIndexComponent', () => {
     let mockArtifactService: Partial<ArtifactService>
     let mockMapService: Partial<MapService>
     let mockmapSearchManager: Partial<MapSearchManagerService>
+    let mockShareService: Partial<ShareService>
     let router: Router
     let translocoService: TranslocoService
     let toastrService: ToastrService
@@ -168,6 +113,9 @@ describe('ComputationsIndexComponent', () => {
             hideSearchLayers: jest.fn(),
             clearSearchLayers: jest.fn()
         }
+        mockShareService = {
+            copyShareLink: jest.fn()
+        }
 
         await TestBed.configureTestingModule({
             imports: [
@@ -184,6 +132,7 @@ describe('ComputationsIndexComponent', () => {
                 { provide: MapService, useValue: mockMapService },
                 { provide: MapSearchManagerService, useValue: mockmapSearchManager },
                 { provide: ToastrService, useClass: MockToastrService },
+                { provide: ShareService, useValue: mockShareService },
                 {
                     provide: ActivatedRoute,
                     useValue: {
@@ -250,10 +199,7 @@ describe('ComputationsIndexComponent', () => {
 
         fixture.debugElement.query(By.css('.parent-computation')).triggerEventHandler('click', null)
 
-        expect(navigateSpy).toHaveBeenCalledWith(
-            ['computation', TEST_UUID],
-            expect.objectContaining({ relativeTo: expect.anything() })
-        )
+        expect(navigateSpy).toHaveBeenCalledWith(['computation', TEST_UUID], { relativeTo: expect.anything() })
     })
 
     it('should derive the NEW badge from run flags', () => {
@@ -349,47 +295,12 @@ describe('ComputationsIndexComponent', () => {
         expect(component.isBookmarked(TEST_UUID)).toBe(false)
     })
 
-    it('should successfully import a new computation', async () => {
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(
-            of(
-                createMetadata({
-                    aoi: {
-                        type: 'Feature',
-                        geometry: {
-                            type: 'MultiPolygon',
-                            coordinates: []
-                        },
-                        properties: { name: 'Imported AOI' }
-                    }
-                })
-            )
-        )
+    it('should copy the computation share link for the current plugin', () => {
+        const computation = { correlation_uuid: TEST_UUID } as ComputationDisplayEntity
 
-        component.importComputation(TEST_UUID)
-        await flushPromises()
+        component.copyShareLink(computation, new Event('click'))
 
-        const expectedComputation = {
-            correlation_uuid: TEST_UUID,
-            pluginId: 'test_plugin',
-            request_ts: new Date('2023-09-27T16:42:52+01:00'),
-            status: 'SUCCESS',
-            aoiName: 'Imported AOI',
-            flags: ['IMPORTED']
-        }
-
-        expect(mockPluginService.getComputationMetadata).toHaveBeenCalledWith(TEST_UUID)
-        expect(mockPluginService.storeNewComputes).toHaveBeenCalledWith(expectedComputation)
-        expect(component.runs()).toHaveLength(1)
-        expect(component.runs()[0]).toEqual(expect.objectContaining(expectedComputation))
-    })
-
-    it('should warn instead of importing an already bookmarked computation', () => {
-        seedStoredRuns([createTestRun()])
-
-        component.importComputation(TEST_UUID)
-
-        expect(mockPluginService.storeNewComputes).not.toHaveBeenCalled()
-        expect(toastrService.warning).toHaveBeenCalled()
+        expect(mockShareService.copyShareLink).toHaveBeenCalledWith('test_plugin', TEST_UUID)
     })
 
     it('should refetch the Discover list when a run succeeds while the tab is active', () => {

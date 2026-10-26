@@ -61,9 +61,13 @@ describe('ComputationComponent', () => {
 
     let pluginRuns$: BehaviorSubject<ComputationDatabaseEntity[]>
 
-    function createComputationComponent(artifacts: ArtifactEntity[]): ComputationComponent {
+    function createComputationComponent(
+        artifacts: ArtifactEntity[],
+        configure?: (component: ComputationComponent) => void
+    ): ComputationComponent {
         const computationFixture = TestBed.createComponent(ComputationComponent)
         computationFixture.componentInstance.computation = createComputation(artifacts)
+        configure?.(computationFixture.componentInstance)
         computationFixture.detectChanges()
         return computationFixture.componentInstance
     }
@@ -260,6 +264,31 @@ describe('ComputationComponent', () => {
         computationComponent.selectTag('visualization')
         expect(computationComponent.filteredArtifacts.length).toBe(1)
         expect(computationComponent.filteredArtifacts[0].name).toBe('Secondary Chart')
+
+        discardPeriodicTasks()
+    }))
+
+    it('should apply a known host-selected tag and open the host-set artifact on init', fakeAsync(() => {
+        const chart = createArtifactEntity({
+            name: 'Secondary Chart',
+            primary: false,
+            tags: ['visualization'],
+            modality: 'CHART',
+            filename: 'image2'
+        })
+        let viewArtifactSpy: jest.SpyInstance | undefined
+        const computationComponent = createComputationComponent(
+            [createArtifactEntity({ name: 'Primary Analysis', primary: true, tags: ['analysis'] }), chart],
+            component => {
+                viewArtifactSpy = jest.spyOn(component, 'viewArtifact').mockImplementation(() => undefined)
+                component.selectedTag = 'visualization'
+                component.activeArtifact = chart
+            }
+        )
+
+        expect(computationComponent.selectedTag).toBe('visualization')
+        expect(computationComponent.filteredArtifacts.map(a => a.name)).toEqual(['Secondary Chart'])
+        expect(viewArtifactSpy).toHaveBeenCalledWith(chart)
 
         discardPeriodicTasks()
     }))

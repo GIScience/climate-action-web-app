@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, distinctUntilChanged } from 'rxjs'
 import { ArtifactService } from '../artifact/artifact.service'
 
 @Injectable({
@@ -9,7 +9,7 @@ export class ArtifactViewerService {
     private artifactService = inject(ArtifactService)
 
     private isViewerVisibleSubject = new BehaviorSubject<boolean>(false)
-    isViewerVisible$ = this.isViewerVisibleSubject.asObservable()
+    isViewerVisible$ = this.isViewerVisibleSubject.pipe(distinctUntilChanged())
 
     minimised = false
     name: string | null = null
