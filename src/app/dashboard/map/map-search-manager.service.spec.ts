@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { Router, RouterModule } from '@angular/router'
 import { TranslocoService } from '@jsverse/transloco'
 import type { GeoJSONSource, MapGeoJSONFeature, MapMouseEvent, Map as MaplibreMap } from 'maplibre-gl'
+import { environment } from 'src/environments/environment'
 import { SearchCentroidCollection } from '../computations-index/computation.interface'
 import { MapSearchManagerService } from './map-search-manager.service'
 
@@ -79,11 +80,11 @@ describe('MapSearchManagerService', () => {
             'search-centroids-source',
             expect.objectContaining({ type: 'geojson', data: centroids, cluster: true })
         )
-        // expect(mockMap.addSource).toHaveBeenCalledWith(
-        //     'search-boundaries-source',
-        //     expect.objectContaining({ type: 'vector' })
-        // )
-        expect(mockMap.addLayer).toHaveBeenCalled()
+        expect(mockMap.addSource).toHaveBeenCalledWith(
+            'search-boundaries-source',
+            expect.objectContaining({ type: 'vector', tiles: [environment.validComputationsTilesUrl] })
+        )
+        expect(mockMap.addLayer).toHaveBeenCalledWith(expect.objectContaining({ 'source-layer': 'default' }))
     })
 
     it('showSearchLayers should update the existing source and filters instead of re-adding layers', () => {

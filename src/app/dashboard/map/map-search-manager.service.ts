@@ -35,8 +35,6 @@ const BOUNDARY_LAYER_MIN_ZOOM = 4
 // Per-feature zoom at which the boundary polygon takes over from the centroid
 const FEATURE_MIN_ZOOM: ExpressionSpecification = ['coalesce', ['get', 'min_zoom'], DEFAULT_FEATURE_MIN_ZOOM]
 
-const BOUNDARY_SOURCE_LAYER = 'tiles.aoi_boundary'
-
 const CENTROID_SOURCE_ID = 'search-centroids-source'
 const BOUNDARY_SOURCE_ID = 'search-boundaries-source'
 
@@ -63,7 +61,7 @@ const hoverFilter = (uuids: string[]): FilterSpecification => ['in', ['get', 'co
 
 const BOUNDARY_LAYER_BASE = {
     source: BOUNDARY_SOURCE_ID,
-    'source-layer': BOUNDARY_SOURCE_LAYER,
+    'source-layer': 'default',
     minzoom: BOUNDARY_LAYER_MIN_ZOOM
 } as const
 
@@ -256,7 +254,7 @@ export class MapSearchManagerService {
         if (!map.getSource(BOUNDARY_SOURCE_ID)) {
             map.addSource(BOUNDARY_SOURCE_ID, {
                 type: 'vector',
-                tiles: [`${environment.validComputationsTilesUrl}/${BOUNDARY_SOURCE_LAYER}/{z}/{x}/{y}.pbf`],
+                tiles: [environment.validComputationsTilesUrl],
                 minzoom: 0,
                 maxzoom: 22
             })

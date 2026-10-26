@@ -337,7 +337,7 @@ export class MapService {
                 fillLayerId: 'region-boundaries-fill',
                 outlineLayerId: 'region-boundaries-outline',
                 sourceLayer: 'default',
-                tiles: 'https://maps.heigit.org/vector/tiles/public.admin_boundaries_layer/{z}/{x}/{y}.pbf',
+                tiles: 'https://maps.heigit.org/vector/tiles/osm.admin_boundaries_layer/{z}/{x}/{y}.pbf',
                 attribution:
                     'Boundaries © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, Source: <a href="https://osm-boundaries.com" target="_blank">OSM Boundaries Map</a> via <a href="https://ohsome.org" target="_blank">ohsome</a>.'
             },
