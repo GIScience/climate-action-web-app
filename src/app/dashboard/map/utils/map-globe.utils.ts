@@ -1,4 +1,4 @@
-import { Map } from 'maplibre-gl'
+import { Map, PaddingOptions } from 'maplibre-gl'
 
 export interface CountryCoordinate {
     country: string
@@ -16,6 +16,10 @@ export interface CountryCoordinatesResponse {
 export class MapGlobeUtils {
     private static readonly SECONDS_PER_REVOLUTION = 240
     private static readonly MAX_SPIN_ZOOM = 5
+    // Landing hero: left padding as a share of the width; the globe centre lands at (1 + offset) / 2 across
+    private static readonly LANDING_OFFSET = 1
+    // Globe radius as a share of the height
+    private static readonly LANDING_RADIUS = 0.8
 
     private static spinAnimation: number | undefined
     private static lastTime = 0
@@ -63,13 +67,21 @@ export class MapGlobeUtils {
         return this.spinAnimation !== undefined
     }
 
+    // Equatorial globe radius is 512·2^zoom / 2π; camera distance scales with height too, so framing holds everywhere
+    static landingCamera(map: Map): { zoom: number; padding: PaddingOptions } {
+        const { clientWidth: width, clientHeight: height } = map.getContainer()
+        return {
+            zoom: Math.log2((2 * Math.PI * this.LANDING_RADIUS * height) / 512),
+            padding: { top: 0, bottom: 0, left: width * this.LANDING_OFFSET, right: 0 }
+        }
+    }
+
     static resetToGlobalView(map: Map): void {
         if (!map) return
 
         map.flyTo({
             center: [0, 0],
-            zoom: 3,
-            padding: { top: 0, bottom: 0, left: 0, right: 0 },
+            ...this.landingCamera(map),
             duration: 2000
         })
     }
@@ -80,5 +92,9 @@ export class MapGlobeUtils {
         map.on('mousedown', () => this.stopSpinning())
         map.on('touchstart', () => this.stopSpinning())
         map.on('wheel', () => this.stopSpinning())
+        // Spinning implies the landing, so only the hero gets re-framed
+        map.on('resize', () => {
+            if (this.isSpinning()) map.jumpTo(this.landingCamera(map))
+        })
     }
 }

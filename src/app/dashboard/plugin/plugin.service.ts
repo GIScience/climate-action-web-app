@@ -73,8 +73,11 @@ export class PluginService {
         })
     }
 
-    getSearch(pluginId: string, cursor: string | null = null, pageSize: number = 10): Observable<SearchPage> {
-        let params = new HttpParams().set('plugin_id', pluginId).set('page_size', String(pageSize))
+    getSearch(pluginId?: string, cursor: string | null = null, pageSize: number = 10): Observable<SearchPage> {
+        let params = new HttpParams().set('page_size', String(pageSize))
+        if (pluginId) {
+            params = params.set('plugin_id', pluginId)
+        }
         if (cursor) {
             params = params.set('cursor', cursor)
         }

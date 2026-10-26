@@ -1,26 +1,37 @@
 {
     "landing": {
         "revisit": {
-            "totalComputations": "You have run a total of {{ count }} computations so far.",
-            "latestComputation": "Browse your latest computation:"
+            "title": "Welcome back. See what others have been assessing.",
+            "description": "The latest assessments from across the Climate Action Navigator. Open one to explore what's there, or select an Assessment Tool from the left to run your own.",
+            "feedTitle": "Latest assessments"
         },
-        "loading": "Loading...",
         "welcome": {
-            "title": "Welcome to the Climate Action Navigator (CAN)",
-            "description": "CAN is your entry point to exploring climate solutions at the local level. CAN offers high-resolution data and insights on key climate indicators, from heating emissions to walkability, helping you identify both strengths and areas for improvement in your city or region."
+            "title": "See where your city should focus its climate action",
+            "description": "The Climate Action Navigator (CAN) is your entry point to exploring climate solutions at the local level, with high-resolution data and insights on key climate indicators, from heating emissions to walkability."
         },
         "notes": {
             "title": "A few notes before you begin…",
-            "onDemand": "CAN results are <strong>calculated on-demand</strong>. This reduces our energy consumption, but means that assessments may take up to 60 minutes during high traffic.",
-            "urbanAreas": "Our tools are at their <strong>best in urban areas</strong>, where open data is most readily available. Results in rural areas may vary.",
-            "experts": "While CAN is open to everyone, our assessment tools are <strong>tailored to experts</strong>. As such, they may include technical terms.",
-            "worksInProgress": "All tools and assessments within CAN are <strong>continuously updated</strong> as new methods and datasets become available. Check back regularly for new and improved features."
+            "onDemand": {
+                "title": "Calculated on demand",
+                "text": "This reduces our energy consumption, but means that assessments may take up to 60 minutes during high traffic."
+            },
+            "urbanAreas": {
+                "title": "Best in urban areas",
+                "text": "Open data is most readily available there. Results in rural areas may vary."
+            },
+            "experts": {
+                "title": "Tailored to experts",
+                "text": "While CAN is open to everyone, our assessment tools may include technical terms."
+            },
+            "worksInProgress": {
+                "title": "Continuously updated",
+                "text": "New methods and datasets are added as they become available. Check back regularly for new and improved features."
+            }
         },
         "cta": {
-            "startExploring": "Start exploring your region now and see where climate action can take you.",
-            "selectTool": "Begin by selecting an Assessment Tool from the sidebar on the left.",
-            "or": "OR",
-            "guidedWalkthrough": "Take our guided walkthrough"
+            "guidedWalkthrough": "Take our guided walkthrough",
+            "or": "or",
+            "selectTool": "select an Assessment Tool from the left"
         }
     },
     "pluginCatalog": {

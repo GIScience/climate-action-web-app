@@ -16,6 +16,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Toggling a computation opens it in a dedicated detail view, instead of expanding it in place within the list
 - Legacy `?share-id=` links are redirected to the new deep link route
 - Plugin Catalog sidebar has been converted into a launcher/deck style menu to accommodate the ever-growing list of tools
+- Landing page on revist now displays the latest 3 computations from the search endpoint, instead of the user's last computation
 
 ### Added
 

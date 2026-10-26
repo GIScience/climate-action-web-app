@@ -1,117 +1,66 @@
 <app-plugin-catalog mode="inline"></app-plugin-catalog>
 
-<div class="welcome-content">
-    <div class="bg bg1"></div>
-    <div class="bg bg2"></div>
-
-    @if (!loading && totalComputations > 0) {
-        <div class="welcome-content__revisit">
-            <h2>{{ 'landing.revisit.totalComputations' | transloco: { count: totalComputations } }}</h2>
-            @if (latestComputation) {
-                <div class="latest-computation">
-                    <h3>{{ 'landing.revisit.latestComputation' | transloco }}</h3>
-                    <a [routerLink]="'/dashboard/plugin/' + latestComputation.pluginId" class="latest-computation-card">
-                        <div class="card-header">
-                            <span class="plugin-name">{{ getPluginName(latestComputation.pluginId) }}</span>
-                            <span class="status status-{{ latestComputation.status.toLowerCase() }}">{{
-                                latestComputation.status
-                            }}</span>
-                        </div>
-                        <div class="card-body">
-                            @if (latestComputation.aoiName) {
-                                <span class="aoi-name">{{ latestComputation.aoiName }}</span>
-                            }
-                            <span class="timestamp">{{ latestComputation.request_ts | date: 'medium' }}</span>
-                        </div>
-                    </a>
+<div class="welcome" [attr.data-style]="mapService.styleChange$ | async">
+    @if (!loading) {
+        <div class="welcome-haze"></div>
+        @if (isRevisit) {
+            <div class="welcome-content welcome-content__revisit">
+                <div class="intro-section">
+                    <h1>{{ 'landing.revisit.title' | transloco }}</h1>
+                    <p>{{ 'landing.revisit.description' | transloco }}</p>
                 </div>
-            }
-        </div>
-    }
-
-    @if (loading) {
-        <div class="welcome-content__loading">
-            <div class="loading-text">{{ 'landing.loading' | transloco }}</div>
-        </div>
-    }
-
-    @if (!loading && totalComputations === 0) {
-        <div class="welcome-content__new">
-            <div class="intro-section">
-                <h1>{{ 'landing.welcome.title' | transloco }}</h1>
-                <p [innerHTML]="'landing.welcome.description' | transloco"></p>
-            </div>
-            <div class="notes-section">
-                <h3>{{ 'landing.notes.title' | transloco }}</h3>
-                <div class="note-cards">
-                    <div class="note-card" style="animation-delay: 0s">
-                        <div class="icon-wrapper">
-                            <img
-                                ngSrc="assets/images/landing/hourglass.png"
-                                alt="Lazy computing"
-                                height="50"
-                                width="50" />
-                        </div>
-                        <p [innerHTML]="'landing.notes.onDemand' | transloco"></p>
-                    </div>
-                    <div class="note-card" style="animation-delay: 0.15s">
-                        <div class="icon-wrapper">
-                            <img ngSrc="assets/images/landing/urban.png" alt="Urban areas" height="50" width="50" />
-                        </div>
-                        <p [innerHTML]="'landing.notes.urbanAreas' | transloco"></p>
-                    </div>
-                    <div class="note-card" style="animation-delay: 0.3s">
-                        <div class="icon-wrapper">
-                            <img ngSrc="assets/images/landing/expert.png" alt="For experts" height="50" width="50" />
-                        </div>
-                        <p [innerHTML]="'landing.notes.experts' | transloco"></p>
-                    </div>
-                    <div class="note-card" style="animation-delay: 0.45s">
-                        <div class="icon-wrapper">
-                            <img ngSrc="assets/images/landing/tools.png" alt="WIP" height="50" width="50" />
-                        </div>
-                        <p [innerHTML]="'landing.notes.worksInProgress' | transloco"></p>
-                    </div>
+                <div class="discoveries-section">
+                    <h2>{{ 'landing.revisit.feedTitle' | transloco }}</h2>
+                    <ul class="discoveries">
+                        @for (entry of discoveries; track entry.correlation_uuid; let i = $index) {
+                            <li [style.--i]="i">
+                                <a class="discovery" [routerLink]="computationRoute(entry)">
+                                    <span class="discovery__text">
+                                        <span class="discovery__plugin">{{
+                                            pluginService.getPluginNameById(entry.plugin_id)
+                                        }}</span>
+                                        <span class="discovery__aoi">{{ entry.aoi_name }}</span>
+                                    </span>
+                                    <span class="discovery__time">{{ relativeTime(entry.request_ts) }}</span>
+                                    <svg
+                                        class="discovery__arrow"
+                                        [lucideIcon]="enterIcon"
+                                        size="18"
+                                        aria-hidden="true"></svg>
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-            <div class="cta-section">
-                <p>{{ 'landing.cta.startExploring' | transloco }}</p>
-                <p>
-                    <strong><span></span>{{ 'landing.cta.selectTool' | transloco }}</strong>
-                </p>
-                <p class="or-text">{{ 'landing.cta.or' | transloco }}</p>
-                <button class="btn-primary btn-withtext--after" (click)="startTour()">
-                    {{ 'landing.cta.guidedWalkthrough' | transloco }}
-                </button>
+        } @else {
+            <div class="welcome-content welcome-content__new">
+                <div class="intro-section">
+                    <h1>{{ 'landing.welcome.title' | transloco }}</h1>
+                    <p>{{ 'landing.welcome.description' | transloco }}</p>
+                </div>
+                <div class="cta-section">
+                    <button class="btn-primary" (click)="startTour()">
+                        {{ 'landing.cta.guidedWalkthrough' | transloco }}
+                    </button>
+                    <span class="cta-or">{{ 'landing.cta.or' | transloco }}</span>
+                    <span class="cta-hint">{{ 'landing.cta.selectTool' | transloco }}</span>
+                </div>
+                <div class="notes-section">
+                    <h2>{{ 'landing.notes.title' | transloco }}</h2>
+                    <dl class="notes">
+                        @for (note of notes; track note.key) {
+                            <div class="note">
+                                <dt>
+                                    <svg [lucideIcon]="note.icon" size="16" aria-hidden="true"></svg>
+                                    {{ 'landing.notes.' + note.key + '.title' | transloco }}
+                                </dt>
+                                <dd>{{ 'landing.notes.' + note.key + '.text' | transloco }}</dd>
+                            </div>
+                        }
+                    </dl>
+                </div>
             </div>
-        </div>
+        }
     }
 </div>
-
-<svg style="display: none">
-    <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
-        <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
-
-        <feComponentTransfer in="turbulence" result="mapped">
-            <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
-            <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
-            <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
-        </feComponentTransfer>
-
-        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
-
-        <feSpecularLighting
-            in="softMap"
-            surfaceScale="5"
-            specularConstant="1"
-            specularExponent="100"
-            lighting-color="white"
-            result="specLight">
-            <fePointLight x="-200" y="-200" z="300" />
-        </feSpecularLighting>
-
-        <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
-
-        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-</svg>

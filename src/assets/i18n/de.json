@@ -1,26 +1,37 @@
 {
     "landing": {
         "revisit": {
-            "totalComputations": "Du hast {count, plural, =0 {leider noch keine Ergebnisse} one {bereits 1 Ergebnis} other {bereits # Ergebnisse}}.",
-            "latestComputation": "Sieh dir deine neueste Berechnung an:"
+            "title": "Willkommen zurück. Sieh, was andere zuletzt analysiert haben.",
+            "description": "Die neuesten Analysen aus dem Klimaschutznavigator. Öffne eine, um sie zu erkunden, oder wähle links ein Analysewerkzeug aus, um deine eigene zu starten.",
+            "feedTitle": "Neueste Analysen"
         },
-        "loading": "Lade...",
         "welcome": {
-            "title": "Willkommen beim Klimaschutznavigator (CAN)",
-            "description": "Der CAN ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen. Er stellt hochaufgelöste Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder zur Fußläufigkeit bereit, die dir helfen, die Stärken, aber auch die Verbesserungspotentiale deiner Stadt oder Region zu identifizieren."
+            "title": "Entdecke die besten Ansatzpunkte deiner Stadt für den Klimaschutz",
+            "description": "Der Klimaschutznavigator (CAN) ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen – mit hochaufgelösten Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder Fußläufigkeit."
         },
         "notes": {
-            "title": "Bevor du beginnst ein paar Hinweise:",
-            "onDemand": "Die CAN Berechnungen werden <strong>auf Anfrage</strong> erstellt. Dies reduziert den Energieverbrauch, heißt aber auch, dass Analysen in manchen Fällen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben.",
-            "urbanAreas": "Unsere Analysewerkzeuge sind <strong>auf urbane Gegenden spezialisiert</strong>, in denen die Verfügbarkeit von nutzergenerierten Daten oft höher ist. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau.",
-            "experts": "Obwohl die Benutzung des CAN jeder und jedem offen steht, sind unsere Analysewerkzeuge <strong>auf Expertinnen und Experten zugeschnitten</strong>. Deshalb kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden.",
-            "worksInProgress": "Alle Analysewerkzeuge und Analysen im CAN sind in <strong>aktiver Entwicklung</strong> und werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
+            "title": "Bevor du beginnst ein paar Hinweise…",
+            "onDemand": {
+                "title": "Auf Anfrage berechnet",
+                "text": "Das reduziert den Energieverbrauch, heißt aber auch, dass Analysen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben."
+            },
+            "urbanAreas": {
+                "title": "Auf urbane Gegenden spezialisiert",
+                "text": "Dort ist die Verfügbarkeit von nutzergenerierten Daten oft höher. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau."
+            },
+            "experts": {
+                "title": "Auf Expertinnen und Experten zugeschnitten",
+                "text": "Obwohl die Benutzung des CAN jeder und jedem offen steht, kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden."
+            },
+            "worksInProgress": {
+                "title": "In aktiver Entwicklung",
+                "text": "Alle Analysewerkzeuge werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
+            }
         },
         "cta": {
-            "startExploring": "Analysiere jetzt deine Region und entdecke neues zum Thema Klimaschutz.",
-            "selectTool": "Starte, indem du ein Analysewerkzeug aus der Seitenleiste links auswählst.",
-            "or": "ODER",
-            "guidedWalkthrough": "Starte das Tutorial"
+            "guidedWalkthrough": "Starte das Tutorial",
+            "or": "oder",
+            "selectTool": "wähle links ein Analysewerkzeug aus"
         }
     },
     "pluginCatalog": {

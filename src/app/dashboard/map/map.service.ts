@@ -8,7 +8,7 @@ import { StorageService } from '@app/storage.service'
 import { resolveLocalizedName } from '@app/utils/localized-name.utils'
 import { TranslocoService } from '@jsverse/transloco'
 import bbox from '@turf/bbox'
-import { inlineSources, osm } from '@versatiles/style'
+import { fetchTileJSON, osm } from '@versatiles/style'
 import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type {
     BBox,
@@ -295,12 +295,14 @@ export class MapService {
             if (!isReportMap) {
                 MapGlobeUtils.setupGlobeProjection(this.map!)
             }
+            this.syncBasemapLabels()
 
             if (this.layersInitialized) return
 
             this.setupLayers()
 
             if (this.isOnLanding) {
+                this.map!.jumpTo(MapGlobeUtils.landingCamera(this.map!))
                 MapGlobeUtils.startSpinning(this.map!, this.isOnLanding)
             } else if (!isReportMap) {
                 this.fitToUserLocale().catch(error => console.warn('Failed to fit to user locale on init:', error))
@@ -1279,22 +1281,29 @@ export class MapService {
     }
 
     private async getStyleFor(style: BasemapStyleName): Promise<StyleSpecification> {
-        const baseOptions = {
-            urls: { base: 'https://tiles.versatiles.org' },
-            // All basemaps share a Mercator baseline (ESRI is implicitly Mercator; v6 vector styles
-            // default to globe, hence the pin) — MapGlobeUtils alone opts main maps into globe.
-            projection: 'mercator',
-            // Basemap labels follow the app language; styles are rebuilt on language change.
-            text: { language: this.translocoService.getActiveLang() === 'de' ? 'de' : 'en' }
-        } as const
         switch (style) {
             case BasemapStyleName.Colorful:
-                return (await inlineSources(osm({ ...baseOptions, theme: 'colorful' }))) as StyleSpecification
+                return this.buildOsmStyle('colorful')
             case BasemapStyleName.Graybeard:
-                return (await inlineSources(osm({ ...baseOptions, theme: 'gray' }))) as StyleSpecification
+                return this.buildOsmStyle('gray')
             case BasemapStyleName.EsriWorldImagery:
                 return this.createRasterStyle()
         }
+    }
+
+    private async buildOsmStyle(theme: 'colorful' | 'gray'): Promise<StyleSpecification> {
+        const baseUrl = 'https://tiles.versatiles.org'
+        // Pre-fetched (and cached) so osm() inlines absolute tile URLs and can check landcover support.
+        const osmTiles = await fetchTileJSON(`${baseUrl}/tiles/osm/tiles.json`)
+        return osm({
+            urls: { base: baseUrl, osm: osmTiles },
+            theme,
+            // Shared Mercator baseline with the ESRI raster; MapGlobeUtils alone opts main maps into globe.
+            projection: 'mercator',
+            text: { language: this.translocoService.getActiveLang() === 'de' ? 'de' : 'en' },
+            // ESA WorldCover at low zooms, only when the tileset carries it
+            features: { landcover: osm.supportsLandcover(osmTiles) }
+        }) as StyleSpecification
     }
 
     private getMapStyles(): Promise<MapStyle[]> {
@@ -1305,6 +1314,16 @@ export class MapService {
     private async refreshBasemapStyles(): Promise<void> {
         if (!this.layerSwitcherControl) return
         this.layerSwitcherControl.setStyles(await this.getMapStyles())
+        // A diffed re-apply restores label visibility without firing style.load
+        this.syncBasemapLabels()
+    }
+
+    private syncBasemapLabels(): void {
+        if (!this.map) return
+        const visibility = this.isOnLanding ? 'none' : 'visible'
+        for (const id of this.map.getLayersOrder()) {
+            if (id.startsWith('label-')) this.map.setLayoutProperty(id, 'visibility', visibility)
+        }
     }
 
     private async addLayerSwitcher(): Promise<void> {
@@ -1344,11 +1363,11 @@ export class MapService {
     private async zoomToUserLocale(): Promise<void> {
         if (!this.map) return
 
-        this.map.flyTo({
-            center: MapService.HEIDELBERG_COORDS,
-            zoom: 4.5,
-            duration: 2000
-        })
+        const noPadding = { top: 0, bottom: 0, left: 0, right: 0 }
+        // Drop the landing's offset so plugin views are centred
+        this.map.flyTo({ center: MapService.HEIDELBERG_COORDS, zoom: 4.5, padding: noPadding, duration: 2000 })
+        // ...even if the flight is interrupted (e.g. by a drag) partway through
+        this.map.once('moveend', () => this.map?.setPadding(noPadding))
     }
 
     private async fitToUserLocale(): Promise<void> {
@@ -1373,6 +1392,7 @@ export class MapService {
         this.isOnLanding = !isReportMap && url === '/dashboard'
 
         if (!this.map) return
+        if (wasOnLanding !== this.isOnLanding) this.syncBasemapLabels()
 
         if (wasOnLanding && !this.isOnLanding) {
             // Dashboard → Plugin: zoom to locale with user's preferred style

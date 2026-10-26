@@ -337,42 +337,6 @@ export class StorageService {
         this.saveUiPreferences(prefs)
     }
 
-    // Landing page data
-
-    async getTotalComputationsCount(): Promise<number> {
-        await this.appwriteService.tryToLogin()
-
-        if (!this.realOnlineUser()) {
-            return this.getPluginRuns().length
-        }
-
-        try {
-            return await this.appwriteDb.getTotalComputationsCount()
-        } catch (error) {
-            console.error('Error getting total computations count from Appwrite.', error)
-            return 0
-        }
-    }
-
-    async getLatestComputation(): Promise<ComputationDatabaseEntity | null> {
-        await this.appwriteService.tryToLogin()
-
-        if (!this.realOnlineUser()) {
-            const activeComputations = [...this.getPluginRuns()].sort(
-                (a, b) => new Date(b.request_ts).getTime() - new Date(a.request_ts).getTime()
-            )
-
-            return activeComputations.length > 0 ? activeComputations[0] : null
-        }
-
-        try {
-            return await this.appwriteDb.getLatestComputation()
-        } catch (error) {
-            console.error('Error getting latest computation from Appwrite.', error)
-            return null
-        }
-    }
-
     // Tour preferences
 
     getPendingTourState(): boolean {
