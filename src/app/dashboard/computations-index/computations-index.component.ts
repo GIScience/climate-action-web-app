@@ -32,7 +32,7 @@ import { isPendingStatus, statusRank } from '../common/status-rank.util'
 import { AOI_ORIGINAL_TYPES, ExternalInput, Plugin } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
-import { ShareService } from '../share/share.service'
+import { computationRouteCommands, ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import { formatComputationTimestamp, formatShortUUID } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
@@ -262,14 +262,16 @@ export class ComputationsIndexComponent implements OnInit {
                 }
             }
             this.storageService.markAsNew(run.correlation_uuid)
-            this.toastr.success(
-                `<strong>${this.pluginService.getPluginNameById(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
-                '',
-                {
-                    timeOut: 7000,
-                    enableHtml: true
-                }
-            )
+            const message = this.translocoService.translate('computationsIndex.runSucceeded', {
+                plugin: this.pluginService.getPluginNameById(run.pluginId || ''),
+                aoi: run.aoiName,
+                id: this.formatUUID(run.correlation_uuid)
+            })
+            this.toastr
+                .success(message, '', { timeOut: 7000, enableHtml: true })
+                .onTap.subscribe(() =>
+                    this.router.navigate(computationRouteCommands(run.pluginId || this.pluginId, run.correlation_uuid))
+                )
         } else if (newStatus === 'FAILURE' || newStatus === 'REVOKED') {
             this.openRunFailureDialog(run, newStatus === 'REVOKED', message)
         }

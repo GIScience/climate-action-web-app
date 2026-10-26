@@ -27,6 +27,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Acknowledge and handle REVOKED state in computations ([#482](https://gitlab.heigit.org/climate-action/web-app/-/issues/482))
 - Computations and artifacts now have shareable deep links, that update the address bar dynamically
 - In 'Discover' mode, hovering a boundary highlights it with a tooltip and clicking it opens the computation directly (overlapping boundaries show a list to pick from)
+- Clicking on a computation "Success" toast opens it directly ([#370](https://gitlab.heigit.org/climate-action/web-app/-/issues/370))
 
 ### Removed
 

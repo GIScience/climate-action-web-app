@@ -120,6 +120,7 @@
             "emailSubject": "Climate Action Navigator: Computation #{{ id }} failed",
             "emailBody": "Hello,\n\nmy computation in the '{{ plugin }}' tool did not complete.\n\nComputation ID: {{ id }}\n\n"
         },
+        "runSucceeded": "<strong>{{ plugin }}</strong> computation for <strong>{{ aoi }}</strong> (ID: #{{ id }}) has completed successfully. Click here to open it.",
         "bookmarkAdded": "Saved to Bookmarks",
         "bookmarkRemoved": "Removed from Bookmarks",
         "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"

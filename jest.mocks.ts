@@ -1,6 +1,7 @@
 import '@angular/compiler'
 import { TranslocoTestingModule, TranslocoTestingOptions } from '@jsverse/transloco'
 import { setImmediate as nodeSetImmediate } from 'node:timers'
+import { Subject } from 'rxjs'
 
 // Mock browser APIs that might not be available in test environment
 
@@ -19,7 +20,7 @@ if (typeof window !== 'undefined') {
 
 // Export the mock class for manual use if needed
 export class MockToastrService {
-    success = jest.fn()
+    success = jest.fn(() => ({ onTap: new Subject<void>() }))
     error = jest.fn()
     warning = jest.fn()
     info = jest.fn()
