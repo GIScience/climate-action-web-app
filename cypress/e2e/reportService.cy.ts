@@ -146,7 +146,7 @@ describe('report builder', () => {
 
         cy.get('.report-header').find('.close-btn').click()
 
-        cy.get('.parent-computation').eq(0).click()
+        cy.get('button.back-btn').click()
 
         cy.window().should(win => {
             const map = (win as any).ng.getComponent(win.document.querySelector('app-map')).mapService.map

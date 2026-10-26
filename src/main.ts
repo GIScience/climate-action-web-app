@@ -74,7 +74,16 @@ const routes: Routes = [
             },
             {
                 path: 'plugin/:name',
-                loadComponent: () => import('@app/dashboard/plugin/plugin.component').then(m => m.PluginComponent)
+                loadComponent: () => import('@app/dashboard/plugin/plugin.component').then(m => m.PluginComponent),
+                children: [
+                    {
+                        path: 'computation/:uuid',
+                        loadComponent: () =>
+                            import('@app/dashboard/computation-detail/computation-detail.component').then(
+                                m => m.ComputationDetailComponent
+                            )
+                    }
+                ]
             }
         ]
     },

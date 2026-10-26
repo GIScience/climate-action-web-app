@@ -1,38 +1,21 @@
-import { animate, state, style, transition, trigger } from '@angular/animations'
 import { CommonModule, NgClass } from '@angular/common'
-import {
-    ChangeDetectorRef,
-    Component,
-    computed,
-    DestroyRef,
-    inject,
-    Input,
-    OnDestroy,
-    OnInit,
-    signal,
-    TemplateRef,
-    ViewChild
-} from '@angular/core'
+import { Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MatDialog } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
-import { SupportedLanguage } from '@app/types/language.types'
 import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
     LucideCheck,
     LucideClock,
-    LucideFileExclamationPoint,
     LucideHash,
     LucideImport,
-    LucideListTodo,
     LucideLoader,
     LucideLoaderCircle,
-    LucideMessageSquareWarning,
     LucideShare2
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -40,27 +23,18 @@ import { Models } from 'appwrite'
 import { compareDesc } from 'date-fns'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
-import { firstValueFrom } from 'rxjs'
-import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
-import { ArtifactEntity } from '../artifact/artifact.interface'
-import {
-    ComputationParametersDialogComponent,
-    ComputationParametersDialogData
-} from '../common/computation-parameters-dialog/computation-parameters-dialog.component'
+import { filter } from 'rxjs'
 import {
     RunFailureDialogComponent,
     RunFailureDialogData
 } from '../common/run-failure-dialog/run-failure-dialog.component'
 import { isPendingStatus, statusRank } from '../common/status-rank.util'
-import { ComputationComponent } from '../computation/computation.component'
-import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
-import { MapService } from '../map/map.service'
 import { AOI_ORIGINAL_TYPES, ExternalInput, Plugin } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { ShareService } from '../share/share.service'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
-import { formatComputationTimestamp, formatShortUUID, getLanguageMismatchTooltip } from './computation-format.utils'
+import { formatComputationTimestamp, formatShortUUID } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
 import { ComputationSyncService, RunStateTransition } from './computation-sync.service'
 import {
@@ -69,7 +43,7 @@ import {
     ComputationMetadata,
     DiscoverTab
 } from './computation.interface'
-import { mapDatabaseComputation, mapHydratedComputation } from './computation.mapper'
+import { mapDatabaseComputation } from './computation.mapper'
 
 @Component({
     selector: 'app-computations-index',
@@ -83,53 +57,22 @@ import { mapDatabaseComputation, mapHydratedComputation } from './computation.ma
         LucideBookmark,
         LucideCheck,
         LucideClock,
-        LucideFileExclamationPoint,
         LucideHash,
         LucideImport,
-        LucideListTodo,
         LucideLoader,
         LucideLoaderCircle,
-        LucideMessageSquareWarning,
         LucideShare2,
-        ComputationComponent,
         TranslocoModule
-    ],
-    animations: [
-        trigger('expandCollapse', [
-            state(
-                'collapsed',
-                style({
-                    height: '0',
-                    padding: '0',
-                    visibility: 'hidden'
-                })
-            ),
-            state(
-                'expanded',
-                style({
-                    height: '*',
-                    padding: '*',
-                    visibility: 'visible'
-                })
-            ),
-            transition('expanded <=> collapsed', [animate('250ms ease-in-out')])
-        ]),
-        trigger('fadeIn', [
-            state('in', style({ opacity: 1 })),
-            transition(':enter', [style({ opacity: 0 }), animate('250ms ease-in')])
-        ])
     ],
     templateUrl: './computations-index.component.html',
     styleUrl: './computations-index.component.scss',
     providers: [ComputationSearchService, ComputationSyncService]
 })
-export class ComputationsIndexComponent implements OnInit, OnDestroy {
+export class ComputationsIndexComponent implements OnInit {
     private pluginService = inject(PluginService)
-    artifactViewerService = inject(ArtifactViewerService)
-    private mapService = inject(MapService)
-    private mapArtifactManager = inject(MapArtifactManagerService)
     private searchService = inject(ComputationSearchService)
     private route = inject(ActivatedRoute)
+    private router = inject(Router)
     private shareService = inject(ShareService)
     private toastr = inject(ToastrService)
     private dialog = inject(MatDialog)
@@ -137,7 +80,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     private appwriteService = inject(AppwriteService)
     private reportService = inject(ReportService)
     private translocoService = inject(TranslocoService)
-    private cdr = inject(ChangeDetectorRef)
     private syncService = inject(ComputationSyncService)
     private destroyRef = inject(DestroyRef)
 
@@ -149,12 +91,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             .sort((a, b) => compareDesc(new Date(a.request_ts?.valueOf() || 0), new Date(b.request_ts?.valueOf() || 0)))
     )
     private readonly bookmarkedIds = computed(() => new Set(this.runs().map(run => run.correlation_uuid)))
-    activeComputation?: ComputationDisplayEntity
-    private activationToken = 0
-    private _activeArtifact?: ArtifactEntity
 
-    newRuns: string[] = []
-    importedRuns: string[] = []
     isReportVisible = false
 
     paginationInfo: { hasMore: boolean; loading: boolean } = {
@@ -169,15 +106,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     @Input() pluginId: string = ''
     @Input() plugin?: Plugin
-    pluginLanguage: SupportedLanguage = SupportedLanguage.EN
-
-    @ViewChild('artifactErrorsTooltip') artifactErrorsTooltip!: TemplateRef<{
-        artifactErrors: ComputationDisplayEntity['artifact_errors']
-    }>
-
-    get activeArtifact(): ArtifactEntity | undefined {
-        return this._activeArtifact
-    }
 
     user: Models.User<Models.Preferences> | null = null
 
@@ -187,14 +115,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
 
         this.pluginId = this.route.snapshot.params['name']
-
-        if (this.pluginService.computeState$) {
-            this.pluginService.computeState$.pipe(takeUntilDestroyed()).subscribe(value => {
-                if (value === 'compute-ready') {
-                    this.collapseComputation()
-                }
-            })
-        }
     }
 
     formatTimestamp(timestamp: Date | string) {
@@ -204,14 +124,21 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     formatUUID = formatShortUUID
 
     ngOnInit(): void {
-        this.pluginLanguage = this.plugin?.language ?? SupportedLanguage.EN
-
         this.loadInitialPluginRuns()
 
         if (this.activeTab === 'discover') {
             this.searchService.ensureLoaded(this.pluginId)
-            this.searchService.showSearchLayers(this.pluginId)
+            if (!this.isDetailRouteActive()) {
+                this.searchService.showSearchLayers(this.pluginId)
+            }
         }
+
+        this.router.events
+            .pipe(
+                filter(event => event instanceof NavigationEnd),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe(() => this.syncSearchLayersWithRoute())
 
         this.shareService
             .onComputationToImport()
@@ -236,34 +163,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         this.reportService.isVisible$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(isVisible => {
             this.isReportVisible = isVisible
         })
-
-        this.artifactViewerService.isViewerVisible$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(isVisible => {
-            if (!isVisible && this._activeArtifact) {
-                this._activeArtifact = undefined
-                this.mapArtifactManager.setActiveArtifactId(null)
-            }
-        })
-
-        this.mapArtifactManager.activeMapArtifacts$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(layers => {
-            if (this._activeArtifact) {
-                const stillOnMap = layers.some(
-                    l =>
-                        l.artifact.correlation_uuid === this._activeArtifact!.correlation_uuid &&
-                        l.artifact.filename === this._activeArtifact!.filename
-                )
-                if (!stillOnMap) {
-                    this._activeArtifact = undefined
-                    this.mapArtifactManager.setActiveArtifactId(null)
-                }
-            }
-        })
-    }
-
-    ngOnDestroy(): void {
-        if (this.activeComputation) {
-            this.artifactViewerService.closeArtifactViewer()
-            this.mapService.removeFocusedLayer()
-        }
     }
 
     private async loadRuns(isInitialLoad: boolean = true): Promise<void> {
@@ -276,24 +175,14 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
             this.paginationInfo = { hasMore: result.hasMore, loading: false }
 
-            this.handleActiveRunsResult(result.documents, isInitialLoad)
+            this.upsertRuns(result.documents)
+
+            if (isInitialLoad) {
+                this.startPeriodicSync()
+            }
         } catch (error) {
             console.error(`Error loading ${isInitialLoad ? 'initial' : 'more'} runs:`, error)
         }
-    }
-
-    private handleActiveRunsResult(documents: ComputationDatabaseEntity[], isInitialLoad: boolean): void {
-        this.upsertRuns(documents)
-        this.updateNewRuns(documents)
-
-        if (isInitialLoad) {
-            this.startPeriodicSync()
-        }
-    }
-
-    private updateNewRuns(documents: ComputationDatabaseEntity[]): void {
-        const newRunsFromData = documents.filter(run => run.flags?.includes('NEW')).map(run => run.correlation_uuid)
-        this.newRuns = [...new Set([...this.newRuns, ...newRunsFromData])]
     }
 
     private refreshRunsFromStorage(): void {
@@ -305,7 +194,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         const storedIds = new Set(stored.map(run => run.correlation_uuid))
         this.runs.update(list =>
-            list.filter(run => !isPendingStatus(run.status) || storedIds.has(run.correlation_uuid))
+            list.filter(run => run.pluginId !== this.pluginId || storedIds.has(run.correlation_uuid))
         )
     }
 
@@ -341,7 +230,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
     switchTab(tab: DiscoverTab): void {
         if (tab === this.activeTab) return
-        this.collapseComputation()
         this.activeTab = tab
         this.storageService.saveActiveTab(tab)
         if (tab === 'discover') {
@@ -352,12 +240,25 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         }
     }
 
-    getAppwriteUrl(path: string): string {
-        return this.appwriteService.getAppwriteUrl(path)
+    private isDetailRouteActive(): boolean {
+        return !!this.route.firstChild
     }
 
-    getRedirectUrl(): string {
-        return this.appwriteService.getRedirectUrl()
+    private syncSearchLayersWithRoute(): void {
+        if (this.activeTab !== 'discover') return
+        if (this.isDetailRouteActive()) {
+            this.searchService.hideSearchLayers()
+        } else {
+            this.searchService.showSearchLayers(this.pluginId)
+        }
+    }
+
+    openComputation(computation: ComputationDisplayEntity): void {
+        this.router.navigate(['computation', computation.correlation_uuid], { relativeTo: this.route })
+    }
+
+    isNewRun(computation: ComputationDisplayEntity): boolean {
+        return computation.flags?.includes('NEW') ?? false
     }
 
     private transitionRunStatus({ run, newStatus, message }: RunStateTransition) {
@@ -368,10 +269,13 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
 
         if (newStatus === 'SUCCESS') {
             this.searchService.markStale()
-            this.storageService.markAsNew(run.correlation_uuid)
-            if (!this.newRuns.includes(run.correlation_uuid)) {
-                this.newRuns.push(run.correlation_uuid)
+            if (this.activeTab === 'discover') {
+                this.searchService.ensureLoaded(this.pluginId)
+                if (!this.isDetailRouteActive()) {
+                    this.searchService.showSearchLayers(this.pluginId)
+                }
             }
+            this.storageService.markAsNew(run.correlation_uuid)
             this.toastr.success(
                 `<strong>${this.pluginService.getPluginNameById(run.pluginId || '')}</strong> computation for <strong>${run.aoiName}</strong> (ID: #${this.formatUUID(run.correlation_uuid)}) has completed successfully.`,
                 '',
@@ -409,124 +313,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
         })
     }
 
-    private async ensureHydrated(computation: ComputationDisplayEntity): Promise<ComputationDisplayEntity> {
-        if (computation.hydrated) return computation
-
-        try {
-            const response = await firstValueFrom(
-                this.pluginService.getComputationMetadata(computation.correlation_uuid)
-            )
-            const hydratedComputation = mapHydratedComputation(computation, response)
-            this.runs.update(runs =>
-                runs.map(run =>
-                    run.correlation_uuid === hydratedComputation.correlation_uuid ? hydratedComputation : run
-                )
-            )
-            this.searchService.updateComputation(hydratedComputation)
-            return hydratedComputation
-        } catch (error) {
-            console.error('Error fetching computation metadata for:', computation.correlation_uuid, error)
-            this.toastr.error(this.translocoService.translate('computationsIndex.errorLoadingComputation'), '', {
-                timeOut: 5000
-            })
-            throw error
-        }
-    }
-
-    removeNewRunMark(correlation_uuid: string) {
-        this.storageService.markAsViewed(correlation_uuid)
-        this.newRuns = this.newRuns.filter(id => id !== correlation_uuid)
-    }
-
-    removeImportedRunMark(correlation_uuid: string) {
-        this.importedRuns = this.importedRuns.filter(id => id !== correlation_uuid)
-    }
-
-    async toggleComputation(computation: ComputationDisplayEntity) {
-        if (this.pluginService.computeState$) {
-            this.pluginService.setComputeState('inactive')
-        }
-        this.pluginService.collapsePluginCatalog()
-        const token = ++this.activationToken
-        const previousActiveComputation = this.activeComputation
-
-        if (previousActiveComputation) {
-            previousActiveComputation.isExpanded = false
-            setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
-            this.artifactViewerService.closeArtifactViewer()
-            this.mapService.removeFocusedLayer()
-        }
-
-        if (previousActiveComputation === computation) {
-            this.activeComputation = undefined
-            this._activeArtifact = undefined
-            this.mapArtifactManager.setActiveArtifactId(null)
-            if (this.activeTab === 'discover') {
-                this.searchService.showSearchLayers(this.pluginId)
-            }
-            return
-        }
-
-        computation.loading = !computation.hydrated
-
-        try {
-            computation = await this.ensureHydrated(computation)
-        } catch {
-            if (token === this.activationToken) {
-                this.activeComputation = undefined
-                if (this.activeTab === 'discover') {
-                    this.searchService.showSearchLayers(this.pluginId)
-                }
-            }
-            return
-        } finally {
-            computation.loading = false
-        }
-
-        if (token !== this.activationToken) return
-
-        computation.keepInDOM = true
-        setTimeout(() => (computation.isExpanded = true), 0)
-        this.activeComputation = computation
-
-        if (this.activeTab === 'discover') {
-            this.searchService.hideSearchLayers()
-        }
-
-        if (computation?.geometry) {
-            const extent = this.mapService.highlightAoI(computation.geometry)
-
-            if (extent) {
-                this.mapService.flyToExtent(extent)
-            }
-        }
-
-        if (this.newRuns.includes(computation.correlation_uuid)) {
-            this.removeNewRunMark(computation.correlation_uuid)
-        }
-
-        if (this.importedRuns.includes(computation.correlation_uuid)) {
-            this.removeImportedRunMark(computation.correlation_uuid)
-        }
-
-        this.cdr.markForCheck()
-    }
-
-    collapseComputation() {
-        this.activationToken++
-        const previousActiveComputation = this.activeComputation
-
-        if (previousActiveComputation) {
-            previousActiveComputation.isExpanded = false
-            setTimeout(() => (previousActiveComputation.keepInDOM = false), 300)
-            this.artifactViewerService.closeArtifactViewer()
-            this.mapService.removeFocusedLayer()
-            this.activeComputation = undefined
-            if (this.activeTab === 'discover') {
-                this.searchService.showSearchLayers(this.pluginId)
-            }
-        }
-    }
     shareComputation(correlation_uuid: string, event: Event) {
         event.stopPropagation()
 
@@ -537,6 +323,7 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
             timeOut: 4000
         })
     }
+
     isBookmarked(correlation_uuid: string): boolean {
         return this.bookmarkedIds().has(correlation_uuid)
     }
@@ -585,42 +372,21 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
     }
 
     private async removeBookmark(correlation_uuid: string): Promise<void> {
-        if (this.activeComputation?.correlation_uuid === correlation_uuid) {
-            this.collapseComputation()
-        }
-
         await this.storageService.deleteComputation(correlation_uuid)
 
         this.runs.update(list => list.filter(run => run.correlation_uuid !== correlation_uuid))
-        this.newRuns = this.newRuns.filter(id => id !== correlation_uuid)
-        this.importedRuns = this.importedRuns.filter(id => id !== correlation_uuid)
 
         this.toastr.info(this.translocoService.translate('computationsIndex.bookmarkRemoved'), '', {
             timeOut: 3000
         })
     }
 
-    storeActiveArtifact(artifact: ArtifactEntity) {
-        if (artifact) {
-            this._activeArtifact = artifact
-            this.mapArtifactManager.setActiveArtifactId(artifact)
-        } else {
-            console.error('Cannot set active artifact: ', artifact)
-        }
+    getAppwriteUrl(path: string): string {
+        return this.appwriteService.getAppwriteUrl(path)
     }
 
-    viewParameters(computation: ComputationDisplayEntity, event?: Event) {
-        event?.stopPropagation()
-        this.dialog.open<ComputationParametersDialogComponent, ComputationParametersDialogData>(
-            ComputationParametersDialogComponent,
-            {
-                data: {
-                    params: computation.params,
-                    requestedParams: computation.requested_params
-                },
-                autoFocus: false
-            }
-        )
+    getRedirectUrl(): string {
+        return this.appwriteService.getRedirectUrl()
     }
 
     private startPeriodicSync() {
@@ -659,7 +425,6 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                     .storeNewComputes(computation)
                     .then(() => {
                         this.upsertRuns([computation])
-                        this.importedRuns = [...this.importedRuns, correlationUuid]
                         this.toastr.success(
                             this.translocoService.translate('computationsIndex.computationImported', {
                                 id: this.formatUUID(correlationUuid)
@@ -688,28 +453,5 @@ export class ComputationsIndexComponent implements OnInit, OnDestroy {
                 })
             }
         })
-    }
-
-    openReport() {
-        this.reportService.openReport()
-    }
-
-    closeReport() {
-        this.reportService.closeReport()
-    }
-
-    hasArtifactErrors(artifactErrors: ComputationDisplayEntity['artifact_errors']): boolean {
-        return !!(artifactErrors && Object.keys(artifactErrors).length > 0)
-    }
-
-    getArtifactErrorEntries(artifactErrors: ComputationDisplayEntity['artifact_errors']): [string, string][] {
-        if (!artifactErrors || Object.keys(artifactErrors).length === 0) {
-            return []
-        }
-        return Object.entries(artifactErrors)
-    }
-
-    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
-        return getLanguageMismatchTooltip(computation, this.pluginLanguage, this.translocoService)
     }
 }

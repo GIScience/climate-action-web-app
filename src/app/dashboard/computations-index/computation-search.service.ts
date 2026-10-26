@@ -48,14 +48,6 @@ export class ComputationSearchService implements OnDestroy {
         }
     }
 
-    updateComputation(computation: ComputationDisplayEntity): void {
-        this.computations.update(computations =>
-            computations.map(current =>
-                current.correlation_uuid === computation.correlation_uuid ? computation : current
-            )
-        )
-    }
-
     showSearchLayers(pluginId: string): void {
         this.switchPlugin(pluginId)
 

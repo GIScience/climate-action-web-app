@@ -103,10 +103,16 @@
         "computationAlreadyPresent": "Computation ID #{{ id }} is already present",
         "computationImported": "Computation ID #{{ id }} imported",
         "errorImportingComputation": "Error importing computation",
-        "errorLoadingComputation": "Couldn't load this computation. Please try again.",
         "bookmarkAdded": "Saved to Bookmarks",
         "bookmarkRemoved": "Removed from Bookmarks",
         "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
+    },
+    "computationDetail": {
+        "back": "All computations",
+        "notFoundTitle": "Computation not found",
+        "notFoundMessage": "This computation no longer exists or the link is invalid.",
+        "errorTitle": "Couldn't load this computation",
+        "retry": "Try again"
     },
     "syncIndicator": {
         "syncing": "Synchronising Bookmarks…",

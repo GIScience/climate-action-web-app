@@ -77,7 +77,6 @@ describe('ComputationComponent', () => {
                 documents: [],
                 hasMore: false
             }),
-            getNewRuns: jest.fn().mockReturnValue([]),
             getComputesByStatus: jest.fn().mockReturnValue([]),
             markAsNew: jest.fn(),
             markAsViewed: jest.fn(),

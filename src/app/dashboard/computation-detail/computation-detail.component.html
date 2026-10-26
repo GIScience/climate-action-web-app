@@ -1,0 +1,124 @@
+<div class="computation-detail">
+    @if (state === 'loading') {
+        <div class="skeleton-container">
+            <div class="skeleton-item">
+                <div class="skeleton-header">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-subtitle"></div>
+                </div>
+            </div>
+            @for (item of [1, 2, 3]; track item) {
+                <div class="skeleton-item">
+                    <div class="skeleton-header">
+                        <div class="skeleton-subtitle"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (state === 'ready' && computation) {
+        <div class="detail-header">
+            <div class="card-header">
+                <div class="card-title">
+                    <h3>{{ computation.aoiName }}</h3>
+                    @if (hasArtifactErrors(computation.artifact_errors)) {
+                        <svg
+                            lucideFileExclamationPoint
+                            size="20"
+                            color="#ff7800"
+                            class="artifact-errors"
+                            [tp]="artifactErrorsTooltip"
+                            [tpData]="computation.artifact_errors"
+                            tpPlacement="right"></svg>
+                    }
+                    @let languageMismatchTooltip = getLanguageMismatchTooltip(computation);
+                    @if (languageMismatchTooltip) {
+                        <svg
+                            lucideMessageSquareWarning
+                            size="18"
+                            color="#9a6700"
+                            class="language-mismatch"
+                            [tp]="languageMismatchTooltip"
+                            tpPlacement="right"></svg>
+                    }
+                </div>
+                <p class="card-subtitle">
+                    <svg lucideClock size="15"></svg>
+                    {{ formatTimestamp(computation.request_ts) }} • <svg lucideHash size="15"></svg
+                    >{{ formatUUID(computation.correlation_uuid) }}
+                </p>
+            </div>
+            @if (!isReportVisible) {
+                <div class="computation-actions">
+                    <button
+                        (click)="viewParameters($event)"
+                        [tp]="'computationsIndex.actions.viewParameters' | transloco"
+                        tpPlacement="left"
+                        [attr.aria-label]="'computationsIndex.actions.viewParameters' | transloco"
+                        class="params-trigger btn-onlyicon">
+                        <svg lucideListTodo size="18"></svg>
+                    </button>
+                    <button
+                        (click)="toggleBookmark($event)"
+                        [class.bookmarked]="isBookmarked()"
+                        [tp]="
+                            (isBookmarked()
+                                ? 'computationsIndex.actions.removeBookmark'
+                                : 'computationsIndex.actions.bookmark'
+                            ) | transloco
+                        "
+                        tpPlacement="left"
+                        [attr.aria-label]="
+                            (isBookmarked()
+                                ? 'computationsIndex.actions.removeBookmark'
+                                : 'computationsIndex.actions.bookmark'
+                            ) | transloco
+                        "
+                        class="bookmark-toggle btn-onlyicon">
+                        <svg lucideBookmark size="18"></svg>
+                    </button>
+                </div>
+            }
+        </div>
+        <div class="detail-artifacts">
+            <ng-scrollbar visibility="hover" orientation="vertical">
+                <app-computation
+                    [computation]="computation"
+                    [activeArtifact]="activeArtifact"
+                    (artifactActivated)="onArtifactActivated($event)">
+                </app-computation>
+            </ng-scrollbar>
+        </div>
+    }
+
+    @if (state === 'not-found') {
+        <div class="detail-message">
+            <h3>{{ 'computationDetail.notFoundTitle' | transloco }}</h3>
+            <p>{{ 'computationDetail.notFoundMessage' | transloco }}</p>
+        </div>
+    }
+
+    @if (state === 'error') {
+        <div class="detail-message">
+            <h3>{{ 'computationDetail.errorTitle' | transloco }}</h3>
+            <button class="btn-alt btn-small btn-withtext--before" (click)="retry()">
+                <svg lucideRotateCw size="16"></svg>
+                {{ 'computationDetail.retry' | transloco }}
+            </button>
+        </div>
+    }
+</div>
+
+<ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
+    <div class="artifact-errors-tooltip">
+        <h3 class="tooltip-title">{{ 'computationsIndex.artifactErrors' | transloco }}</h3>
+        @if (artifactErrors) {
+            @for (error of getArtifactErrorEntries(artifactErrors); track error[0]) {
+                <p class="error-item">
+                    <strong>{{ error[0] }}:</strong> {{ error[1] }}
+                </p>
+            }
+        }
+    </div>
+</ng-template>

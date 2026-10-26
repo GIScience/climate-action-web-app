@@ -204,6 +204,8 @@ describe('mapService', () => {
         cy.wait('@getGeoJsonJinrongjie')
         cy.waitForRenderComplete()
 
+        cy.get('button.back-btn').click()
+
         cy.get('.parent-computation').eq(1).click()
         cy.wait('@getGeoJsonComputationWestChangan')
         cy.waitForRenderComplete()

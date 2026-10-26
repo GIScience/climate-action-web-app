@@ -13,6 +13,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Own computations are now managed under the new 'Bookmarks' tab, and entries from the pre-computed set (see 'Discover' mode below) can be bookmarked into (and removed from) your personal list ([#354](https://gitlab.heigit.org/climate-action/web-app/-/issues/354))
 - Computation runs are now local-first: stored in IndexedDB (instead of a localStorage) and replicated to Appwrite in the background via a persisted outbox
 - Computation failure notices are surfaced in a persistent dialog now instead of the toast, with the option given to contact support
+- Toggling a computation opens it in a dedicated detail view, instead of expanding it in place within the list
 
 ### Added
 

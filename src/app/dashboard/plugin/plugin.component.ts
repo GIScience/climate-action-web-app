@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common'
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatTabsModule } from '@angular/material/tabs'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { formatSourceText, processSourceUrls, sortSourcesByAuthor } from '@app/utils/source.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideChevronsDown,
     LucideChevronsUp,
+    LucideCircleArrowLeft,
     LucideCircleX,
     LucideCloudOff,
     LucideDiamondPlus,
@@ -43,12 +44,14 @@ import { PluginService } from './plugin.service'
         NgScrollbarModule,
         LucideChevronsDown,
         LucideChevronsUp,
+        LucideCircleArrowLeft,
         LucideCircleX,
         LucideCloudOff,
         LucideDiamondPlus,
         LucideExternalLink,
         LucideX,
-        TranslocoModule
+        TranslocoModule,
+        RouterOutlet
     ],
     animations: [
         trigger('accordion', [
@@ -90,6 +93,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     pluginObs$: Observable<Plugin> | undefined
     computeState: ComputeState = 'inactive'
     loading = true
+    detailActive = false
     isPurposeExpanded = false
     shortPurpose = ''
     isReportVisible = false
@@ -120,6 +124,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         if (this.reportVisibilitySubscription) {
             this.reportVisibilitySubscription.unsubscribe()
         }
+        this.pluginService.setActivePlugin(null)
     }
 
     private loadPluginDetails() {
@@ -138,6 +143,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                         plugin.assets.icon = this.pluginService.getIconUrl(plugin.id)
                         this.shortPurpose = this.extractFirstSentence(plugin.purpose)
                         this.loading = false
+                        this.pluginService.setActivePlugin(plugin)
                         return plugin
                     }),
                     catchError(error => {
@@ -166,6 +172,13 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         this.pluginService.setComputeState('compute-ready')
         this.mapArtifactManager.clearAll()
         this.pluginService.collapsePluginCatalog()
+        if (this.detailActive) {
+            this.leaveDetail()
+        }
+    }
+
+    leaveDetail() {
+        this.router.navigate(['/dashboard/plugin', this.route.snapshot.paramMap.get('name')])
     }
 
     exitComputeState() {

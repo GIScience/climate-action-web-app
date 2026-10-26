@@ -251,14 +251,6 @@ export class StorageService {
         return this.getPluginRuns().filter(run => statuses.includes(run.status as ComputationRunState))
     }
 
-    // New runs tracking
-
-    getNewRuns(): string[] {
-        return this.getPluginRuns()
-            .filter(run => run.flags?.includes('NEW'))
-            .map(run => run.correlation_uuid)
-    }
-
     async markAsNew(correlationId: string): Promise<void> {
         await this.setFlag(correlationId, 'NEW', true)
     }

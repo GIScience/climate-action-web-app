@@ -28,8 +28,10 @@ export class PluginService {
     private apiUrl = environment.climateActionApiUrl
 
     private computeStateSubject = new BehaviorSubject<ComputeState>('inactive')
+    private activePluginSubject = new BehaviorSubject<Plugin | null>(null)
 
     public computeState$ = this.computeStateSubject.asObservable()
+    public activePlugin$ = this.activePluginSubject.asObservable()
 
     private catalogToggleInput!: HTMLInputElement
 
@@ -99,13 +101,11 @@ export class PluginService {
             retryWhen(errors =>
                 errors.pipe(
                     concatMap((error, index) => {
-                        if (index < maxRetries) {
+                        if (error?.status !== 404 && index < maxRetries) {
                             console.warn(`Retrying request for computation ${id} (${index + 1})...`)
                             return of(error).pipe(delay((index + 1) * 1000))
                         }
-                        return throwError(
-                            () => `Error fetching computation ${id} after several retries: ${error.message}`
-                        )
+                        return throwError(() => error)
                     })
                 )
             ),
@@ -137,6 +137,10 @@ export class PluginService {
         if (this.catalogToggleInput && !this.catalogToggleInput.checked) {
             this.catalogToggleInput.checked = true
         }
+    }
+
+    setActivePlugin(plugin: Plugin | null): void {
+        this.activePluginSubject.next(plugin)
     }
 
     setComputeState(computeState: ComputeState): void {

@@ -38,7 +38,7 @@
                                             <div class="card-title">
                                                 <h3>{{ scheduledRun.aoiName }}</h3>
                                             </div>
-                                            <p class="card-subtitle m-0">
+                                            <p class="card-subtitle">
                                                 <svg lucideClock size="15"></svg>
                                                 {{ formatTimestamp(scheduledRun.request_ts) }} •
                                                 <svg lucideHash size="15"></svg>
@@ -71,7 +71,6 @@
                         </ng-scrollbar>
                     </div>
                 }
-
                 @if (!user && !(bookmarkedRuns.length === 0 && paginationInfo.loading)) {
                     <div class="prompt-container">
                         @if (bookmarkedRuns.length > 0) {
@@ -173,46 +172,21 @@
 </ng-template>
 
 <ng-template #computationRow let-computation="computation" let-showBadges="showBadges">
-    <div class="computation" [class.computation-expanded]="computation.isExpanded">
+    <div class="computation">
         <div
             [ngClass]="{
                 'parent-computation': true,
-                'is-new': showBadges && newRuns.includes(computation.correlation_uuid),
-                'is-imported': showBadges && importedRuns.includes(computation.correlation_uuid)
+                'is-new': showBadges && isNewRun(computation)
             }"
-            (click)="toggleComputation(computation)"
-            (keyup.enter)="toggleComputation(computation)"
+            (click)="openComputation(computation)"
+            (keyup.enter)="openComputation(computation)"
             tabindex="0">
             <div class="computation-arrow">
-                @if (computation.loading) {
-                    <svg lucideLoaderCircle size="20" class="arrow-spinner"></svg>
-                } @else {
-                    <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
-                }
+                <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
             </div>
             <div class="card-header">
                 <div class="card-title">
                     <h3>{{ computation.aoiName }}</h3>
-                    @if (hasArtifactErrors(computation.artifact_errors)) {
-                        <svg
-                            lucideFileExclamationPoint
-                            size="20"
-                            color="#ff7800"
-                            class="artifact-errors"
-                            [tp]="artifactErrorsTooltip"
-                            [tpData]="computation.artifact_errors"
-                            tpPlacement="right"></svg>
-                    }
-                    @let languageMismatchTooltip = getLanguageMismatchTooltip(computation);
-                    @if (languageMismatchTooltip) {
-                        <svg
-                            lucideMessageSquareWarning
-                            size="18"
-                            color="#9a6700"
-                            class="language-mismatch"
-                            [tp]="languageMismatchTooltip"
-                            tpPlacement="right"></svg>
-                    }
                     @if (showBadges && computation.flags?.includes('IMPORTED')) {
                         <svg
                             lucideImport
@@ -223,7 +197,7 @@
                             tpPlacement="right"></svg>
                     }
                 </div>
-                <p class="card-subtitle m-0">
+                <p class="card-subtitle">
                     <svg lucideClock size="15"></svg>
                     {{ formatTimestamp(computation.request_ts) }} • <svg lucideHash size="15"></svg
                     >{{ formatUUID(computation.correlation_uuid) }}
@@ -231,16 +205,14 @@
             </div>
             @if (!isReportVisible) {
                 <div class="computation-actions">
-                    @if (computation.hydrated && computation.isExpanded) {
-                        <button
-                            (click)="viewParameters(computation, $event)"
-                            [tp]="'computationsIndex.actions.viewParameters' | transloco"
-                            tpPlacement="left"
-                            [attr.aria-label]="'computationsIndex.actions.viewParameters' | transloco"
-                            class="params-trigger btn-onlyicon">
-                            <svg lucideListTodo size="18"></svg>
-                        </button>
-                    }
+                    <button
+                        (click)="shareComputation(computation.correlation_uuid, $event)"
+                        [tp]="'computationsIndex.actions.share' | transloco"
+                        tpPlacement="left"
+                        [attr.aria-label]="'computationsIndex.actions.share' | transloco"
+                        class="share-trigger btn-onlyicon">
+                        <svg lucideShare2 size="18"></svg>
+                    </button>
                     <button
                         (click)="toggleBookmark(computation, $event)"
                         [class.bookmarked]="isBookmarked(computation.correlation_uuid)"
@@ -260,42 +232,14 @@
                         class="bookmark-toggle btn-onlyicon">
                         <svg lucideBookmark size="18"></svg>
                     </button>
-                    <button
-                        (click)="shareComputation(computation.correlation_uuid, $event)"
-                        [tp]="'computationsIndex.actions.share' | transloco"
-                        tpPlacement="left"
-                        [attr.aria-label]="'computationsIndex.actions.share' | transloco"
-                        class="share-trigger btn-onlyicon">
-                        <svg lucideShare2 size="18"></svg>
-                    </button>
                 </div>
             }
-            @if (showBadges && newRuns.includes(computation.correlation_uuid)) {
+            @if (showBadges && isNewRun(computation)) {
                 <div class="computation-status" [ngClass]="computation.status">
                     <svg lucideCheck size="15"></svg>
                     {{ 'computationsIndex.status.done' | transloco }}
                 </div>
             }
         </div>
-        @if (computation.hydrated) {
-            <app-computation
-                [computation]="computation"
-                [activeArtifact]="activeArtifact"
-                (artifactActivated)="storeActiveArtifact($event)">
-            </app-computation>
-        }
-    </div>
-</ng-template>
-
-<ng-template #artifactErrorsTooltip let-artifactErrors="data" let-hide>
-    <div class="artifact-errors-tooltip">
-        <h3 class="tooltip-title">{{ 'computationsIndex.artifactErrors' | transloco }}</h3>
-        @if (artifactErrors) {
-            @for (error of getArtifactErrorEntries(artifactErrors); track error[0]) {
-                <p class="error-item">
-                    <strong>{{ error[0] }}:</strong> {{ error[1] }}
-                </p>
-            }
-        }
     </div>
 </ng-template>

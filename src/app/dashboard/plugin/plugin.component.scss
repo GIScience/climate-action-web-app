@@ -156,6 +156,13 @@
     }
 }
 
+.detail-toolbar {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: rem(15) rem(15) rem(5);
+}
+
 .computations-list {
     padding: rem(15) rem(15) 0;
 

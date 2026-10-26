@@ -93,32 +93,45 @@
                     </div>
                 </div>
                 <div class="plugin-content-wrapper">
+                    <ng-template #newComputeButton>
+                        <div
+                            class="new-compute__wrapper"
+                            [tp]="
+                                plugin.online
+                                    ? ('plugin.loginToCompute' | transloco)
+                                    : ('plugin.offlineNewCompute' | transloco)
+                            "
+                            [tpIsEnabled]="!plugin.online || !user">
+                            <button
+                                class="new-compute btn-primary btn-small btn-withtext--after"
+                                (click)="enterComputeState()"
+                                [disabled]="!plugin.online || !user">
+                                <svg lucideDiamondPlus size="20"></svg>
+                                {{ 'plugin.newComputation' | transloco }}
+                            </button>
+                        </div>
+                    </ng-template>
+                    @if (detailActive) {
+                        <div class="detail-toolbar">
+                            <button class="back-btn btn-light btn-small btn-withtext--after" (click)="leaveDetail()">
+                                <svg lucideCircleArrowLeft size="20"></svg>
+                                {{ 'computationDetail.back' | transloco }}
+                            </button>
+                            <ng-container *ngTemplateOutlet="newComputeButton"></ng-container>
+                        </div>
+                    }
+                    <router-outlet (activate)="detailActive = true" (deactivate)="detailActive = false"></router-outlet>
                     @if (computeState === 'inactive') {
-                        <div class="computations-list">
+                        <div class="computations-list" [hidden]="detailActive">
                             <div class="computations-list__header">
                                 <h2>{{ 'plugin.computations' | transloco }}</h2>
-                                <div
-                                    class="new-compute__wrapper"
-                                    [tp]="
-                                        plugin.online
-                                            ? ('plugin.loginToCompute' | transloco)
-                                            : ('plugin.offlineNewCompute' | transloco)
-                                    "
-                                    [tpIsEnabled]="!plugin.online || !user">
-                                    <button
-                                        class="new-compute btn-primary btn-small btn-withtext--after"
-                                        (click)="enterComputeState()"
-                                        [disabled]="!plugin.online || !user">
-                                        <svg lucideDiamondPlus size="20"></svg>
-                                        {{ 'plugin.newComputation' | transloco }}
-                                    </button>
-                                </div>
+                                <ng-container *ngTemplateOutlet="newComputeButton"></ng-container>
                             </div>
                             <app-computations-index [plugin]="plugin"></app-computations-index>
                         </div>
                     }
                     @if (plugin.online && computeState === 'compute-ready') {
-                        <div class="plugin-compute">
+                        <div class="plugin-compute" [hidden]="detailActive">
                             <div class="plugin-compute__header">
                                 <h2>{{ 'plugin.computePanel' | transloco }}</h2>
                                 <button
