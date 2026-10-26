@@ -193,6 +193,10 @@ button {
     backdrop-filter: grayscale(0.75) blur(2.5px);
 }
 
+.cdk-overlay-scrim-backdrop {
+    background-color: rgb(16 36 42 / 22%);
+}
+
 .mat-mdc-dialog-container .mdc-dialog__surface {
     border-radius: 10px !important;
 }

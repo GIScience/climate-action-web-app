@@ -108,7 +108,6 @@ describe('ComputationDetailComponent', () => {
         mockPluginService = {
             getComputationMetadata: jest.fn().mockReturnValue(of(buildMetadata())),
             setComputeState: jest.fn(),
-            collapsePluginCatalog: jest.fn(),
             storeNewComputes: jest.fn(() => Promise.resolve()),
             getPluginNameById: jest.fn((id: string) => id),
             activePlugin$: new BehaviorSubject(null).asObservable()

@@ -99,7 +99,6 @@ export class ComputationDetailComponent implements OnInit, OnDestroy {
                     this.clearSelection()
 
                     this.pluginService.setComputeState('inactive')
-                    this.pluginService.collapsePluginCatalog()
 
                     return this.pluginService.getComputationMetadata(uuid).pipe(
                         map(metadata => ({ uuid, metadata, error: null })),

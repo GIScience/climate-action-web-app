@@ -1,69 +1,118 @@
-<div class="plugin-catalog" [ngClass]="{ 'is-loading': loading }">
-    <input id="catalog-toggle" type="checkbox" #catalogToggle checked="checked" />
-    <div id="catalog-header">
-        <h3 class="plugin-title">{{ 'pluginCatalog.title' | transloco }}</h3>
-        <label for="catalog-toggle">
-            <span id="catalog-toggle-burger"></span>
-        </label>
-    </div>
-    <div class="plugins-list">
-        @if (loading) {
-            <div class="loading-state">
-                <ul>
-                    @for (i of [1, 2, 3, 4, 5]; track i) {
-                        <li class="plugin-card">
-                            <div class="plugin-card__icon">
-                                <img src="assets/images/plugin-icons/loading.png" alt="Loading..." />
-                            </div>
-                            <div class="plugin-card__text">
-                                <h3>{{ 'pluginCatalog.loading' | transloco }}</h3>
-                                <span>N/A</span>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            </div>
+@if (mode === 'deck') {
+    <button
+        #deckTrigger
+        type="button"
+        class="deck"
+        [ngClass]="{ 'deck--open': open, 'is-loading': loading }"
+        (click)="toggle($event)"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="open"
+        [attr.aria-label]="'pluginCatalog.switchTool' | transloco"
+        [tp]="'pluginCatalog.switchTool' | transloco"
+        [tpIsEnabled]="!open"
+        tpPlacement="bottom">
+        @for (slot of [0, 1]; track slot) {
+            <span class="deck__card deck__card--back-{{ slot + 1 }}">
+                @if (backCards[slot]; as card) {
+                    <img [src]="card.icon" alt="" (error)="onImageError($event)" />
+                }
+            </span>
         }
+        <span class="deck__card deck__card--front">
+            @if (activeCard) {
+                <img [src]="activeCard.icon" alt="" (error)="onImageError($event)" />
+            }
+        </span>
+    </button>
 
-        @if (!loading) {
-            <ng-scrollbar visibility="hover" orientation="vertical" position="invertY">
-                <ul>
-                    @for (card of cards; track card; let i = $index) {
-                        <li
-                            class="plugin-card"
-                            (click)="showPlugin(card)"
-                            (keydown)="showPlugin(card)"
-                            [ngClass]="{
-                                'plugin-card-highlight': activeCard === card,
-                                'plugin-card-offline': !card.online
-                            }"
-                            tabindex="0"
-                            [tp]="tpl"
-                            tpPlacement="right">
-                            <div class="plugin-card__icon">
-                                <img [src]="card.icon" alt="{{ card.icon_credit }}" (error)="onImageError($event)" />
-                                <div class="plugin-card__icon-text">
-                                    <h5>{{ card.name }}</h5>
-                                </div>
-                            </div>
-                            <div class="plugin-card__text">
-                                <h3>{{ card.name }}</h3>
-                                @if (card.version && card.library_version) {
-                                    <span>ver. {{ card.version }}/{{ card.library_version }}</span>
-                                }
-                                @if (!(card.version && card.library_version)) {
-                                    <span>ver. 0.0.1/0.0.1</span>
-                                }
-                            </div>
-                            <ng-template #tpl>
-                                @if (card.teaser) {
-                                    <span>{{ card.teaser }}</span>
-                                }
-                            </ng-template>
-                        </li>
+    <ng-template
+        [appDropdownMenu]="deckTrigger"
+        [dropdownOpen]="open"
+        [dropdownPositions]="deckPositions"
+        [dropdownOverlayConfig]="overlayConfig"
+        (dropdownClosed)="close()">
+        <ng-container *ngTemplateOutlet="grid"></ng-container>
+    </ng-template>
+} @else {
+    <ng-container *ngTemplateOutlet="grid"></ng-container>
+}
+
+<ng-template #grid>
+    <div
+        #panel
+        class="catalog-panel"
+        [ngClass]="'catalog-panel--' + mode"
+        [attr.role]="mode === 'deck' ? 'dialog' : 'region'"
+        [attr.aria-label]="'pluginCatalog.title' | transloco"
+        tabindex="-1"
+        (keydown)="onGridKeydown($event)">
+        <h3 class="catalog-panel__title">{{ 'pluginCatalog.title' | transloco }}</h3>
+
+        <div class="plugins-list">
+            @if (loading) {
+                <div class="plugin-grid" role="status" [attr.aria-label]="'pluginCatalog.loading' | transloco">
+                    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+                        <div class="plugin-card-skeleton"></div>
                     }
-                </ul>
-            </ng-scrollbar>
+                </div>
+            } @else {
+                <ng-scrollbar visibility="hover" orientation="vertical">
+                    <div class="plugin-grid" (mouseleave)="hoveredCard = undefined">
+                        @for (card of cards; track card.id; let i = $index) {
+                            <button
+                                #tile
+                                type="button"
+                                class="plugin-card"
+                                [ngClass]="{
+                                    'plugin-card-highlight': activeCard === card,
+                                    'plugin-card-highlight-soft': isHighlightSoftened(card),
+                                    'plugin-card-offline': !card.online,
+                                    'plugin-card-dimmed': isDimmed(card)
+                                }"
+                                [attr.aria-current]="activeCard === card ? 'page' : null"
+                                [style.--i]="i"
+                                [style.--col]="i % gridColumns"
+                                [style.--row]="(i - (i % gridColumns)) / gridColumns"
+                                [tp]="card.teaser"
+                                [tpIsEnabled]="!!card.teaser"
+                                [tpDelay]="teaserDelay"
+                                tpPlacement="bottom"
+                                [tpPopperOptions]="teaserPopperOptions"
+                                (click)="showPlugin(card)"
+                                (mouseenter)="hoveredCard = card"
+                                (focus)="hoveredCard = card">
+                                <span class="plugin-card__icon">
+                                    <img [src]="card.icon" alt="" (error)="onImageError($event)" />
+                                </span>
+                                <span class="plugin-card__name">{{ card.name }}</span>
+                                @if (!card.online) {
+                                    <svg
+                                        lucideCloudOff
+                                        size="14"
+                                        class="plugin-card__offline"
+                                        [title]="'plugin.offline' | transloco"></svg>
+                                }
+                            </button>
+                        }
+                    </div>
+                </ng-scrollbar>
+            }
+        </div>
+
+        @if (concernLegend.length) {
+            <ul class="concern-legend" [attr.aria-label]="'pluginCatalog.concernsLabel' | transloco">
+                @for (concern of concernLegend; track concern) {
+                    <li
+                        class="concern-legend__item"
+                        [class.is-active]="isConcernActive(concern)"
+                        [style.--concern-color]="concernStyles[concern].color"
+                        (mouseenter)="highlightedConcern = concern"
+                        (mouseleave)="highlightedConcern = undefined">
+                        <svg [lucideIcon]="concernStyles[concern].icon" size="14" aria-hidden="true"></svg>
+                        {{ 'pluginCatalog.concerns.' + concern | transloco }}
+                    </li>
+                }
+            </ul>
         }
     </div>
-</div>
+</ng-template>

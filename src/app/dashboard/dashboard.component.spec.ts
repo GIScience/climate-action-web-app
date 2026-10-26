@@ -8,7 +8,6 @@ import { ArtifactComponent } from './artifact/artifact.component'
 import { ComputationComponent } from './computation/computation.component'
 import { DashboardComponent } from './dashboard.component'
 import { MapService } from './map/map.service'
-import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
 
 describe('DashboardComponent', () => {
     let component: DashboardComponent
@@ -28,7 +27,6 @@ describe('DashboardComponent', () => {
                 DashboardComponent,
                 HttpClientModule,
                 ArtifactComponent,
-                PluginCatalogComponent,
                 RouterModule.forRoot([]),
                 getTranslocoTestingModule()
             ],

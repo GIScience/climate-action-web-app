@@ -25,7 +25,17 @@
     },
     "pluginCatalog": {
         "title": "Analysewerkzeug",
-        "loading": "Lade..."
+        "loading": "Lade...",
+        "switchTool": "Werkzeug wechseln",
+        "concernsLabel": "Themen",
+        "concerns": {
+            "cycling": "Radverkehr",
+            "adaption": "Klimaanpassung",
+            "mitigation": "Klimaschutz",
+            "pedestrian": "Fußverkehr",
+            "waste": "Abfall",
+            "ghg_emission": "Treibhausgase"
+        }
     },
     "plugin": {
         "loading": "Lade...",

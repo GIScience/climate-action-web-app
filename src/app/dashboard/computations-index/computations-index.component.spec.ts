@@ -88,7 +88,6 @@ describe('ComputationsIndexComponent', () => {
             getComputationMetadata: jest.fn(),
             setComputeState: jest.fn(),
             getComputationRunState: jest.fn().mockReturnValue(of({ state: 'PENDING' })),
-            collapsePluginCatalog: jest.fn(),
             getPluginNameById: jest.fn((id: string) => id),
             getSearch: jest.fn().mockReturnValue(of(createSearchPage([]))),
             getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),

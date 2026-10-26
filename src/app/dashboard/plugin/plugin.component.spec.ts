@@ -2,9 +2,9 @@ import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
 import { processSourceUrls } from '@app/utils/source.utils'
+import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrModule } from 'ngx-toastr'
 import { getTranslocoTestingModule } from '../../../../jest.mocks'
-import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
 import { PluginComponent } from './plugin.component'
 import { Plugin } from './plugin.interface'
 
@@ -15,11 +15,7 @@ describe('PluginComponent', () => {
     const test_plugin = {
         name: 'Test 1',
         version: '0.0.1',
-        concerns: [
-            {
-                concern: 'ghg_emission'
-            }
-        ],
+        concerns: ['ghg_emission'],
         purpose: 'This Plugin serves no purpose besides being a blueprint for real plugins.',
         methodology: 'This Plugin uses no methodology because it does nothing.',
         sources: [
@@ -62,10 +58,19 @@ describe('PluginComponent', () => {
             imports: [
                 HttpClientModule,
                 PluginComponent,
-                PluginCatalogComponent,
                 RouterModule.forRoot([]),
                 getTranslocoTestingModule(),
                 ToastrModule.forRoot()
+            ],
+            providers: [
+                provideTippyLoader(() => import('tippy.js')),
+                provideTippyConfig({
+                    defaultVariation: 'tooltip',
+                    variations: {
+                        tooltip: tooltipVariation,
+                        popper: popperVariation
+                    }
+                })
             ]
         })
         fixture = TestBed.createComponent(PluginComponent)

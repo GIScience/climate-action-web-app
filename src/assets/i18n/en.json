@@ -25,7 +25,17 @@
     },
     "pluginCatalog": {
         "title": "Assessment Tools",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "switchTool": "Switch tool",
+        "concernsLabel": "Topics",
+        "concerns": {
+            "cycling": "Cycling",
+            "adaption": "Climate adaptation",
+            "mitigation": "Climate mitigation",
+            "pedestrian": "Walking",
+            "waste": "Waste",
+            "ghg_emission": "Greenhouse gases"
+        }
     },
     "plugin": {
         "loading": "Loading...",

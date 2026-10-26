@@ -67,11 +67,7 @@ describe('PluginService', () => {
     const test_plugin = {
         name: 'Test 1',
         version: '0.0.1',
-        concerns: [
-            {
-                concern: 'ghg_emission'
-            }
-        ],
+        concerns: ['ghg_emission'],
         purpose: 'This Plugin serves no purpose besides being a blueprint for real plugins.',
         methodology: 'This Plugin uses no methodology because it does nothing.',
         sources: [

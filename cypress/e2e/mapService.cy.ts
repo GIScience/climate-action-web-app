@@ -139,7 +139,7 @@ describe('mapService', () => {
         mockGeoJsonJinrongjie()
 
         beforeCompareSnapshots(
-            'app-plugin-catalog, .dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
+            '.dashboard__left-column, .dashboard__middle-column, .dashboard__right-column, .maplibregl-control-container, .child-computations, .child-computations-wrapper, .toast-container'
         )
 
         visitPluginPage([

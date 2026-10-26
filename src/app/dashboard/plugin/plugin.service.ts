@@ -4,7 +4,7 @@ import { environment } from '@environments/environment'
 import { TranslocoService } from '@jsverse/transloco'
 import type { Feature as GeoJSONFeature, MultiPolygon } from 'geojson'
 import { BehaviorSubject, map, Observable, of, throwError } from 'rxjs'
-import { catchError, concatMap, delay, retryWhen, tap, timeout } from 'rxjs/operators'
+import { catchError, concatMap, delay, retryWhen, shareReplay, tap, timeout } from 'rxjs/operators'
 import { StorageService } from '../../storage.service'
 import { derivePluginNameFromId } from '../../utils/string.utils'
 import { ComputationRunState, ComputationRunStateInfo } from '../common/status.types'
@@ -33,8 +33,7 @@ export class PluginService {
     public computeState$ = this.computeStateSubject.asObservable()
     public activePlugin$ = this.activePluginSubject.asObservable()
 
-    private catalogToggleInput!: HTMLInputElement
-
+    private pluginsCache = new Map<string, Observable<Plugin[]>>()
     private pluginNameCache = new Map<string, string>()
     private metadataCache = new Map<string, { data: ComputationMetadata; timestamp: number }>()
     private readonly METADATA_CACHE_TTL = 60 * 60 * 1000
@@ -44,15 +43,18 @@ export class PluginService {
     }
 
     getPlugins(): Observable<Plugin[]> {
-        return this.http
-            .get<Plugin[]>(`${this.apiUrl}/plugin`, {
-                params: { lang: this.translocoService.getActiveLang() }
-            })
-            .pipe(
+        const lang = this.translocoService.getActiveLang()
+        let plugins$ = this.pluginsCache.get(lang)
+        if (!plugins$) {
+            plugins$ = this.http.get<Plugin[]>(`${this.apiUrl}/plugin`, { params: { lang } }).pipe(
                 tap(plugins => {
                     plugins.forEach(p => this.pluginNameCache.set(p.id, p.name))
-                })
+                }),
+                shareReplay(1)
             )
+            this.pluginsCache.set(lang, plugins$)
+        }
+        return plugins$
     }
 
     getPluginNameById(pluginId: string): string {
@@ -121,22 +123,6 @@ export class PluginService {
                 this.metadataCache.set(id, { data: metadata, timestamp: Date.now() })
             })
         )
-    }
-
-    setCatalogToggleInput(input: HTMLInputElement) {
-        this.catalogToggleInput = input
-    }
-
-    expandPluginCatalog() {
-        if (this.catalogToggleInput && this.catalogToggleInput.checked) {
-            this.catalogToggleInput.checked = false
-        }
-    }
-
-    collapsePluginCatalog() {
-        if (this.catalogToggleInput && !this.catalogToggleInput.checked) {
-            this.catalogToggleInput.checked = true
-        }
     }
 
     setActivePlugin(plugin: Plugin | null): void {

@@ -4,12 +4,13 @@ import { RouterModule } from '@angular/router'
 import { TranslocoModule } from '@jsverse/transloco'
 import { StorageService } from '../../storage.service'
 import { ComputationDatabaseEntity } from '../computations-index/computation.interface'
+import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
 import { PluginService } from '../plugin/plugin.service'
 import { TourEngine } from '../walkthrough/tour-engine.service'
 
 @Component({
     selector: 'app-landing',
-    imports: [CommonModule, RouterModule, NgOptimizedImage, TranslocoModule],
+    imports: [CommonModule, RouterModule, NgOptimizedImage, PluginCatalogComponent, TranslocoModule],
     templateUrl: './landing.component.html',
     styleUrl: './landing.component.scss'
 })

@@ -93,7 +93,6 @@ describe('ComputationComponent', () => {
             getComputationMetadata: jest.fn(),
             setComputeState: jest.fn(),
             getComputationRunState: jest.fn(),
-            collapsePluginCatalog: jest.fn(),
             getPluginNameById: jest.fn((id: string) => id),
             getPluginDetails: jest.fn().mockReturnValue(
                 of({

@@ -230,8 +230,6 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
     private renderArtifact(artifact: ArtifactEntity) {
         const isMapArtifact = this.mapArtifactManager.isMapArtifact(artifact.modality)
 
-        this.pluginService.collapsePluginCatalog()
-
         // Allow for any type of report
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const waitForArtifactFetch = (observable: Observable<any>, dataCheck: (data: any) => boolean) => {

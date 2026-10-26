@@ -15,6 +15,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Computation failure notices are surfaced in a persistent dialog now instead of the toast, with the option given to contact support
 - Toggling a computation opens it in a dedicated detail view, instead of expanding it in place within the list
 - Legacy `?share-id=` links are redirected to the new deep link route
+- Plugin Catalog sidebar has been converted into a launcher/deck style menu to accommodate the ever-growing list of tools
 
 ### Added
 

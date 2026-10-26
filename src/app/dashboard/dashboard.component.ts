@@ -17,7 +17,6 @@ import { LegendObject } from './artifact/artifact.interface'
 import { MapArtifactLayer, MapArtifactManagerService } from './map/map-artifact-manager.service'
 import { MapComponent } from './map/map.component'
 import { MapService } from './map/map.service'
-import { PluginCatalogComponent } from './plugin-catalog/plugin-catalog.component'
 import { ReportComponent } from './report/report.component'
 import { ReportService } from './report/report.service'
 import { SearchComponent } from './search/search.component'
@@ -26,15 +25,7 @@ import { SearchComponent } from './search/search.component'
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    imports: [
-        CommonModule,
-        PluginCatalogComponent,
-        ArtifactViewerComponent,
-        SearchComponent,
-        MapComponent,
-        RouterModule,
-        ReportComponent
-    ]
+    imports: [CommonModule, ArtifactViewerComponent, SearchComponent, MapComponent, RouterModule, ReportComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     artifactViewerService = inject(ArtifactViewerService)

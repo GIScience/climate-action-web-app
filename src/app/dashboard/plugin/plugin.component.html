@@ -2,7 +2,10 @@
     @if (loading) {
         <div>
             <div class="plugin-header is-loading">
-                <h1>{{ 'plugin.loading' | transloco }}</h1>
+                <div class="plugin-name-wrapper">
+                    <app-plugin-catalog mode="deck"></app-plugin-catalog>
+                    <h1>{{ 'plugin.loading' | transloco }}</h1>
+                </div>
             </div>
             <div class="plugin-content-wrapper is-loading">
                 <h2>{{ 'plugin.loading' | transloco }}</h2>
@@ -15,6 +18,7 @@
             <div>
                 <div class="plugin-header">
                     <div class="plugin-name-wrapper">
+                        <app-plugin-catalog mode="deck"></app-plugin-catalog>
                         <h1>{{ plugin.name }}</h1>
                         @if (plugin.state && plugin.state !== 'active') {
                             <a href="https://github.com/GIScience/badges#{{ plugin.state }}" target="_blank">

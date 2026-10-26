@@ -24,6 +24,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar'
 import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap, throwError } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
+import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
 import { ReportService } from '../report/report.service'
 import { PluginParameterComponent } from './plugin-parameter/plugin-parameter.component'
 import { ComputeState, Plugin } from './plugin.interface'
@@ -39,6 +40,7 @@ import { PluginService } from './plugin.service'
         MarkdownModule,
         MatTabsModule,
         ComputationsIndexComponent,
+        PluginCatalogComponent,
         PluginParameterComponent,
         TippyDirective,
         NgScrollbarModule,
@@ -171,7 +173,6 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
 
         this.pluginService.setComputeState('compute-ready')
         this.mapArtifactManager.clearAll()
-        this.pluginService.collapsePluginCatalog()
         if (this.detailActive) {
             this.leaveDetail()
         }

@@ -1,4 +1,4 @@
-import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay'
+import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay'
 import { TemplatePortal } from '@angular/cdk/portal'
 import {
     Directive,
@@ -30,6 +30,8 @@ export class DropdownMenuDirective implements OnChanges, OnDestroy {
     @Input({ required: true }) appDropdownMenu!: Element
     @Input() dropdownOpen = false
     @Input() dropdownPositions: ConnectedPosition[] = DEFAULT_POSITIONS
+    // Overrides for the CDK overlay, e.g. a different backdrop
+    @Input() dropdownOverlayConfig: Partial<OverlayConfig> = {}
     @Output() dropdownClosed = new EventEmitter<void>()
 
     private overlayRef: OverlayRef | null = null
@@ -55,7 +57,8 @@ export class DropdownMenuDirective implements OnChanges, OnDestroy {
         this.overlayRef = this.overlay.create({
             positionStrategy,
             hasBackdrop: true,
-            backdropClass: 'cdk-overlay-transparent-backdrop'
+            backdropClass: 'cdk-overlay-transparent-backdrop',
+            ...this.dropdownOverlayConfig
         })
 
         this.overlayRef.backdropClick().subscribe(() => this.dropdownClosed.emit())

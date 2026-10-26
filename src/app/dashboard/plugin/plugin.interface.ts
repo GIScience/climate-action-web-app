@@ -61,9 +61,7 @@ export type AoiConstraint =
 
 export type PluginBaseInfo = Pick<Plugin, 'id' | 'version'>
 
-export interface Concern {
-    concern: 'ghg_emission' | 'mitigation' | 'adaption' | 'pedestrian' | 'cycling' | 'waste'
-}
+export type Concern = 'cycling' | 'adaption' | 'mitigation' | 'pedestrian' | 'waste' | 'ghg_emission'
 
 export interface ComputeRequest {
     aoi: GeoJSONFeature
