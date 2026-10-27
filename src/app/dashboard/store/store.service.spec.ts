@@ -1,13 +1,13 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { jest } from '@jest/globals'
-import { of } from 'rxjs'
+import { firstValueFrom, of } from 'rxjs'
+import { Mock } from 'vitest'
 import { StoreService } from './store.service'
 
 describe('StoreService', () => {
     let service: StoreService
     let httpClientSpy: {
-        get: jest.Mock
+        get: Mock
     }
 
     const correlation_uuid = 'd9660bee-85ca-40c1-80b8-b51c5fd0cd9f'
@@ -16,7 +16,7 @@ describe('StoreService', () => {
 
     beforeEach(() => {
         httpClientSpy = {
-            get: jest.fn().mockImplementation(() => of({ go_to: presigned_url }))
+            get: vi.fn().mockImplementation(() => of({ go_to: presigned_url }))
         }
 
         TestBed.configureTestingModule({
@@ -31,13 +31,11 @@ describe('StoreService', () => {
         service = TestBed.inject(StoreService)
     })
 
-    it('should resolve the presigned download url', done => {
-        service.getArtifactS3Url(correlation_uuid, filename).subscribe(url => {
-            expect(url).toEqual(presigned_url)
-            expect(httpClientSpy.get).toHaveBeenCalledWith(
-                expect.stringContaining(`/store/${correlation_uuid}/${filename}`)
-            )
-            done()
-        })
+    it('should resolve the presigned download url', async () => {
+        const url = await firstValueFrom(service.getArtifactS3Url(correlation_uuid, filename))
+        expect(url).toEqual(presigned_url)
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+            expect.stringContaining(`/store/${correlation_uuid}/${filename}`)
+        )
     })
 })

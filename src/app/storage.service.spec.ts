@@ -6,6 +6,7 @@ import { Models } from 'appwrite'
 import { IDBFactory } from 'fake-indexeddb'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
+import { Mock } from 'vitest'
 import { AppwriteService } from './auth/appwrite.service'
 import { ComputationDatabaseEntity } from './dashboard/computations-index/computation.interface'
 import { RunSyncService } from './persistence/run-sync.service'
@@ -35,12 +36,12 @@ describe('StorageService', () => {
     let mockAppwriteService: {
         _user: BehaviorSubject<Models.User<Models.Preferences> | null>
         onLogout: EventEmitter<void>
-        registerBeforeLogout: jest.Mock
-        tryToLogin: jest.Mock
+        registerBeforeLogout: Mock
+        tryToLogin: Mock
     }
-    let mockAppwriteDb: { fetchPluginRunsPaginated: jest.Mock }
-    let mockRunSyncService: { commit: jest.Mock; scheduleDrain: jest.Mock; drainNow: jest.Mock }
-    let mockToastrService: { error: jest.Mock }
+    let mockAppwriteDb: { fetchPluginRunsPaginated: Mock }
+    let mockRunSyncService: { commit: Mock; scheduleDrain: Mock; drainNow: Mock }
+    let mockToastrService: { error: Mock }
 
     beforeEach(() => {
         // Fresh IndexedDB and localStorage per test
@@ -52,18 +53,18 @@ describe('StorageService', () => {
         mockAppwriteService = {
             _user: userSubject,
             onLogout,
-            registerBeforeLogout: jest.fn(),
-            tryToLogin: jest.fn().mockResolvedValue(false)
+            registerBeforeLogout: vi.fn(),
+            tryToLogin: vi.fn().mockResolvedValue(false)
         }
         mockAppwriteDb = {
-            fetchPluginRunsPaginated: jest.fn().mockResolvedValue({ documents: [], total: 0, hasMore: false })
+            fetchPluginRunsPaginated: vi.fn().mockResolvedValue({ documents: [], total: 0, hasMore: false })
         }
         mockRunSyncService = {
-            commit: jest.fn().mockResolvedValue(undefined),
-            scheduleDrain: jest.fn(),
-            drainNow: jest.fn().mockResolvedValue(undefined)
+            commit: vi.fn().mockResolvedValue(undefined),
+            scheduleDrain: vi.fn(),
+            drainNow: vi.fn().mockResolvedValue(undefined)
         }
-        mockToastrService = { error: jest.fn() }
+        mockToastrService = { error: vi.fn() }
 
         TestBed.configureTestingModule({
             providers: [
@@ -72,7 +73,7 @@ describe('StorageService', () => {
                 { provide: AppwriteService, useValue: mockAppwriteService },
                 { provide: AppwriteDbService, useValue: mockAppwriteDb },
                 { provide: RunSyncService, useValue: mockRunSyncService },
-                { provide: TranslocoService, useValue: { selectTranslate: jest.fn(() => of('Storage unavailable')) } },
+                { provide: TranslocoService, useValue: { selectTranslate: vi.fn(() => of('Storage unavailable')) } },
                 { provide: ToastrService, useValue: mockToastrService }
             ]
         })
@@ -114,8 +115,8 @@ describe('StorageService', () => {
         })
 
         it('toast an error when IndexedDB is unavailable', async () => {
-            jest.spyOn(runsDb, 'getAllRuns').mockRejectedValue(new Error('IndexedDB is not available'))
-            const consoleError = jest.spyOn(console, 'error').mockImplementation()
+            vi.spyOn(runsDb, 'getAllRuns').mockRejectedValue(new Error('IndexedDB is not available'))
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
             const service = await createService()
             // The toast is shown from a setTimeout, so wait for it

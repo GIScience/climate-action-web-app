@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { inject, Injectable } from '@angular/core'
+import { EnvironmentInjector, inject, Injectable, InjectionToken, runInInjectionContext } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { NavigationEnd, Router } from '@angular/router'
 import { MapGeoTiffUtils } from '@app/dashboard/map/utils/map-geotiff.utils'
@@ -1409,3 +1409,13 @@ export class MapService {
         }
     }
 }
+
+// Creates a fresh, independent MapService (the report renders one map per map artifact).
+// Injected as a token so tests can substitute the instances.
+export const MAP_SERVICE_FACTORY = new InjectionToken<() => MapService>('MAP_SERVICE_FACTORY', {
+    providedIn: 'root',
+    factory: () => {
+        const injector = inject(EnvironmentInjector)
+        return () => runInInjectionContext(injector, () => new MapService())
+    }
+})

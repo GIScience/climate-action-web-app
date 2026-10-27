@@ -1,19 +1,19 @@
 import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { MapService } from '@app/dashboard/map/map.service'
-import { jest } from '@jest/globals'
 import * as maplibregl from 'maplibre-gl'
+import { Mocked } from 'vitest'
 import { RasterComponent } from './raster.component'
 
 describe('RasterComponent', () => {
     let component: RasterComponent
     let fixture: ComponentFixture<RasterComponent>
-    let mapServiceSpy: jest.Mocked<MapService>
+    let mapServiceSpy: Mocked<MapService>
 
     beforeEach(async () => {
         mapServiceSpy = {
-            addRasterLayer: jest.fn()
-        } as unknown as jest.Mocked<MapService>
+            addRasterLayer: vi.fn()
+        } as unknown as Mocked<MapService>
 
         await TestBed.configureTestingModule({
             imports: [RasterComponent, HttpClientModule],
@@ -41,8 +41,8 @@ describe('RasterComponent', () => {
             id: 'geotiff-geotiff-123456789',
             sourceId: 'source-geotiff-geotiff-123456789',
             name: 'geotiff',
-            setOpacity: jest.fn().mockReturnValue(undefined) as (opacity: number) => maplibregl.Map | undefined,
-            setVisible: jest.fn().mockReturnValue(undefined) as (visible: boolean) => maplibregl.Map | undefined
+            setOpacity: vi.fn().mockReturnValue(undefined) as (opacity: number) => maplibregl.Map | undefined,
+            setVisible: vi.fn().mockReturnValue(undefined) as (visible: boolean) => maplibregl.Map | undefined
         }
 
         mapServiceSpy.addRasterLayer.mockResolvedValue(mockLayer)

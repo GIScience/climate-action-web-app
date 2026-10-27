@@ -2,18 +2,11 @@ import { TestBed } from '@angular/core/testing'
 import { Router, RouterModule } from '@angular/router'
 import { TranslocoService } from '@jsverse/transloco'
 import type { GeoJSONSource, MapGeoJSONFeature, MapMouseEvent, Map as MaplibreMap } from 'maplibre-gl'
+import { Popup } from 'maplibre-gl'
 import { environment } from 'src/environments/environment'
+import { Mock, MockInstance, Mocked } from 'vitest'
 import { SearchCentroidCollection } from '../computations-index/computation.interface'
 import { MapSearchManagerService } from './map-search-manager.service'
-
-const mockPopup = {
-    setLngLat: jest.fn().mockReturnThis(),
-    setDOMContent: jest.fn().mockReturnThis(),
-    addTo: jest.fn().mockReturnThis(),
-    isOpen: jest.fn().mockReturnValue(false),
-    remove: jest.fn()
-}
-jest.mock('maplibre-gl', () => ({ Popup: jest.fn(() => mockPopup) }))
 
 const UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
 const OTHER_UUID = '0f6d2b1e-5a7c-4c3d-9e8f-1a2b3c4d5e6f'
@@ -21,7 +14,6 @@ const OTHER_UUID = '0f6d2b1e-5a7c-4c3d-9e8f-1a2b3c4d5e6f'
 describe('MapSearchManagerService', () => {
     type MockMap = Pick<
         MaplibreMap,
-        | 'on'
         | 'isStyleLoaded'
         | 'getSource'
         | 'addSource'
@@ -33,30 +25,50 @@ describe('MapSearchManagerService', () => {
         | 'setLayoutProperty'
         | 'queryRenderedFeatures'
         | 'easeTo'
-    >
+    > & { on: (type: string, ...args: unknown[]) => MaplibreMap }
     type MapLayer = NonNullable<ReturnType<MaplibreMap['getLayer']>>
 
     let service: MapSearchManagerService
-    let mockMap: jest.Mocked<MockMap>
+    let mockMap: Mocked<MockMap>
+    // Popups are real maplibre objects; the methods that would touch the map are stubbed on the prototype.
+    // `remove` is an instance property, so each popup gets the shared mock on its first chained call.
+    let mockPopup: {
+        setLngLat: MockInstance<Popup['setLngLat']>
+        setDOMContent: MockInstance<Popup['setDOMContent']>
+        addTo: MockInstance<Popup['addTo']>
+        isOpen: MockInstance<Popup['isOpen']>
+        remove: Mock<() => void>
+    }
 
     const centroids: SearchCentroidCollection = { type: 'FeatureCollection', features: [] }
     const mockLayer = { id: 'mock-layer' } as unknown as MapLayer
 
     beforeEach(() => {
-        mockMap = {
-            on: jest.fn(),
-            isStyleLoaded: jest.fn().mockReturnValue(true),
-            getSource: jest.fn().mockReturnValue(undefined),
-            addSource: jest.fn(),
-            getLayer: jest.fn().mockReturnValue(undefined),
-            addLayer: jest.fn(),
-            removeLayer: jest.fn(),
-            removeSource: jest.fn(),
-            setFilter: jest.fn(),
-            setLayoutProperty: jest.fn(),
-            queryRenderedFeatures: jest.fn().mockReturnValue([]),
-            easeTo: jest.fn()
+        const popupRemove = vi.fn()
+        mockPopup = {
+            setLngLat: vi.spyOn(Popup.prototype, 'setLngLat').mockImplementation(function (this: Popup) {
+                this.remove = popupRemove as unknown as Popup['remove']
+                return this
+            }),
+            setDOMContent: vi.spyOn(Popup.prototype, 'setDOMContent').mockReturnThis(),
+            addTo: vi.spyOn(Popup.prototype, 'addTo').mockReturnThis(),
+            isOpen: vi.spyOn(Popup.prototype, 'isOpen').mockReturnValue(false),
+            remove: popupRemove
         }
+        mockMap = {
+            on: vi.fn(),
+            isStyleLoaded: vi.fn().mockReturnValue(true),
+            getSource: vi.fn().mockReturnValue(undefined),
+            addSource: vi.fn(),
+            getLayer: vi.fn().mockReturnValue(undefined),
+            addLayer: vi.fn(),
+            removeLayer: vi.fn(),
+            removeSource: vi.fn(),
+            setFilter: vi.fn(),
+            setLayoutProperty: vi.fn(),
+            queryRenderedFeatures: vi.fn().mockReturnValue([]),
+            easeTo: vi.fn()
+        } as unknown as Mocked<MockMap>
 
         TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([])],
@@ -71,6 +83,10 @@ describe('MapSearchManagerService', () => {
 
         service = TestBed.inject(MapSearchManagerService)
         service.setMap(mockMap as unknown as MaplibreMap)
+    })
+
+    afterEach(() => {
+        vi.restoreAllMocks()
     })
 
     it('showSearchLayers should add the clustered centroid source, boundary source and layers', () => {
@@ -88,7 +104,7 @@ describe('MapSearchManagerService', () => {
     })
 
     it('showSearchLayers should update the existing source and filters instead of re-adding layers', () => {
-        const mockSource = { setData: jest.fn() }
+        const mockSource = { setData: vi.fn() }
         mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
         mockMap.getLayer.mockReturnValue(mockLayer)
 
@@ -153,7 +169,7 @@ describe('MapSearchManagerService', () => {
     }
 
     it('clicking a boundary should open its computation, or list them when several overlap', () => {
-        const navigateSpy = jest.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true)
+        const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true)
         showInteractiveLayers()
         mockMap.queryRenderedFeatures.mockReturnValue([boundaryFeature(UUID, 'Heidelberg')])
 

@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
-import { getTranslocoTestingModule, MockToastrService } from '../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../testing/test-helpers'
 import { ArtifactComponent } from './artifact/artifact.component'
 import { ComputationComponent } from './computation/computation.component'
 import { DashboardComponent } from './dashboard.component'
@@ -16,9 +16,9 @@ describe('DashboardComponent', () => {
 
     beforeEach(() => {
         mockMapService = {
-            initMap: jest.fn(() => Promise.resolve()),
-            highlightAoI: jest.fn(),
-            removeFocusedLayer: jest.fn()
+            initMap: vi.fn(() => Promise.resolve()),
+            highlightAoI: vi.fn(),
+            removeFocusedLayer: vi.fn()
         }
 
         TestBed.configureTestingModule({

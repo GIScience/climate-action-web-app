@@ -2,7 +2,7 @@ import { HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
-import { getTranslocoTestingModule } from '../../../../jest.mocks'
+import { getTranslocoTestingModule } from '../../../testing/test-helpers'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ArtifactViewerComponent } from './artifact-viewer.component'
 

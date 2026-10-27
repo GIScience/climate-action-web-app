@@ -1,9 +1,9 @@
 import { HttpEvent, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
 import { environment } from '@environments/environment'
-import { jest } from '@jest/globals'
 import { Models } from 'appwrite'
-import { BehaviorSubject, Observable, of } from 'rxjs'
+import { BehaviorSubject, firstValueFrom, Observable, of } from 'rxjs'
+import { Mock } from 'vitest'
 import { AppwriteService, BasicKeyInfo } from './appwrite.service'
 import { AuthInterceptor } from './auth.interceptor'
 
@@ -12,7 +12,7 @@ describe('AuthInterceptor', () => {
     let mockAppwriteService: Partial<AppwriteService>
     let mockHttpHandler: HttpHandler
     let mockUserSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
-    let mockHandleFunction: jest.Mock
+    let mockHandleFunction: Mock
 
     const mockUser = {
         $id: 'test-user-id',
@@ -40,7 +40,7 @@ describe('AuthInterceptor', () => {
 
     beforeEach(() => {
         mockUserSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
-        mockHandleFunction = jest.fn().mockReturnValue(of(new HttpResponse<unknown>()))
+        mockHandleFunction = vi.fn().mockReturnValue(of(new HttpResponse<unknown>()))
 
         mockAppwriteService = {
             _user: mockUserSubject,
@@ -54,8 +54,8 @@ describe('AuthInterceptor', () => {
             }
         }
 
-        jest.spyOn(mockAppwriteService, 'tryToLogin')
-        jest.spyOn(mockAppwriteService, 'getBasicKey')
+        vi.spyOn(mockAppwriteService, 'tryToLogin')
+        vi.spyOn(mockAppwriteService, 'getBasicKey')
 
         TestBed.configureTestingModule({
             providers: [AuthInterceptor, { provide: AppwriteService, useValue: mockAppwriteService }]
@@ -69,97 +69,83 @@ describe('AuthInterceptor', () => {
     })
 
     describe('intercept', () => {
-        it('should not add auth header for non-API requests', done => {
+        it('should not add auth header for non-API requests', async () => {
             const request = new HttpRequest('GET', 'https://example.com')
 
-            interceptor.intercept(request, mockHttpHandler).subscribe(() => {
-                expect(mockHandleFunction).toHaveBeenCalledWith(request)
-                done()
-            })
+            await firstValueFrom(interceptor.intercept(request, mockHttpHandler))
+            expect(mockHandleFunction).toHaveBeenCalledWith(request)
         })
 
-        it('should add auth header for API requests when user is logged in', done => {
+        it('should add auth header for API requests when user is logged in', async () => {
             mockUserSubject.next(mockUser)
 
             const apiUrl = environment.climateActionApiUrl + '/endpoint'
             const request = new HttpRequest('GET', apiUrl)
 
-            setTimeout(() => {
-                interceptor.intercept(request, mockHttpHandler).subscribe(() => {
-                    expect(mockHandleFunction).toHaveBeenCalled()
+            await new Promise(resolve => setTimeout(resolve, 100))
+            await firstValueFrom(interceptor.intercept(request, mockHttpHandler))
+            expect(mockHandleFunction).toHaveBeenCalled()
 
-                    const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
-                    const requestWithAuth = lastCall[0] as HttpRequest<unknown>
-                    const authHeader = requestWithAuth.headers.get('Authorization')
-                    expect(authHeader).toBe(mockKeyInfo.key)
-
-                    done()
-                })
-            }, 100)
+            const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
+            const requestWithAuth = lastCall[0] as HttpRequest<unknown>
+            const authHeader = requestWithAuth.headers.get('Authorization')
+            expect(authHeader).toBe(mockKeyInfo.key)
         })
 
-        it('should not add auth header when user is not logged in', done => {
+        it('should not add auth header when user is not logged in', async () => {
             mockUserSubject.next(null)
 
             const apiUrl = environment.climateActionApiUrl + '/endpoint'
             const request = new HttpRequest('GET', apiUrl)
 
-            interceptor.intercept(request, mockHttpHandler).subscribe(() => {
-                const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
-                const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
-                expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
-                done()
-            })
+            await firstValueFrom(interceptor.intercept(request, mockHttpHandler))
+            const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
+            const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
+            expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
         })
 
-        it('should handle errors when fetching API key', done => {
-            mockUserSubject.next(mockUser)
-
-            jest.spyOn(mockAppwriteService, 'getBasicKey').mockImplementation(() => {
+        it('should handle errors when fetching API key', async () => {
+            vi.spyOn(mockAppwriteService, 'getBasicKey').mockImplementation(() => {
                 return Promise.reject(new Error('Key fetch error'))
             })
+
+            mockUserSubject.next(mockUser)
 
             const apiUrl = environment.climateActionApiUrl + '/endpoint'
             const request = new HttpRequest('GET', apiUrl)
 
-            interceptor.intercept(request, mockHttpHandler).subscribe(() => {
-                const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
-                const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
-                expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
-                done()
-            })
+            await firstValueFrom(interceptor.intercept(request, mockHttpHandler))
+            const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
+            const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
+            expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
         })
     })
 
     describe('auth state management', () => {
-        it('should update API key when user state changes', done => {
+        it('should update API key when user state changes', () => {
             mockUserSubject.next(null)
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const loadApiKeySpy = jest.spyOn(interceptor as any, 'loadApiKey')
+            const loadApiKeySpy = vi.spyOn(interceptor as any, 'loadApiKey')
 
             mockUserSubject.next(mockUser)
 
             expect(loadApiKeySpy).toHaveBeenCalled()
-            done()
         })
 
-        it('should clear API key when user logs out', done => {
+        it('should clear API key when user logs out', async () => {
             mockUserSubject.next(mockUser)
 
-            setTimeout(() => {
-                mockUserSubject.next(null)
+            await new Promise(resolve => setTimeout(resolve, 100))
+            mockUserSubject.next(null)
 
-                const apiUrl = environment.climateActionApiUrl + '/endpoint'
-                const request = new HttpRequest('GET', apiUrl)
+            const apiUrl = environment.climateActionApiUrl + '/endpoint'
+            const request = new HttpRequest('GET', apiUrl)
 
-                interceptor.intercept(request, mockHttpHandler).subscribe(() => {
-                    const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
-                    const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
-                    expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
-                    done()
-                })
-            }, 100)
+            await firstValueFrom(interceptor.intercept(request, mockHttpHandler))
+            const lastCall = mockHandleFunction.mock.calls[mockHandleFunction.mock.calls.length - 1]
+            const requestWithoutAuth = lastCall[0] as HttpRequest<unknown>
+            expect(requestWithoutAuth.headers.has('Authorization')).toBeFalsy()
         })
     })
 })

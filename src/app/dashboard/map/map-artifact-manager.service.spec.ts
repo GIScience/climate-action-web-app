@@ -2,6 +2,7 @@ import { ComponentRef } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { VectorComponent } from '@app/dashboard/artifact/vector/vector.component'
 import { BehaviorSubject } from 'rxjs'
+import { Mocked } from 'vitest'
 import { ArtifactData, ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapArtifactManagerService } from './map-artifact-manager.service'
@@ -13,7 +14,7 @@ describe('MapArtifactManagerService', () => {
         vector: BehaviorSubject<ArtifactData | null>
         raster: BehaviorSubject<ArtifactData | null>
     }
-    let mockMapService: jest.Mocked<Partial<MapService>>
+    let mockMapService: Mocked<Partial<MapService>>
 
     const createMockArtifact = (overrides: Partial<ArtifactEntity> = {}): ArtifactEntity => ({
         name: 'test-artifact',
@@ -46,9 +47,9 @@ describe('MapArtifactManagerService', () => {
         }
 
         mockMapService = {
-            updateFoWGeometries: jest.fn(),
-            clearFoWByType: jest.fn(),
-            calculateMapPadding: jest.fn().mockReturnValue({ top: 50, right: 100, bottom: 50, left: 250 })
+            updateFoWGeometries: vi.fn(),
+            clearFoWByType: vi.fn(),
+            calculateMapPadding: vi.fn().mockReturnValue({ top: 50, right: 100, bottom: 50, left: 250 })
         }
 
         TestBed.configureTestingModule({
@@ -111,7 +112,7 @@ describe('MapArtifactManagerService', () => {
 
         it('should destroy componentRef on removal', () => {
             service.addMapArtifact(artifact1)
-            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<VectorComponent>
+            const mockComponentRef = { destroy: vi.fn() } as unknown as ComponentRef<VectorComponent>
             service.updateLayerInfo(artifact1, ['layer-1'], 'source-1', mockComponentRef)
 
             service.removeMapArtifact(artifact1)
@@ -140,7 +141,7 @@ describe('MapArtifactManagerService', () => {
 
         it('should preserve existing componentRef if not provided', () => {
             service.addMapArtifact(artifact1)
-            const mockComponentRef = { destroy: jest.fn() } as unknown as ComponentRef<VectorComponent>
+            const mockComponentRef = { destroy: vi.fn() } as unknown as ComponentRef<VectorComponent>
             service.updateLayerInfo(artifact1, ['layer-1'], 'source-1', mockComponentRef)
 
             service.updateLayerInfo(artifact1, ['layer-2'], 'source-2')
@@ -171,7 +172,7 @@ describe('MapArtifactManagerService', () => {
 
         it('should update fog of war when promoting', () => {
             service.addMapArtifact(artifact1)
-            jest.clearAllMocks()
+            vi.clearAllMocks()
 
             service.promoteToPin(artifact1)
 

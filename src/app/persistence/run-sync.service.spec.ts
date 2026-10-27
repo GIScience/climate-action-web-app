@@ -4,6 +4,7 @@ import { ComputationDatabaseEntity } from '@app/dashboard/computations-index/com
 import { Models } from 'appwrite'
 import { IDBFactory } from 'fake-indexeddb'
 import { BehaviorSubject } from 'rxjs'
+import { Mock, MockInstance } from 'vitest'
 import { AppwriteDbService } from './appwrite-db.service'
 import { RunSyncService } from './run-sync.service'
 import { RunsDbService } from './runs-db.service'
@@ -25,13 +26,13 @@ describe('RunSyncService', () => {
     let service: RunSyncService
     let runsDb: RunsDbService
     let userSubject: BehaviorSubject<Models.User<Models.Preferences> | null>
-    let mockAppwriteDb: { ensurePluginRun: jest.Mock; removePluginRun: jest.Mock }
+    let mockAppwriteDb: { ensurePluginRun: Mock; removePluginRun: Mock }
 
     function setup(initialUser: Models.User<Models.Preferences> | null = null): void {
         userSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(initialUser)
         mockAppwriteDb = {
-            ensurePluginRun: jest.fn().mockResolvedValue(undefined),
-            removePluginRun: jest.fn().mockResolvedValue(undefined)
+            ensurePluginRun: vi.fn().mockResolvedValue(undefined),
+            removePluginRun: vi.fn().mockResolvedValue(undefined)
         }
 
         TestBed.configureTestingModule({
@@ -49,17 +50,18 @@ describe('RunSyncService', () => {
 
     beforeEach(() => {
         globalThis.indexedDB = new IDBFactory()
-        jest.useFakeTimers({ doNotFake: ['setImmediate', 'queueMicrotask', 'nextTick'] })
+        // Leave setImmediate and microtasks real: the IndexedDB work below depends on them
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
     })
 
     afterEach(() => {
-        jest.useRealTimers()
+        vi.useRealTimers()
     })
 
     // Advancing the fake timers only starts a drain. Its IndexedDB work uses
     // the real setImmediate, so keep yielding until that has finished too.
     async function advanceTimersAndSettle(ms: number): Promise<void> {
-        await jest.advanceTimersByTimeAsync(ms)
+        await vi.advanceTimersByTimeAsync(ms)
         for (let i = 0; i < 200; i++) {
             await new Promise(resolve => setImmediate(resolve))
         }
@@ -122,7 +124,7 @@ describe('RunSyncService', () => {
     it('should surface an error state once auto-retries are exhausted and recover on manual retry', async () => {
         setup(realUser)
         mockAppwriteDb.ensurePluginRun.mockRejectedValue(new Error('Still down'))
-        const consoleWarn = jest.spyOn(console, 'warn').mockImplementation()
+        const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
         await service.commit({ op: 'upsert', correlation_uuid: 'uuid-1', payload: makeRun('uuid-1') })
         // Set the change to 7 failed attempts, so the next failure reaches the limit of 8
@@ -186,7 +188,7 @@ describe('RunSyncService', () => {
 
     it('should leave the outbox untouched when another tab holds the drain lock', async () => {
         setup(realUser)
-        const locksRequest = jest.spyOn(navigator.locks, 'request') as jest.SpyInstance
+        const locksRequest = vi.spyOn(navigator.locks, 'request') as MockInstance
         locksRequest.mockImplementation(async (_name, _options, callback) =>
             (callback as (lock: null) => Promise<void>)(null)
         )

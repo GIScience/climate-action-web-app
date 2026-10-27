@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing'
 import type { Feature as GeoJSONFeature } from 'geojson'
 import type { GeoJSONSource, Map as MaplibreMap, Source } from 'maplibre-gl'
+import { Mocked } from 'vitest'
 import { MapFoWManagerService } from './map-fow-manager.service'
 
 describe('MapFoWManagerService', () => {
+    // `on` is simplified: maplibre's overloads don't type-check under vitest's Mocked<>
     type MockMap = Pick<
         MaplibreMap,
-        | 'on'
         | 'isStyleLoaded'
         | 'getSource'
         | 'addSource'
@@ -15,11 +16,11 @@ describe('MapFoWManagerService', () => {
         | 'removeLayer'
         | 'removeSource'
         | 'moveLayer'
-    >
+    > & { on: (type: string, ...args: unknown[]) => MaplibreMap }
     type MapLayer = NonNullable<ReturnType<MaplibreMap['getLayer']>>
 
     let service: MapFoWManagerService
-    let mockMap: jest.Mocked<MockMap>
+    let mockMap: Mocked<MockMap>
 
     const createMockFeature = (coordinates: number[][][]): GeoJSONFeature => ({
         type: 'Feature',
@@ -47,19 +48,19 @@ describe('MapFoWManagerService', () => {
         ]
     ]
 
-    const createMockMap = (): jest.Mocked<MockMap> => ({
-        on: jest.fn(),
-        isStyleLoaded: jest.fn().mockReturnValue(true),
-        getSource: jest.fn().mockReturnValue(undefined),
-        addSource: jest.fn(),
-        getLayer: jest.fn().mockReturnValue(undefined),
-        addLayer: jest.fn(),
-        removeLayer: jest.fn(),
-        removeSource: jest.fn(),
-        moveLayer: jest.fn()
+    const createMockMap = (): Mocked<MockMap> => ({
+        on: vi.fn(),
+        isStyleLoaded: vi.fn().mockReturnValue(true),
+        getSource: vi.fn().mockReturnValue(undefined),
+        addSource: vi.fn(),
+        getLayer: vi.fn().mockReturnValue(undefined),
+        addLayer: vi.fn(),
+        removeLayer: vi.fn(),
+        removeSource: vi.fn(),
+        moveLayer: vi.fn()
     })
 
-    const asMap = (map: jest.Mocked<MockMap>): MaplibreMap => map as unknown as MaplibreMap
+    const asMap = (map: Mocked<MockMap>): MaplibreMap => map as unknown as MaplibreMap
     const createMockLayer = (): MapLayer => ({ id: 'mock-layer' }) as unknown as MapLayer
     const createMockSource = (): Source => ({ type: 'geojson' }) as unknown as Source
 
@@ -99,7 +100,7 @@ describe('MapFoWManagerService', () => {
     describe('addGeometry', () => {
         beforeEach(() => {
             service.setMap(asMap(mockMap))
-            jest.clearAllMocks()
+            vi.clearAllMocks()
         })
 
         it('should add geometry and update map layers', () => {
@@ -118,7 +119,7 @@ describe('MapFoWManagerService', () => {
 
             service.addGeometry(asMap(mockMap), 'id-1', feature1, 'focused')
 
-            const mockSource = { setData: jest.fn() }
+            const mockSource = { setData: vi.fn() }
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
 
@@ -136,7 +137,7 @@ describe('MapFoWManagerService', () => {
 
             service.clearByType(asMap(mockMap), 'focused')
 
-            const mockSource = { setData: jest.fn() }
+            const mockSource = { setData: vi.fn() }
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
 
@@ -147,7 +148,7 @@ describe('MapFoWManagerService', () => {
     describe('clearByType', () => {
         beforeEach(() => {
             service.setMap(asMap(mockMap))
-            jest.clearAllMocks()
+            vi.clearAllMocks()
         })
 
         it('should clear only geometries of specified type', () => {
@@ -156,13 +157,13 @@ describe('MapFoWManagerService', () => {
 
             service.addGeometry(asMap(mockMap), 'focused-id', focusedFeature, 'focused')
 
-            const mockSource = { setData: jest.fn() }
+            const mockSource = { setData: vi.fn() }
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
 
             service.addGeometry(asMap(mockMap), 'pinned-id', pinnedFeature, 'pinned')
 
-            jest.clearAllMocks()
+            vi.clearAllMocks()
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
 
@@ -190,7 +191,7 @@ describe('MapFoWManagerService', () => {
             const feature = createMockFeature(simplePolygonCoords)
 
             service.addGeometry(asMap(mockMap), 'pinned-id', feature, 'pinned')
-            jest.clearAllMocks()
+            vi.clearAllMocks()
 
             service.clearByType(asMap(mockMap), 'focused')
 
@@ -204,12 +205,12 @@ describe('MapFoWManagerService', () => {
 
             service.addGeometry(asMap(mockMap), 'focused-id', focusedFeature, 'focused')
 
-            const mockSource = { setData: jest.fn() }
+            const mockSource = { setData: vi.fn() }
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
 
             service.addGeometry(asMap(mockMap), 'pinned-id', pinnedFeature, 'pinned')
-            jest.clearAllMocks()
+            vi.clearAllMocks()
 
             mockMap.getSource.mockReturnValue(mockSource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
@@ -239,7 +240,7 @@ describe('MapFoWManagerService', () => {
         it('should replace all geometries of a type in a single update via setGeometriesByType', () => {
             const feature1 = createMockFeature(simplePolygonCoords)
             const feature2 = createMockFeature(anotherPolygonCoords)
-            const mockSource = { setData: jest.fn() }
+            const mockSource = { setData: vi.fn() }
 
             service.setGeometriesByType(asMap(mockMap), 'constraint', [feature1, feature2])
             expect(mockMap.addSource).toHaveBeenCalledTimes(2) // fow + outline sources, exactly one update
@@ -266,8 +267,8 @@ describe('MapFoWManagerService', () => {
             const secondaryMockMap = createMockMap()
             const primaryFeature = createMockFeature(simplePolygonCoords)
             const reportFeature = createMockFeature(anotherPolygonCoords)
-            const primarySource = { setData: jest.fn() }
-            const reportSource = { setData: jest.fn() }
+            const primarySource = { setData: vi.fn() }
+            const reportSource = { setData: vi.fn() }
 
             service.setMap(asMap(secondaryMockMap))
             mockMap.getSource.mockReturnValue(primarySource as unknown as GeoJSONSource)
@@ -278,7 +279,7 @@ describe('MapFoWManagerService', () => {
             service.addGeometry(asMap(mockMap), 'primary-focused', primaryFeature, 'focused')
             service.addGeometry(asMap(secondaryMockMap), 'report-focused', reportFeature, 'focused')
 
-            jest.clearAllMocks()
+            vi.clearAllMocks()
             mockMap.getSource.mockReturnValue(primarySource as unknown as GeoJSONSource)
             mockMap.getLayer.mockReturnValue(createMockLayer())
             secondaryMockMap.getSource.mockReturnValue(reportSource as unknown as GeoJSONSource)

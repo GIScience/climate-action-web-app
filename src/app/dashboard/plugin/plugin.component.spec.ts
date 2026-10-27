@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router'
 import { processSourceUrls } from '@app/utils/source.utils'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrModule } from 'ngx-toastr'
-import { getTranslocoTestingModule } from '../../../../jest.mocks'
+import { getTranslocoTestingModule } from '../../../testing/test-helpers'
 import { PluginComponent } from './plugin.component'
 import { Plugin } from './plugin.interface'
 

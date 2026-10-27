@@ -3,13 +3,11 @@ import {
     Component,
     ComponentRef,
     ElementRef,
-    EnvironmentInjector,
     OnInit,
     QueryList,
     ViewChildren,
     ViewContainerRef,
-    inject,
-    runInInjectionContext
+    inject
 } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
@@ -21,7 +19,7 @@ import { ArtifactComponent } from '../artifact/artifact.component'
 import { ArtifactEntity, LegendObject } from '../artifact/artifact.interface'
 import type { LegendComponent } from '../artifact/legend/legend.component'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
-import { MapService } from '../map/map.service'
+import { MAP_SERVICE_FACTORY, MapService } from '../map/map.service'
 import { ExportPDFService } from './export-pdf.service'
 import { ReportService } from './report.service'
 
@@ -51,7 +49,7 @@ import { ReportService } from './report.service'
 })
 export class ReportComponent implements OnInit {
     reportService = inject(ReportService)
-    private injector = inject(EnvironmentInjector)
+    private createMapService = inject(MAP_SERVICE_FACTORY)
     private ExportPDFService = inject(ExportPDFService)
     private translocoService = inject(TranslocoService)
     private toastr = inject(ToastrService)
@@ -86,7 +84,7 @@ export class ReportComponent implements OnInit {
             addedArtifacts.forEach(artifact => {
                 const artifactId = this.reportService.getArtifactKey(artifact)
                 if (this.reportService.isMapArtifact(artifact.modality) && !this.mapServices.has(artifactId)) {
-                    const mapService = runInInjectionContext(this.injector, () => new MapService())
+                    const mapService = this.createMapService()
                     this.mapServices.set(artifactId, mapService)
 
                     const artifactService = this.reportService.getServiceForArtifact(artifact)

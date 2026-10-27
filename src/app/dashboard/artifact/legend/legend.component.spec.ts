@@ -95,7 +95,7 @@ describe('LegendComponent', () => {
             legend_type: 'DISCRETE',
             legend_data: { forest: '#00ff00', water: '#0000ff' }
         }
-        component.onHiddenCategoriesChange = jest.fn()
+        component.onHiddenCategoriesChange = vi.fn()
         fixture.detectChanges()
 
         const checkboxes = fixture.debugElement.queryAll(By.css('.legend-checkbox'))
@@ -106,7 +106,7 @@ describe('LegendComponent', () => {
     })
 
     it('should call onHiddenCategoriesChange with hidden categories when a checkbox is toggled', () => {
-        const toggleSpy = jest.fn()
+        const toggleSpy = vi.fn()
         component.legendData = {
             legend_type: 'DISCRETE',
             legend_data: { forest: '#00ff00', water: '#0000ff', urban: '#888888' }
@@ -127,7 +127,7 @@ describe('LegendComponent', () => {
             legend_type: 'DISCRETE',
             legend_data: { forest: '#00ff00', water: '#0000ff' }
         }
-        component.onHiddenCategoriesChange = jest.fn()
+        component.onHiddenCategoriesChange = vi.fn()
         fixture.detectChanges()
 
         const checkboxes = fixture.debugElement.queryAll(By.css('.legend-checkbox'))

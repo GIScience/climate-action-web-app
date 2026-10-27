@@ -6,10 +6,12 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
+import { Mocked, MockedFunction } from 'vitest'
+import { getTranslocoTestingModule, MockToastrService } from '../../../testing/test-helpers'
 import { ArtifactData, ArtifactEntity, ChartData, LegendObject, PlotlyChartData } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
 import { ComputationBasicInfo } from '../computations-index/computation.interface'
+import { MAP_SERVICE_FACTORY, MapService } from '../map/map.service'
 import { PluginService } from '../plugin/plugin.service'
 import { ExportPDFService } from './export-pdf.service'
 import { ReportComponent } from './report.component'
@@ -21,19 +23,19 @@ interface MockReportService {
     isVisible$: Observable<boolean>
     isExportReady$: Observable<boolean>
     MAX_ARTIFACTS: 10
-    isMapArtifact: jest.MockedFunction<(modality: ArtifactEntity['modality']) => boolean>
-    getArtifactKey: jest.MockedFunction<(artifact: Pick<ArtifactEntity, 'correlation_uuid' | 'filename'>) => string>
-    getServiceForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ArtifactService | undefined>
-    removeArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    closeReport: jest.MockedFunction<() => void>
-    getComputationInfoForArtifact: jest.MockedFunction<(artifact: ArtifactEntity) => ComputationBasicInfo | undefined>
+    isMapArtifact: MockedFunction<(modality: ArtifactEntity['modality']) => boolean>
+    getArtifactKey: MockedFunction<(artifact: Pick<ArtifactEntity, 'correlation_uuid' | 'filename'>) => string>
+    getServiceForArtifact: MockedFunction<(artifact: ArtifactEntity) => ArtifactService | undefined>
+    removeArtifact: MockedFunction<(artifact: ArtifactEntity) => void>
+    closeReport: MockedFunction<() => void>
+    getComputationInfoForArtifact: MockedFunction<(artifact: ArtifactEntity) => ComputationBasicInfo | undefined>
     _artifactsSubject: BehaviorSubject<ArtifactEntity[]>
     _isVisibleSubject: BehaviorSubject<boolean>
     _isExportReadySubject: BehaviorSubject<boolean>
 }
 
 interface MockExportPDFService {
-    exportToPDF: jest.MockedFunction<
+    exportToPDF: MockedFunction<
         (
             artifacts: ArtifactEntity[],
             artifactContainers: QueryList<ElementRef>,
@@ -45,9 +47,9 @@ interface MockExportPDFService {
 type MockPluginService = object
 
 interface MockArtifactService {
-    clearLegend: jest.MockedFunction<() => void>
+    clearLegend: MockedFunction<() => void>
     legend: BehaviorSubject<LegendObject | null>
-    getLegend: jest.MockedFunction<(artifact: ArtifactEntity) => void>
+    getLegend: MockedFunction<(artifact: ArtifactEntity) => void>
     currentUrl: string | null
     downloadJsonHref: SafeUrl | null
     apiUrl: string
@@ -66,30 +68,29 @@ interface MockArtifactService {
     chart: Observable<{ data: ChartData | null; artifact: ArtifactEntity | null }>
     plotlyChartSubject: BehaviorSubject<{ data: PlotlyChartData | null; artifact: ArtifactEntity | null }>
     plotlyChart: Observable<{ data: PlotlyChartData | null; artifact: ArtifactEntity | null }>
-    getMarkdown: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getImage: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getTable: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getVector: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getRaster: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getChart: jest.MockedFunction<(artifact: ArtifactEntity) => void>
-    getPlotlyChart: jest.MockedFunction<(artifact: ArtifactEntity) => void>
+    getMarkdown: MockedFunction<(artifact: ArtifactEntity) => void>
+    getImage: MockedFunction<(artifact: ArtifactEntity) => void>
+    getTable: MockedFunction<(artifact: ArtifactEntity) => void>
+    getVector: MockedFunction<(artifact: ArtifactEntity) => void>
+    getRaster: MockedFunction<(artifact: ArtifactEntity) => void>
+    getChart: MockedFunction<(artifact: ArtifactEntity) => void>
+    getPlotlyChart: MockedFunction<(artifact: ArtifactEntity) => void>
 }
 
-jest.mock('../map/map.service', () => ({
-    MapService: jest.fn().mockImplementation(() => ({
-        initMap: jest.fn(() => Promise.resolve()),
-        highlightAoI: jest.fn(),
-        addGeoJsonLayer: jest.fn(),
-        addGeoTiffLayer: jest.fn()
-    }))
-}))
+const createMockMapService = () =>
+    ({
+        initMap: vi.fn(() => Promise.resolve()),
+        highlightAoI: vi.fn(),
+        addGeoJsonLayer: vi.fn(),
+        addGeoTiffLayer: vi.fn()
+    }) as unknown as MapService
 
 describe('ReportComponent', () => {
     let component: ReportComponent
     let fixture: ComponentFixture<ReportComponent>
-    let reportService: jest.Mocked<MockReportService>
-    let exportPDFService: jest.Mocked<MockExportPDFService>
-    let pluginService: jest.Mocked<MockPluginService>
+    let reportService: Mocked<MockReportService>
+    let exportPDFService: Mocked<MockExportPDFService>
+    let pluginService: Mocked<MockPluginService>
     let toastr: MockToastrService
 
     const mockArtifact: ArtifactEntity = {
@@ -133,26 +134,26 @@ describe('ReportComponent', () => {
             isVisible$: isVisibleSubject.asObservable(),
             isExportReady$: isExportReadySubject.asObservable(),
             MAX_ARTIFACTS: 10,
-            isMapArtifact: jest
+            isMapArtifact: vi
                 .fn()
                 .mockImplementation(modality => modality === 'VECTOR_MAP_LAYER' || modality === 'RASTER_MAP_LAYER'),
-            getArtifactKey: jest
+            getArtifactKey: vi
                 .fn()
                 .mockImplementation(artifact => `${artifact.correlation_uuid}__${artifact.filename}`),
-            getServiceForArtifact: jest.fn(),
-            removeArtifact: jest.fn(),
-            closeReport: jest.fn(),
-            getComputationInfoForArtifact: jest.fn().mockReturnValue(mockComputationInfo),
+            getServiceForArtifact: vi.fn(),
+            removeArtifact: vi.fn(),
+            closeReport: vi.fn(),
+            getComputationInfoForArtifact: vi.fn().mockReturnValue(mockComputationInfo),
             _artifactsSubject: artifactsSubject,
             _isVisibleSubject: isVisibleSubject,
             _isExportReadySubject: isExportReadySubject
-        } as jest.Mocked<MockReportService>
+        } as Mocked<MockReportService>
 
         exportPDFService = {
-            exportToPDF: jest.fn().mockResolvedValue(undefined)
-        } as jest.Mocked<MockExportPDFService>
+            exportToPDF: vi.fn().mockResolvedValue(undefined)
+        } as Mocked<MockExportPDFService>
 
-        pluginService = {} as jest.Mocked<MockPluginService>
+        pluginService = {} as Mocked<MockPluginService>
 
         await TestBed.configureTestingModule({
             imports: [ReportComponent, HttpClientModule, NoopAnimationsModule, getTranslocoTestingModule()],
@@ -161,6 +162,7 @@ describe('ReportComponent', () => {
                 { provide: ReportService, useValue: reportService },
                 { provide: ExportPDFService, useValue: exportPDFService },
                 { provide: PluginService, useValue: pluginService },
+                { provide: MAP_SERVICE_FACTORY, useValue: createMockMapService },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',
@@ -188,9 +190,9 @@ describe('ReportComponent', () => {
 
         it('should create MapService for map artifacts', () => {
             const mockArtifactService: MockArtifactService = {
-                clearLegend: jest.fn(),
+                clearLegend: vi.fn(),
                 legend: new BehaviorSubject<LegendObject | null>(null),
-                getLegend: jest.fn(),
+                getLegend: vi.fn(),
                 currentUrl: null,
                 downloadJsonHref: null,
                 apiUrl: 'mock-api-url',
@@ -221,13 +223,13 @@ describe('ReportComponent', () => {
                     data: null,
                     artifact: null
                 }).asObservable(),
-                getMarkdown: jest.fn(),
-                getImage: jest.fn(),
-                getTable: jest.fn(),
-                getVector: jest.fn(),
-                getRaster: jest.fn(),
-                getChart: jest.fn(),
-                getPlotlyChart: jest.fn()
+                getMarkdown: vi.fn(),
+                getImage: vi.fn(),
+                getTable: vi.fn(),
+                getVector: vi.fn(),
+                getRaster: vi.fn(),
+                getChart: vi.fn(),
+                getPlotlyChart: vi.fn()
             }
 
             reportService.isMapArtifact.mockImplementation(modality => {
@@ -342,12 +344,12 @@ describe('ReportComponent', () => {
 
     describe('handleExport', () => {
         beforeEach(() => {
-            jest.clearAllMocks()
+            vi.clearAllMocks()
         })
 
         it('should show maps rendering toast and skip export when maps are loading', () => {
             component.isMapsLoading = true
-            const exportSpy = jest.spyOn(component, 'exportToPDF')
+            const exportSpy = vi.spyOn(component, 'exportToPDF')
 
             component.handleExport()
 
@@ -357,7 +359,7 @@ describe('ReportComponent', () => {
 
         it('should export when maps are ready', () => {
             component.isMapsLoading = false
-            const exportSpy = jest.spyOn(component, 'exportToPDF').mockResolvedValue(undefined)
+            const exportSpy = vi.spyOn(component, 'exportToPDF').mockResolvedValue(undefined)
 
             component.handleExport()
 

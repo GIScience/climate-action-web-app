@@ -3,56 +3,25 @@ import { CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { ToastrService } from 'ngx-toastr'
-import { getTranslocoTestingModule, MockToastrService } from '../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../testing/test-helpers'
 import { AppComponent } from './app.component'
 import { ArtifactViewerService } from './dashboard/artifact-viewer/artifact-viewer.service'
 import { MapService } from './dashboard/map/map.service'
 import { ReportService } from './dashboard/report/report.service'
 import { RunSyncService, SyncState } from './persistence/run-sync.service'
 
-jest.mock(
-    'src/environments/environment',
-    () => ({
-        environment: {
-            production: false,
-            environmentType: 'testing',
-            climateActionApiUrl: 'http://mock-api-url',
-            geocodeUrl: 'http://mock-geocode-url',
-            geocodeAPIKey: 'mock-ors-api-key',
-            appwriteProjectId: 'mock-appwrite-project-id',
-            appwriteEndpoint: 'mock-appwrite-endpoint',
-            appwriteWebsiteUrl: 'mock-appwrite-website-url',
-            cachetUrl: 'http://mock-cachet-url',
-            cachetWatchedComponents: 'Climate Action: Climate Action Navigator',
-            scheduleLookaheadDays: '7',
-            supportEmail: 'support@example.org'
-        }
-    }),
-    { virtual: true }
-)
-
-jest.mock(
-    '../../package.json',
-    () => ({
-        default: {
-            version: '2.1.0'
-        }
-    }),
-    { virtual: true }
-)
-
 const mockArtifactViewerService = {
-    closeArtifactViewer: jest.fn()
+    closeArtifactViewer: vi.fn()
 }
 
 const mockMapService = {
-    removeFocusedLayer: jest.fn(),
-    removeComputeLayers: jest.fn()
+    removeFocusedLayer: vi.fn(),
+    removeComputeLayers: vi.fn()
 }
 
 const mockReportService = {
-    closeReport: jest.fn(),
-    collapseLeftColumn: jest.fn()
+    closeReport: vi.fn(),
+    collapseLeftColumn: vi.fn()
 }
 
 describe('AppComponent', () => {
@@ -72,10 +41,10 @@ describe('AppComponent', () => {
                     provide: RunSyncService,
                     useValue: {
                         syncState: signal<SyncState>('idle'),
-                        retrySync: jest.fn(),
-                        scheduleDrain: jest.fn(),
-                        commit: jest.fn().mockResolvedValue(undefined),
-                        drainNow: jest.fn().mockResolvedValue(undefined)
+                        retrySync: vi.fn(),
+                        scheduleDrain: vi.fn(),
+                        commit: vi.fn().mockResolvedValue(undefined),
+                        drainNow: vi.fn().mockResolvedValue(undefined)
                     }
                 }
             ]
@@ -84,7 +53,7 @@ describe('AppComponent', () => {
         fixture = TestBed.createComponent(AppComponent)
         component = fixture.componentInstance
 
-        component.currentYear = jest.fn().mockReturnValue(2023)
+        component.currentYear = vi.fn().mockReturnValue(2023)
 
         fixture.detectChanges()
     })

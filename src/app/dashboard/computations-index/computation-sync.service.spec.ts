@@ -1,5 +1,6 @@
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { of, throwError } from 'rxjs'
+import { Mock } from 'vitest'
 import { PluginService } from '../plugin/plugin.service'
 import { ComputationSyncService, RunStateTransition } from './computation-sync.service'
 import { ComputationDatabaseEntity } from './computation.interface'
@@ -9,7 +10,7 @@ const MAX_INTERVAL = 1800000
 
 describe('ComputationSyncService', () => {
     let service: ComputationSyncService
-    let mockPluginService: { getComputationRunState: jest.Mock }
+    let mockPluginService: { getComputationRunState: Mock }
     let transitions: RunStateTransition[]
 
     const createRun = (overrides: Partial<ComputationDatabaseEntity> = {}): ComputationDatabaseEntity => ({
@@ -23,7 +24,7 @@ describe('ComputationSyncService', () => {
 
     beforeEach(() => {
         mockPluginService = {
-            getComputationRunState: jest.fn().mockReturnValue(of({ state: 'PENDING' }))
+            getComputationRunState: vi.fn().mockReturnValue(of({ state: 'PENDING' }))
         }
 
         TestBed.configureTestingModule({
@@ -56,7 +57,7 @@ describe('ComputationSyncService', () => {
             'pending-run': { state: 'PENDING' },
             'still-started-run': { state: 'STARTED' }
         }
-        mockPluginService.getComputationRunState = jest.fn((uuid: string) => of(stateByUuid[uuid]))
+        mockPluginService.getComputationRunState = vi.fn((uuid: string) => of(stateByUuid[uuid]))
 
         service.start(() => runs)
 
@@ -164,8 +165,8 @@ describe('ComputationSyncService', () => {
     }))
 
     it('should log and emit nothing when the state check errors', fakeAsync(() => {
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
-        mockPluginService.getComputationRunState = jest.fn().mockReturnValue(throwError(() => new Error('boom')))
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+        mockPluginService.getComputationRunState = vi.fn().mockReturnValue(throwError(() => new Error('boom')))
         const run = createRun()
 
         service.start(() => [run])

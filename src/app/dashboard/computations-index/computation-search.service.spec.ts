@@ -35,13 +35,13 @@ describe('ComputationSearchService', () => {
 
     beforeEach(() => {
         mockPluginService = {
-            getSearch: jest.fn().mockReturnValue(of(createPage([]))),
-            getSearchCentroids: jest.fn().mockReturnValue(of(emptyCentroids))
+            getSearch: vi.fn().mockReturnValue(of(createPage([]))),
+            getSearchCentroids: vi.fn().mockReturnValue(of(emptyCentroids))
         }
         mockmapSearchManager = {
-            showSearchLayers: jest.fn(),
-            hideSearchLayers: jest.fn(),
-            clearSearchLayers: jest.fn()
+            showSearchLayers: vi.fn(),
+            hideSearchLayers: vi.fn(),
+            clearSearchLayers: vi.fn()
         }
 
         TestBed.configureTestingModule({
@@ -56,7 +56,7 @@ describe('ComputationSearchService', () => {
     })
 
     it('should page through the search with the cursor and skip duplicate entries', () => {
-        mockPluginService.getSearch = jest
+        mockPluginService.getSearch = vi
             .fn()
             .mockImplementation((_pluginId: string, cursor: string | null) =>
                 cursor === null
@@ -76,7 +76,7 @@ describe('ComputationSearchService', () => {
         expect(loadedIds()).toEqual(['a', 'b'])
         expect(service.hasMore()).toBe(false)
 
-        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
         service.loadMore()
 
         expect(mockPluginService.getSearch).toHaveBeenCalledTimes(2)
@@ -109,7 +109,7 @@ describe('ComputationSearchService', () => {
 
     it('hideSearchLayers should hide the layers and skip displaying late centroid responses', () => {
         const centroids$ = new Subject<SearchCentroidCollection>()
-        mockPluginService.getSearchCentroids = jest.fn().mockReturnValue(centroids$)
+        mockPluginService.getSearchCentroids = vi.fn().mockReturnValue(centroids$)
 
         service.showSearchLayers('test_plugin')
         service.hideSearchLayers()

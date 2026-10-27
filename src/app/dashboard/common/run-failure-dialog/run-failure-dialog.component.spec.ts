@@ -1,13 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { By } from '@angular/platform-browser'
-import { getTranslocoTestingModule } from '../../../../../jest.mocks'
+import { Mock } from 'vitest'
+import { getTranslocoTestingModule } from '../../../../testing/test-helpers'
 import { RunFailureDialogComponent, RunFailureDialogData } from './run-failure-dialog.component'
 
 describe('RunFailureDialogComponent', () => {
     let fixture: ComponentFixture<RunFailureDialogComponent>
-    let mockDialogRef: { close: jest.Mock }
-    let writeText: jest.Mock
+    let mockDialogRef: { close: Mock }
+    let writeText: Mock
 
     const baseData: RunFailureDialogData = {
         revoked: false,
@@ -18,8 +19,8 @@ describe('RunFailureDialogComponent', () => {
     }
 
     async function setup(data: Partial<RunFailureDialogData> = {}): Promise<void> {
-        mockDialogRef = { close: jest.fn() }
-        writeText = jest.fn()
+        mockDialogRef = { close: vi.fn() }
+        writeText = vi.fn()
         Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
 
         await TestBed.configureTestingModule({

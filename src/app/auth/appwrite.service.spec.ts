@@ -2,59 +2,20 @@ import { TestBed } from '@angular/core/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from '@environments/environment'
 import { Account, Models } from 'appwrite'
+import { MockInstance } from 'vitest'
 import { AppwriteService } from './appwrite.service'
-
-jest.mock('@environments/environment', () => ({
-    environment: {
-        production: false,
-        appwriteEndpoint: 'mock-endpoint',
-        appwriteProjectId: 'mock-project-id'
-    }
-}))
 
 const originalConsoleError = console.error
 const originalConsoleWarn = console.warn
 beforeAll(() => {
-    console.error = jest.fn()
-    console.warn = jest.fn()
+    console.error = vi.fn()
+    console.warn = vi.fn()
 })
 
 afterAll(() => {
     console.error = originalConsoleError
     console.warn = originalConsoleWarn
 })
-
-type MockAccount = Partial<Account> & {
-    get: jest.Mock
-    deleteSession: jest.Mock
-}
-
-jest.mock('appwrite', () => ({
-    Account: jest.fn().mockImplementation(() => ({
-        get: jest.fn(),
-        deleteSession: jest.fn()
-    })),
-    Client: jest.fn().mockImplementation(() => ({
-        setEndpoint: jest.fn().mockReturnThis(),
-        setProject: jest.fn().mockReturnThis()
-    })),
-    TablesDB: jest.fn().mockImplementation(() => ({
-        getRow: jest.fn().mockResolvedValue({ $id: 'mock-row-id' })
-    })),
-    ID: {
-        unique: jest.fn().mockReturnValue('unique-mock-id')
-    },
-    Permission: {
-        read: jest.fn().mockReturnValue('read-permission'),
-        update: jest.fn().mockReturnValue('update-permission')
-    },
-    Role: {
-        user: jest.fn().mockReturnValue('user-role')
-    },
-    Query: {
-        equal: jest.fn().mockReturnValue('mock-equal-query')
-    }
-}))
 
 describe('AppwriteService', () => {
     let service: AppwriteService
@@ -78,17 +39,27 @@ describe('AppwriteService', () => {
         accessedAt: new Date().toISOString()
     } as unknown as Models.User<Models.Preferences>
 
+    // The SDK is real; the two calls that would reach the network are stubbed on the prototype
+    let accountGet: MockInstance<Account['get']>
+    let accountDeleteSession: MockInstance<Account['deleteSession']>
+
     beforeEach(() => {
+        accountGet = vi.spyOn(Account.prototype, 'get').mockResolvedValue(undefined as never)
+        accountDeleteSession = vi.spyOn(Account.prototype, 'deleteSession').mockResolvedValue(undefined as never)
+
         TestBed.configureTestingModule({
             imports: [NoopAnimationsModule]
         })
         service = TestBed.inject(AppwriteService)
     })
 
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+
     describe('tryToLogin', () => {
         it('should set user when login is successful', async () => {
-            const mockAccount = service['account'] as MockAccount
-            mockAccount.get.mockResolvedValue(mockUser)
+            accountGet.mockResolvedValue(mockUser)
 
             const result = await service.tryToLogin()
 
@@ -99,8 +70,7 @@ describe('AppwriteService', () => {
         })
 
         it('should handle failed login', async () => {
-            const mockAccount = service['account'] as MockAccount
-            mockAccount.get.mockRejectedValue(new Error('Failed to login'))
+            accountGet.mockRejectedValue(new Error('Failed to login'))
 
             const originalEnvironmentType = environment.environmentType
             environment.environmentType = 'production'
@@ -118,8 +88,7 @@ describe('AppwriteService', () => {
 
     describe('tryToLogout', () => {
         it('should clear user on successful logout', async () => {
-            const mockAccount = service['account'] as MockAccount
-            mockAccount.deleteSession.mockResolvedValue({})
+            accountDeleteSession.mockResolvedValue({})
 
             await service.tryToLogout()
 
@@ -129,8 +98,7 @@ describe('AppwriteService', () => {
         })
 
         it('should clear user even if logout fails', async () => {
-            const mockAccount = service['account'] as MockAccount
-            mockAccount.deleteSession.mockRejectedValue(new Error('Failed to logout'))
+            accountDeleteSession.mockRejectedValue(new Error('Failed to logout'))
 
             await service.tryToLogout()
 

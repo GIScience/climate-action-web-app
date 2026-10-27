@@ -8,7 +8,8 @@ import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of, Subject, throwError } from 'rxjs'
-import { MockToastrService } from '../../../../jest.mocks'
+import { Mock, MockInstance } from 'vitest'
+import { MockToastrService } from '../../../testing/test-helpers'
 import { StorageService } from '../../storage.service'
 import { SupportedLanguage } from '../../types/language.types'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -80,9 +81,9 @@ describe('ComputationDetailComponent', () => {
     let mockArtifactViewerService: Partial<ArtifactViewerService>
     let mockArtifactService: Partial<ArtifactService>
     let mockShareService: Partial<ShareService>
-    let mockMatDialog: { open: jest.Mock; closeAll: jest.Mock }
+    let mockMatDialog: { open: Mock; closeAll: Mock }
     let router: Router
-    let navigateSpy: jest.SpyInstance
+    let navigateSpy: MockInstance
     let translocoService: TranslocoService
 
     let paramMap$: BehaviorSubject<ReturnType<typeof convertToParamMap>>
@@ -106,42 +107,42 @@ describe('ComputationDetailComponent', () => {
         } as unknown as ActivatedRoute
 
         mockPluginService = {
-            getComputationMetadata: jest.fn().mockReturnValue(of(buildMetadata())),
-            setComputeState: jest.fn(),
-            storeNewComputes: jest.fn(() => Promise.resolve()),
-            getPluginNameById: jest.fn((id: string) => id),
+            getComputationMetadata: vi.fn().mockReturnValue(of(buildMetadata())),
+            setComputeState: vi.fn(),
+            storeNewComputes: vi.fn(() => Promise.resolve()),
+            getPluginNameById: vi.fn((id: string) => id),
             activePlugin$: new BehaviorSubject(null).asObservable()
         }
 
         mockStorageService = {
-            getPluginRuns: jest.fn().mockReturnValue([]),
-            getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            markAsViewed: jest.fn().mockResolvedValue(undefined),
-            deleteComputation: jest.fn().mockResolvedValue(undefined)
+            getPluginRuns: vi.fn().mockReturnValue([]),
+            getPluginRunsObservable: vi.fn().mockReturnValue(pluginRuns$.asObservable()),
+            markAsViewed: vi.fn().mockResolvedValue(undefined),
+            deleteComputation: vi.fn().mockResolvedValue(undefined)
         }
 
         mockMapService = {
             mapReady$: of(undefined),
-            highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
-            flyToExtent: jest.fn(),
-            removeFocusedLayer: jest.fn(),
+            highlightAoI: vi.fn().mockReturnValue([0, 0, 1, 1]),
+            flyToExtent: vi.fn(),
+            removeFocusedLayer: vi.fn(),
             map: undefined
         }
 
         mockMapArtifactManager = {
             activeMapArtifacts$: mapArtifacts$.asObservable(),
-            setActiveArtifactId: jest.fn(),
-            clearTransientArtifacts: jest.fn(),
-            setTransientArtifact: jest.fn().mockReturnValue(true),
-            isMapArtifact: jest.fn().mockReturnValue(false),
-            isArtifactPersisted: jest.fn().mockReturnValue(false),
-            getActiveMapArtifacts: jest.fn().mockReturnValue([])
+            setActiveArtifactId: vi.fn(),
+            clearTransientArtifacts: vi.fn(),
+            setTransientArtifact: vi.fn().mockReturnValue(true),
+            isMapArtifact: vi.fn().mockReturnValue(false),
+            isArtifactPersisted: vi.fn().mockReturnValue(false),
+            getActiveMapArtifacts: vi.fn().mockReturnValue([])
         } as Partial<MapArtifactManagerService>
 
         mockArtifactViewerService = {
             isViewerVisible$: viewerVisible$.asObservable(),
-            closeArtifactViewer: jest.fn(),
-            setName: jest.fn()
+            closeArtifactViewer: vi.fn(),
+            setName: vi.fn()
         } as Partial<ArtifactViewerService>
 
         mockArtifactService = {
@@ -150,16 +151,16 @@ describe('ComputationDetailComponent', () => {
             table: new BehaviorSubject(null),
             chart: new BehaviorSubject(null),
             plotlyChart: new BehaviorSubject(null),
-            fetchArtifact: jest.fn(),
-            clearLegend: jest.fn(),
-            getLegend: jest.fn()
+            fetchArtifact: vi.fn(),
+            clearLegend: vi.fn(),
+            getLegend: vi.fn()
         } as unknown as Partial<ArtifactService>
 
         mockShareService = {
-            copyShareLink: jest.fn()
+            copyShareLink: vi.fn()
         }
 
-        mockMatDialog = { open: jest.fn(), closeAll: jest.fn() }
+        mockMatDialog = { open: vi.fn(), closeAll: vi.fn() }
 
         await TestBed.configureTestingModule({
             imports: [
@@ -195,7 +196,7 @@ describe('ComputationDetailComponent', () => {
         router = TestBed.inject(Router)
         // The ActivatedRoute stub lacks router internals, so real navigation
         // (e.g. the ?artifact= query param sync) must never run in tests
-        navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true)
+        navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true)
     })
 
     function createComponent(): void {
@@ -245,7 +246,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should show the not-found panel when the metadata fetch 404s', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(throwError(() => ({ status: 404 })))
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(throwError(() => ({ status: 404 })))
 
         createComponent()
         tick()
@@ -257,7 +258,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should show a retryable error panel on other failures', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(throwError(() => ({ status: 500 })))
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(throwError(() => ({ status: 500 })))
 
         createComponent()
         tick()
@@ -265,7 +266,7 @@ describe('ComputationDetailComponent', () => {
 
         expect(component.state).toBe('error')
 
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(buildMetadata()))
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(of(buildMetadata()))
 
         component.retry()
         tick()
@@ -274,7 +275,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should redirect to the owning plugin when the URL names the wrong one', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(buildMetadata('other_plugin')))
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(of(buildMetadata('other_plugin')))
 
         createComponent()
         tick()
@@ -298,7 +299,7 @@ describe('ComputationDetailComponent', () => {
 
     it('should warn about and strip an unknown ?artifact= param instead of opening anything', fakeAsync(() => {
         snapshotStub.queryParamMap = convertToParamMap({ artifact: 'missing.png' })
-        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
         createComponent()
         tick()
@@ -329,7 +330,7 @@ describe('ComputationDetailComponent', () => {
     it('should write the default tag to the URL on load, then merge user selections and share them', async () => {
         const metadata = buildMetadata()
         metadata.artifacts.push({ ...metadata.artifacts[0], name: 'Chart', filename: 'chart.png', primary: false })
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(of(metadata))
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(of(metadata))
 
         createComponent()
         await flushPromises()
@@ -355,7 +356,7 @@ describe('ComputationDetailComponent', () => {
     })
 
     it('should display the artifact errors icon when the computation has artifact errors', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest.fn().mockReturnValue(
+        mockPluginService.getComputationMetadata = vi.fn().mockReturnValue(
             of({
                 ...buildMetadata(),
                 artifact_errors: { 'Failing Indicator': 'Error message' }
@@ -378,7 +379,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should display a language mismatch icon when computation language differs from active language', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest
+        mockPluginService.getComputationMetadata = vi
             .fn()
             .mockReturnValue(of({ ...buildMetadata(), language: SupportedLanguage.DE }))
 
@@ -390,7 +391,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should not display a language mismatch icon when computation language matches active language', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest
+        mockPluginService.getComputationMetadata = vi
             .fn()
             .mockReturnValue(of({ ...buildMetadata(), language: SupportedLanguage.EN }))
 
@@ -411,7 +412,7 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should open the parameters dialog with params and requested params', fakeAsync(() => {
-        mockPluginService.getComputationMetadata = jest
+        mockPluginService.getComputationMetadata = vi
             .fn()
             .mockReturnValue(of({ ...buildMetadata(), requested_params: { foo: 'bar' } }))
 

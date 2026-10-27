@@ -6,7 +6,8 @@ import { ActivatedRoute } from '@angular/router'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
+import { MockInstance } from 'vitest'
+import { getTranslocoTestingModule, MockToastrService } from '../../../testing/test-helpers'
 import { StorageService } from '../../storage.service'
 import { ArtifactEntity } from '../artifact/artifact.interface'
 import { ArtifactService } from '../artifact/artifact.service'
@@ -76,31 +77,31 @@ describe('ComputationComponent', () => {
         pluginRuns$ = new BehaviorSubject<ComputationDatabaseEntity[]>([])
 
         mockStorageService = {
-            getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            getPluginRunsPaginated: jest.fn().mockResolvedValue({
+            getPluginRunsObservable: vi.fn().mockReturnValue(pluginRuns$.asObservable()),
+            getPluginRunsPaginated: vi.fn().mockResolvedValue({
                 documents: [],
                 hasMore: false
             }),
-            getComputesByStatus: jest.fn().mockReturnValue([]),
-            markAsNew: jest.fn(),
-            markAsViewed: jest.fn(),
-            getActiveTab: jest.fn().mockReturnValue('bookmarks'),
-            saveActiveTab: jest.fn()
+            getComputesByStatus: vi.fn().mockReturnValue([]),
+            markAsNew: vi.fn(),
+            markAsViewed: vi.fn(),
+            getActiveTab: vi.fn().mockReturnValue('bookmarks'),
+            saveActiveTab: vi.fn()
         }
 
         mockPluginService = {
-            updateRunStatus: jest.fn(),
-            getComputationMetadata: jest.fn(),
-            setComputeState: jest.fn(),
-            getComputationRunState: jest.fn(),
-            getPluginNameById: jest.fn((id: string) => id),
-            getPluginDetails: jest.fn().mockReturnValue(
+            updateRunStatus: vi.fn(),
+            getComputationMetadata: vi.fn(),
+            setComputeState: vi.fn(),
+            getComputationRunState: vi.fn(),
+            getPluginNameById: vi.fn((id: string) => id),
+            getPluginDetails: vi.fn().mockReturnValue(
                 of({
                     plugin_id: 'test_plugin',
                     plugin_version: '1.0.0'
                 })
             ),
-            getSearch: jest.fn().mockReturnValue(
+            getSearch: vi.fn().mockReturnValue(
                 of({
                     items: [],
                     current_page: null,
@@ -109,24 +110,24 @@ describe('ComputationComponent', () => {
                     next_page: null
                 })
             ),
-            getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
-            storeNewComputes: jest.fn(() => Promise.resolve()),
-            getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable())
+            getSearchCentroids: vi.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
+            storeNewComputes: vi.fn(() => Promise.resolve()),
+            getPluginRuns: vi.fn().mockReturnValue(pluginRuns$.asObservable())
         }
 
         mockArtifactService = {
-            getImage: jest.fn(),
+            getImage: vi.fn(),
             vector: new BehaviorSubject(null),
             raster: new BehaviorSubject(null)
         }
         mockMapService = {
-            initMap: jest.fn(() => Promise.resolve()),
-            highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
-            removeFocusedLayer: jest.fn(),
-            flyToExtent: jest.fn()
+            initMap: vi.fn(() => Promise.resolve()),
+            highlightAoI: vi.fn().mockReturnValue([0, 0, 1, 1]),
+            removeFocusedLayer: vi.fn(),
+            flyToExtent: vi.fn()
         }
         mockStoreService = {
-            getArtifactS3Url: jest.fn((correlationUuid: string, filename: string) =>
+            getArtifactS3Url: vi.fn((correlationUuid: string, filename: string) =>
                 of(`https://storage.example.com/${correlationUuid}/${filename}?X-Amz-Signature=abc`)
             )
         }
@@ -167,7 +168,7 @@ describe('ComputationComponent', () => {
         fixture = TestBed.createComponent(ComputationsIndexComponent)
         component = fixture.componentInstance
 
-        component.formatTimestamp = jest.fn().mockReturnValue('Jan 1, 2023 12:00 PM')
+        component.formatTimestamp = vi.fn().mockReturnValue('Jan 1, 2023 12:00 PM')
 
         fixture.detectChanges()
         tick()
@@ -184,7 +185,7 @@ describe('ComputationComponent', () => {
     }))
 
     it('should render content for non-expandable computations correctly', fakeAsync(() => {
-        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([
+        mockStorageService.getComputesByStatus = vi.fn().mockReturnValue([
             {
                 correlation_uuid: TEST_UUID,
                 pluginId: 'test_plugin',
@@ -275,11 +276,11 @@ describe('ComputationComponent', () => {
             modality: 'CHART',
             filename: 'image2'
         })
-        let viewArtifactSpy: jest.SpyInstance | undefined
+        let viewArtifactSpy: MockInstance | undefined
         const computationComponent = createComputationComponent(
             [createArtifactEntity({ name: 'Primary Analysis', primary: true, tags: ['analysis'] }), chart],
             component => {
-                viewArtifactSpy = jest.spyOn(component, 'viewArtifact').mockImplementation(() => undefined)
+                viewArtifactSpy = vi.spyOn(component, 'viewArtifact').mockImplementation(() => undefined)
                 component.selectedTag = 'visualization'
                 component.activeArtifact = chart
             }
@@ -314,10 +315,10 @@ describe('ComputationComponent', () => {
         })
 
         const fakeAnchor = document.createElement('a')
-        jest.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
-        const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(fakeAnchor)
-        const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
-        const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
+        vi.spyOn(fakeAnchor, 'click').mockImplementation(() => {})
+        const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeAnchor)
+        const appendChildSpy = vi.spyOn(document.body, 'appendChild').mockImplementation(computation => computation)
+        const removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation(computation => computation)
 
         computationComponent.downloadContent(testArtifact)
 

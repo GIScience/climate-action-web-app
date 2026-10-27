@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RunSyncService, SyncState } from '@app/persistence/run-sync.service'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
-import { getTranslocoTestingModule } from '../../../jest.mocks'
+import { getTranslocoTestingModule } from '../../testing/test-helpers'
 import { AppwriteService } from '../auth/appwrite.service'
 import { DashboardService } from '../dashboard/dashboard.service'
 import { TourEngine } from '../dashboard/walkthrough/tour-engine.service'
@@ -34,25 +34,25 @@ describe('AccountComponent', () => {
         userSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
         appwriteService = {
             _user: userSubject,
-            tryToLogin: jest.fn().mockResolvedValue(true),
-            tryToLogout: jest.fn().mockResolvedValue(undefined),
-            getAppwriteUrl: jest.fn().mockReturnValue('https://example.com'),
-            getRedirectUrl: jest.fn().mockReturnValue('https://example.com'),
-            loginAsFakeUser: jest.fn().mockResolvedValue(undefined)
+            tryToLogin: vi.fn().mockResolvedValue(true),
+            tryToLogout: vi.fn().mockResolvedValue(undefined),
+            getAppwriteUrl: vi.fn().mockReturnValue('https://example.com'),
+            getRedirectUrl: vi.fn().mockReturnValue('https://example.com'),
+            loginAsFakeUser: vi.fn().mockResolvedValue(undefined)
         }
 
         dashboardService = {
-            clearDashboardState: jest.fn()
+            clearDashboardState: vi.fn()
         }
 
         tourEngine = {
-            initializeTour: jest.fn()
+            initializeTour: vi.fn()
         }
 
         syncState = signal<SyncState>('idle')
         runSyncService = {
             syncState,
-            retrySync: jest.fn()
+            retrySync: vi.fn()
         }
 
         await TestBed.configureTestingModule({
@@ -86,7 +86,7 @@ describe('AccountComponent', () => {
     })
 
     it('should unsubscribe from user subscription on destroy', () => {
-        const spy = jest.spyOn(component['userSubscription'], 'unsubscribe')
+        const spy = vi.spyOn(component['userSubscription'], 'unsubscribe')
         component.ngOnDestroy()
         expect(spy).toHaveBeenCalled()
     })

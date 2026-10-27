@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing'
 import { DrawInput } from '@app/dashboard/plugin/plugin.interface'
 import { TranslocoService } from '@jsverse/transloco'
+import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw'
 import type { Map as MaplibreMap } from 'maplibre-gl'
 import { ToastrService } from 'ngx-toastr'
+import { Mock } from 'vitest'
 import { MapDrawingService } from './map-drawing.service'
 
 type MockTerraDrawEvent = 'change' | 'finish' | 'ready'
@@ -15,7 +17,7 @@ class MockTerraDrawInstance {
     mode = 'static'
     listeners = new Map<MockTerraDrawEvent, Array<(...args: unknown[]) => void>>()
 
-    start = jest.fn(() => {
+    start = vi.fn(() => {
         if (mockStartFailures > 0) {
             mockStartFailures--
             this.enabled = true
@@ -23,61 +25,64 @@ class MockTerraDrawInstance {
         }
         this.enabled = true
     })
-    stop = jest.fn(() => {
+    stop = vi.fn(() => {
         this.enabled = false
     })
-    getMode = jest.fn(() => this.mode)
-    setMode = jest.fn((mode: string) => {
+    getMode = vi.fn(() => this.mode)
+    setMode = vi.fn((mode: string) => {
         this.mode = mode
     })
-    getSnapshot = jest.fn(() => [])
-    removeFeatures = jest.fn()
-    on = jest.fn((event: MockTerraDrawEvent, listener: (...args: unknown[]) => void) => {
+    getSnapshot = vi.fn(() => [])
+    removeFeatures = vi.fn()
+    on = vi.fn((event: MockTerraDrawEvent, listener: (...args: unknown[]) => void) => {
         const listeners = this.listeners.get(event) ?? []
         listeners.push(listener)
         this.listeners.set(event, listeners)
     })
 }
 
-jest.mock('@watergis/maplibre-gl-terradraw', () => ({
-    MaplibreTerradrawControl: jest.fn().mockImplementation(() => {
-        const terraDraw = new MockTerraDrawInstance()
+// The real control is constructed (its constructor only stores options; the mocked map never
+// calls onAdd). Each control hands out its own mock TerraDraw, recorded in creation order.
+const terraDrawByControl = new WeakMap<MaplibreTerradrawControl, MockTerraDrawInstance>()
+function mockTerraDrawInstance(this: MaplibreTerradrawControl): MockTerraDrawInstance {
+    let terraDraw = terraDrawByControl.get(this)
+    if (!terraDraw) {
+        terraDraw = new MockTerraDrawInstance()
+        terraDrawByControl.set(this, terraDraw)
         mockTerraDrawInstances.push(terraDraw)
-        return {
-            getTerraDrawInstance: () => terraDraw
-        }
-    })
-}))
+    }
+    return terraDraw
+}
 
 describe('MapDrawingService', () => {
     type MapEvent = 'load' | 'style.load' | 'idle'
     type MockMap = {
         map: MaplibreMap
         cursor: CSSStyleDeclaration
-        isStyleLoaded: jest.Mock<boolean, []>
+        isStyleLoaded: Mock<() => boolean>
         emit: (event: MapEvent) => void
         listenersFor: (event: MapEvent) => Array<() => void>
     }
 
     let service: MapDrawingService
-    let mockToastr: { error: jest.Mock }
+    let mockToastr: { error: Mock }
 
     const createMockMap = (styleLoaded: boolean): MockMap => {
         const listeners = new Map<MapEvent, Set<() => void>>()
         const cursor = {} as CSSStyleDeclaration
-        const isStyleLoaded = jest.fn(() => styleLoaded)
+        const isStyleLoaded = vi.fn(() => styleLoaded)
 
         const map = {
-            addControl: jest.fn(),
-            removeControl: jest.fn(),
-            getCanvas: jest.fn(() => ({ style: cursor })),
+            addControl: vi.fn(),
+            removeControl: vi.fn(),
+            getCanvas: vi.fn(() => ({ style: cursor })),
             isStyleLoaded,
-            on: jest.fn((event: MapEvent, listener: () => void) => {
+            on: vi.fn((event: MapEvent, listener: () => void) => {
                 const eventListeners = listeners.get(event) ?? new Set()
                 eventListeners.add(listener)
                 listeners.set(event, eventListeners)
             }),
-            off: jest.fn((event: MapEvent, listener: () => void) => {
+            off: vi.fn((event: MapEvent, listener: () => void) => {
                 listeners.get(event)?.delete(listener)
             })
         } as unknown as MaplibreMap
@@ -92,10 +97,13 @@ describe('MapDrawingService', () => {
     }
 
     beforeEach(() => {
-        jest.useFakeTimers()
+        vi.useFakeTimers()
+        vi.spyOn(MaplibreTerradrawControl.prototype, 'getTerraDrawInstance').mockImplementation(
+            mockTerraDrawInstance as unknown as MaplibreTerradrawControl['getTerraDrawInstance']
+        )
         mockTerraDrawInstances.length = 0
         mockStartFailures = 0
-        mockToastr = { error: jest.fn() }
+        mockToastr = { error: vi.fn() }
 
         TestBed.configureTestingModule({
             providers: [
@@ -109,8 +117,8 @@ describe('MapDrawingService', () => {
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
-        jest.useRealTimers()
+        vi.restoreAllMocks()
+        vi.useRealTimers()
     })
 
     describe('startDrawing', () => {
@@ -152,7 +160,7 @@ describe('MapDrawingService', () => {
         })
 
         it('should keep listening for readiness after a transient startup failure', () => {
-            jest.spyOn(console, 'warn').mockImplementation(() => {})
+            vi.spyOn(console, 'warn').mockImplementation(() => {})
             mockStartFailures = 1
             const mockMap = createMockMap(true)
 
@@ -223,7 +231,7 @@ describe('MapDrawingService', () => {
 
     describe('activation timeout', () => {
         it('should surface an error and reset drawing state when activation never completes in time', () => {
-            jest.spyOn(console, 'error').mockImplementation(() => {})
+            vi.spyOn(console, 'error').mockImplementation(() => {})
             const mockMap = createMockMap(false)
 
             service.startDrawing(DrawInput.Polygon, mockMap.map)
@@ -233,7 +241,7 @@ describe('MapDrawingService', () => {
             expect(service.isDrawingModeValue).toBe(true)
             expect(mockMap.cursor.cursor).toBe('wait')
 
-            jest.advanceTimersByTime(10000)
+            vi.advanceTimersByTime(10000)
 
             expect(mockToastr.error).toHaveBeenCalledTimes(1)
             expect(service.isDrawingModeValue).toBe(false)
@@ -248,7 +256,7 @@ describe('MapDrawingService', () => {
             service.startDrawing(DrawInput.Circle, mockMap.map)
             expect(service.currentDrawModeValue).toBe(DrawInput.Circle)
 
-            jest.advanceTimersByTime(10000)
+            vi.advanceTimersByTime(10000)
 
             expect(mockToastr.error).not.toHaveBeenCalled()
             expect(service.currentDrawModeValue).toBe(DrawInput.Circle)
@@ -256,13 +264,13 @@ describe('MapDrawingService', () => {
         })
 
         it('should not surface an error when drawing is stopped before activation', () => {
-            jest.spyOn(console, 'error').mockImplementation(() => {})
+            vi.spyOn(console, 'error').mockImplementation(() => {})
             const mockMap = createMockMap(false)
 
             service.startDrawing(DrawInput.Box, mockMap.map)
             service.stopDrawing()
 
-            jest.advanceTimersByTime(10000)
+            vi.advanceTimersByTime(10000)
 
             expect(mockToastr.error).not.toHaveBeenCalled()
             expect(service.isDrawingModeValue).toBe(false)

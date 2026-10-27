@@ -1,8 +1,8 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { jest } from '@jest/globals'
 import { of } from 'rxjs'
-import { getTranslocoTestingModule } from '../../../../jest.mocks'
+import { Mock } from 'vitest'
+import { getTranslocoTestingModule } from '../../../testing/test-helpers'
 import { StorageService } from '../../storage.service'
 import { ComputationID } from '../computations-index/computation.interface'
 import { Plugin } from './plugin.interface'
@@ -12,8 +12,8 @@ describe('PluginService', () => {
     let service: PluginService
     let storageService: StorageService
     let httpClientSpy: {
-        post: jest.Mock
-        get: jest.Mock
+        post: Mock
+        get: Mock
     }
 
     const test_computation = {
@@ -108,15 +108,15 @@ describe('PluginService', () => {
 
     beforeEach(() => {
         httpClientSpy = {
-            post: jest.fn().mockImplementation(() => of({})),
-            get: jest.fn().mockImplementation(() => of({}))
+            post: vi.fn().mockImplementation(() => of({})),
+            get: vi.fn().mockImplementation(() => of({}))
         }
 
         const mockStorageService = {
-            getComputesByStatus: jest.fn().mockReturnValue([test_plugin_run, test_plugin_run]),
-            storeNewCompute: jest.fn(() => Promise.resolve()),
-            updateComputation: jest.fn(() => Promise.resolve()),
-            getPluginRuns: jest.fn().mockReturnValue([test_plugin_run])
+            getComputesByStatus: vi.fn().mockReturnValue([test_plugin_run, test_plugin_run]),
+            storeNewCompute: vi.fn(() => Promise.resolve()),
+            updateComputation: vi.fn(() => Promise.resolve()),
+            getPluginRuns: vi.fn().mockReturnValue([test_plugin_run])
         }
 
         TestBed.configureTestingModule({

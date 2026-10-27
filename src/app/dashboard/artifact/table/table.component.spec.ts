@@ -1,20 +1,20 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { jest } from '@jest/globals'
 import { of } from 'rxjs'
+import { Mocked } from 'vitest'
 import { TableComponent } from './table.component'
 
 describe('TableComponent', () => {
     let component: TableComponent
     let fixture: ComponentFixture<TableComponent>
-    let httpClientSpy: jest.Mocked<HttpClient>
+    let httpClientSpy: Mocked<HttpClient>
 
     beforeEach(() => {
         httpClientSpy = {
-            post: jest.fn(),
-            get: jest.fn()
-        } as unknown as jest.Mocked<HttpClient>
+            post: vi.fn(),
+            get: vi.fn()
+        } as unknown as Mocked<HttpClient>
 
         TestBed.configureTestingModule({
             imports: [TableComponent, HttpClientModule],

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { jest } from '@jest/globals'
+import { Mocked } from 'vitest'
 import { MapComponent } from './map.component'
 import { MapService } from './map.service'
 
 describe('MapComponent', () => {
     let component: MapComponent
     let fixture: ComponentFixture<MapComponent>
-    let mockMapService: jest.Mocked<MapService>
+    let mockMapService: Mocked<MapService>
 
     beforeEach(async () => {
         mockMapService = {
-            initMap: jest.fn<MapService['initMap']>().mockResolvedValue(undefined)
-        } as unknown as jest.Mocked<MapService>
+            initMap: vi.fn<MapService['initMap']>().mockResolvedValue(undefined)
+        } as unknown as Mocked<MapService>
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],

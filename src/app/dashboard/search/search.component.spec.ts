@@ -1,6 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { getTranslocoTestingModule } from '../../../../jest.mocks'
+import { getTranslocoTestingModule } from '../../../testing/test-helpers'
 import { SearchComponent } from './search.component'
 
 describe('SearchComponent', () => {

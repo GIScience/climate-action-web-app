@@ -13,33 +13,10 @@ import type { GeoJSON, Feature as GeoJSONFeature, GeoJsonTypes, LineString, Poly
 import { JSONSchema7 } from 'json-schema'
 import { Map as MaplibreMap } from 'maplibre-gl'
 import { ToastrService } from 'ngx-toastr'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../../jest.mocks'
+import { Mock } from 'vitest'
+import { getTranslocoTestingModule, MockToastrService } from '../../../../testing/test-helpers'
 import { AoiConstraintService } from './aoi-constraint.service'
 import { PluginParameterComponent } from './plugin-parameter.component'
-
-// Mock @tmcw/togeojson since it is ESM-only
-jest.mock('@tmcw/togeojson', () => ({
-    gpx: jest.fn(() => ({
-        type: 'FeatureCollection',
-        features: [
-            {
-                type: 'Feature',
-                geometry: {
-                    type: 'LineString',
-                    coordinates: [
-                        [0, 0],
-                        [1, 1]
-                    ]
-                },
-                properties: { name: 'My Track' }
-            }
-        ]
-    })),
-    kml: jest.fn(() => ({
-        type: 'FeatureCollection',
-        features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] }, properties: {} }]
-    }))
-}))
 
 type TestableComponent = {
     bufferSourceFeature?: GeoJSONFeature
@@ -63,11 +40,11 @@ function asFileList(file: File): FileList {
 
 function createFakeMap(): MaplibreMap {
     return {
-        addControl: jest.fn(),
-        removeControl: jest.fn(),
-        on: jest.fn(),
-        off: jest.fn(),
-        once: jest.fn(),
+        addControl: vi.fn(),
+        removeControl: vi.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
+        once: vi.fn(),
         getCanvas: () => ({ style: {} }),
         loaded: () => true,
         isStyleLoaded: () => true,
@@ -1318,16 +1295,12 @@ describe('PluginParameterComponent', () => {
             })
 
             it('should convert a GPX file through @tmcw/togeojson', async () => {
-                const { gpx } = await import('@tmcw/togeojson')
                 const result = await internal.parseAoiFileContent('track.gpx', '<gpx></gpx>')
-                expect(gpx).toHaveBeenCalled()
                 expect(result).toMatchObject({ type: 'FeatureCollection' })
             })
 
             it('should convert a KML file through @tmcw/togeojson', async () => {
-                const { kml } = await import('@tmcw/togeojson')
                 const result = await internal.parseAoiFileContent('places.kml', '<kml></kml>')
-                expect(kml).toHaveBeenCalled()
                 expect(result).toMatchObject({ type: 'FeatureCollection' })
             })
 
@@ -1340,7 +1313,7 @@ describe('PluginParameterComponent', () => {
 
         describe('bufferAoi', () => {
             it('buffers the source geometry into a polygon and renders it', () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
                 internal.bufferSourceFeature = lineFeature
 
                 component.bufferAoi(50)
@@ -1352,7 +1325,7 @@ describe('PluginParameterComponent', () => {
             })
 
             it('always re-buffers from the pristine source, never the previously buffered result', () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
                 internal.bufferSourceFeature = lineFeature
 
                 component.bufferAoi(10)
@@ -1369,8 +1342,8 @@ describe('PluginParameterComponent', () => {
 
         describe('readFileData', () => {
             it('renders an uploaded polygon and prefills the area name', async () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
-                const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const flySpy = vi.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
                 const named: GeoJSONFeature = {
                     type: 'Feature',
                     geometry: polygonGeometry,
@@ -1387,8 +1360,8 @@ describe('PluginParameterComponent', () => {
             })
 
             it('eagerly buffers a non-polygonal upload so the AOI is immediately usable', async () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
-                const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const flySpy = vi.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
                 const file = new File([JSON.stringify(lineFeature)], 'track.geojson')
 
                 component.readFileData(asFileList(file))
@@ -1401,18 +1374,18 @@ describe('PluginParameterComponent', () => {
             })
 
             it('shows an error toast and renders nothing for an unparseable file', async () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
                 const file = new File(['this is not geojson'], 'broken.geojson')
 
                 component.readFileData(asFileList(file))
-                await flushUntil(() => (toastr.error as jest.Mock).mock.calls.length > 0)
+                await flushUntil(() => (toastr.error as Mock).mock.calls.length > 0)
 
                 expect(toastr.error).toHaveBeenCalled()
                 expect(renderSpy).not.toHaveBeenCalled()
             })
 
             it('ignores an empty file list', () => {
-                const renderSpy = jest.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
+                const renderSpy = vi.spyOn(component.mapService, 'renderFeature').mockResolvedValue(undefined)
                 expect(() => component.readFileData(null)).not.toThrow()
                 expect(renderSpy).not.toHaveBeenCalled()
             })
@@ -1421,12 +1394,12 @@ describe('PluginParameterComponent', () => {
 
     describe('language change', () => {
         beforeEach(() => {
-            jest.useFakeTimers()
+            vi.useFakeTimers()
         })
 
         afterEach(() => {
-            jest.clearAllTimers()
-            jest.useRealTimers()
+            vi.clearAllTimers()
+            vi.useRealTimers()
         })
 
         it('rebuilds the TerraDraw control', () => {
@@ -1434,18 +1407,18 @@ describe('PluginParameterComponent', () => {
             component.mapService.map = map
 
             component.mapService.startDrawing(DrawInput.Polygon)
-            const firstControl = (map.addControl as jest.Mock).mock.calls[0][0]
+            const firstControl = (map.addControl as Mock).mock.calls[0][0]
 
             TestBed.inject(TranslocoService).setActiveLang('de')
             expect(map.removeControl).toHaveBeenCalledWith(firstControl)
 
             component.mapService.startDrawing(DrawInput.Polygon)
             expect(map.addControl).toHaveBeenCalledTimes(2)
-            expect((map.addControl as jest.Mock).mock.calls[1][0]).not.toBe(firstControl)
+            expect((map.addControl as Mock).mock.calls[1][0]).not.toBe(firstControl)
         })
 
         it('clears a drawn area when the panel is destroyed', () => {
-            const clearSpy = jest.spyOn(component.mapService, 'clearDrawnFeatures')
+            const clearSpy = vi.spyOn(component.mapService, 'clearDrawnFeatures')
             component.setSelectionMode(DrawInput.Polygon)
             clearSpy.mockClear()
 
@@ -1455,7 +1428,7 @@ describe('PluginParameterComponent', () => {
         })
 
         it('keeps a boundary selection when the panel is destroyed', () => {
-            const clearSpy = jest.spyOn(component.mapService, 'clearDrawnFeatures')
+            const clearSpy = vi.spyOn(component.mapService, 'clearDrawnFeatures')
             expect(component.currentSelectionMode).toBe(ExternalInput.Boundary)
 
             fixture.destroy()
@@ -1500,11 +1473,11 @@ describe('PluginParameterComponent', () => {
 
         beforeEach(() => {
             constraintService = fixture.debugElement.injector.get(AoiConstraintService)
-            jest.spyOn(constraintService, 'activate').mockImplementation(() => {})
+            vi.spyOn(constraintService, 'activate').mockImplementation(() => {})
         })
 
         afterEach(() => {
-            jest.restoreAllMocks()
+            vi.restoreAllMocks()
         })
 
         it('keeps the legacy soft warning and allows submit when the plugin has no constraints', () => {
@@ -1515,7 +1488,7 @@ describe('PluginParameterComponent', () => {
         })
 
         it('invalidates the area selection and shows a blocker message on a constraint violation, keeping the selection', () => {
-            jest.spyOn(constraintService, 'validate').mockReturnValue({ kind: 'area' })
+            vi.spyOn(constraintService, 'validate').mockReturnValue({ kind: 'area' })
 
             selectFeature(selectedFeature(600))
 
@@ -1525,12 +1498,12 @@ describe('PluginParameterComponent', () => {
         })
 
         it('suppresses the legacy soft warning when an AreaConstraint is active', () => {
-            jest.spyOn(constraintService, 'areaConstraint', 'get').mockReturnValue({
+            vi.spyOn(constraintService, 'areaConstraint', 'get').mockReturnValue({
                 constraint_type: 'AreaConstraint',
                 min_area: 0,
                 max_area: 1000
             })
-            jest.spyOn(constraintService, 'validate').mockReturnValue(null)
+            vi.spyOn(constraintService, 'validate').mockReturnValue(null)
 
             selectFeature(selectedFeature(600))
 
@@ -1542,13 +1515,13 @@ describe('PluginParameterComponent', () => {
             fixture.detectChanges()
             expect((fixture.nativeElement as HTMLElement).querySelector('.constraint-note')).toBeNull()
 
-            jest.spyOn(constraintService, 'hasConstraints', 'get').mockReturnValue(true)
+            vi.spyOn(constraintService, 'hasConstraints', 'get').mockReturnValue(true)
             fixture.detectChanges()
             expect((fixture.nativeElement as HTMLElement).querySelector('.constraint-note')).not.toBeNull()
         })
 
         it('locks the non-boundary tools and forces Boundary mode for a BoundarySelectionConstraint', () => {
-            jest.spyOn(constraintService, 'boundarySelectionConstraint', 'get').mockReturnValue({
+            vi.spyOn(constraintService, 'boundarySelectionConstraint', 'get').mockReturnValue({
                 constraint_type: 'BoundarySelectionConstraint',
                 osm_ids: [-11674964, -14320076]
             })
@@ -1568,14 +1541,14 @@ describe('PluginParameterComponent', () => {
         })
 
         it('defaults to Rectangle drawing for a CoveredByGeomConstraint without locking the other tools', () => {
-            jest.spyOn(constraintService, 'coveredByGeomConstraint', 'get').mockReturnValue({
+            vi.spyOn(constraintService, 'coveredByGeomConstraint', 'get').mockReturnValue({
                 constraint_type: 'CoveredByGeomConstraint',
                 geom: { type: 'MultiPolygon', coordinates: [] },
                 description: 'Heidelberg'
             })
-            const enableSpy = jest.spyOn(component.mapService, 'enableBoundarySelection')
-            const disableSpy = jest.spyOn(component.mapService, 'disableBoundarySelection')
-            const drawSpy = jest.spyOn(component.mapService, 'startDrawing')
+            const enableSpy = vi.spyOn(component.mapService, 'enableBoundarySelection')
+            const disableSpy = vi.spyOn(component.mapService, 'disableBoundarySelection')
+            const drawSpy = vi.spyOn(component.mapService, 'startDrawing')
 
             component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
             component.ngOnChanges()
@@ -1595,12 +1568,12 @@ describe('PluginParameterComponent', () => {
 
         it('flies to the allowed regions and revalidates when constraint geometries arrive', () => {
             const allowed = [selectedFeature(1)]
-            jest.spyOn(constraintService, 'allowedGeometries', 'get').mockReturnValue(allowed)
-            const loadState = jest.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
-            const validateSpy = jest.spyOn(constraintService, 'validate').mockReturnValue(null)
-            const fowSpy = jest.spyOn(component.mapService, 'updateFoWGeometries')
-            const flySpy = jest.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
-            const inViewSpy = jest.spyOn(component.mapService, 'isExtentInView').mockReturnValue(false)
+            vi.spyOn(constraintService, 'allowedGeometries', 'get').mockReturnValue(allowed)
+            const loadState = vi.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
+            const validateSpy = vi.spyOn(constraintService, 'validate').mockReturnValue(null)
+            const fowSpy = vi.spyOn(component.mapService, 'updateFoWGeometries')
+            const flySpy = vi.spyOn(component.mapService, 'flyToExtent').mockImplementation(() => {})
+            const inViewSpy = vi.spyOn(component.mapService, 'isExtentInView').mockReturnValue(false)
 
             selectFeature(selectedFeature(2))
             validateSpy.mockClear()
@@ -1620,7 +1593,7 @@ describe('PluginParameterComponent', () => {
         })
 
         it('overlays the panel while constraint geometries load and hides it once the map settles', async () => {
-            const loadState = jest.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
+            const loadState = vi.spyOn(constraintService, 'loadState', 'get').mockReturnValue('loading')
 
             component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
             component.ngOnChanges()
@@ -1637,8 +1610,8 @@ describe('PluginParameterComponent', () => {
         })
 
         it('clears constraint state on destroy', () => {
-            const fowSpy = jest.spyOn(component.mapService, 'clearFoWByType')
-            const deactivateSpy = jest.spyOn(constraintService, 'deactivate')
+            const fowSpy = vi.spyOn(component.mapService, 'clearFoWByType')
+            const deactivateSpy = vi.spyOn(constraintService, 'deactivate')
 
             fixture.destroy()
 

@@ -2,7 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { By } from '@angular/platform-browser'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
-import { getTranslocoTestingModule } from '../../../../../jest.mocks'
+import { Mock } from 'vitest'
+import { getTranslocoTestingModule } from '../../../../testing/test-helpers'
 import {
     ComputationParametersDialogComponent,
     ComputationParametersDialogData
@@ -10,10 +11,10 @@ import {
 
 describe('ComputationParametersDialogComponent', () => {
     let fixture: ComponentFixture<ComputationParametersDialogComponent>
-    let mockDialogRef: { close: jest.Mock }
+    let mockDialogRef: { close: Mock }
 
     async function setup(data: ComputationParametersDialogData): Promise<void> {
-        mockDialogRef = { close: jest.fn() }
+        mockDialogRef = { close: vi.fn() }
 
         await TestBed.configureTestingModule({
             imports: [ComputationParametersDialogComponent, NoopAnimationsModule, getTranslocoTestingModule()],

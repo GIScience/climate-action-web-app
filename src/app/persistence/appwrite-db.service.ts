@@ -32,8 +32,7 @@ export class AppwriteDbService {
 
     private readonly DATABASE_ID = 'climate_action'
     private readonly RUNS_TABLE_ID = environment.appwriteRunsCollectionId
-    // @ts-ignore: Suppress TypeScript error for test environment detection
-    private isTestEnvironment = typeof jest !== 'undefined' || typeof Cypress !== 'undefined'
+    private isTestEnvironment = environment.environmentType === 'testing'
 
     private get tablesDB(): TablesDB {
         return this.appwriteService.getTablesDB()

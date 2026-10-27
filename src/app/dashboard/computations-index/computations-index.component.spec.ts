@@ -7,7 +7,7 @@ import { TranslocoService } from '@jsverse/transloco'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
 import { ToastrService } from 'ngx-toastr'
 import { BehaviorSubject, of } from 'rxjs'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../testing/test-helpers'
 import { StorageService } from '../../storage.service'
 import { ArtifactService } from '../artifact/artifact.service'
 import { MapSearchManagerService } from '../map/map-search-manager.service'
@@ -61,7 +61,7 @@ describe('ComputationsIndexComponent', () => {
     let pluginRuns$: BehaviorSubject<ComputationDatabaseEntity[]>
 
     function seedStoredRuns(runs: ComputationDatabaseEntity[]): void {
-        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue(runs)
+        mockStorageService.getComputesByStatus = vi.fn().mockReturnValue(runs)
         pluginRuns$.next(runs)
         fixture.detectChanges()
     }
@@ -70,50 +70,50 @@ describe('ComputationsIndexComponent', () => {
         pluginRuns$ = new BehaviorSubject<ComputationDatabaseEntity[]>([])
 
         mockStorageService = {
-            getPluginRunsObservable: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            getPluginRunsPaginated: jest.fn().mockResolvedValue({
+            getPluginRunsObservable: vi.fn().mockReturnValue(pluginRuns$.asObservable()),
+            getPluginRunsPaginated: vi.fn().mockResolvedValue({
                 documents: [],
                 hasMore: false
             }),
-            getComputesByStatus: jest.fn().mockReturnValue([]),
-            markAsNew: jest.fn(),
-            markAsViewed: jest.fn(),
-            deleteComputation: jest.fn(() => Promise.resolve()),
-            getActiveTab: jest.fn().mockReturnValue('bookmarks'),
-            saveActiveTab: jest.fn()
+            getComputesByStatus: vi.fn().mockReturnValue([]),
+            markAsNew: vi.fn(),
+            markAsViewed: vi.fn(),
+            deleteComputation: vi.fn(() => Promise.resolve()),
+            getActiveTab: vi.fn().mockReturnValue('bookmarks'),
+            saveActiveTab: vi.fn()
         }
 
         mockPluginService = {
-            updateRunStatus: jest.fn(),
-            getComputationMetadata: jest.fn(),
-            setComputeState: jest.fn(),
-            getComputationRunState: jest.fn().mockReturnValue(of({ state: 'PENDING' })),
-            getPluginNameById: jest.fn((id: string) => id),
-            getSearch: jest.fn().mockReturnValue(of(createSearchPage([]))),
-            getSearchCentroids: jest.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
-            getPluginRuns: jest.fn().mockReturnValue(pluginRuns$.asObservable()),
-            storeNewComputes: jest.fn(() => Promise.resolve())
+            updateRunStatus: vi.fn(),
+            getComputationMetadata: vi.fn(),
+            setComputeState: vi.fn(),
+            getComputationRunState: vi.fn().mockReturnValue(of({ state: 'PENDING' })),
+            getPluginNameById: vi.fn((id: string) => id),
+            getSearch: vi.fn().mockReturnValue(of(createSearchPage([]))),
+            getSearchCentroids: vi.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
+            getPluginRuns: vi.fn().mockReturnValue(pluginRuns$.asObservable()),
+            storeNewComputes: vi.fn(() => Promise.resolve())
         }
 
         mockArtifactService = {
-            getImage: jest.fn(),
-            resetAllSubjects: jest.fn(),
+            getImage: vi.fn(),
+            resetAllSubjects: vi.fn(),
             vector: new BehaviorSubject(null),
             raster: new BehaviorSubject(null)
         }
         mockMapService = {
-            initMap: jest.fn(() => Promise.resolve()),
-            highlightAoI: jest.fn().mockReturnValue([0, 0, 1, 1]),
-            removeFocusedLayer: jest.fn(),
-            flyToExtent: jest.fn()
+            initMap: vi.fn(() => Promise.resolve()),
+            highlightAoI: vi.fn().mockReturnValue([0, 0, 1, 1]),
+            removeFocusedLayer: vi.fn(),
+            flyToExtent: vi.fn()
         }
         mockmapSearchManager = {
-            showSearchLayers: jest.fn(),
-            hideSearchLayers: jest.fn(),
-            clearSearchLayers: jest.fn()
+            showSearchLayers: vi.fn(),
+            hideSearchLayers: vi.fn(),
+            clearSearchLayers: vi.fn()
         }
         mockShareService = {
-            copyShareLink: jest.fn()
+            copyShareLink: vi.fn()
         }
 
         await TestBed.configureTestingModule({
@@ -164,7 +164,7 @@ describe('ComputationsIndexComponent', () => {
         component = fixture.componentInstance
         translocoService.setActiveLang('en')
 
-        component.formatTimestamp = jest.fn().mockReturnValue('1 Jan 2023, 12:00 PM')
+        component.formatTimestamp = vi.fn().mockReturnValue('1 Jan 2023, 12:00 PM')
 
         fixture.detectChanges()
         await flushPromises()
@@ -193,7 +193,7 @@ describe('ComputationsIndexComponent', () => {
     })
 
     it('clicking a row should navigate to the computation detail', () => {
-        const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true)
+        const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true)
         seedStoredRuns([createTestRun()])
 
         fixture.debugElement.query(By.css('.parent-computation')).triggerEventHandler('click', null)
@@ -216,7 +216,7 @@ describe('ComputationsIndexComponent', () => {
         seedStoredRuns([createTestRun()])
         expect(component.runs()).toHaveLength(1)
 
-        mockStorageService.getComputesByStatus = jest.fn().mockReturnValue([])
+        mockStorageService.getComputesByStatus = vi.fn().mockReturnValue([])
         pluginRuns$.next([])
         await flushPromises()
 
@@ -230,7 +230,7 @@ describe('ComputationsIndexComponent', () => {
             plugin_id: 'test_plugin',
             aoi_name: 'Test AoI'
         }
-        mockPluginService.getSearch = jest.fn().mockReturnValue(of(createSearchPage([entry])))
+        mockPluginService.getSearch = vi.fn().mockReturnValue(of(createSearchPage([entry])))
 
         component.switchTab('discover')
         fixture.detectChanges()

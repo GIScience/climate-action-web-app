@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { RouterModule } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../testing/test-helpers'
 import { ShareService } from './share.service'
 
 const UUID = '8a897536-c4b4-4e5a-9d70-50430183ac66'
@@ -37,7 +37,7 @@ describe('ShareService', () => {
 
     it('should copy the share link to the clipboard and notify the user', () => {
         Object.defineProperty(navigator, 'clipboard', {
-            value: { writeText: jest.fn().mockResolvedValue(undefined) },
+            value: { writeText: vi.fn().mockResolvedValue(undefined) },
             configurable: true
         })
 

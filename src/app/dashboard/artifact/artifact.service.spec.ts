@@ -1,15 +1,15 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { jest } from '@jest/globals'
-import { of } from 'rxjs'
+import { firstValueFrom, of } from 'rxjs'
+import { Mock } from 'vitest'
 import { Artifact, ChartData, LegendObject, PlotlyChartData } from './artifact.interface'
 import { ArtifactService } from './artifact.service'
 
 describe('ArtifactService', () => {
     let service: ArtifactService
     let httpClientSpy: {
-        post: jest.Mock
-        get: jest.Mock
+        post: Mock
+        get: Mock
     }
 
     const correlation_uuid = 'd9660bee-85ca-40c1-80b8-b51c5fd0cd9f'
@@ -47,8 +47,8 @@ describe('ArtifactService', () => {
 
     beforeEach(() => {
         httpClientSpy = {
-            post: jest.fn().mockImplementation(() => of({})),
-            get: jest.fn().mockImplementation(() => of({ go_to: presigned_url }))
+            post: vi.fn().mockImplementation(() => of({})),
+            get: vi.fn().mockImplementation(() => of({ go_to: presigned_url }))
         }
 
         TestBed.configureTestingModule({
@@ -67,76 +67,66 @@ describe('ArtifactService', () => {
         expect(service).toBeTruthy()
     })
 
-    it('should get markdown artifact item', done => {
+    it('should get markdown artifact item', async () => {
         service.getMarkdown(test_artifact)
-        service.markdown.subscribe(x => {
-            expect(x).toEqual(
-                expect.objectContaining({
-                    ...test_artifact,
-                    url: presigned_url
-                })
-            )
-            done()
-        })
+        const x = await firstValueFrom(service.markdown)
+        expect(x).toEqual(
+            expect.objectContaining({
+                ...test_artifact,
+                url: presigned_url
+            })
+        )
     })
 
-    it('should get vector artifact item', done => {
+    it('should get vector artifact item', async () => {
         service.getVector(test_artifact)
-        service.vector.subscribe(x => {
-            expect(x).toEqual(
-                expect.objectContaining({
-                    ...test_artifact,
-                    url: presigned_url
-                })
-            )
-            done()
-        })
+        const x = await firstValueFrom(service.vector)
+        expect(x).toEqual(
+            expect.objectContaining({
+                ...test_artifact,
+                url: presigned_url
+            })
+        )
     })
 
-    it('should get raster artifact item', done => {
+    it('should get raster artifact item', async () => {
         service.getRaster(test_artifact)
-        service.raster.subscribe(x => {
-            expect(x).toEqual(
-                expect.objectContaining({
-                    ...test_artifact,
-                    url: presigned_url
-                })
-            )
-            done()
-        })
+        const x = await firstValueFrom(service.raster)
+        expect(x).toEqual(
+            expect.objectContaining({
+                ...test_artifact,
+                url: presigned_url
+            })
+        )
     })
 
-    it('should get table artifact item', done => {
+    it('should get table artifact item', async () => {
         service.getTable(test_artifact)
-        service.table.subscribe(x => {
-            expect(x).toEqual(
-                expect.objectContaining({
-                    ...test_artifact,
-                    url: presigned_url
-                })
-            )
-            done()
-        })
+        const x = await firstValueFrom(service.table)
+        expect(x).toEqual(
+            expect.objectContaining({
+                ...test_artifact,
+                url: presigned_url
+            })
+        )
     })
 
-    it('should get chart artifact item', done => {
+    it('should get chart artifact item', async () => {
         httpClientSpy.get.mockReturnValueOnce(of({ go_to: presigned_url })).mockReturnValueOnce(of(test_chart))
 
         service.getChart(test_artifact)
-        service.chart.subscribe(x => {
-            expect(x).toEqual({
-                data: test_chart,
-                artifact: test_artifact
-            })
-            expect(httpClientSpy.get).toHaveBeenCalledWith(
-                expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
-            )
-            expect(httpClientSpy.get).toHaveBeenCalledWith(presigned_url)
-            done()
+        const x = await firstValueFrom(service.chart)
+        expect(x).toEqual({
+            data: test_chart,
+            artifact: test_artifact
         })
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+            expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+        )
+        expect(httpClientSpy.get).toHaveBeenCalledWith(presigned_url)
     })
 
-    it('should get plotly chart artifact item using display_filename', done => {
+    it('should get plotly chart artifact item using display_filename', async () => {
         const test_plotly_chart = { data: [], layout: {} } as PlotlyChartData
         const display_filename = 'simple_scatter_chart.json'
         const test_plotly_artifact = {
@@ -148,35 +138,29 @@ describe('ArtifactService', () => {
         httpClientSpy.get.mockReturnValue(of(test_plotly_chart))
 
         service.getPlotlyChart(test_plotly_artifact)
-        service.plotlyChart.subscribe(x => {
-            expect(x).toEqual({
-                data: test_plotly_chart,
-                artifact: test_plotly_artifact
-            })
-            expect(httpClientSpy.get).toHaveBeenCalledWith(
-                expect.stringContaining(`/store/${correlation_uuid}/${display_filename}`)
-            )
-            done()
+        const x = await firstValueFrom(service.plotlyChart)
+        expect(x).toEqual({
+            data: test_plotly_chart,
+            artifact: test_plotly_artifact
         })
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+            expect.stringContaining(`/store/${correlation_uuid}/${display_filename}`)
+        )
     })
 
-    it('should get plotly chart artifact item falling back to filename', done => {
+    it('should get plotly chart artifact item falling back to filename', async () => {
         httpClientSpy.get.mockReturnValue(of({ data: [], layout: {} } as PlotlyChartData))
 
         service.getPlotlyChart(test_artifact)
-        service.plotlyChart.subscribe(() => {
-            expect(httpClientSpy.get).toHaveBeenCalledWith(
-                expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
-            )
-            done()
-        })
+        await firstValueFrom(service.plotlyChart)
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+            expect.stringContaining(`/store/${correlation_uuid}/${store_uuid}`)
+        )
     })
 
-    it('should augment legend', done => {
+    it('should augment legend', async () => {
         service.getLegend(test_geojson)
-        service.legend.subscribe(x => {
-            expect(x?.title).toEqual('test_artifact')
-            done()
-        })
+        const x = await firstValueFrom(service.legend)
+        expect(x?.title).toEqual('test_artifact')
     })
 })

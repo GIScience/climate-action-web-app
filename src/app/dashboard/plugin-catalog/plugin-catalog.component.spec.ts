@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { environment } from '@environments/environment'
 import { popperVariation, provideTippyConfig, provideTippyLoader, tooltipVariation } from '@ngneat/helipopper/config'
-import { getTranslocoTestingModule } from '../../../../jest.mocks'
+import { getTranslocoTestingModule } from '../../../testing/test-helpers'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
@@ -44,9 +44,9 @@ describe('PluginCatalogComponent', () => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, PluginCatalogComponent, getTranslocoTestingModule()],
             providers: [
-                { provide: MapService, useValue: { removeFocusedLayer: jest.fn(), removeComputeLayers: jest.fn() } },
-                { provide: ArtifactViewerService, useValue: { closeArtifactViewer: jest.fn() } },
-                { provide: MapArtifactManagerService, useValue: { clearTransientArtifacts: jest.fn() } },
+                { provide: MapService, useValue: { removeFocusedLayer: vi.fn(), removeComputeLayers: vi.fn() } },
+                { provide: ArtifactViewerService, useValue: { closeArtifactViewer: vi.fn() } },
+                { provide: MapArtifactManagerService, useValue: { clearTransientArtifacts: vi.fn() } },
                 provideTippyLoader(() => import('tippy.js')),
                 provideTippyConfig({
                     defaultVariation: 'tooltip',
@@ -72,7 +72,7 @@ describe('PluginCatalogComponent', () => {
 
     it('opens the grid from the deck, and closes it when a plugin is picked', () => {
         createComponent('deck')
-        const navigate = jest.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true)
+        const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true)
         expect(tiles()).toHaveLength(0)
 
         fixture.nativeElement.querySelector('button.deck').click()

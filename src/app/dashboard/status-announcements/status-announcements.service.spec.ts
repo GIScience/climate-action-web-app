@@ -2,7 +2,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { environment } from '@environments/environment'
 import { ToastrService } from 'ngx-toastr'
-import { getTranslocoTestingModule, MockToastrService } from '../../../../jest.mocks'
+import { getTranslocoTestingModule, MockToastrService } from '../../../testing/test-helpers'
 import { StatusAnnouncementsService } from './status-announcements.service'
 
 const groupRef = (id: string) => ({ relationships: { group: { data: { type: 'componentGroups', id } } } })
@@ -55,11 +55,11 @@ describe('StatusAnnouncementsService', () => {
     afterEach(() => {
         environment.fallbackSchedulesUrl = ''
         httpMock.verify()
-        jest.useRealTimers()
+        vi.useRealTimers()
     })
 
     it('toasts upcoming schedules at the top and pins ongoing ones to the bottom, skipping the rest', () => {
-        jest.useFakeTimers().setSystemTime(new Date('2026-06-16T00:00:00'))
+        vi.useFakeTimers().setSystemTime(new Date('2026-06-16T00:00:00'))
 
         service.showActiveAnnouncements()
 
@@ -311,7 +311,7 @@ describe('StatusAnnouncementsService', () => {
     }))
 
     it('falls back to the schedules document when Cachet stays unreachable', fakeAsync(() => {
-        const consoleError = jest.spyOn(console, 'error').mockImplementation()
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         service.showActiveAnnouncements()
 
@@ -366,7 +366,7 @@ describe('StatusAnnouncementsService', () => {
     }))
 
     it('times out stalled Cachet requests before retrying and falling back', fakeAsync(() => {
-        const consoleError = jest.spyOn(console, 'error').mockImplementation()
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         service.showActiveAnnouncements()
 

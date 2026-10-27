@@ -2,32 +2,32 @@ import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { MapArtifactManagerService } from '@app/dashboard/map/map-artifact-manager.service'
 import { MapService } from '@app/dashboard/map/map.service'
-import { jest } from '@jest/globals'
 import { delay, of } from 'rxjs'
+import { Mocked } from 'vitest'
 import { VectorComponent } from './vector.component'
 
 describe('VectorComponent', () => {
     let component: VectorComponent
     let fixture: ComponentFixture<VectorComponent>
-    let httpClientSpy: jest.Mocked<HttpClient>
-    let mapServiceSpy: jest.Mocked<MapService>
-    let mapArtifactManagerSpy: jest.Mocked<MapArtifactManagerService>
+    let httpClientSpy: Mocked<HttpClient>
+    let mapServiceSpy: Mocked<MapService>
+    let mapArtifactManagerSpy: Mocked<MapArtifactManagerService>
 
     beforeEach(() => {
         httpClientSpy = {
-            post: jest.fn(),
-            get: jest.fn()
-        } as unknown as jest.Mocked<HttpClient>
+            post: vi.fn(),
+            get: vi.fn()
+        } as unknown as Mocked<HttpClient>
 
         mapServiceSpy = {
-            addGeoJsonLayer: jest.fn(),
-            addPmtilesLayer: jest.fn()
-        } as unknown as jest.Mocked<MapService>
+            addGeoJsonLayer: vi.fn(),
+            addPmtilesLayer: vi.fn()
+        } as unknown as Mocked<MapService>
 
         mapArtifactManagerSpy = {
-            updateLayerInfo: jest.fn(),
-            isArtifactOnMap: jest.fn().mockReturnValue(true)
-        } as unknown as jest.Mocked<MapArtifactManagerService>
+            updateLayerInfo: vi.fn(),
+            isArtifactOnMap: vi.fn().mockReturnValue(true)
+        } as unknown as Mocked<MapArtifactManagerService>
 
         TestBed.configureTestingModule({
             imports: [VectorComponent, HttpClientModule],

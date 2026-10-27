@@ -3,53 +3,11 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts'
 import { ChartData } from '../artifact.interface'
 import { ChartComponent } from './chart.component'
 
-jest.mock('chart.js', () => {
-    const mockChart = {
-        destroy: jest.fn(),
-        update: jest.fn(),
-        render: jest.fn()
-    }
-
-    const Chart = jest.fn().mockImplementation(() => mockChart) as jest.Mock & {
-        register: jest.Mock
-    }
-    Chart.register = jest.fn()
-
-    return {
-        Chart,
-        registerables: [],
-        defaults: {
-            set: jest.fn()
-        }
-    }
-})
-
 describe('ChartComponent', () => {
     let component: ChartComponent
     let fixture: ComponentFixture<ChartComponent>
 
     beforeEach(() => {
-        const mockContext = {
-            fillStyle: '',
-            strokeStyle: '',
-            lineWidth: 0,
-            beginPath: jest.fn(),
-            moveTo: jest.fn(),
-            lineTo: jest.fn(),
-            stroke: jest.fn(),
-            fill: jest.fn(),
-            arc: jest.fn(),
-            closePath: jest.fn(),
-            clearRect: jest.fn(),
-            save: jest.fn(),
-            restore: jest.fn(),
-            translate: jest.fn(),
-            scale: jest.fn(),
-            rotate: jest.fn()
-        }
-
-        HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue(mockContext)
-
         TestBed.configureTestingModule({
             imports: [ChartComponent],
             providers: [provideCharts(withDefaultRegisterables())]

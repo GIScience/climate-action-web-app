@@ -6,8 +6,9 @@ stages:
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
     PNPM_VERSION: '12.9.0'
+    HUSKY: '0'
 
-test_jest_and_lint:
+test_unit_and_lint:
     stage: test
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
@@ -18,7 +19,6 @@ test_jest_and_lint:
                 - pnpm-lock.yaml
         paths:
             - .pnpm-store
-            - .jest-cache
         policy: pull-push
     image:
         name: node:22-alpine
@@ -61,7 +61,7 @@ test_cypress:
         NODE_ENV: 'test'
         NODE_OPTIONS: '--no-warnings'
         CYPRESS_INSTALL_BINARY: '0'
-    needs: ['test_jest_and_lint']
+    needs: ['test_unit_and_lint']
     image:
         name: cypress/included:cypress-16.1.1-node-24.21.0-chrome-154.0.8037.92-1-ff-157.0-edge-154.0.4258.48-1
         entrypoint: ['']

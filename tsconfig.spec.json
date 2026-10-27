@@ -3,7 +3,8 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "./out-tsc/spec",
-        "types": ["jest", "node"]
+        "types": ["vitest/globals", "node"],
+        "useDefineForClassFields": false
     },
-    "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
+    "include": ["src/**/*.spec.ts", "src/**/*.d.ts", "src/test-setup.ts", "src/testing/**/*.ts"]
 }

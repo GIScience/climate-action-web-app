@@ -184,7 +184,7 @@ describe('AoiConstraintService', () => {
         }))
 
         it('validates against the returned subset when some boundaries are missing from the response', () => {
-            const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
             flushBoundaries(boundaryA)
             expect(service.loadState).toBe('ready')
             expect(warnSpy).toHaveBeenCalled()
@@ -205,7 +205,7 @@ describe('AoiConstraintService', () => {
         })
 
         it('emits geometriesChanged$ when the fetch settles', () => {
-            const emitted = jest.fn()
+            const emitted = vi.fn()
             service.geometriesChanged$.subscribe(emitted)
             flushBoundaries(boundaryA, boundaryB)
             expect(emitted).toHaveBeenCalledTimes(1)

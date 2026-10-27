@@ -2,11 +2,12 @@ import { TestBed } from '@angular/core/testing'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { Models } from 'appwrite'
 import { BehaviorSubject } from 'rxjs'
+import { Mock } from 'vitest'
 import { AppwriteDbService } from './appwrite-db.service'
 
 const originalConsoleError = console.error
 beforeAll(() => {
-    console.error = jest.fn()
+    console.error = vi.fn()
 })
 
 afterAll(() => {
@@ -14,14 +15,14 @@ afterAll(() => {
 })
 
 interface MockTablesDB {
-    listRows: jest.Mock
-    createRow: jest.Mock
-    updateRow: jest.Mock
-    deleteRow: jest.Mock
+    listRows: Mock
+    createRow: Mock
+    updateRow: Mock
+    deleteRow: Mock
 }
 
 interface MockAppwriteService extends Partial<AppwriteService> {
-    getTablesDB: jest.Mock
+    getTablesDB: Mock
     _user: BehaviorSubject<Models.User<Models.Preferences> | null>
 }
 
@@ -54,14 +55,14 @@ describe('AppwriteDbService', () => {
         userSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(mockUser)
 
         mockTablesDB = {
-            listRows: jest.fn(),
-            createRow: jest.fn(),
-            updateRow: jest.fn(),
-            deleteRow: jest.fn()
+            listRows: vi.fn(),
+            createRow: vi.fn(),
+            updateRow: vi.fn(),
+            deleteRow: vi.fn()
         }
 
         mockAppwriteService = {
-            getTablesDB: jest.fn().mockReturnValue(mockTablesDB),
+            getTablesDB: vi.fn().mockReturnValue(mockTablesDB),
             _user: userSubject
         }
 
