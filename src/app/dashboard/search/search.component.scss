@@ -14,15 +14,18 @@
         position: relative;
 
         input.search-locations {
+            backdrop-filter: blur(6px);
+            background-color: rgb(255 255 255 / 92%);
             background-image: url('../../../assets/images/search.svg');
-            background-position: rem(8) center;
+            background-position: rem(10) center;
             background-repeat: no-repeat;
-            background-size: rem(18);
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            font-size: 1.15rem;
-            padding: rem(8) rem(30);
+            background-size: rem(16);
+            border: 1px solid rgb(20 40 50 / 12%);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgb(20 40 50 / 18%);
+            font-size: 1rem;
+            height: rem(34);
+            padding: 0 rem(30) 0 rem(32);
             position: relative;
             transition: width 0.25s ease;
             width: 75%;
@@ -47,7 +50,7 @@
             border: none;
             position: absolute;
             right: 0;
-            top: rem(7);
+            top: rem(6);
             z-index: 2;
         }
     }
@@ -55,8 +58,8 @@
     .location-suggestions {
         backdrop-filter: blur(5px);
         background-color: rgb(255 255 255 / 85%);
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        border: 1px solid rgb(20 40 50 / 12%);
+        border-radius: 8px;
         margin-top: rem(-10);
         overflow-y: auto;
         padding-top: rem(10);

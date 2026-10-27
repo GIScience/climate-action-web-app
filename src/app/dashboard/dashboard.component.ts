@@ -9,7 +9,10 @@ import {
     ViewContainerRef,
     inject
 } from '@angular/core'
-import { RouterModule } from '@angular/router'
+import { ActivatedRoute, RouterModule } from '@angular/router'
+import { TranslocoModule } from '@jsverse/transloco'
+import { LucidePanelLeftClose, LucidePanelLeftOpen } from '@lucide/angular'
+import { TippyDirective } from '@ngneat/helipopper'
 import { Subscription } from 'rxjs'
 import { ArtifactViewerComponent } from './artifact-viewer/artifact-viewer.component'
 import { ArtifactViewerService } from './artifact-viewer/artifact-viewer.service'
@@ -25,7 +28,18 @@ import { SearchComponent } from './search/search.component'
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    imports: [CommonModule, ArtifactViewerComponent, SearchComponent, MapComponent, RouterModule, ReportComponent]
+    imports: [
+        CommonModule,
+        ArtifactViewerComponent,
+        SearchComponent,
+        MapComponent,
+        RouterModule,
+        ReportComponent,
+        TranslocoModule,
+        TippyDirective,
+        LucidePanelLeftClose,
+        LucidePanelLeftOpen
+    ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     artifactViewerService = inject(ArtifactViewerService)
@@ -33,12 +47,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
     private elementRef = inject(ElementRef)
+    private route = inject(ActivatedRoute)
 
     @ViewChild('legendContainer', { read: ViewContainerRef, static: false })
     legendContainer!: ViewContainerRef
     mapArtifactsSubscription!: Subscription
     leftColumnCollapsed = false
     isReportVisible = false
+    leftColumnCollapsible = false
     private collapseTimeout?: number
     private legendRenderVersion = 0
     private renderedLegendKey = ''
@@ -125,6 +141,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     private isCurrentLegendRender(version: number): boolean {
         return version === this.legendRenderVersion
+    }
+
+    onRouteActivate(): void {
+        this.leftColumnCollapsible = this.route.firstChild?.routeConfig?.path === 'plugin/:name'
+        if (!this.leftColumnCollapsible && this.leftColumnCollapsed) this.setCollapsed(false)
     }
 
     collapseLeftColumn(): void {

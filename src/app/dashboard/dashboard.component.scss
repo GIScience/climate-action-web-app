@@ -72,7 +72,43 @@ main.dashboard {
         }
 
         &.collapsed {
-            transform: translateX(rem(-500));
+            transform: translateX(calc(-100% + #{rem(75)}));
+        }
+
+        .left-column-collapser {
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background-color: rgb(255 255 255 / 75%);
+            border: 1px solid rgb(20 40 50 / 12%);
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            box-shadow:
+                2px 1px 3px rgb(20 40 50 / 15%),
+                inset 2px 0px 3px rgba(20 40 50 / 15%);
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            height: rem(40);
+            justify-content: center;
+            left: 100%;
+            padding: 0;
+            pointer-events: all;
+            position: absolute;
+            top: rem(27);
+            transition:
+                color 0.15s ease,
+                background-color 0.15s ease;
+            width: rem(27);
+
+            &:hover {
+                background-color: rgb(255 255 255 / 90%);
+                color: #008080;
+            }
+
+            &:focus-visible {
+                outline: 2px solid #008080;
+                outline-offset: 2px;
+            }
         }
     }
 

@@ -196,6 +196,10 @@
         "confirmCloseWithoutExport": "Are you sure you want to close the Report Builder without exporting? It will not be saved.",
         "mapsRendering": "Maps are still rendering, please wait..."
     },
+    "dashboard": {
+        "collapseLeftColumn": "Collapse panel",
+        "expandLeftColumn": "Expand panel"
+    },
     "search": {
         "placeholder": "Search...",
         "clearSearch": "Clear Search",

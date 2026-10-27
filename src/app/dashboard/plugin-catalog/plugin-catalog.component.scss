@@ -71,11 +71,11 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 .deck:focus-visible,
 .deck--open {
     .deck__card--back-1 {
-        transform: rotate(-18deg) translate(rem(-4), rem(-1));
+        transform: rotate(-13.6deg) translate(rem(-2.8), rem(-0.6));
     }
 
     .deck__card--back-2 {
-        transform: rotate(15deg) translate(rem(4), rem(-1));
+        transform: rotate(11.4deg) translate(rem(2.8), rem(-0.6));
     }
 
     .deck__card--front {
@@ -304,8 +304,8 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 @keyframes deal {
     from {
         opacity: 0;
-        transform: translate(calc(var(--col) * -100%), calc(var(--row) * -100%)) rotate(calc((var(--col) - 1) * 8deg))
-            scale(0.55);
+        transform: translate(calc(var(--col) * -25%), calc(min(var(--row), 2) * -25%))
+            rotate(calc((var(--col) - 1) * 3deg)) scale(0.85);
     }
 }
 

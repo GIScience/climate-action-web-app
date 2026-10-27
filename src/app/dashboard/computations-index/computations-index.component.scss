@@ -6,30 +6,59 @@
         background: #fff;
         border: 1px solid #e0e0e0;
         border-radius: 24px;
-        display: inline-flex;
-        justify-content: space-evenly;
-        padding: rem(8);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: rem(6);
+        position: relative;
         width: 100%;
+
+        &::before {
+            background: #cfe3ff;
+            border-radius: 18px;
+            bottom: rem(6);
+            content: '';
+            left: rem(6);
+            position: absolute;
+            top: rem(6);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            width: calc(50% - #{rem(6)});
+        }
+
+        &:has(.computations-tab:nth-child(2).active)::before {
+            transform: translateX(100%);
+        }
     }
 
     .computations-tab {
         background: transparent;
         border: none;
-        border-radius: 20px;
-        color: #333;
+        border-radius: 18px;
+        color: #666;
         cursor: pointer;
         font-family: inherit;
         font-size: rem(14);
-        font-variation-settings: 'wght' 500;
-        padding: rem(8) rem(40);
-        transition: all 0.2s ease;
+        font-variation-settings: 'wght' 600;
+        justify-content: center;
+        padding: rem(8);
+        position: relative;
+        text-align: center;
+        transition:
+            background-color 0.2s ease,
+            color 0.2s ease;
 
         &:hover:not(.active) {
-            color: #333;
+            background-color: rgb(0 0 0 / 4%);
+            color: #222;
         }
 
         &.active {
-            background: #cfe3ff;
+            color: #1a1a1a;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .computations-tabs::before {
+            transition: none;
         }
     }
 }
@@ -117,7 +146,8 @@
             }
         }
 
-        .bookmarks-container {
+        .bookmarks-container,
+        .discover-container {
             width: 100%;
 
             .empty-computations {
@@ -143,21 +173,6 @@
                     max-height: 45vh;
                     min-height: 20vh;
                     padding: rem(10) 0 !important;
-                }
-            }
-        }
-
-        .discover-container {
-            width: 100%;
-
-            .computations-container {
-                animation: fadeIn 0.5s ease-out;
-                width: 100%;
-
-                .ng-scrollbar {
-                    max-height: 45vh;
-                    min-height: 20vh;
-                    padding: 10px 0 !important;
                 }
             }
         }

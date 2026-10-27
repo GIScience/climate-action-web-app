@@ -1,8 +1,7 @@
 @use 'spec/tools/rem' as *;
 
 ::ng-deep {
-    .maplibregl-ctrl-top-right,
-    .maplibregl-style-switcher-container {
+    .maplibregl-ctrl-top-right {
         display: none !important;
     }
 

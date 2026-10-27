@@ -6,7 +6,7 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         margin-right: 0.5vw;
-        top: calc(0.5vw + 2.5rem);
+        top: calc(0.5vw + #{rem(34)});
 
         &::before {
             content: '';
@@ -14,28 +14,80 @@
             height: 0;
             order: 2;
         }
+
+        .maplibregl-ctrl {
+            margin: rem(8) 0 0 rem(8);
+        }
+
+        .maplibregl-ctrl-group {
+            backdrop-filter: blur(6px);
+            background-color: rgb(255 255 255 / 92%);
+            border: 1px solid rgb(20 40 50 / 12%);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgb(20 40 50 / 18%);
+            overflow: hidden;
+
+            button {
+                height: rem(32);
+                width: rem(32);
+
+                + button {
+                    border-left: 1px solid rgb(20 40 50 / 10%);
+                    border-top: none;
+                }
+
+                &:focus-visible {
+                    box-shadow: inset 0 0 0 2px #008080;
+                }
+            }
+        }
     }
 
     .maplibregl-ctrl.maplibregl-ctrl-scale {
-        backdrop-filter: blur(5px);
-        font-size: 0.85rem;
-        height: rem(29);
-        line-height: rem(29);
-        margin-right: 0;
+        --scale-ink: #222;
+        --scale-halo: #fff;
+
+        background: none;
+        border: none;
+        color: var(--scale-ink);
+        font-size: 0.75rem;
+        font-weight: 600;
+        height: rem(22);
+        line-height: rem(16);
         order: 3;
+        padding: 0 rem(4);
+        position: relative;
+        text-align: right;
+        text-shadow:
+            0 0 2px var(--scale-halo),
+            0 0 2px var(--scale-halo),
+            0 0 3px var(--scale-halo);
+
+        &::after {
+            border: 2px solid var(--scale-ink);
+            border-top: none;
+            bottom: 0;
+            content: '';
+            filter: drop-shadow(0 0 1px var(--scale-halo)) drop-shadow(0 0 1px var(--scale-halo));
+            height: rem(6);
+            left: 0;
+            position: absolute;
+            right: 0;
+        }
+    }
+
+    .dashboard:has(> .map-background[data-style='ESRI World Imagery']) & .maplibregl-ctrl.maplibregl-ctrl-scale {
+        --scale-ink: #fff;
+        --scale-halo: rgb(0 0 0 / 85%);
     }
 
     .maplibregl-ctrl.navigation-controls {
-        align-items: center;
         display: flex;
         flex-direction: row;
-        gap: rem(10);
-        justify-content: center;
         order: 1;
     }
 
     .maplibregl-ctrl.zoom-to-zero-control {
-        margin-right: 0;
         order: 1;
 
         button {
@@ -45,8 +97,8 @@
         }
 
         img {
-            height: rem(18);
-            width: rem(18);
+            height: rem(17);
+            width: rem(17);
         }
     }
 }
@@ -57,6 +109,7 @@
     .maplibregl-ctrl.maplibregl-style-switcher-container {
         backdrop-filter: blur(5px);
         background-color: rgb(255 255 255 / 85%);
+        border-radius: 8px;
         margin: 0;
         max-width: rem(200);
 
@@ -208,14 +261,14 @@
             background-image: url('../../assets/images/layers.svg');
             background-position: center;
             background-repeat: no-repeat;
-            background-size: 65%;
+            background-size: 55%;
             border-radius: 5px;
             box-sizing: content-box;
-            height: rem(28);
+            height: rem(30);
             margin: 0;
             position: relative;
             transition: background-color 0.2s ease;
-            width: rem(28);
+            width: rem(30);
             z-index: 2;
 
             &:hover {
@@ -229,8 +282,8 @@
                 background-size: 65%;
                 border: 1px solid #ddd;
                 position: absolute;
-                right: rem(8);
-                top: rem(8);
+                right: rem(6);
+                top: rem(6);
             }
 
             .panel-container {
@@ -249,49 +302,77 @@
 }
 
 .maplibregl-style-list {
+    column-gap: rem(8);
+    display: grid;
+    grid-template-columns: repeat(3, rem(56));
+
     h3 {
+        grid-column: 1 / -1;
         margin-bottom: rem(15);
         margin-top: 0;
     }
 
     button {
-        border-radius: 5px !important;
+        background: none;
         height: auto;
-        min-width: rem(170);
-        padding: rem(8);
-        position: relative;
+        padding: 0;
         width: 100%;
-
-        &.active {
-            background-color: rgb(0 128 128 / 25%);
-            font-weight: 600;
-
-            &:hover {
-                background-color: rgb(0 128 128 / 25%);
-            }
-        }
 
         + button {
             border: none;
         }
 
-        &:after {
-            border-bottom: 1px solid #ccc;
-            bottom: 0;
-            content: '';
-            display: block;
-            left: 5%;
-            margin: 0 auto;
-            position: absolute;
-            width: 90%;
+        &:not(:disabled):hover {
+            background: none;
         }
 
-        &:last-child {
-            &:after {
-                display: none;
+        &:hover,
+        &:focus-visible {
+            .maplibregl-style-thumbnail {
+                box-shadow: 0 2px 6px rgb(20 40 50 / 30%);
+            }
+
+            .maplibregl-style-label {
+                opacity: 1;
             }
         }
+
+        &.active .maplibregl-style-thumbnail {
+            outline: 2px solid #008080;
+            outline-offset: 2px;
+        }
     }
+}
+
+.maplibregl-style-thumbnail {
+    aspect-ratio: 1;
+    background-color: #e3e8ea;
+    background-position: center;
+    background-size: cover;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgb(20 40 50 / 20%);
+    display: block;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.15s ease;
+}
+
+.maplibregl-style-label {
+    align-items: center;
+    background-color: rgb(20 40 50 / 50%);
+    color: #fff;
+    display: flex;
+    font-size: rem(10);
+    font-weight: 600;
+    inset: 0;
+    justify-content: center;
+    line-height: 1.2;
+    opacity: 0;
+    padding: rem(4);
+    position: absolute;
+    text-align: center;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+    transition: opacity 0.15s ease;
 }
 
 .maplibregl-popup {

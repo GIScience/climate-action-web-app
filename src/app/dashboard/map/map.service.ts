@@ -56,6 +56,12 @@ const ALL_BASEMAPS: readonly BasemapStyleName[] = [
     BasemapStyleName.EsriWorldImagery
 ] as const
 
+const BASEMAP_THUMBNAILS: Record<BasemapStyleName, string> = {
+    [BasemapStyleName.Colorful]: 'assets/images/basemaps/colorful.jpg',
+    [BasemapStyleName.Graybeard]: 'assets/images/basemaps/graybeard.jpg',
+    [BasemapStyleName.EsriWorldImagery]: 'assets/images/basemaps/esri-world-imagery.jpg'
+}
+
 function isBasemapStyleName(value: string): value is BasemapStyleName {
     return (ALL_BASEMAPS as readonly string[]).includes(value)
 }
@@ -1307,7 +1313,13 @@ export class MapService {
     }
 
     private getMapStyles(): Promise<MapStyle[]> {
-        return Promise.all(ALL_BASEMAPS.map(async title => ({ title, style: await this.getStyleFor(title) })))
+        return Promise.all(
+            ALL_BASEMAPS.map(async title => ({
+                title,
+                style: await this.getStyleFor(title),
+                thumbnail: BASEMAP_THUMBNAILS[title]
+            }))
+        )
     }
 
     // Rebuild the basemap styles (labels carry the language) and re-apply the active one.

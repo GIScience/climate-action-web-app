@@ -196,6 +196,10 @@
         "confirmCloseWithoutExport": "Möchtest du den Report wirklich schließen, ohne zu exportieren? Der Report wird nicht gespeichert.",
         "mapsRendering": "Karten werden noch gerendert, bitte warten..."
     },
+    "dashboard": {
+        "collapseLeftColumn": "Bereich einklappen",
+        "expandLeftColumn": "Bereich ausklappen"
+    },
     "search": {
         "placeholder": "Suche...",
         "clearSearch": "Suche zurücksetzen",

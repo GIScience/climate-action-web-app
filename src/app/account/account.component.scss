@@ -41,12 +41,17 @@
         }
     }
 
-    .profile-button svg {
+    .profile-button svg,
+    .login-button svg {
         align-items: center;
         border: rem(2) solid #008080;
         border-radius: 50%;
         display: flex;
         justify-content: center;
+    }
+
+    .login-button svg {
+        padding: rem(4);
     }
 
     .fake-user-button {

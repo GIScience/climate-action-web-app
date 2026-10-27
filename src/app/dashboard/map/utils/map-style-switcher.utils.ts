@@ -16,6 +16,7 @@ type OpacityPaintKey = keyof AllPaintProperties & `${string}-opacity`
 export interface MapStyle {
     title: string
     style: StyleSpecification
+    thumbnail?: string
 }
 
 export class MapStyleSwitcherControl implements IControl {
@@ -136,12 +137,22 @@ export class MapStyleSwitcherControl implements IControl {
             this.styleMap.set(style.title, style.style)
             const button = Object.assign(document.createElement('button'), {
                 type: 'button',
-                innerText: style.title,
                 className:
                     style.title.replace(/[^a-z0-9-]/gi, '_') + (style.title === this.defaultStyle ? ' active' : ''),
                 onclick: () => this.handleStyleChange(button)
             })
             button.dataset['title'] = style.title
+
+            const thumbnail = Object.assign(document.createElement('span'), {
+                className: 'maplibregl-style-thumbnail'
+            })
+            if (style.thumbnail) thumbnail.style.backgroundImage = `url('${style.thumbnail}')`
+            const label = Object.assign(document.createElement('span'), {
+                className: 'maplibregl-style-label',
+                textContent: style.title
+            })
+            thumbnail.appendChild(label)
+            button.appendChild(thumbnail)
             container.appendChild(button)
         })
         return container
