@@ -73,31 +73,37 @@
             width: 100%;
 
             .skeleton-item {
-                align-items: center;
                 animation: fadeIn 0.3s ease-out;
-                display: grid;
-                grid-template-columns: 1fr rem(100);
-                margin-left: rem(30);
-                padding: rem(10) 0;
 
                 &:after {
                     border-bottom: 1px solid #ccc;
                     content: '';
                     display: block;
-                    grid-column: 1 / -1;
-                    margin: rem(10) auto 0;
+                    margin: 0 auto;
                     width: 80%;
+                }
+
+                .skeleton-row {
+                    align-items: center;
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    padding: rem(10) rem(10) rem(10) rem(15);
                 }
 
                 .skeleton-header {
                     display: flex;
                     flex-direction: column;
-                    gap: rem(8);
+                    gap: rem(6);
+                    padding: rem(4) 0;
+                }
+
+                .skeleton-actions {
+                    display: flex;
                 }
 
                 .skeleton-title,
                 .skeleton-subtitle,
-                .skeleton-status {
+                .skeleton-action {
                     animation: shimmer 1.5s infinite;
                     background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
                     background-size: 200% 100%;
@@ -106,19 +112,34 @@
 
                 .skeleton-title {
                     height: rem(20);
-                    width: rem(200);
+                    width: rem(160);
                 }
 
                 .skeleton-subtitle {
-                    height: rem(14);
-                    width: rem(150);
+                    height: rem(20);
+                    width: rem(220);
                 }
 
-                .skeleton-status {
-                    border-radius: 12px;
-                    height: rem(24);
-                    justify-self: center;
-                    width: rem(80);
+                .skeleton-action {
+                    border-radius: 50%;
+                    height: rem(20);
+                    margin: rem(6);
+                    width: rem(20);
+                }
+            }
+
+            &.skeleton-leave {
+                animation: fadeOut 0.2s ease-out forwards;
+                left: 0;
+                pointer-events: none;
+                position: absolute;
+                right: 0;
+                top: 0;
+                z-index: 1;
+
+                .skeleton-item,
+                .skeleton-item * {
+                    animation-play-state: paused;
                 }
             }
         }
@@ -148,6 +169,7 @@
 
         .bookmarks-container,
         .discover-container {
+            position: relative;
             width: 100%;
 
             .empty-computations {
@@ -166,7 +188,6 @@
             }
 
             .computations-container {
-                animation: fadeIn 0.5s ease-out;
                 width: 100%;
 
                 .ng-scrollbar {
@@ -210,20 +231,12 @@
         }
 
         .card-header {
-            margin-left: rem(30);
+            margin-left: rem(10);
         }
     }
 
     .computation {
-        animation: fadeInUp 0.4s ease-out;
-        animation-fill-mode: both;
         border-radius: 10px;
-
-        @for $i from 1 through 10 {
-            &:nth-child(#{$i}) {
-                animation-delay: #{$i * 0.05}s;
-            }
-        }
 
         &:after {
             border-bottom: 1px solid #ccc;
@@ -238,24 +251,13 @@
             border-radius: 10px;
             cursor: pointer;
             display: grid;
-            grid-template-columns: rem(30) 1fr auto auto;
-            padding: rem(10) rem(10) rem(10) rem(5);
+            grid-template-columns: 1fr auto auto;
+            padding: rem(10) rem(10) rem(10) rem(15);
             transition: background-color 0.15s ease-in-out;
             width: 100%;
 
             &:hover {
                 background-color: #def0ff;
-            }
-
-            .computation-arrow {
-                display: flex;
-
-                mat-icon {
-                    color: #666;
-                    font-size: rem(28);
-                    height: rem(28);
-                    width: rem(28);
-                }
             }
 
             .computation-actions {
@@ -303,8 +305,19 @@
         margin-bottom: rem(5);
 
         h3 {
+            align-self: baseline;
             margin: 0;
         }
+    }
+
+    .new-run-dot {
+        align-self: baseline;
+        animation: pulse 1s alternate 6;
+        background-color: #1fb26a;
+        border-radius: 50%;
+        flex-shrink: 0;
+        height: rem(10);
+        width: rem(10);
     }
 
     .card-subtitle {
@@ -345,11 +358,6 @@
                 animation: spin 1s linear infinite;
             }
         }
-
-        &.SUCCESS {
-            animation: pulse 1s alternate infinite;
-            background-color: lightgreen;
-        }
     }
 
     @keyframes fadeInOut {
@@ -380,23 +388,21 @@
         }
     }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(rem(20));
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
     @keyframes fadeIn {
         from {
             opacity: 0;
         }
         to {
             opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
         }
     }
 

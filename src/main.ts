@@ -115,6 +115,7 @@ bootstrapApplication(AppComponent, {
         },
         provideTippyLoader(() => import('tippy.js')),
         provideTippyConfig({
+            appendTo: (reference: Element) => reference.closest('[popover]') ?? document.body,
             defaultVariation: 'tooltip',
             variations: {
                 tooltip: tooltipVariation,

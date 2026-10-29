@@ -655,7 +655,12 @@ export class MapService {
         // Execute the flyTo animation
         if (bounds) {
             const padding = this.calculateMapPadding()
+            // cameraForBounds also applies the map's current padding, which mid-flight out of the
+            // landing can leave no room at all. Measure without it; nothing renders in between.
+            const currentPadding = this.map.getPadding()
+            this.map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
             const zoom = this.map.cameraForBounds(bounds, { padding })
+            this.map.setPadding(currentPadding)
             if (zoom?.zoom !== undefined) {
                 this.map.flyTo({
                     center: zoom.center,

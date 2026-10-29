@@ -124,14 +124,16 @@
                             <ng-container *ngTemplateOutlet="newComputeButton"></ng-container>
                         </div>
                     }
-                    <router-outlet (activate)="detailActive = true" (deactivate)="detailActive = false"></router-outlet>
+                    <router-outlet (activate)="onDetailActivate()" (deactivate)="onDetailDeactivate()"></router-outlet>
                     @if (computeState === 'inactive') {
                         <div class="computations-list" [hidden]="detailActive">
                             <div class="computations-list__header">
                                 <h2>{{ 'plugin.computations' | transloco }}</h2>
                                 <ng-container *ngTemplateOutlet="newComputeButton"></ng-container>
                             </div>
-                            <app-computations-index [plugin]="plugin"></app-computations-index>
+                            <app-computations-index
+                                [plugin]="plugin"
+                                [class.returning]="returningFromDetail"></app-computations-index>
                         </div>
                     }
                     @if (plugin.online && computeState === 'compute-ready') {

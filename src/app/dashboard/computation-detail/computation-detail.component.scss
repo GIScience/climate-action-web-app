@@ -1,25 +1,32 @@
+@use 'spec/tools/rem' as *;
 :host {
+    animation: slideInFromRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: block;
-    padding: 0 15px 10px;
+    padding: 0 rem(15) rem(10);
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
 }
 
 .computation-detail {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
 
     .detail-header {
         align-items: center;
         border-bottom: 1px solid #ccc;
         display: grid;
         grid-template-columns: 1fr auto;
-        padding: 10px 10px 15px 5px;
+        padding: rem(10) rem(10) rem(15) rem(5);
 
         .card-title {
             align-items: center;
             display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
+            gap: rem(5);
+            margin-bottom: rem(5);
 
             h3 {
                 margin: 0;
@@ -30,12 +37,12 @@
             align-items: center;
             color: #666;
             display: flex;
-            font-size: 12px;
-            gap: 1px;
+            font-size: rem(12);
+            gap: rem(1);
             margin: 0;
 
             svg:first-of-type {
-                margin-right: 1px;
+                margin-right: rem(1);
             }
         }
 
@@ -70,7 +77,7 @@
         .ng-scrollbar {
             max-height: 45vh;
             min-height: 20vh;
-            padding: 10px 0 !important;
+            padding: rem(10) 0 !important;
         }
     }
 
@@ -79,9 +86,9 @@
         color: #666;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: rem(10);
         justify-content: center;
-        padding: 40px 20px;
+        padding: rem(40) rem(20);
         text-align: center;
 
         h3 {
@@ -94,36 +101,72 @@
     }
 
     .skeleton-container {
-        padding: 10px 0;
         width: 100%;
 
-        .skeleton-item {
-            animation: fadeIn 0.3s ease-out;
-            display: grid;
-            padding: 10px 0;
+        .skeleton-header {
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            gap: rem(6);
+            padding: rem(14) rem(10) rem(19) rem(5);
+        }
 
-            .skeleton-header {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
+        .skeleton-artifacts {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin: rem(15) rem(5) rem(20);
+        }
+
+        .skeleton-artifact {
+            border-bottom: 1px solid #ccc;
+            padding: rem(22) rem(15);
+
+            &:last-of-type {
+                border-bottom: none;
             }
+        }
+
+        .skeleton-title,
+        .skeleton-subtitle,
+        .skeleton-name {
+            animation: shimmer 1.5s infinite;
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            border-radius: 4px;
+        }
+
+        .skeleton-title {
+            height: rem(20);
+            width: rem(160);
+        }
+
+        .skeleton-subtitle {
+            height: rem(20);
+            width: rem(220);
+        }
+
+        .skeleton-name {
+            height: rem(14);
+            width: rem(150);
+        }
+
+        .skeleton-artifact:nth-child(even) .skeleton-name {
+            width: rem(110);
+        }
+
+        &.skeleton-leave {
+            animation: fadeOut 0.2s ease-out forwards;
+            left: 0;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 1;
 
             .skeleton-title,
-            .skeleton-subtitle {
-                animation: shimmer 1.5s infinite;
-                background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-                background-size: 200% 100%;
-                border-radius: 4px;
-            }
-
-            .skeleton-title {
-                height: 20px;
-                width: 200px;
-            }
-
-            .skeleton-subtitle {
-                height: 14px;
-                width: 150px;
+            .skeleton-subtitle,
+            .skeleton-name {
+                animation-play-state: paused;
             }
         }
     }
@@ -138,24 +181,33 @@
     }
 }
 
-@keyframes fadeIn {
+@keyframes fadeOut {
     from {
-        opacity: 0;
+        opacity: 1;
     }
     to {
-        opacity: 1;
+        opacity: 0;
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
     }
 }
 
 .artifact-errors-tooltip {
     .tooltip-title {
-        font-size: 14px;
+        font-size: rem(14);
         margin-top: 0;
     }
 
     .error-item {
         border-bottom: 1px solid #ccc;
-        padding-bottom: 10px;
+        padding-bottom: rem(10);
 
         &:last-child {
             border-bottom: none;

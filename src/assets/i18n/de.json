@@ -7,7 +7,7 @@
         },
         "welcome": {
             "title": "Entdecke die besten Ansatzpunkte deiner Stadt für den Klimaschutz",
-            "description": "Der Klimaschutznavigator (CAN) ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen – mit hochaufgelösten Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder Fußläufigkeit."
+            "description": "Der Klimaschutznavigator (CAN) ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen – mit hochaufgelösten Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder Fußläufigkeit. Wähle links ein <strong>Analysewerkzeug</strong> aus, um loszulegen."
         },
         "notes": {
             "title": "Bevor du beginnst ein paar Hinweise…",
@@ -29,14 +29,15 @@
             }
         },
         "cta": {
-            "guidedWalkthrough": "Starte das Tutorial",
-            "or": "oder",
-            "selectTool": "wähle links ein Analysewerkzeug aus"
+            "prompt": "Brauchst du Hilfe bei deiner ersten Berechnung?",
+            "guidedWalkthrough": "Starte das Tutorial"
         }
     },
     "pluginCatalog": {
-        "title": "Analysewerkzeug",
+        "title": "Analysewerkzeuge",
         "loading": "Lade...",
+        "unavailable": "Keine Analysewerkzeuge verfügbar",
+        "unavailableToast": "Derzeit sind keine Analysewerkzeuge online. Bitte die Seite neu laden.",
         "switchTool": "Werkzeug wechseln",
         "concernsLabel": "Themen",
         "concerns": {
@@ -90,6 +91,7 @@
             "done": "Fertig"
         },
         "actions": {
+            "open": "Berechnung öffnen",
             "viewParameters": "Einstellungen anzeigen",
             "bookmark": "Zu Lesezeichen hinzufügen",
             "removeBookmark": "Lesezeichen entfernen"

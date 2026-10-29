@@ -343,6 +343,9 @@ export class ComputationDetailComponent implements OnInit, OnDestroy {
     }
 
     private writeQueryParams(queryParams: Params): void {
+        // Don't rewrite the URL if the user is navigating away,
+        // i.e. a 'go home' click
+        if (this.router.getCurrentNavigation()) return
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams,

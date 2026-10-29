@@ -24,7 +24,7 @@ describe('walkthrough', () => {
 
         cy.clickFakeUserButtonUntilGone()
 
-        cy.get('.welcome-content .cta-section .btn-primary').click()
+        cy.get('.welcome-content .cta-tour').click()
 
         cy.get('.driver-popover-progress-text').invoke('text').should('eq', '1 of 10')
 

@@ -6,6 +6,13 @@ import { Artifact, PlotlyChartData } from '../artifact.interface'
 
 type PlotlyModule = typeof import('plotly.js-strict-dist')
 
+// Remove Plotly injected MapLibre styles to avoid conflicts with our own
+function removeInjectedMaplibreStyles() {
+    for (const style of document.head.querySelectorAll('style')) {
+        if (style.textContent?.startsWith('.maplibregl-map{')) style.remove()
+    }
+}
+
 @Component({
     selector: 'app-plotly-chart',
     templateUrl: './plotly-chart.component.html',
@@ -62,6 +69,7 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
             this.loadError = false
 
             this.Plotly = await import('plotly.js-strict-dist')
+            removeInjectedMaplibreStyles()
 
             const deLocale = await import('plotly.js-locales/de')
             // Type assertion needed as the register method exists but isn't in strict dist typings
@@ -82,6 +90,7 @@ export class PlotlyChartComponent implements OnInit, AfterViewInit, OnDestroy {
                     responsive: true,
                     displayModeBar: true,
                     displaylogo: false,
+                    showSendToCloud: false,
                     toImageButtonOptions: {
                         filename: this.inputData?.artifact?.name,
                         format: 'jpeg',

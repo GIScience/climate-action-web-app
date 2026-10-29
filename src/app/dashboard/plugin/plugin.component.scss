@@ -179,6 +179,27 @@
         display: flex;
         justify-content: center;
     }
+
+    app-computations-index {
+        display: block;
+
+        &.returning {
+            animation: slideInFromLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
+            }
+        }
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
 }
 
 .plugin-compute {

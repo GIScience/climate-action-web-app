@@ -37,14 +37,14 @@
             <div class="welcome-content welcome-content__new">
                 <div class="intro-section">
                     <h1>{{ 'landing.welcome.title' | transloco }}</h1>
-                    <p>{{ 'landing.welcome.description' | transloco }}</p>
+                    <p [innerHTML]="'landing.welcome.description' | transloco"></p>
                 </div>
                 <div class="cta-section">
-                    <button class="btn-primary" (click)="startTour()">
+                    <span class="cta-prompt">{{ 'landing.cta.prompt' | transloco }}</span>
+                    <button class="cta-tour" (click)="startTour()">
                         {{ 'landing.cta.guidedWalkthrough' | transloco }}
+                        <svg [lucideIcon]="tourIcon" size="16" aria-hidden="true"></svg>
                     </button>
-                    <span class="cta-or">{{ 'landing.cta.or' | transloco }}</span>
-                    <span class="cta-hint">{{ 'landing.cta.selectTool' | transloco }}</span>
                 </div>
                 <div class="notes-section">
                     <h2>{{ 'landing.notes.title' | transloco }}</h2>

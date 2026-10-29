@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router'
 import { getDateFnsLocale } from '@app/utils/locale.utils'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
+    LucideArrowRight,
     LucideBuilding,
     LucideCornerDownLeft,
     LucideDynamicIcon,
@@ -41,6 +42,7 @@ export class LandingComponent implements OnInit {
     protected mapService = inject(MapService)
 
     readonly enterIcon = LucideCornerDownLeft
+    readonly tourIcon = LucideArrowRight
 
     readonly notes: { key: string; icon: LucideIconInput }[] = [
         { key: 'onDemand', icon: LucideHourglass },

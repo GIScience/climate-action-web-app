@@ -28,6 +28,7 @@ import {
 import { TippyDirective } from '@ngneat/helipopper'
 import type { TippyProps } from '@ngneat/helipopper/config'
 import { NgScrollbarModule } from 'ngx-scrollbar'
+import { ToastrService } from 'ngx-toastr'
 import { filter, skip } from 'rxjs'
 import { DropdownMenuDirective } from '../../shared/dropdown-menu.directive'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
@@ -80,6 +81,7 @@ const isKnownConcern = (concern: string): concern is Concern => Object.hasOwn(CO
 export class PluginCatalogComponent implements OnInit {
     private router = inject(Router)
     private pluginService = inject(PluginService)
+    private toastr = inject(ToastrService)
     private translocoService = inject(TranslocoService)
     private artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
@@ -169,11 +171,19 @@ export class PluginCatalogComponent implements OnInit {
                 this.syncActiveCardWithRoute()
                 this.concernLegend = this.buildConcernLegend()
                 this.loading = false
+                if (!this.cards.length) this.notifyUnavailable()
             },
             error: error => {
                 console.error('Error fetching plugins:', error)
                 this.loading = false
+                if (!this.cards.length) this.notifyUnavailable()
             }
+        })
+    }
+
+    private notifyUnavailable(): void {
+        this.toastr.error(this.translocoService.translate('pluginCatalog.unavailableToast'), '', {
+            timeOut: 7000
         })
     }
 

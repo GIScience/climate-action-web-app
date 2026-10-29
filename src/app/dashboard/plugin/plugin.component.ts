@@ -96,6 +96,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     computeState: ComputeState = 'inactive'
     loading = true
     detailActive = false
+    returningFromDetail = false
     isPurposeExpanded = false
     shortPurpose = ''
     isReportVisible = false
@@ -176,6 +177,18 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
         if (this.detailActive) {
             this.leaveDetail()
         }
+    }
+
+    onDetailActivate() {
+        this.detailActive = true
+        this.returningFromDetail = false
+    }
+
+    // Only slide the list back in when it is what replaces the detail view,
+    // not when leaving the detail for the compute panel
+    onDetailDeactivate() {
+        this.detailActive = false
+        this.returningFromDetail = this.computeState === 'inactive'
     }
 
     leaveDetail() {

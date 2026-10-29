@@ -142,14 +142,19 @@
 </div>
 
 <ng-template #loadingSkeleton>
-    <div class="skeleton-container">
+    <div class="skeleton-container" animate.leave="skeleton-leave">
         @for (item of [1, 2, 3, 4, 5]; track item) {
             <div class="skeleton-item">
-                <div class="skeleton-header">
-                    <div class="skeleton-title"></div>
-                    <div class="skeleton-subtitle"></div>
+                <div class="skeleton-row">
+                    <div class="skeleton-header">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-subtitle"></div>
+                    </div>
+                    <div class="skeleton-actions">
+                        <div class="skeleton-action"></div>
+                        <div class="skeleton-action"></div>
+                    </div>
                 </div>
-                <div class="skeleton-status"></div>
             </div>
         }
     </div>
@@ -180,13 +185,19 @@
             }"
             (click)="openComputation(computation)"
             (keyup.enter)="openComputation(computation)"
+            [title]="'computationsIndex.actions.open' | transloco"
             tabindex="0">
-            <div class="computation-arrow">
-                <mat-icon aria-hidden="true" fontIcon="chevron_right"></mat-icon>
-            </div>
             <div class="card-header">
                 <div class="card-title">
                     <h3>{{ computation.aoiName }}</h3>
+                    @if (showBadges && isNewRun(computation)) {
+                        <span
+                            class="new-run-dot"
+                            role="img"
+                            [attr.aria-label]="'computationsIndex.status.done' | transloco"
+                            [tp]="'computationsIndex.status.done' | transloco"
+                            tpPlacement="right"></span>
+                    }
                     @if (showBadges && computation.flags?.includes('IMPORTED')) {
                         <svg
                             lucideImport
@@ -204,7 +215,7 @@
                 </p>
             </div>
             @if (!isReportVisible) {
-                <div class="computation-actions">
+                <div class="computation-actions" title="">
                     <button
                         (click)="copyShareLink(computation, $event)"
                         [tp]="'computationDetail.copyLink' | transloco"
@@ -232,12 +243,6 @@
                         class="bookmark-toggle btn-onlyicon">
                         <svg lucideBookmark size="18"></svg>
                     </button>
-                </div>
-            }
-            @if (showBadges && isNewRun(computation)) {
-                <div class="computation-status" [ngClass]="computation.status">
-                    <svg lucideCheck size="15"></svg>
-                    {{ 'computationsIndex.status.done' | transloco }}
                 </div>
             }
         </div>

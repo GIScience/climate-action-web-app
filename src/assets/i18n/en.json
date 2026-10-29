@@ -2,12 +2,12 @@
     "landing": {
         "revisit": {
             "title": "Welcome back. See what others have been assessing.",
-            "description": "The latest assessments from across the Climate Action Navigator. Open one to explore what's there, or select an Assessment Tool from the left to run your own.",
+            "description": "Open one of these recent assessments to explore what others are interested in. Or, select an Assessment Tool from the left to run your own analysis.",
             "feedTitle": "Latest assessments"
         },
         "welcome": {
             "title": "See where your city should focus its climate action",
-            "description": "The Climate Action Navigator (CAN) is your entry point to exploring climate solutions at the local level, with high-resolution data and insights on key climate indicators, from heating emissions to walkability."
+            "description": "The Climate Action Navigator (CAN) is your entry point to exploring climate solutions at the local level, with high-resolution data and insights on key climate indicators, from heating emissions to walkability. Start with an <strong>Assessment Tool</strong> on the left."
         },
         "notes": {
             "title": "A few notes before you begin…",
@@ -29,14 +29,15 @@
             }
         },
         "cta": {
-            "guidedWalkthrough": "Take our guided walkthrough",
-            "or": "or",
-            "selectTool": "select an Assessment Tool from the left"
+            "prompt": "Need help with your first computation?",
+            "guidedWalkthrough": "Take our guided walkthrough"
         }
     },
     "pluginCatalog": {
         "title": "Assessment Tools",
         "loading": "Loading...",
+        "unavailable": "No assessment tools available",
+        "unavailableToast": "No assessment tools are online right now. Try reloading the page.",
         "switchTool": "Switch tool",
         "concernsLabel": "Topics",
         "concerns": {
@@ -90,6 +91,7 @@
             "done": "Done"
         },
         "actions": {
+            "open": "Open Computation",
             "viewParameters": "View Parameters",
             "bookmark": "Save to Bookmarks",
             "removeBookmark": "Remove Bookmark"

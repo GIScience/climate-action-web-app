@@ -55,6 +55,11 @@
                         <div class="plugin-card-skeleton"></div>
                     }
                 </div>
+            } @else if (!cards.length) {
+                <p class="catalog-panel__empty" role="status">
+                    <svg lucideCloudOff size="28" aria-hidden="true"></svg>
+                    {{ 'pluginCatalog.unavailable' | transloco }}
+                </p>
             } @else {
                 <ng-scrollbar visibility="hover" orientation="vertical">
                     <div class="plugin-grid" (mouseleave)="hoveredCard = undefined">

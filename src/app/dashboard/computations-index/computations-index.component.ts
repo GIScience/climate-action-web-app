@@ -2,7 +2,6 @@ import { CommonModule, NgClass } from '@angular/common'
 import { Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MatDialog } from '@angular/material/dialog'
-import { MatIconModule } from '@angular/material/icon'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
@@ -10,7 +9,6 @@ import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
-    LucideCheck,
     LucideClock,
     LucideHash,
     LucideImport,
@@ -43,14 +41,12 @@ import { mapDatabaseComputation } from './computation.mapper'
 @Component({
     selector: 'app-computations-index',
     imports: [
-        MatIconModule,
         TippyDirective,
         NgClass,
         CommonModule,
         NgScrollbarModule,
         FilterByCriteriaPipe,
         LucideBookmark,
-        LucideCheck,
         LucideClock,
         LucideHash,
         LucideImport,

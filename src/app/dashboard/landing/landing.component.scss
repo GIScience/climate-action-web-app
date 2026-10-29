@@ -88,6 +88,7 @@
             font-size: rem(16);
             line-height: 1.65;
             margin: 0;
+            text-wrap: balance;
         }
     }
 
@@ -197,40 +198,56 @@
 }
 
 .welcome-content__new {
+    .intro-section p ::ng-deep strong {
+        font-variation-settings: 'wght' 600;
+    }
+
     .cta-section {
-        align-items: center;
+        align-items: baseline;
         display: flex;
-        gap: rem(14);
+        flex-wrap: wrap;
+        font-size: rem(16);
+        gap: rem(4) rem(8);
         margin-top: rem(20);
-
-        .btn-primary {
-            flex-shrink: 0;
-            white-space: nowrap;
-        }
     }
 
-    .cta-or {
+    .cta-prompt {
+        color: var(--ink-muted);
+    }
+
+    .cta-tour {
         align-items: center;
-        color: var(--ink-muted);
-        display: flex;
-        flex-shrink: 0;
-        font-size: rem(12);
-        gap: rem(8);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        background: none;
+        border: 0;
+        color: var(--accent);
+        font-size: inherit;
+        font-variation-settings: 'wght' 600;
+        gap: rem(6);
+        padding: 0;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: rem(4);
+        transition: text-decoration-color 0.2s ease;
 
-        &::before,
-        &::after {
-            border-top: 1px solid currentcolor;
-            content: '';
-            opacity: 0.5;
-            width: rem(24);
+        svg {
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
         }
-    }
 
-    .cta-hint {
-        color: var(--ink-muted);
-        line-height: 1.4;
+        &:hover,
+        &:focus-visible {
+            text-decoration-color: currentcolor;
+
+            svg {
+                transform: translateX(3px);
+            }
+        }
+
+        &:focus-visible {
+            border-radius: 4px;
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
     }
 
     .notes-section {
