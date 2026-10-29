@@ -84,7 +84,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (!this.isCurrentLegendRender(renderVersion)) return
 
         const componentRef = this.legendContainer.createComponent(LegendComponent)
-        componentRef.instance.artifactId = layer.artifact.correlation_uuid
+        componentRef.instance.artifactId = `${layer.artifact.correlation_uuid}__${layer.artifact.filename}`
 
         if (legendData.legend_type === 'DISCRETE' && layer.artifact.modality === 'VECTOR_MAP_LAYER') {
             const persistedHiddenCategories = this.mapArtifactManager.getHiddenCategories(layer.artifact)

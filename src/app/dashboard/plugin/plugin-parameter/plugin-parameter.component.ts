@@ -206,6 +206,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     protected boundaryOnly = false
     protected constraintDescriptions: AoiConstraintDescription[] = []
     protected mapPreparing = false
+    protected isSubmitting = false
     private mapPreparationToken = 0
 
     private bufferSourceFeature?: GeoJSONFeature
@@ -264,7 +265,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     onSubmit(model: FormlyModel) {
-        if (this.user && this.form.valid) {
+        if (this.user && this.form.valid && !this.isSubmitting) {
             this.requestCompute(model)
         }
     }
@@ -452,6 +453,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             }
         })
 
+        this.isSubmitting = true
         this.pluginService.computePlugin(this.plugin.id, computeRequest).subscribe({
             next: async data => {
                 const compute: ComputationDatabaseEntity = {
@@ -476,6 +478,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                         timeOut: 7000
                     })
                 } catch (error) {
+                    this.isSubmitting = false
                     console.error('Failed to store computation:', error)
                     this.toastr.error(
                         this.translocoService.translate('pluginParameter.errorWhileSubmittingYourRequest'),
@@ -487,6 +490,7 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 }
             },
             error: error => {
+                this.isSubmitting = false
                 switch (error.status) {
                     case 401:
                         this.toastr.error(this.translocoService.translate('pluginParameter.pleaseEnsureLoggedIn'), '', {

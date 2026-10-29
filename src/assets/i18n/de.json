@@ -63,6 +63,7 @@
         "offlineNewCompute": "Dieses Analysewerkzeug ist derzeit offline. Bitte versuche es später erneut.",
         "computePanel": "Berechnung konfigurieren",
         "computeStart": "Berechnung starten",
+        "computeSubmitting": "Wird gesendet…",
         "cancel": "Abbrechen",
         "dialog": {
             "methodology": "Methoden",

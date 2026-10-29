@@ -63,6 +63,7 @@
         "offlineNewCompute": "This Assessment Tool is currently offline. Please try again later.",
         "computePanel": "New Computation",
         "computeStart": "Compute",
+        "computeSubmitting": "Submitting…",
         "cancel": "Cancel",
         "dialog": {
             "methodology": "Methodology",
