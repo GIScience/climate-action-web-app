@@ -38,6 +38,11 @@
             "matchUpdateTypes": ["major"],
             "minimumReleaseAge": "6 months",
             "groupName": "angular"
+        },
+        {
+            "matchDepNames": ["vitest", "@vitest/*"],
+            "matchUpdateTypes": ["major"],
+            "groupName": "vitest"
         }
     ]
 }
