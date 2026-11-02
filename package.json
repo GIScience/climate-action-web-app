@@ -56,7 +56,7 @@
         "@versatiles/style": "^7.0.0",
         "@watergis/maplibre-gl-terradraw": "^1.4.0",
         "@xmldom/xmldom": "^0.9.10",
-        "appwrite": "~24.2.0",
+        "appwrite": "~26.2.0",
         "chart.js": "4.5.0",
         "date-fns": "^4.1.0",
         "driver.js": "^1.3.5",
