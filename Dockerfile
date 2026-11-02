@@ -1,6 +1,6 @@
-FROM node:22-slim AS build
+FROM node:24-slim AS build
 
-ARG PNPM_VERSION=12.9.0
+ARG PNPM_VERSION=12.16.1
 
 WORKDIR /ca-web-app
 
@@ -21,7 +21,7 @@ RUN find dist/browser -type f \
         ! -name 'env.js' ! -name 'env.template.js' -size +1k \
         -exec gzip -9 -k {} +
 
-FROM nginx:1.31-alpine AS runtime
+FROM nginx:1.31-alpine-slim AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/

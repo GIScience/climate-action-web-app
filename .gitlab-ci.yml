@@ -5,7 +5,7 @@ stages:
 
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
-    PNPM_VERSION: '12.9.0'
+    PNPM_VERSION: '12.16.1'
     HUSKY: '0'
 
 test_unit_and_lint:
