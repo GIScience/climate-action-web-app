@@ -273,10 +273,6 @@ export class MapService {
             this.mapArtifactManager.setMapInstance(this.map, this)
         }
 
-        if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
-            maplibregl.setRTLTextPlugin('assets/rtl/mapbox-gl-rtl-text.js', true)
-        }
-
         const navigationControl = new maplibregl.NavigationControl({
             visualizePitch: true,
             visualizeRoll: true

@@ -63,7 +63,7 @@ test_cypress:
         CYPRESS_INSTALL_BINARY: '0'
     needs: ['test_unit_and_lint']
     image:
-        name: cypress/included:cypress-16.1.1-node-24.21.0-chrome-154.0.8037.92-1-ff-157.0-edge-154.0.4258.48-1
+        name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
         entrypoint: ['']
     before_script:
         - |
@@ -95,9 +95,9 @@ build_staging:
     cache: []
     rules:
         - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
-    image: docker.io/docker:29.8.2-cli
+    image: docker.io/docker:29.9.2-cli
     services:
-        - name: docker:29.8.2-dind
+        - name: docker:29.9.2-dind
           alias: thedockerhost
     variables:
         DOCKER_HOST: tcp://thedockerhost:2375
@@ -121,9 +121,9 @@ build_release:
     cache: []
     rules:
         - if: $CI_COMMIT_TAG
-    image: docker.io/docker:29.8.2-cli
+    image: docker.io/docker:29.9.2-cli
     services:
-        - name: docker:29.8.2-dind
+        - name: docker:29.9.2-dind
           alias: thedockerhost
     variables:
         DOCKER_HOST: tcp://thedockerhost:2375

@@ -1,7 +1,7 @@
 {
     "name": "climate-action-navigator",
     "version": "3.7.0",
-    "packageManager": "pnpm@12.9.0",
+    "packageManager": "pnpm@12.16.1",
     "scripts": {
         "ng": "ng",
         "start": "ng serve --no-hmr --host=127.0.0.1",
@@ -44,7 +44,6 @@
         "@jsverse/transloco": "8.4.0",
         "@jsverse/transloco-messageformat": "^8.0.2",
         "@lucide/angular": "^1.45.0",
-        "@mapbox/mapbox-gl-rtl-text": "^0.4.0",
         "@ngneat/helipopper": "^13.0.0",
         "@ngx-formly/core": "^8.0.0",
         "@ngx-formly/material": "^8.0.0",
@@ -72,7 +71,7 @@
         "ngx-papaparse": "^8.0.0",
         "ngx-scrollbar": "^19.0.0",
         "ngx-toastr": "^20.0.0",
-        "plotly.js-locales": "4.1.1",
+        "plotly.js-locales": "4.2.0",
         "plotly.js-strict-dist": "^4.0.0",
         "pmtiles": "^4.3.0",
         "polyclip-ts": "^0.16.8",
