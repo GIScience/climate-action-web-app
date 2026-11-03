@@ -1,31 +1,31 @@
 {
     "landing": {
         "revisit": {
-            "title": "Willkommen zurück. Sieh, was andere zuletzt analysiert haben.",
+            "title": "Willkommen zurück! Sieh, was andere zuletzt analysiert haben",
             "description": "Die neuesten Analysen aus dem Klimaschutznavigator. Öffne eine, um sie zu erkunden, oder wähle links ein Analysewerkzeug aus, um deine eigene zu starten.",
             "feedTitle": "Neueste Analysen"
         },
         "welcome": {
-            "title": "Entdecke die besten Ansatzpunkte deiner Stadt für den Klimaschutz",
-            "description": "Der Klimaschutznavigator (CAN) ermöglicht es dir, Klimaschutzlösungen auf lokaler Ebene zu untersuchen – mit hochaufgelösten Daten und Analysen für wichtige Klimaschutzindikatoren wie Heizungsemissionen oder Fußläufigkeit. Wähle links ein <strong>Analysewerkzeug</strong> aus, um loszulegen."
+            "title": "Entdecke, wo in deinem Stadtteil Klimaschutz gefragt ist",
+            "description": "Der Climate Action Navigator macht aus offenen Daten hochauflösende Analysen für NGOs, Bürgerinitiativen und Stadtverwaltungen – von Heizemissionen bis zu Fußgänger- und Fahrradfreundlichkeit. Wähle ein <strong>Analysewerkzeug</strong> und ein Gebiet aus und erfahre, wo Handlungsbedarf besteht."
         },
         "notes": {
-            "title": "Bevor du beginnst ein paar Hinweise…",
+            "title": "Bevor du beginnst, ein paar Hinweise:",
             "onDemand": {
-                "title": "Auf Anfrage berechnet",
-                "text": "Das reduziert den Energieverbrauch, heißt aber auch, dass Analysen bis zu 60 Minuten dauern können, wenn wir gerade viele Besucher haben."
+                "title": "Auf Abruf berechnet",
+                "text": "Das senkt unseren Energieverbrauch, bedeutet aber, dass Analysen bei hoher Auslastung bis zu 60 Minuten dauern können."
             },
             "urbanAreas": {
-                "title": "Auf urbane Gegenden spezialisiert",
-                "text": "Dort ist die Verfügbarkeit von nutzergenerierten Daten oft höher. Die Ergebnisse in ländlichen Gegenden sind deshalb möglicherweise weniger genau."
+                "title": "Am besten in städtischen Gebieten",
+                "text": "Dort sind offene Daten am besten verfügbar. Besonders in ländlichen Gebieten kann die Qualität der Ergebnisse variieren."
             },
             "experts": {
-                "title": "Auf Expertinnen und Experten zugeschnitten",
-                "text": "Obwohl die Benutzung des CAN jeder und jedem offen steht, kann es vorkommen, dass an manchen Stellen Fachbegriffe verwendet werden."
+                "title": "Auf Fachleute zugeschnitten",
+                "text": "Der CAN steht zwar allen offen, unsere Analysewerkzeuge können jedoch Fachbegriffe enthalten."
             },
             "worksInProgress": {
                 "title": "In aktiver Entwicklung",
-                "text": "Alle Analysewerkzeuge werden ständig auf Basis der neusten verfügbaren Methoden und Daten weiterentwickelt."
+                "text": "Alle Analysewerkzeuge werden beständig weiterentwickelt. Schau regelmäßig vorbei, um neue und verbesserte Funktionen zu entdecken."
             }
         },
         "cta": {

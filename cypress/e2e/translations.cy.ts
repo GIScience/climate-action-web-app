@@ -14,7 +14,7 @@ describe('translations', () => {
             }
         })
 
-        cy.get('.notes-section h2').should('have.text', 'Bevor du beginnst ein paar Hinweise…')
+        cy.get('.notes-section h2').should('have.text', 'Bevor du beginnst, ein paar Hinweise:')
     })
 
     it('prefer the local storage language if present and load it', () => {
@@ -25,7 +25,7 @@ describe('translations', () => {
             }
         })
 
-        cy.get('.intro-section h1').should('have.text', 'See where your city should focus its climate action')
+        cy.get('.intro-section h1').should('have.text', 'Explore where climate action is needed in your neighbourhood')
     })
 
     it('should switch the language dynamically when selected through the language menu', () => {
