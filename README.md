@@ -52,7 +52,7 @@ This is the repository of the frontend website of HeiGIT's [Climate Action](http
     - Edit `env.js` with your settings:
         - `ENVIRONMENT_TYPE`: Set to `'development'` for local development
         - `GEOCODE_API_KEY`: Get an API key from [HeiGIT](https://account.heigit.org/) for the Search function
-        - `CLIMATE_ACTION_API_URL`: Set to `'api/v1/gateway'` for local development with the backend
+        - `CLIMATE_ACTION_API_URL`: Set to `'http://api.localhost/climate-action-platform/v0'` to use the Docker-based backend, or remove the line to use a natively run API Gateway (see [Backend Server](#backend-server))
         - Other values can typically use the defaults provided
 4. Run `pnpm dev` or `ng serve` to start the dev server
 5. Navigate to `http://localhost:4200/`
@@ -66,6 +66,10 @@ The application will automatically reload if you change any of the source files.
 To see more than the raw website and access the plugins, you will need to set up a local dev environment of the [Climate Action Infrastructure](https://gitlab.heigit.org/climate-action/infrastructure).
 
 Make sure to start at least one plugin along with the API Gateway, for example `docker compose up -d ca-plugin-blueprint ca-api-gateway`
+
+#### Running the API Gateway natively
+
+Alternatively, run the API Gateway directly with Python (listening on `http://localhost:8000`, routes at the root). Leave `CLIMATE_ACTION_API_URL` unset in `env.js` so the default relative `api` path applies, and start the dev server with `pnpm dev`.
 
 ### Code Formatting & Pre-commit Hook
 
@@ -95,7 +99,7 @@ docker build . --tag repo.heigit.org/climate-action/web-app:{image_tag}
 ```shell
 docker run --publish 8080:80 \
   -e ENVIRONMENT_TYPE="development" \
-  -e CLIMATE_ACTION_API_URL="http://localhost/api/v1/gateway" \
+  -e CLIMATE_ACTION_API_URL="http://api.localhost/climate-action-platform/v0" \
   -e GEOCODE_API_KEY="your-ors-api-key" \
   -e APPWRITE_PROJECT_ID="your-project-id" \
   -e APPWRITE_ENDPOINT="appwrite-api-endpoint" \

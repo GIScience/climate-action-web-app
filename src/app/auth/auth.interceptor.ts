@@ -85,7 +85,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        if (request.url.includes(this.apiBaseUrl)) {
+        if (request.url.startsWith(this.apiBaseUrl)) {
             return from(this.processWithAuth(request, next))
         }
 
