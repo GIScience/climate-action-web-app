@@ -39,6 +39,7 @@
         "unavailable": "Keine Analysewerkzeuge verfügbar",
         "unavailableToast": "Derzeit sind keine Analysewerkzeuge online. Bitte die Seite neu laden.",
         "switchTool": "Werkzeug wechseln",
+        "close": "Schließen",
         "concernsLabel": "Themen",
         "concerns": {
             "cycling": "Radverkehr",

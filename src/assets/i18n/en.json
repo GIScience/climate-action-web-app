@@ -39,6 +39,7 @@
         "unavailable": "No assessment tools available",
         "unavailableToast": "No assessment tools are online right now. Try reloading the page.",
         "switchTool": "Switch tool",
+        "close": "Close",
         "concernsLabel": "Topics",
         "concerns": {
             "cycling": "Cycling",

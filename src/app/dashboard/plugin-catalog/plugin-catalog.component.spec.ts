@@ -72,14 +72,26 @@ describe('PluginCatalogComponent', () => {
         expect(tiles().map(tile => tile.textContent?.trim())).toEqual(['Alpha', 'Bravo', 'Charlie'])
     })
 
-    it('opens the grid from the deck, and closes it when a plugin is picked', () => {
+    it('opens the grid from the deck, and closes it via its close button or when a plugin is picked', async () => {
         createComponent('deck')
         const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true)
+        const openDeck = () => {
+            fixture.nativeElement.querySelector('button.deck').click()
+            fixture.detectChanges()
+            fixture.detectChanges()
+        }
         expect(tiles()).toHaveLength(0)
 
-        fixture.nativeElement.querySelector('button.deck').click()
+        openDeck()
+        expect(tiles()).toHaveLength(3)
+
+        // Closing waits for the fold animation to finish
+        document.querySelector<HTMLButtonElement>('.catalog-panel__close')!.click()
+        await new Promise(resolve => setTimeout(resolve, 0))
         fixture.detectChanges()
-        fixture.detectChanges()
+        expect(tiles()).toHaveLength(0)
+
+        openDeck()
         expect(tiles()).toHaveLength(3)
 
         tiles()[1].click()

@@ -16,14 +16,15 @@ import { NavigationEnd, Router } from '@angular/router'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBike,
+    LucideChevronDown,
     LucideCloudOff,
-    LucideDynamicIcon,
     LucideFactory,
     LucideFootprints,
     LucideIconInput,
     LucideLeaf,
     LucideRecycle,
-    LucideUmbrella
+    LucideUmbrella,
+    LucideX
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import type { TippyProps } from '@ngneat/helipopper/config'
@@ -62,6 +63,15 @@ const CONCERN_STYLES: Record<Concern, { icon: LucideIconInput; color: string }> 
     ghg_emission: { icon: LucideFactory, color: '#8a5a44' }
 }
 
+// Folds the deck launcher back into the deck, reversing its `panel-in` keyframes
+const FOLD_KEYFRAMES: Keyframe[] = [
+    { transform: 'none', opacity: 1 },
+    { transform: 'scale(0.15)', opacity: 0 }
+]
+const FOLD_TIMING: KeyframeAnimationOptions = { duration: 160, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
+
+const prefersMotion = () => !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
 const isKnownConcern = (concern: string): concern is Concern => Object.hasOwn(CONCERN_STYLES, concern)
 
 @Component({
@@ -71,14 +81,18 @@ const isKnownConcern = (concern: string): concern is Concern => Object.hasOwn(CO
     imports: [
         CommonModule,
         DropdownMenuDirective,
+        LucideChevronDown,
         LucideCloudOff,
-        LucideDynamicIcon,
+        LucideX,
         TippyDirective,
         NgScrollbarModule,
         TranslocoModule
     ]
 })
 export class PluginCatalogComponent implements OnInit {
+    // Set when the landing (inline) catalog goes away, so the next deck plays its arrival animation
+    private static leftLanding = false
+
     private router = inject(Router)
     private pluginService = inject(PluginService)
     private toastr = inject(ToastrService)
@@ -89,6 +103,7 @@ export class PluginCatalogComponent implements OnInit {
     private destroyRef = inject(DestroyRef)
 
     @Input() mode: 'deck' | 'inline' = 'inline'
+    @Input() label?: string
 
     @ViewChild('deckTrigger') deckTrigger?: ElementRef<HTMLButtonElement>
     @ViewChild('panel') panel?: ElementRef<HTMLElement>
@@ -113,6 +128,8 @@ export class PluginCatalogComponent implements OnInit {
     highlightedConcern?: Concern
     loading = true
     open = false
+    closing = false
+    arriving = false
 
     get backCards(): PluginCard[] {
         return this.cards.filter(card => card !== this.activeCard).slice(0, 2)
@@ -120,6 +137,13 @@ export class PluginCatalogComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadPlugins()
+
+        if (this.mode === 'inline') {
+            this.destroyRef.onDestroy(() => (PluginCatalogComponent.leftLanding = true))
+        } else if (PluginCatalogComponent.leftLanding) {
+            PluginCatalogComponent.leftLanding = false
+            this.arriving = prefersMotion()
+        }
 
         this.router.events
             .pipe(
@@ -216,7 +240,7 @@ export class PluginCatalogComponent implements OnInit {
 
     toggle(event: MouseEvent) {
         if (this.open) {
-            this.close()
+            this.dismiss()
             return
         }
 
@@ -236,9 +260,26 @@ export class PluginCatalogComponent implements OnInit {
         }
     }
 
+    dismiss(restoreFocus = false) {
+        if (!this.open || this.closing) return
+
+        const panel = this.panel?.nativeElement
+        if (!panel || !prefersMotion()) {
+            this.close(restoreFocus)
+            return
+        }
+
+        this.closing = true
+        const done = () => {
+            this.closing = false
+            this.close(restoreFocus)
+        }
+        panel.animate(FOLD_KEYFRAMES, FOLD_TIMING).finished.then(done, done)
+    }
+
     onGridKeydown(event: KeyboardEvent) {
         if (event.key === 'Escape') {
-            this.close(true)
+            this.dismiss(true)
             return
         }
 
