@@ -67,7 +67,7 @@
         "maplibre-ui-translations": "^0.7.0",
         "material-icons-font": "^2.1.0",
         "ng2-charts": "^11.0.0",
-        "ngx-markdown": "20.1.0",
+        "ngx-markdown": "^21.0.0",
         "ngx-papaparse": "^8.0.0",
         "ngx-scrollbar": "^19.0.0",
         "ngx-toastr": "^20.0.0",
