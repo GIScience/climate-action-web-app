@@ -173,6 +173,35 @@ Run `pnpm test:all` to execute the unit & integration tests on [Vitest](https://
 For the cypress tests to succeed you will need a running instance of your app (see 4. under [Installation](#Installation)).
 Additionally, for interactive cypress runs using `cy:open` you need to make sure your test-browser is set to English.
 
+### Vulnerabilities
+
+After Docker images are built, the GitLab CI automatically scans the image and the production npm dependencies for vulnerabilities.
+Configuration of the scans is done via ci-variables.
+Default variables are available on a group level but may be overwritten on a per-project basis.
+There are no automated actions in place.
+In case a check fails, try updating the base image, OS packages and project dependencies, which may immediately
+resolve some vulnerabilities.
+Note that you may to need to rebuild the image from scratch (i.e. without cache).
+Note that some vulnerabilities may be unavoidable e.g. if they already exist in the latest base image.
+
+To check the npm dependencies locally execute `pnpm audit --prod`.
+
+To scan the image locally, pull or build the latest image of the web-app, then execute
+
+```shell
+docker run \
+  --rm  \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $HOME/.cache/trivy:/root/.cache/trivy \
+  aquasec/trivy \
+  image \
+  repo.heigit.org/climate-action/web-app:devel \
+  --ignore-unfixed \
+  --severity HIGH,CRITICAL
+```
+
+In case the image was improved, you may have to manually push and deploy the new image.
+
 ## References
 
 - [Matplotlib Colormaps](https://matplotlib.org/stable/users/explain/colors/colormaps.html)
