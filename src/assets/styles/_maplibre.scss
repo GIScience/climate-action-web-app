@@ -392,6 +392,13 @@
         }
     }
 
+    .discover-uuid {
+        color: #888;
+        font-size: 0.85em;
+        font-variation-settings: 'wght' 400;
+        white-space: nowrap;
+    }
+
     &.discover-tooltip {
         pointer-events: none;
 
@@ -403,6 +410,14 @@
 
             strong {
                 font-variation-settings: 'wght' 600;
+            }
+        }
+
+        .discover-tooltip__list > div {
+            text-align: left;
+
+            &:first-of-type {
+                margin-top: rem(4);
             }
         }
     }

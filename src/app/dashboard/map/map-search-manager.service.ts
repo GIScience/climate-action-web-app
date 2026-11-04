@@ -18,6 +18,7 @@ import type {
 } from 'maplibre-gl'
 import { Popup } from 'maplibre-gl'
 import { environment } from 'src/environments/environment'
+import { formatShortUUID } from '../computations-index/computation-format.utils'
 import { AoiFeatureProperties, SearchCentroidCollection } from '../computations-index/computation.interface'
 import { computationRouteCommands } from '../share/share.service'
 
@@ -156,6 +157,32 @@ const createElement = <K extends keyof HTMLElementTagNameMap>(
 const createPopup = (className: string, options: PopupOptions): Popup =>
     new Popup({ closeButton: false, offset: 12, className: `smooth-popup ${className}`, ...options })
 
+const shortUuidElement = (entry: AoiFeatureProperties): HTMLSpanElement =>
+    createElement('span', 'discover-uuid', ` · #${formatShortUUID(entry.correlation_uuid)}`)
+
+const tooltipLine = (...nodes: (string | Node)[]): HTMLDivElement => {
+    const line = createElement('div')
+    line.append(...nodes)
+    return line
+}
+
+const entryLine = (entry: AoiFeatureProperties): HTMLDivElement =>
+    tooltipLine(createElement('strong', '', entry.aoi_name), shortUuidElement(entry))
+
+const tooltipContent = (label: string, lines: HTMLElement[]): HTMLDivElement => {
+    const content = createElement('div', lines.length > 1 ? 'discover-tooltip__list' : '')
+    content.append(label, ...lines)
+    return content
+}
+
+interface HoverTarget {
+    // Identifies the hovered feature(s) so the tooltip is only rebuilt when they change
+    key: string
+    content: HTMLElement
+    // Boundary polygons to highlight; clusters and dots have none
+    highlightUuids?: string[]
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -165,7 +192,7 @@ export class MapSearchManagerService {
     private map?: MaplibreMap
     private popup?: Popup
     private tooltip?: Popup
-    private hoveredUuids: string[] = []
+    private hoverKey?: string
     private state?: { pluginId: string; centroids: SearchCentroidCollection }
     private visible = false
     private getPadding?: () => PaddingOptions
@@ -315,34 +342,53 @@ export class MapSearchManagerService {
     private readonly onMapMove = (e: MapMouseEvent) => {
         const map = this.map
         if (!map) return
-        const entries = this.popup?.isOpen() ? [] : uniqueAoiEntries(this.featuresAt(e.point, [BOUNDARY_FILL_LAYER_ID]))
-        if (entries.length === 0) {
+        const features = this.popup?.isOpen() ? [] : this.featuresAt(e.point, INTERACTIVE_LAYER_IDS)
+        const target = features.length > 0 ? this.hoverTarget(features) : undefined
+        if (!target) {
             this.clearHover()
             return
         }
 
-        const uuids = entries.map(entry => entry.correlation_uuid)
-        if (uuids.join() === this.hoveredUuids.join()) {
+        if (target.key === this.hoverKey) {
             this.tooltip?.setLngLat(e.lngLat)
             return
         }
 
-        this.hoveredUuids = uuids
-        map.setFilter(BOUNDARY_HOVER_LAYER_ID, hoverFilter(uuids))
-        const key = entries.length === 1 ? 'map.discover.viewComputation' : 'map.discover.multipleComputations'
-        const content = createElement('div')
-        content.append(
-            this.translocoService.translate(key),
-            createElement('br'),
-            createElement('strong', '', entries.map(entry => entry.aoi_name).join(', '))
-        )
+        this.hoverKey = target.key
+        map.setFilter(BOUNDARY_HOVER_LAYER_ID, hoverFilter(target.highlightUuids ?? []))
         this.tooltip ??= createPopup('discover-tooltip', { closeOnClick: false })
-        this.tooltip.setLngLat(e.lngLat).setDOMContent(content).addTo(map)
+        this.tooltip.setLngLat(e.lngLat).setDOMContent(target.content).addTo(map)
+    }
+
+    // Topmost feature first, as for clicks: a cluster bubble or centroid dot above a polygon wins the hover
+    private hoverTarget(features: MapGeoJSONFeature[]): HoverTarget | undefined {
+        const top = features[0]
+        if (top.layer.id === CLUSTER_LAYER_ID) return undefined
+
+        if (top.layer.id === UNCLUSTERED_LAYER_ID) {
+            const entries = uniqueAoiEntries([top])
+            if (entries.length === 0) return undefined
+            const label = this.translocoService.translate('map.discover.zoomToComputation')
+            return {
+                key: `dot:${entries[0].correlation_uuid}`,
+                content: tooltipContent(label, [entryLine(entries[0])])
+            }
+        }
+
+        const entries = uniqueAoiEntries(features)
+        if (entries.length === 0) return undefined
+        const uuids = entries.map(entry => entry.correlation_uuid)
+        const key = entries.length === 1 ? 'map.discover.viewComputation' : 'map.discover.multipleComputations'
+        return {
+            key: `boundary:${uuids.join()}`,
+            content: tooltipContent(this.translocoService.translate(key), entries.map(entryLine)),
+            highlightUuids: uuids
+        }
     }
 
     private readonly clearHover = () => {
-        if (this.hoveredUuids.length === 0) return
-        this.hoveredUuids = []
+        if (!this.hoverKey) return
+        this.hoverKey = undefined
         this.tooltip?.remove()
         if (this.map && this.layersAdded(this.map)) {
             this.map.setFilter(BOUNDARY_HOVER_LAYER_ID, hoverFilter([]))
@@ -373,6 +419,7 @@ export class MapSearchManagerService {
     }
 
     private easeTo(map: MaplibreMap, feature: MapGeoJSONFeature, zoom: number): void {
+        this.clearHover()
         map.easeTo({
             center: (feature.geometry as Point).coordinates as [number, number],
             zoom: zoom + ZOOM_NUDGE,
@@ -386,6 +433,7 @@ export class MapSearchManagerService {
 
         const links = entries.map(entry => {
             const link = createElement('a', 'discover-popup__entry', entry.aoi_name)
+            link.append(shortUuidElement(entry))
             link.href = this.router.serializeUrl(
                 this.router.createUrlTree(computationRouteCommands(pluginId, entry.correlation_uuid))
             )

@@ -370,7 +370,8 @@
         "discover": {
             "viewComputation": "Berechnung ansehen für",
             "multipleComputations": "Mehrere Berechnungen hier",
-            "selectComputation": "Berechnung auswählen"
+            "selectComputation": "Berechnung auswählen",
+            "zoomToComputation": "Hineinzoomen zur Berechnung für"
         },
         "drawing": {
             "radius": "Radius",

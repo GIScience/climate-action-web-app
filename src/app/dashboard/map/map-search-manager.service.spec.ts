@@ -191,7 +191,7 @@ describe('MapSearchManagerService', () => {
         expect(content.querySelector('.discover-popup__title')?.textContent).toBe('map.discover.selectComputation')
         const entries = content.querySelectorAll<HTMLAnchorElement>('a.discover-popup__entry')
         expect(entries).toHaveLength(2)
-        expect(entries[0].textContent).toBe('Heidelberg')
+        expect(entries[0].textContent).toBe('Heidelberg · #8a897536')
         expect(entries[1].getAttribute('href')).toBe(`/dashboard/plugin/test_plugin/computation/${OTHER_UUID}`)
 
         entries[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
