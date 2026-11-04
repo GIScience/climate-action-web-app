@@ -113,6 +113,7 @@ main.dashboard {
     }
 
     .dashboard__middle-column {
+        container-type: size;
         pointer-events: none;
         position: relative;
     }
@@ -121,16 +122,36 @@ main.dashboard {
         align-items: flex-end;
         display: flex;
         flex-direction: column;
+    }
+
+    .dashboard__legends {
+        backdrop-filter: blur(5px);
+        background-color: rgb(255 255 255 / 85%);
+        border-radius: 5px;
+        box-shadow: 2px 2px 4px rgb(0 0 0 / 10%);
+        margin-top: rem(85);
+        max-width: rem(220);
+        min-width: rem(140);
+
+        &:empty {
+            display: none;
+        }
 
         ::ng-deep {
             app-legend {
-                &:first-of-type {
-                    margin-top: rem(85);
-                }
+                display: block;
+            }
 
-                &:not(:first-of-type) {
-                    margin-top: rem(10);
-                }
+            app-legend + app-legend .legend-container {
+                border-top: 1px solid rgb(0 0 0 / 8%);
+            }
+
+            .legend-container {
+                backdrop-filter: none;
+                background: none;
+                border-radius: 0;
+                box-shadow: none;
+                max-width: none;
             }
         }
     }

@@ -1,5 +1,12 @@
-<div [class.minimised]="artifactViewerService.minimised" class="artifact-container">
-    <div class="artifact-header">
+<div
+    cdkDrag
+    [cdkDragDisabled]="artifactViewerService.minimised"
+    [cdkDragFreeDragPosition]="dragPosition"
+    cdkDragBoundary=".dashboard__middle-column"
+    [class.minimised]="artifactViewerService.minimised"
+    class="artifact-container">
+    <div cdkDragHandle class="artifact-header">
+        <svg lucideGripHorizontal size="15" class="grip-icon"></svg>
         <h3 class="artifact-name">{{ artifactViewerService.name }}</h3>
         <div class="artifact-window-controls">
             <button

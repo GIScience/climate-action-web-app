@@ -1,44 +1,65 @@
 @use 'spec/tools/rem' as *;
 
+$edge-gap: rem(75);
+$chrome-height: rem(75);
+
 .artifact-container {
     backdrop-filter: blur(15px);
     background-color: rgb(255 255 255 / 85%);
     border: 1px solid #ccc;
     border-radius: 10px;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    margin: 0 auto;
+    max-height: calc(100% - #{$edge-gap * 2});
     overflow: hidden;
     pointer-events: all;
     position: absolute;
-    width: 100%;
+    right: 0;
+    top: $edge-gap;
+    width: min(#{rem(840)}, 100%);
     z-index: 3;
 
-    @media (min-width: 1800px) {
-        height: 90%;
-        right: 5%;
-        top: 5%;
-        width: 90%;
-    }
-
     &.minimised {
-        height: rem(48);
-        left: 20%;
-        margin-top: calc(98vh - 9.5rem);
-        top: 0;
-        width: 60%;
+        bottom: rem(20);
+        height: rem(53);
+        top: auto;
+        transform: none !important;
+        width: min(#{rem(560)}, 100%);
+
+        .artifact-header {
+            cursor: unset;
+
+            .grip-icon {
+                display: none;
+            }
+        }
     }
 
     .artifact-header {
         align-items: center;
-        background-color: rgba(240, 248, 255, 0.5);
+        background-color: rgb(201 210 210 / 75%);
+        cursor: move;
         display: flex;
+        flex-shrink: 0;
         padding: rem(10);
+
+        .grip-icon {
+            color: #7a7a7a;
+            flex-shrink: 0;
+        }
 
         .artifact-name {
             margin: 0 rem(8);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .artifact-window-controls {
             display: flex;
+            flex-shrink: 0;
             margin-left: auto;
 
             .minimise-btn {
@@ -59,6 +80,15 @@
                     background-color: #ffd8d8;
                 }
             }
+        }
+    }
+
+    ::ng-deep .artifact {
+        height: auto;
+        min-height: 0;
+
+        > ng-scrollbar {
+            max-height: calc(100cqh - #{$edge-gap * 2} - #{$chrome-height});
         }
     }
 }
