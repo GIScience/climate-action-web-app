@@ -13,6 +13,43 @@
 
 <div class="computations-index">
     <div class="computations-index-content">
+        @if (activeTab === 'discover') {
+            <div class="discover-container">
+                @if (searchLoading() && searchComputations().length === 0) {
+                    <ng-container *ngTemplateOutlet="loadingSkeleton"></ng-container>
+                }
+                @if (!searchLoading() && searchComputations().length === 0) {
+                    <div class="empty-computations">
+                        <span class="empty-computations__message">{{
+                            'computationsIndex.noComputationSearchResults' | transloco
+                        }}</span>
+                    </div>
+                }
+                @if (searchComputations().length > 0) {
+                    <div class="computations-container">
+                        <ng-scrollbar
+                            visibility="hover"
+                            appearance="compact"
+                            orientation="vertical"
+                            reachedBottomOffset="40"
+                            (reachedBottom)="loadMoreSearch()">
+                            @for (computation of searchComputations(); track computation.correlation_uuid) {
+                                <ng-container
+                                    *ngTemplateOutlet="
+                                        computationRow;
+                                        context: { computation: computation, showBadges: false }
+                                    "></ng-container>
+                            }
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    listFooter;
+                                    context: { loading: searchLoading(), ended: !searchHasMore() && searchPages() > 1 }
+                                "></ng-container>
+                        </ng-scrollbar>
+                    </div>
+                }
+            </div>
+        }
         @if (activeTab === 'bookmarks') {
             <div class="bookmarks-container">
                 @if (bookmarkedRuns.length === 0 && !paginationInfo.loading) {
@@ -27,7 +64,12 @@
                 }
                 @if (bookmarkedRuns.length > 0) {
                     <div class="computations-container">
-                        <ng-scrollbar visibility="hover" appearance="compact" orientation="vertical">
+                        <ng-scrollbar
+                            visibility="hover"
+                            appearance="compact"
+                            orientation="vertical"
+                            reachedBottomOffset="40"
+                            (reachedBottom)="loadMoreBookmarks()">
                             @for (
                                 scheduledRun of scheduled() | filterByCriteria: pluginId;
                                 track scheduledRun.correlation_uuid
@@ -68,6 +110,14 @@
                                         context: { computation: computation, showBadges: true }
                                     "></ng-container>
                             }
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    listFooter;
+                                    context: {
+                                        loading: paginationInfo.loading,
+                                        ended: !paginationInfo.hasMore && paginationInfo.pages > 1
+                                    }
+                                "></ng-container>
                         </ng-scrollbar>
                     </div>
                 }
@@ -85,56 +135,6 @@
                             ><strong>{{ 'computationsIndex.login.action' | transloco }}</strong></a
                         >
                     </div>
-                }
-
-                @if (paginationInfo.hasMore || paginationInfo.loading) {
-                    <ng-container
-                        *ngTemplateOutlet="
-                            loadMoreControls;
-                            context: {
-                                hasMore: paginationInfo.hasMore,
-                                loading: paginationInfo.loading,
-                                onLoadMore: loadMoreBookmarks
-                            }
-                        "></ng-container>
-                }
-            </div>
-        }
-        @if (activeTab === 'discover') {
-            <div class="discover-container">
-                @if (searchLoading() && searchComputations().length === 0) {
-                    <ng-container *ngTemplateOutlet="loadingSkeleton"></ng-container>
-                }
-                @if (!searchLoading() && searchComputations().length === 0) {
-                    <div class="empty-computations">
-                        <span class="empty-computations__message">{{
-                            'computationsIndex.noComputationSearchResults' | transloco
-                        }}</span>
-                    </div>
-                }
-                @if (searchComputations().length > 0) {
-                    <div class="computations-container">
-                        <ng-scrollbar visibility="hover" appearance="compact" orientation="vertical">
-                            @for (computation of searchComputations(); track computation.correlation_uuid) {
-                                <ng-container
-                                    *ngTemplateOutlet="
-                                        computationRow;
-                                        context: { computation: computation, showBadges: false }
-                                    "></ng-container>
-                            }
-                        </ng-scrollbar>
-                    </div>
-                }
-                @if (searchHasMore() || searchLoading()) {
-                    <ng-container
-                        *ngTemplateOutlet="
-                            loadMoreControls;
-                            context: {
-                                hasMore: searchHasMore(),
-                                loading: searchLoading(),
-                                onLoadMore: loadMoreSearch
-                            }
-                        "></ng-container>
                 }
             </div>
         }
@@ -160,20 +160,17 @@
     </div>
 </ng-template>
 
-<ng-template #loadMoreControls let-hasMore="hasMore" let-loading="loading" let-onLoadMore="onLoadMore">
-    <div class="load-more-container">
-        @if (hasMore && !loading) {
-            <button (click)="onLoadMore()" class="btn-alt btn-small btn-withtext--after load-more-btn">
-                {{ 'computationsIndex.loadMore' | transloco }}
-            </button>
-        }
-        @if (hasMore && loading) {
-            <div class="loading-indicator">
-                <svg lucideLoaderCircle size="20"></svg>
-                <span>{{ 'computationsIndex.loadingMore' | transloco }}</span>
-            </div>
-        }
-    </div>
+<ng-template #listFooter let-loading="loading" let-ended="ended">
+    @if (loading) {
+        <div class="list-footer">
+            <svg lucideLoaderCircle size="20"></svg>
+            <span>{{ 'computationsIndex.loadingMore' | transloco }}</span>
+        </div>
+    } @else if (ended) {
+        <div class="list-footer">
+            <span>{{ 'computationsIndex.endOfList' | transloco }}</span>
+        </div>
+    }
 </ng-template>
 
 <ng-template #computationRow let-computation="computation" let-showBadges="showBadges">

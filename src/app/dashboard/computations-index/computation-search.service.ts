@@ -13,6 +13,7 @@ export class ComputationSearchService implements OnDestroy {
     readonly computations = signal<ComputationDisplayEntity[]>([])
     readonly loading = signal(false)
     readonly hasMore = signal(false)
+    readonly pages = signal(0)
 
     private readonly pageSize = 10
     private pluginId?: string
@@ -95,6 +96,7 @@ export class ComputationSearchService implements OnDestroy {
         this.stale = false
         this.computations.set([])
         this.hasMore.set(false)
+        this.pages.set(0)
         this.loading.set(false)
     }
 
@@ -112,6 +114,7 @@ export class ComputationSearchService implements OnDestroy {
                 this.computations.update(computations => [...computations, ...additions])
                 this.nextCursor = page.next_page
                 this.hasMore.set(page.next_page !== null)
+                this.pages.update(count => count + 1)
                 this.loaded = true
                 this.loading.set(false)
             },

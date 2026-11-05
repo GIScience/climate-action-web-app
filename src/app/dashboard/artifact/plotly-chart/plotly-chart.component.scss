@@ -11,19 +11,28 @@
     ::ng-deep {
         .modebar-group {
             display: flex !important;
+
+            .modebar-btn {
+                font-size: rem(18);
+
+                svg path {
+                    fill: #999 !important;
+                }
+            }
         }
     }
 }
 
 .in-app-full {
     background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    box-shadow: 5px 5px 20px 25px rgba(0, 0, 0, 0.35);
+    border: 2.5px solid #aaa;
+    border-radius: 10px;
     height: calc(100vh - 6.071rem) !important;
+    left: 0.5vw;
     overflow: hidden;
     padding: rem(10) 0;
     position: fixed;
+    top: 4.286rem;
     width: 99vw !important;
     z-index: 9999;
 
@@ -37,6 +46,14 @@
 
             .modebar {
                 margin-right: rem(15);
+
+                .modebar-btn {
+                    font-size: rem(22);
+
+                    svg path {
+                        fill: #999 !important;
+                    }
+                }
             }
         }
     }

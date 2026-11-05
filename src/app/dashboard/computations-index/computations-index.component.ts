@@ -1,5 +1,15 @@
 import { CommonModule, NgClass } from '@angular/common'
-import { Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core'
+import {
+    afterRenderEffect,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    Input,
+    OnInit,
+    signal,
+    viewChild
+} from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
@@ -19,7 +29,8 @@ import {
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { compareDesc } from 'date-fns'
-import { NgScrollbarModule } from 'ngx-scrollbar'
+import { NgScrollbar, NgScrollbarModule } from 'ngx-scrollbar'
+import { NgScrollReachDrop } from 'ngx-scrollbar/reached-event'
 import { ToastrService } from 'ngx-toastr'
 import { filter } from 'rxjs'
 import {
@@ -45,6 +56,7 @@ import { mapDatabaseComputation } from './computation.mapper'
         NgClass,
         CommonModule,
         NgScrollbarModule,
+        NgScrollReachDrop,
         FilterByCriteriaPipe,
         LucideBookmark,
         LucideClock,
@@ -85,20 +97,24 @@ export class ComputationsIndexComponent implements OnInit {
 
     isReportVisible = false
 
-    paginationInfo: { hasMore: boolean; loading: boolean } = {
+    paginationInfo: { hasMore: boolean; loading: boolean; pages: number } = {
         hasMore: true,
-        loading: false
+        loading: false,
+        pages: 0
     }
 
     activeTab: DiscoverTab = this.storageService.getActiveTab('discover')
     readonly searchComputations = this.searchService.computations
     readonly searchLoading = this.searchService.loading
     readonly searchHasMore = this.searchService.hasMore
+    readonly searchPages = this.searchService.pages
 
     @Input() pluginId: string = ''
     @Input() plugin?: Plugin
 
     user: Models.User<Models.Preferences> | null = null
+
+    private readonly scrollbar = viewChild(NgScrollbar)
 
     constructor() {
         this.appwriteService._user.pipe(takeUntilDestroyed()).subscribe(user => {
@@ -106,6 +122,20 @@ export class ComputationsIndexComponent implements OnInit {
         })
 
         this.pluginId = this.route.snapshot.params['name']
+
+        // ngx-scrollbar only emits reachedBottom once the viewport overflows,
+        // so a short first page keeps fetching until it does (or the list ends)
+        afterRenderEffect(() => {
+            this.runs()
+            this.searchComputations()
+            const viewport = this.scrollbar()?.adapter.viewportElement
+            if (!viewport || viewport.scrollHeight > viewport.clientHeight) return
+            if (this.activeTab === 'bookmarks') {
+                this.loadMoreBookmarks()
+            } else {
+                this.loadMoreSearch()
+            }
+        })
     }
 
     formatTimestamp(timestamp: Date | string) {
@@ -151,11 +181,12 @@ export class ComputationsIndexComponent implements OnInit {
         if (!isInitialLoad && (!this.paginationInfo.hasMore || this.paginationInfo.loading)) return
 
         try {
-            this.paginationInfo = { hasMore: true, loading: true }
+            const pages = isInitialLoad ? 0 : this.paginationInfo.pages
+            this.paginationInfo = { hasMore: true, loading: true, pages }
 
             const result = await this.storageService.getPluginRunsPaginated(this.pluginId, isInitialLoad)
 
-            this.paginationInfo = { hasMore: result.hasMore, loading: false }
+            this.paginationInfo = { hasMore: result.hasMore, loading: false, pages: pages + 1 }
 
             this.upsertRuns(result.documents)
 
@@ -208,7 +239,10 @@ export class ComputationsIndexComponent implements OnInit {
     }
 
     readonly loadMoreBookmarks = () => void this.loadRuns(false)
-    readonly loadMoreSearch = () => this.searchService.loadMore()
+    readonly loadMoreSearch = () => {
+        // The scroll sentinel also fires at the end of a fully loaded list
+        if (this.searchHasMore()) this.searchService.loadMore()
+    }
 
     switchTab(tab: DiscoverTab): void {
         if (tab === this.activeTab) return

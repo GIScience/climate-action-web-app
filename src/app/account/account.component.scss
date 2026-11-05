@@ -57,6 +57,10 @@
     .fake-user-button {
         border: 2px dashed #e78400;
         margin-right: rem(10);
+
+        svg {
+            padding: rem(4);
+        }
     }
 
     .sync-badge {

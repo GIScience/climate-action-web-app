@@ -85,8 +85,8 @@
         },
         "noComputations": "No computations to show yet.",
         "noComputationSearchResults": "No results found.",
-        "loadMore": "Load More",
         "loadingMore": "Loading more computations...",
+        "endOfList": "You have reached the end of the list.",
         "status": {
             "queued": "Queued",
             "running": "Running",

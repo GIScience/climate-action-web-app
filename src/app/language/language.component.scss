@@ -37,17 +37,18 @@
             border-radius: 50%;
             content: '';
             display: inline-block;
-            height: 26px;
-            left: 7.5px;
+            height: rem(26);
+            left: rem(8);
             position: absolute;
-            top: 7.5px;
-            width: 26px;
+            top: rem(8);
+            width: rem(26);
         }
 
         svg {
             align-items: center;
             display: flex;
             justify-content: center;
+            padding: rem(0.5);
         }
 
         .current-lang {

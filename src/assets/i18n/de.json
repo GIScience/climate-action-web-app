@@ -85,8 +85,8 @@
         },
         "noComputations": "Du hast noch keine Ergebnisse.",
         "noComputationSearchResults": "Keine Ergebnisse gefunden.",
-        "loadMore": "Weitere Ergebnisse laden",
         "loadingMore": "Lade weitere Ergebnisse ...",
+        "endOfList": "Du hast das Ende der Liste erreicht.",
         "status": {
             "queued": "In der Warteschlange",
             "running": "Berechne",

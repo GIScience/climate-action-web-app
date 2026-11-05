@@ -11,7 +11,7 @@
         [attr.aria-label]="label ? null : ('pluginCatalog.switchTool' | transloco)"
         [tp]="'pluginCatalog.switchTool' | transloco"
         [tpIsEnabled]="!open"
-        tpPlacement="bottom">
+        tpPlacement="right">
         <span #deckStack class="deck__stack">
             @for (slot of [0, 1]; track slot) {
                 <span class="deck__card deck__card--back-{{ slot + 1 }}">

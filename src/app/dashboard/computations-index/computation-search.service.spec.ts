@@ -75,6 +75,7 @@ describe('ComputationSearchService', () => {
         expect(mockPluginService.getSearch).toHaveBeenLastCalledWith('test_plugin', 'cursor-1', 10)
         expect(loadedIds()).toEqual(['a', 'b'])
         expect(service.hasMore()).toBe(false)
+        expect(service.pages()).toBe(2)
 
         const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
         service.loadMore()
