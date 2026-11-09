@@ -102,22 +102,16 @@ build_staging:
     stage: build
     cache: []
     rules:
-        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == 'push'
+        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
     image: docker.io/docker:29.9.2-cli
-    services:
-        - name: docker:29.9.2-dind
-          alias: thedockerhost
-    variables:
-        DOCKER_HOST: tcp://thedockerhost:2375
-        DOCKER_TLS_CERTDIR: ''
-        DOCKER_DRIVER: overlay2
     before_script:
-        - unset DOCKER_AUTH_CONFIG
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
+        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
     script:
         - |
             docker --config ~/ca_config \
-                build \
+                buildx build \
+                --builder=kube \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
                 .
