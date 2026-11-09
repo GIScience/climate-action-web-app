@@ -6,6 +6,8 @@ WORKDIR /ca-web-app
 
 ENV CYPRESS_INSTALL_BINARY=0
 ENV NODE_OPTIONS=--max-old-space-size=4096
+ENV NG_BUILD_MAX_WORKERS=2
+ENV GOMAXPROCS=2
 
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN npm install -g pnpm@${PNPM_VERSION}
@@ -14,6 +16,8 @@ RUN pnpm install --frozen-lockfile
 COPY src/ ./src/
 COPY angular.json ./angular.json
 COPY tsconfig*.json ./
+# TEMP diagnostic: probe the buildkit pod's memory limit by allocating 256MB chunks until killed; remove once known
+RUN node -e 'const held=[];(async()=>{for(let i=1;i<=64;i++){held.push(Buffer.alloc(256<<20,1));console.log(`${i*256} MB held`);await new Promise(r=>setTimeout(r,150))}})()'
 RUN pnpm run build:prod
 
 RUN find dist/browser -type f \
