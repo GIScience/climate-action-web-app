@@ -15,16 +15,17 @@ COPY angular.json ./angular.json
 COPY tsconfig*.json ./
 RUN pnpm run build:prod
 
-RUN find dist/browser -type f \
+FROM nginx:1.31-alpine-slim AS runtime
+COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
+
+# CI skips the build stage by passing `--build-context build=./prebuilt`
+COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
+
+RUN find /usr/share/nginx/html -type f \
         \( -name '*.js' -o -name '*.mjs' -o -name '*.css' -o -name '*.svg' \
         -o -name '*.html' -o -name '*.json' -o -name '*.ttf' \) \
         ! -name 'env.js' ! -name 'env.template.js' -size +1k \
         -exec gzip -9 -k {} +
-
-FROM nginx:1.31-alpine-slim AS runtime
-COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
 
 ENV ENVIRONMENT_TYPE=""
 ENV CLIMATE_ACTION_API_URL=""
