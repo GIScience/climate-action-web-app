@@ -25,6 +25,10 @@ test_unit_and_lint:
     variables:
         NODE_OPTIONS: '--no-warnings'
         CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '1'
+        KUBERNETES_CPU_LIMIT: '2'
+        KUBERNETES_MEMORY_REQUEST: '2Gi'
+        KUBERNETES_MEMORY_LIMIT: '4Gi'
     before_script:
         - |
             cat > "./src/assets/env.js" << EOF
@@ -61,6 +65,10 @@ test_cypress:
         NODE_ENV: 'test'
         NODE_OPTIONS: '--no-warnings'
         CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '2'
+        KUBERNETES_CPU_LIMIT: '4'
+        KUBERNETES_MEMORY_REQUEST: '8Gi'
+        KUBERNETES_MEMORY_LIMIT: '12Gi'
     needs: ['test_unit_and_lint']
     image:
         name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
