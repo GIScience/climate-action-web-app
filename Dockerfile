@@ -5,6 +5,7 @@ ARG PNPM_VERSION=12.16.1
 WORKDIR /ca-web-app
 
 ENV CYPRESS_INSTALL_BINARY=0
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN npm install -g pnpm@${PNPM_VERSION}
