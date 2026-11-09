@@ -1,5 +1,5 @@
 stages:
-    # - test
+    - test
     - build
     - deploy
 
@@ -8,102 +8,101 @@ variables:
     PNPM_VERSION: '12.16.1'
     HUSKY: '0'
 
-# test_unit_and_lint:
-#     stage: test
-#     rules:
-#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-#         - when: never
-#     cache:
-#         key:
-#             files:
-#                 - pnpm-lock.yaml
-#         paths:
-#             - .pnpm-store
-#         policy: pull-push
-#     image:
-#         name: node:22-alpine
-#     variables:
-#         NODE_OPTIONS: '--no-warnings'
-#         CYPRESS_INSTALL_BINARY: '0'
-#         KUBERNETES_CPU_REQUEST: '1'
-#         KUBERNETES_CPU_LIMIT: '2'
-#         KUBERNETES_MEMORY_REQUEST: '2Gi'
-#         KUBERNETES_MEMORY_LIMIT: '4Gi'
-#     before_script:
-#         - |
-#             cat > "./src/assets/env.js" << EOF
-#             ;(function (window) {
-#                 window.env = window.env || {}
-#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
-#             })(this)
-#             EOF
-#         - npm install -g pnpm@${PNPM_VERSION}
-#         - pnpm config set store-dir .pnpm-store
-#         - pnpm install --frozen-lockfile --prefer-offline
-#         - pnpm store prune
-#     script:
-#         - pnpm lint
-#         - pnpm test:coverage
-#     artifacts:
-#         reports:
-#             coverage_report:
-#                 coverage_format: cobertura
-#                 path: coverage/cobertura-coverage.xml
+test_unit_and_lint:
+    stage: test
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+        policy: pull-push
+    image:
+        name: node:22-alpine
+    variables:
+        NODE_OPTIONS: '--no-warnings'
+        CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '1'
+        KUBERNETES_CPU_LIMIT: '2'
+        KUBERNETES_MEMORY_REQUEST: '2Gi'
+        KUBERNETES_MEMORY_LIMIT: '4Gi'
+    before_script:
+        - |
+            cat > "./src/assets/env.js" << EOF
+            ;(function (window) {
+                window.env = window.env || {}
+                window['env']['ENVIRONMENT_TYPE'] = 'testing'
+            })(this)
+            EOF
+        - npm install -g pnpm@${PNPM_VERSION}
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
+    script:
+        - pnpm lint
+        - pnpm test:coverage
+    artifacts:
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage/cobertura-coverage.xml
 
-# test_cypress:
-#     stage: test
-#     rules:
-#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-#         - when: never
-#     cache:
-#         key:
-#             files:
-#                 - pnpm-lock.yaml
-#         paths:
-#             - .pnpm-store
-#     variables:
-#         NODE_ENV: 'test'
-#         NODE_OPTIONS: '--no-warnings'
-#         CYPRESS_INSTALL_BINARY: '0'
-#         KUBERNETES_CPU_REQUEST: '2'
-#         KUBERNETES_CPU_LIMIT: '4'
-#         KUBERNETES_MEMORY_REQUEST: '8Gi'
-#         KUBERNETES_MEMORY_LIMIT: '12Gi'
-#     needs: ['test_unit_and_lint']
-#     image:
-#         name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
-#         entrypoint: ['']
-#     before_script:
-#         - |
-#             cat > "./src/assets/env.js" << EOF
-#             ;(function (window) {
-#                 window.env = window.env || {}
-#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
-#                 window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
-#             })(this)
-#             EOF
-#         - npm install -g pnpm@${PNPM_VERSION}
-#         - pnpm config set store-dir .pnpm-store
-#         - pnpm install --frozen-lockfile --prefer-offline
-#         - pnpm store prune
-#     script:
-#         - pnpm start &
-#         - pnpm wait-on http://localhost:4200
-#         - pnpm cy:run
-#     artifacts:
-#         when: on_failure
-#         paths:
-#             - cypress/screenshots/**/*.png
-#             - cypress/snapshots/actual/**/*.png
-#             - cypress/snapshots/diff/**/*.png
-#         expire_in: 7 day
+test_cypress:
+    stage: test
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+    variables:
+        NODE_ENV: 'test'
+        NODE_OPTIONS: '--no-warnings'
+        CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '2'
+        KUBERNETES_CPU_LIMIT: '4'
+        KUBERNETES_MEMORY_REQUEST: '8Gi'
+        KUBERNETES_MEMORY_LIMIT: '12Gi'
+    needs: ['test_unit_and_lint']
+    image:
+        name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
+        entrypoint: ['']
+    before_script:
+        - |
+            cat > "./src/assets/env.js" << EOF
+            ;(function (window) {
+                window.env = window.env || {}
+                window['env']['ENVIRONMENT_TYPE'] = 'testing'
+                window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
+            })(this)
+            EOF
+        - npm install -g pnpm@${PNPM_VERSION}
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
+    script:
+        - pnpm start &
+        - pnpm wait-on http://localhost:4200
+        - pnpm cy:run
+    artifacts:
+        when: on_failure
+        paths:
+            - cypress/screenshots/**/*.png
+            - cypress/snapshots/actual/**/*.png
+            - cypress/snapshots/diff/**/*.png
+        expire_in: 7 day
 
 build_app:
     stage: build
     rules:
-        # - if: $CI_COMMIT_TAG
-        # - !reference [build_staging, rules]
-        - when: always
+        - if: $CI_COMMIT_TAG
+        - !reference [build_staging, rules]
     cache:
         key:
             files:
@@ -137,8 +136,7 @@ build_staging:
     cache: []
     needs: [build_app]
     rules:
-        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
-        - when: always
+        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
     image: docker.io/docker:29.9.2-cli
     before_script:
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
@@ -244,19 +242,19 @@ test_dependency_audit:
         exit_codes:
             - 1
 
-# deploy_staging:
-#     stage: deploy
-#     tags: [k8s-kta]
-#     needs:
-#         - build_staging
-#     rules:
-#         - !reference [build_staging, rules]
-#     image: repo.heigit.org/heigit/argocd-cli:latest
-#     script:
-#         - |
-#             argocd app actions \
-#               run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
-#               restart --kind Deployment \
-#               --server ${ARGOCD_SERVER} \
-#               --auth-token ${ARGOCD_AUTH_TOKEN}\
-#               --resource-name can-${CI_PROJECT_NAME}
+deploy_staging:
+    stage: deploy
+    tags: [k8s-kta]
+    needs:
+        - build_staging
+    rules:
+        - !reference [build_staging, rules]
+    image: repo.heigit.org/heigit/argocd-cli:latest
+    script:
+        - |
+            argocd app actions \
+              run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
+              restart --kind Deployment \
+              --server ${ARGOCD_SERVER} \
+              --auth-token ${ARGOCD_AUTH_TOKEN}\
+              --resource-name can-${CI_PROJECT_NAME}
