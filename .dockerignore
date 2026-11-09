@@ -4,6 +4,7 @@
 .gitignore
 .angular/**
 
+dist/**
 node_modules/**
 
 .pnpm-store
