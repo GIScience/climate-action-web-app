@@ -125,6 +125,7 @@ build_app:
         - pnpm store prune
     script:
         - pnpm run build:prod
+        # Match the path the Dockerfile's build stage produces
         - mkdir -p prebuilt/ca-web-app && mv dist prebuilt/ca-web-app/dist
     artifacts:
         paths:

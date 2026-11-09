@@ -18,6 +18,7 @@ RUN pnpm run build:prod
 FROM nginx:1.31-alpine-slim AS runtime
 COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
 
+# CI skips the build stage by passing `--build-context build=./prebuilt`
 COPY --from=build /ca-web-app/dist/browser/ /usr/share/nginx/html/
 
 RUN find /usr/share/nginx/html -type f \
