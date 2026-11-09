@@ -98,21 +98,46 @@ variables:
 #             - cypress/snapshots/diff/**/*.png
 #         expire_in: 7 day
 
-build_staging:
+build_app:
     stage: build
-    cache: []
     rules:
-        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+        # - if: $CI_COMMIT_TAG
+        # - !reference [build_staging, rules]
         - when: always
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+        policy: pull-push
+    image: node:24-slim
     variables:
+        CYPRESS_INSTALL_BINARY: '0'
         KUBERNETES_CPU_REQUEST: '4'
         KUBERNETES_CPU_LIMIT: '8'
         KUBERNETES_MEMORY_REQUEST: '8Gi'
         KUBERNETES_MEMORY_LIMIT: '16Gi'
-        KUBERNETES_SERVICE_CPU_REQUEST: '2'
-        KUBERNETES_SERVICE_CPU_LIMIT: '4'
-        KUBERNETES_SERVICE_MEMORY_REQUEST: '4Gi'
-        KUBERNETES_SERVICE_MEMORY_LIMIT: '8Gi'
+    before_script:
+        - npm install -g pnpm@${PNPM_VERSION}
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
+    script:
+        - pnpm run build:prod
+        - mkdir -p prebuilt/ca-web-app && mv dist prebuilt/ca-web-app/dist
+    artifacts:
+        paths:
+            - prebuilt/
+        expire_in: 1 hour
+
+build_staging:
+    stage: build
+    cache: []
+    needs: [build_app]
+    rules:
+        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+        - when: always
     image: docker.io/docker:29.9.2-cli
     before_script:
         - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
@@ -122,6 +147,7 @@ build_staging:
             docker --config ~/ca_config \
                 buildx build \
                 --builder=kube \
+                --build-context build=./prebuilt \
                 --build-arg "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}" \
                 --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
                 --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
@@ -133,6 +159,7 @@ build_staging:
 build_release:
     stage: build
     cache: []
+    needs: [build_app]
     rules:
         - if: $CI_COMMIT_TAG
     image: docker.io/docker:29.9.2-cli
@@ -144,6 +171,7 @@ build_release:
             docker --config ~/ca_config \
                 buildx build \
                 --builder=kube \
+                --build-context build=./prebuilt \
                 --platform=linux/amd64 \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
                 --push \

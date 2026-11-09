@@ -5,6 +5,7 @@
 .angular/**
 
 dist/**
+prebuilt/**
 node_modules/**
 
 .pnpm-store
