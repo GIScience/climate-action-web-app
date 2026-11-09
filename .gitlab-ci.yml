@@ -98,9 +98,30 @@ variables:
 #             - cypress/snapshots/diff/**/*.png
 #         expire_in: 7 day
 
+build_app:
+    stage: build
+    rules:
+        - when: always
+    variables:
+        KUBERNETES_CPU_REQUEST: '4'
+        KUBERNETES_CPU_LIMIT: '8'
+        KUBERNETES_MEMORY_REQUEST: '8Gi'
+        KUBERNETES_MEMORY_LIMIT: '16Gi'
+    image: node:24-slim
+    before_script:
+        - corepack enable pnpm
+        - pnpm install --frozen-lockfile
+    script:
+        - pnpm run build:prod
+    artifacts:
+        paths:
+            - dist/browser/
+        expire_in: 1 hour
+
 build_staging:
     stage: build
     cache: []
+    needs: [build_app]
     rules:
         # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
         - when: always
@@ -119,8 +140,6 @@ build_staging:
                 buildx build \
                 --builder=kube \
                 --build-arg "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}" \
-                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
-                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
                 .
