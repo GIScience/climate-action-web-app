@@ -26,16 +26,13 @@ import {
     ComputationParametersDialogData
 } from '../common/computation-parameters-dialog/computation-parameters-dialog.component'
 import { ComputationComponent } from '../computation/computation.component'
+import { confirmUnbookmark, toBookmarkEntity } from '../computations-index/computation-bookmark.utils'
 import {
     formatComputationTimestamp,
     formatShortUUID,
     getLanguageMismatchTooltip
 } from '../computations-index/computation-format.utils'
-import {
-    ComputationDatabaseEntity,
-    ComputationDisplayEntity,
-    ComputationMetadata
-} from '../computations-index/computation.interface'
+import { ComputationDisplayEntity, ComputationMetadata } from '../computations-index/computation.interface'
 import { mapHydratedComputation } from '../computations-index/computation.mapper'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
@@ -239,20 +236,13 @@ export class ComputationDetailComponent implements OnInit, OnDestroy {
         if (!this.computation) return
 
         if (this.isBookmarked()) {
+            if (!confirmUnbookmark(this.computation, this.translocoService)) return
             await this.storageService.deleteComputation(this.computation.correlation_uuid)
             this.toastr.info(this.translocoService.translate('computationsIndex.bookmarkRemoved'), '', {
                 timeOut: 3000
             })
         } else {
-            const entity: ComputationDatabaseEntity = {
-                correlation_uuid: this.computation.correlation_uuid,
-                request_ts: this.computation.request_ts,
-                status: 'SUCCESS',
-                aoiName: this.computation.aoiName,
-                pluginId: this.computation.pluginId,
-                language: this.computation.language
-            }
-            await this.pluginService.storeNewComputes(entity)
+            await this.pluginService.storeNewComputes(toBookmarkEntity(this.computation))
             this.toastr.success(this.translocoService.translate('computationsIndex.bookmarkAdded'), '', {
                 timeOut: 3000
             })

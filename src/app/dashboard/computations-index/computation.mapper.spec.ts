@@ -26,7 +26,8 @@ describe('computation mappers', () => {
                 status: 'SUCCESS',
                 aoiName: 'Test AOI',
                 pluginId: 'test_plugin',
-                flags: ['NEW']
+                flags: ['NEW'],
+                valid_until: new Date('2023-10-27T00:00:00')
             }
 
             expect(mapDatabaseComputation(run)).toEqual({
@@ -36,6 +37,7 @@ describe('computation mappers', () => {
                 aoiName: 'Test AOI',
                 pluginId: 'test_plugin',
                 flags: ['NEW'],
+                valid_until: run.valid_until,
                 artifacts: [],
                 hydrated: false
             })
@@ -75,6 +77,7 @@ describe('computation mappers', () => {
             correlation_uuid: 'test-uuid',
             request_ts: new Date('2023-10-01T10:00:00+01:00'),
             language: undefined,
+            valid_until: new Date('2023-10-27T00:00:00'),
             params: { year: 2023 },
             requested_params: { year: 2023 },
             aoi: {
@@ -97,6 +100,7 @@ describe('computation mappers', () => {
                     correlation_uuid: 'test-uuid',
                     request_ts: metadata.request_ts,
                     status: 'SUCCESS',
+                    valid_until: metadata.valid_until,
                     aoiName: 'Metadata AOI',
                     geometry: metadata.aoi,
                     pluginId: 'metadata_plugin',

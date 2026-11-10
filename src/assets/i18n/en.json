@@ -127,7 +127,8 @@
         "runSucceeded": "<strong>{{ plugin }}</strong> computation for <strong>{{ aoi }}</strong> (ID: #{{ id }}) has completed successfully. Click here to open it.",
         "bookmarkAdded": "Saved to Bookmarks",
         "bookmarkRemoved": "Removed from Bookmarks",
-        "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
+        "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?",
+        "unbookmarkExpiredConfirm": "This computation has expired and no longer appears in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?"
     },
     "computationDetail": {
         "back": "All computations",

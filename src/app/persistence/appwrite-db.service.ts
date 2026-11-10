@@ -80,7 +80,8 @@ export class AppwriteDbService {
                         request_ts: row.timestamp,
                         status: row.status,
                         aoiName: row.aoiName,
-                        language: row.language
+                        language: row.language,
+                        valid_until: row.valid_until
                     }) as ComputationDatabaseEntity
             )
 
@@ -144,51 +145,5 @@ export class AppwriteDbService {
         if (!rowId) return
 
         await this.tablesDB.deleteRow({ databaseId: this.DATABASE_ID, tableId: this.RUNS_TABLE_ID, rowId })
-    }
-
-    async getTotalComputationsCount(): Promise<number> {
-        try {
-            if (!this.user_id) return 0
-
-            // We only need the total count, not the rows
-            const response = await this.tablesDB.listRows({
-                databaseId: this.DATABASE_ID,
-                tableId: this.RUNS_TABLE_ID,
-                queries: [Query.equal('user_id', this.user_id), Query.limit(1)]
-            })
-
-            return response.total
-        } catch (error) {
-            this.logError('Error fetching total computations count:', error)
-            return 0
-        }
-    }
-
-    async getLatestComputation(): Promise<ComputationDatabaseEntity | null> {
-        try {
-            if (!this.user_id) return null
-
-            const response = await this.tablesDB.listRows<ComputationRow>({
-                databaseId: this.DATABASE_ID,
-                tableId: this.RUNS_TABLE_ID,
-                queries: [Query.equal('user_id', this.user_id), Query.orderDesc('timestamp'), Query.limit(1)]
-            })
-
-            if (response.rows.length === 0) return null
-
-            const row = response.rows[0]
-            return {
-                correlation_uuid: row.correlation_uuid,
-                flags: row.flags,
-                pluginId: row.pluginId,
-                request_ts: row.timestamp,
-                status: row.status,
-                aoiName: row.aoiName,
-                language: row.language
-            } as ComputationDatabaseEntity
-        } catch (error) {
-            this.logError('Error fetching latest computation:', error)
-            return null
-        }
     }
 }

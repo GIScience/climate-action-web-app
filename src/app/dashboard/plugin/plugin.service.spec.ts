@@ -228,4 +228,14 @@ describe('PluginService', () => {
             status: 'PENDING'
         })
     })
+
+    it('should fetch valid_until and save it on the stored run', () => {
+        httpClientSpy.get.mockReturnValue(of({ ...test_computation, valid_until: '2025-08-28T00:00:00' }))
+
+        service.storeValidUntil('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6')
+
+        expect(storageService.updateComputation).toHaveBeenCalledWith('1fbeed00-e9b7-4f54-bae7-18f64bd33ea6', {
+            valid_until: '2025-08-28T00:00:00'
+        })
+    })
 })

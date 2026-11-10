@@ -52,6 +52,7 @@ export function mapDatabaseComputation(run: ComputationDatabaseEntity): Computat
         pluginId: run.pluginId,
         language: run.language,
         flags: run.flags,
+        valid_until: run.valid_until,
         artifacts: [],
         hydrated: false
     }
@@ -79,6 +80,7 @@ export function mapHydratedComputation(
         status: metadata.status,
         request_ts: metadata.request_ts ?? computation.request_ts,
         language: metadata.language,
+        valid_until: metadata.valid_until,
         aoiName: (metadata.aoi?.properties?.['name'] as string | undefined) ?? computation.aoiName,
         geometry: metadata.aoi,
         pluginId: metadata.plugin_info?.id ?? computation.pluginId,

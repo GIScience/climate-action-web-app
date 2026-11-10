@@ -151,4 +151,13 @@ export class PluginService {
     async updateRunStatus(correlationId: string, newStatus: ComputationRunState) {
         await this.storageService.updateComputation(correlationId, { status: newStatus })
     }
+
+    // Fetches the computation's valid_until in the background and saves it on the stored run.
+    // If the fetch fails, the run keeps no value, which counts as expired.
+    storeValidUntil(correlationId: string): void {
+        this.getComputationMetadata(correlationId).subscribe({
+            next: ({ valid_until }) => void this.storageService.updateComputation(correlationId, { valid_until }),
+            error: () => undefined
+        })
+    }
 }

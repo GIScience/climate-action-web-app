@@ -40,6 +40,7 @@ export interface ComputationMetadata {
     correlation_uuid: string
     request_ts: Date
     language?: SupportedLanguage
+    valid_until?: Date
     params: ComputationParameters
     requested_params?: ComputationParameters
     aoi: GeoJSONFeature<MultiPolygon>
@@ -52,7 +53,7 @@ export interface ComputationMetadata {
 
 export interface ComputationDisplayEntity extends Pick<
     ComputationMetadata,
-    'correlation_uuid' | 'request_ts' | 'language' | 'status'
+    'correlation_uuid' | 'request_ts' | 'language' | 'status' | 'valid_until'
 > {
     artifacts: ArtifactEntity[]
     params?: ComputationParameters
@@ -71,7 +72,7 @@ export interface ComputationDisplayEntity extends Pick<
 
 export type ComputationDatabaseEntity = Pick<
     ComputationDisplayEntity,
-    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'language' | 'flags'
+    'correlation_uuid' | 'request_ts' | 'status' | 'aoiName' | 'pluginId' | 'language' | 'flags' | 'valid_until'
 >
 
 export type ComputationBasicInfo = Pick<

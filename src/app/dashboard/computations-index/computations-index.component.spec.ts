@@ -92,7 +92,8 @@ describe('ComputationsIndexComponent', () => {
             getSearch: vi.fn().mockReturnValue(of(createSearchPage([]))),
             getSearchCentroids: vi.fn().mockReturnValue(of({ type: 'FeatureCollection', features: [] })),
             getPluginRuns: vi.fn().mockReturnValue(pluginRuns$.asObservable()),
-            storeNewComputes: vi.fn(() => Promise.resolve())
+            storeNewComputes: vi.fn(() => Promise.resolve()),
+            storeValidUntil: vi.fn()
         }
 
         mockArtifactService = {
@@ -172,6 +173,7 @@ describe('ComputationsIndexComponent', () => {
     })
 
     afterEach(() => {
+        vi.unstubAllGlobals()
         expect(fixture.debugElement.queryAll(By.css('.computations-index')).length).toBe(1)
     })
 
@@ -272,6 +274,7 @@ describe('ComputationsIndexComponent', () => {
                 aoiName: 'Test AoI'
             })
         )
+        expect(mockPluginService.storeValidUntil).toHaveBeenCalledWith('dir-1')
         expect(component.isBookmarked('dir-1')).toBe(true)
         expect(toastrService.success).toHaveBeenCalled()
     })
@@ -284,6 +287,7 @@ describe('ComputationsIndexComponent', () => {
             correlation_uuid: TEST_UUID,
             request_ts: new Date('2023-09-27T16:42:52+01:00'),
             status: 'SUCCESS',
+            valid_until: new Date(Date.now() + 60_000),
             artifacts: []
         } as ComputationDisplayEntity
 
@@ -292,6 +296,19 @@ describe('ComputationsIndexComponent', () => {
 
         expect(mockStorageService.deleteComputation).toHaveBeenCalledWith(TEST_UUID)
         expect(component.isBookmarked(TEST_UUID)).toBe(false)
+    })
+
+    it('should keep an expired bookmark when the confirmation is declined', async () => {
+        const confirmSpy = vi.fn().mockReturnValue(false)
+        vi.stubGlobal('confirm', confirmSpy)
+        seedStoredRuns([createTestRun({ valid_until: new Date('2020-01-01T00:00:00Z') })])
+
+        component.toggleBookmark(component.runs()[0], new Event('click'))
+        await flushPromises()
+
+        expect(confirmSpy).toHaveBeenCalled()
+        expect(mockStorageService.deleteComputation).not.toHaveBeenCalled()
+        expect(component.isBookmarked(TEST_UUID)).toBe(true)
     })
 
     it('should copy the computation share link for the current plugin', () => {

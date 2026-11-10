@@ -38,10 +38,11 @@ import {
     RunFailureDialogData
 } from '../common/run-failure-dialog/run-failure-dialog.component'
 import { isPendingStatus, statusRank } from '../common/status-rank.util'
-import { AOI_ORIGINAL_TYPES, ExternalInput, Plugin } from '../plugin/plugin.interface'
+import { Plugin } from '../plugin/plugin.interface'
 import { PluginService } from '../plugin/plugin.service'
 import { ReportService } from '../report/report.service'
 import { computationRouteCommands, ShareService } from '../share/share.service'
+import { confirmUnbookmark, toBookmarkEntity } from './computation-bookmark.utils'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
 import { formatComputationTimestamp, formatShortUUID } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
@@ -225,6 +226,7 @@ export class ComputationsIndexComponent implements OnInit {
                         existing.status = entity.status
                     }
                     existing.flags = entity.flags ?? existing.flags
+                    existing.valid_until = entity.valid_until ?? existing.valid_until
                 } else if (isPendingStatus(entity.status) || entity.status === 'SUCCESS') {
                     additions.push(mapDatabaseComputation(entity))
                 }
@@ -292,6 +294,7 @@ export class ComputationsIndexComponent implements OnInit {
                 }
             }
             this.storageService.markAsNew(run.correlation_uuid)
+            this.pluginService.storeValidUntil(run.correlation_uuid)
             const message = this.translocoService.translate('computationsIndex.runSucceeded', {
                 plugin: this.pluginService.getPluginNameById(run.pluginId || ''),
                 aoi: run.aoiName,
@@ -338,12 +341,8 @@ export class ComputationsIndexComponent implements OnInit {
     toggleBookmark(computation: ComputationDisplayEntity, event: Event): void {
         event.stopPropagation()
         if (this.isBookmarked(computation.correlation_uuid)) {
-            if (
-                this.isCustomAoi(computation) &&
-                !confirm(this.translocoService.translate('computationsIndex.unbookmarkCustomAoiConfirm'))
-            ) {
-                return
-            }
+            // A row listed in Discover is still valid and can be bookmarked again, so it needs no confirm.
+            if (this.activeTab === 'bookmarks' && !confirmUnbookmark(computation, this.translocoService)) return
             this.removeBookmark(computation.correlation_uuid)
         } else {
             this.addBookmark(computation)
@@ -355,29 +354,14 @@ export class ComputationsIndexComponent implements OnInit {
         this.shareService.copyShareLink(this.pluginId, computation.correlation_uuid)
     }
 
-    private isCustomAoi(computation: ComputationDisplayEntity): boolean {
-        if (computation.flags?.includes('CUSTOM_AOI')) return true
-
-        // Older boundary computations lack original_type entirely,
-        // so absence counts as a boundary.
-        const originalType = computation.geometry?.properties?.['original_type']
-        return !!originalType && originalType !== AOI_ORIGINAL_TYPES[ExternalInput.Boundary]
-    }
-
     private async addBookmark(computation: ComputationDisplayEntity): Promise<void> {
         if (this.isBookmarked(computation.correlation_uuid)) return
 
-        const entity: ComputationDatabaseEntity = {
-            correlation_uuid: computation.correlation_uuid,
-            request_ts: computation.request_ts,
-            status: 'SUCCESS',
-            aoiName: computation.aoiName,
-            pluginId: computation.pluginId,
-            language: computation.language
-        }
+        const entity = toBookmarkEntity(computation)
 
         await this.pluginService.storeNewComputes(entity)
         this.upsertRuns([entity])
+        this.pluginService.storeValidUntil(entity.correlation_uuid)
         this.toastr.success(this.translocoService.translate('computationsIndex.bookmarkAdded'), '', {
             timeOut: 3000
         })

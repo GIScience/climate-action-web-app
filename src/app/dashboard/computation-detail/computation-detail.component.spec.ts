@@ -207,6 +207,7 @@ describe('ComputationDetailComponent', () => {
     }
 
     afterEach(fakeAsync(() => {
+        vi.unstubAllGlobals()
         tick()
         discardPeriodicTasks()
         flush()
@@ -434,6 +435,10 @@ describe('ComputationDetailComponent', () => {
     }))
 
     it('should bookmark the computation from the detail view', fakeAsync(() => {
+        mockPluginService.getComputationMetadata = vi
+            .fn()
+            .mockReturnValue(of({ ...buildMetadata(), valid_until: '2999-01-01T00:00:00' }))
+
         createComponent()
         tick()
 
@@ -445,10 +450,24 @@ describe('ComputationDetailComponent', () => {
                 correlation_uuid: UUID,
                 pluginId: 'test_plugin',
                 status: 'SUCCESS',
-                aoiName: 'Test AOI'
+                aoiName: 'Test AOI',
+                valid_until: '2999-01-01T00:00:00'
             })
         )
     }))
+
+    it('should keep an expired bookmark when the confirmation is declined', async () => {
+        const confirmSpy = vi.fn().mockReturnValue(false)
+        vi.stubGlobal('confirm', confirmSpy)
+        mockStorageService.getPluginRuns = vi.fn().mockReturnValue([{ correlation_uuid: UUID }])
+
+        createComponent()
+        await flushPromises()
+        await component.toggleBookmark()
+
+        expect(confirmSpy).toHaveBeenCalled()
+        expect(mockStorageService.deleteComputation).not.toHaveBeenCalled()
+    })
 
     it('should tear down viewer and map state on destroy', fakeAsync(() => {
         createComponent()

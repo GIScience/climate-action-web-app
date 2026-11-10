@@ -4,12 +4,13 @@ import { TranslocoService } from '@jsverse/transloco'
 import { format } from 'date-fns'
 import { ComputationDisplayEntity } from './computation.interface'
 
+export function parseUtcTimestamp(timestamp: Date | string): Date {
+    if (typeof timestamp !== 'string') return timestamp
+    return new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z')
+}
+
 export function formatComputationTimestamp(timestamp: Date | string, lang: string): string {
-    const date =
-        typeof timestamp === 'string'
-            ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(timestamp) ? timestamp : timestamp + 'Z')
-            : timestamp
-    return format(date, getDatePattern(lang), { locale: getDateFnsLocale(lang) })
+    return format(parseUtcTimestamp(timestamp), getDatePattern(lang), { locale: getDateFnsLocale(lang) })
 }
 
 function getDatePattern(lang: string): string {
