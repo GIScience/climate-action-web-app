@@ -62,6 +62,7 @@
         "loginToCompute": "Please login to request a computation.",
         "offline": "This Assessment Tool is currently offline.",
         "offlineNewCompute": "This Assessment Tool is currently offline. Please try again later.",
+        "loadFailed": "The '{{ plugin }}' tool could not be loaded. Please try again later.",
         "computePanel": "New Computation",
         "computeStart": "Compute",
         "computeSubmitting": "Submitting…",
@@ -103,7 +104,6 @@
             "syncPrompt": "Your bookmarks are only saved in this browser — sync with your account to keep them safe.",
             "action": "Log in to continue"
         },
-        "imported": "Imported Computation",
         "artifactErrors": "Some results could not be computed.",
         "languageMismatch": "This computation was generated in {{ language }}. Request a new computation if you need it in {{ currentLanguage }}.",
         "languageMismatchPluginOnly": "This computation was generated in {{ language }}. This Assessment Tool is not available in {{ currentLanguage }} currently.",

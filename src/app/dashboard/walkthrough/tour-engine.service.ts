@@ -47,10 +47,9 @@ export class TourEngine {
 
     async checkForPendingTour() {
         setTimeout(async () => {
-            const getPendingTourState = this.storageService.getPendingTourState()
-            const isAuthenticated = await this.checkAuthentication()
+            if (!this.storageService.getPendingTourState()) return
 
-            if (getPendingTourState && isAuthenticated) {
+            if (await this.appwriteService.initialLogin) {
                 this.storageService.clearTourAfterLoginFlag()
                 await this.startFullTour()
             }

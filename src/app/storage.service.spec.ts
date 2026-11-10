@@ -37,7 +37,6 @@ describe('StorageService', () => {
         _user: BehaviorSubject<Models.User<Models.Preferences> | null>
         onLogout: EventEmitter<void>
         registerBeforeLogout: Mock
-        tryToLogin: Mock
     }
     let mockAppwriteDb: { fetchPluginRunsPaginated: Mock }
     let mockRunSyncService: { commit: Mock; scheduleDrain: Mock; drainNow: Mock }
@@ -53,8 +52,7 @@ describe('StorageService', () => {
         mockAppwriteService = {
             _user: userSubject,
             onLogout,
-            registerBeforeLogout: vi.fn(),
-            tryToLogin: vi.fn().mockResolvedValue(false)
+            registerBeforeLogout: vi.fn()
         }
         mockAppwriteDb = {
             fetchPluginRunsPaginated: vi.fn().mockResolvedValue({ documents: [], total: 0, hasMore: false })

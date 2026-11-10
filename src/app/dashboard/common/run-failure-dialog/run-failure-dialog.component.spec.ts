@@ -11,11 +11,8 @@ describe('RunFailureDialogComponent', () => {
     let writeText: Mock
 
     const baseData: RunFailureDialogData = {
-        revoked: false,
-        pluginName: 'Heat',
-        aoiName: 'Heidelberg',
-        correlationUuid: 'abc-123',
-        mailto: 'mailto:support@example.org'
+        run: { correlation_uuid: 'abc-123', request_ts: new Date(), status: 'FAILURE', aoiName: 'Heidelberg' },
+        pluginName: 'Heat'
     }
 
     async function setup(data: Partial<RunFailureDialogData> = {}): Promise<void> {
@@ -36,7 +33,7 @@ describe('RunFailureDialogComponent', () => {
     }
 
     it('should show the revoked title and the failure message when given', async () => {
-        await setup({ revoked: true, message: 'service busy' })
+        await setup({ run: { ...baseData.run, status: 'REVOKED' }, message: 'service busy' })
 
         expect(fixture.debugElement.query(By.css('h3')).nativeElement.textContent).toContain('revokedTitle')
         expect(fixture.debugElement.query(By.css('.run-failure-dialog__message')).nativeElement.textContent).toBe(

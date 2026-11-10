@@ -15,13 +15,11 @@ import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
-import { environment } from '@environments/environment'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
     LucideClock,
     LucideHash,
-    LucideImport,
     LucideLoader,
     LucideLoaderCircle,
     LucideShare2
@@ -62,7 +60,6 @@ import { mapDatabaseComputation } from './computation.mapper'
         LucideBookmark,
         LucideClock,
         LucideHash,
-        LucideImport,
         LucideLoader,
         LucideLoaderCircle,
         LucideShare2,
@@ -306,30 +303,14 @@ export class ComputationsIndexComponent implements OnInit {
                     this.router.navigate(computationRouteCommands(run.pluginId || this.pluginId, run.correlation_uuid))
                 )
         } else if (newStatus === 'FAILURE' || newStatus === 'REVOKED') {
-            this.openRunFailureDialog(run, newStatus === 'REVOKED', message)
+            this.openRunFailureDialog(run, message)
         }
     }
 
-    private openRunFailureDialog(run: ComputationDatabaseEntity, revoked: boolean, message?: string) {
+    private openRunFailureDialog(run: ComputationDatabaseEntity, message?: string) {
         const pluginName = this.pluginService.getPluginNameById(run.pluginId || '')
-        const subject = this.translocoService.translate('computationsIndex.runFailure.emailSubject', {
-            id: this.formatUUID(run.correlation_uuid)
-        })
-        const body = this.translocoService.translate('computationsIndex.runFailure.emailBody', {
-            plugin: pluginName,
-            id: run.correlation_uuid
-        })
-        const query = `subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-        const data: RunFailureDialogData = {
-            revoked,
-            pluginName,
-            aoiName: run.aoiName,
-            correlationUuid: run.correlation_uuid,
-            message,
-            mailto: `mailto:${environment.supportEmail}?${query}`
-        }
         this.dialog.open<RunFailureDialogComponent, RunFailureDialogData>(RunFailureDialogComponent, {
-            data,
+            data: { run, pluginName, message },
             autoFocus: false
         })
     }

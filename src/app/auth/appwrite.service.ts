@@ -22,11 +22,12 @@ export class AppwriteService {
     public _user = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
     public onLogout = new EventEmitter<void>()
     private beforeLogoutHooks: Array<() => Promise<void>> = []
+    readonly initialLogin: Promise<boolean>
 
     constructor() {
         this.client.setEndpoint(environment.appwriteEndpoint + '/v1').setProject(environment.appwriteProjectId)
 
-        this.tryToLogin()
+        this.initialLogin = this.tryToLogin()
     }
 
     getTablesDB(): TablesDB {
@@ -121,7 +122,7 @@ export class AppwriteService {
             console.error('Error deleting session:', error)
         } finally {
             this._user.next(null)
-            window.location.reload()
+            window.location.assign(document.baseURI)
         }
     }
 }

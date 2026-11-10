@@ -21,7 +21,8 @@ import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
 import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
-import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap, throwError } from 'rxjs'
+import { ToastrService } from 'ngx-toastr'
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap } from 'rxjs'
 import { ComputationsIndexComponent } from '../computations-index/computations-index.component'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { PluginCatalogComponent } from '../plugin-catalog/plugin-catalog.component'
@@ -88,6 +89,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     private reportService = inject(ReportService)
     private translocoService = inject(TranslocoService)
     private mapArtifactManager = inject(MapArtifactManagerService)
+    private toastr = inject(ToastrService)
 
     @ViewChild('pluginMethodologyDialog') pluginMethodologyDialog!: TemplateRef<Plugin>
     @ViewChild('pluginCreditsDialog') pluginCreditsDialog!: TemplateRef<Plugin>
@@ -102,6 +104,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
     isReportVisible = false
 
     private reportVisibilitySubscription: Subscription | undefined
+    private loadedPluginId?: string
 
     user: Models.User<Models.Preferences> | null = null
 
@@ -146,6 +149,7 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                         plugin.assets.icon = this.pluginService.getIconUrl(plugin.id)
                         this.shortPurpose = this.extractFirstSentence(plugin.purpose)
                         this.loading = false
+                        this.loadedPluginId = plugin.id
                         this.pluginService.setActivePlugin(plugin)
                         return plugin
                     }),
@@ -155,7 +159,16 @@ export class PluginComponent implements AfterViewInit, OnDestroy {
                             this.router.navigate(['/404'], { skipLocationChange: true })
                             return EMPTY
                         }
-                        return throwError(() => error)
+                        this.toastr.error(
+                            this.translocoService.translate('plugin.loadFailed', {
+                                plugin: this.pluginService.getPluginNameById(pluginId)
+                            })
+                        )
+                        this.router.navigate(
+                            this.loadedPluginId ? ['/dashboard/plugin', this.loadedPluginId] : ['/dashboard'],
+                            { replaceUrl: true }
+                        )
+                        return EMPTY
                     })
                 )
             })

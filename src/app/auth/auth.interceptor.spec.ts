@@ -44,7 +44,7 @@ describe('AuthInterceptor', () => {
 
         mockAppwriteService = {
             _user: mockUserSubject,
-            tryToLogin: () => Promise.resolve(true),
+            initialLogin: Promise.resolve(true),
             getBasicKey: () => Promise.resolve(mockKeyInfo)
         }
 
@@ -54,7 +54,6 @@ describe('AuthInterceptor', () => {
             }
         }
 
-        vi.spyOn(mockAppwriteService, 'tryToLogin')
         vi.spyOn(mockAppwriteService, 'getBasicKey')
 
         TestBed.configureTestingModule({
@@ -62,10 +61,6 @@ describe('AuthInterceptor', () => {
         })
 
         interceptor = TestBed.inject(AuthInterceptor)
-    })
-
-    it('should attempt to login on initialization', () => {
-        expect(mockAppwriteService.tryToLogin).toHaveBeenCalled()
     })
 
     describe('intercept', () => {

@@ -38,7 +38,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     private async initAuth(): Promise<void> {
         try {
-            await this.appwriteService.tryToLogin()
+            await this.appwriteService.initialLogin
             if (this.appwriteService._user.value) {
                 await this.loadApiKey()
             }

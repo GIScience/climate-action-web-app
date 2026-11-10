@@ -195,15 +195,6 @@
                             [tp]="'computationsIndex.status.done' | transloco"
                             tpPlacement="right"></span>
                     }
-                    @if (showBadges && computation.flags?.includes('IMPORTED')) {
-                        <svg
-                            lucideImport
-                            size="20"
-                            color="#aaaaaa"
-                            class="imported-computation"
-                            [tp]="'computationsIndex.imported' | transloco"
-                            tpPlacement="right"></svg>
-                    }
                 </div>
                 <p class="card-subtitle">
                     <svg lucideClock size="15"></svg>

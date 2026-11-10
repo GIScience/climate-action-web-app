@@ -62,6 +62,7 @@
         "loginToCompute": "Bitte melde dich an, um eine Berechnung zu starten.",
         "offline": "Dieses Analysewerkzeug ist derzeit offline.",
         "offlineNewCompute": "Dieses Analysewerkzeug ist derzeit offline. Bitte versuche es später erneut.",
+        "loadFailed": "Das Analysewerkzeug '{{ plugin }}' konnte nicht geladen werden. Bitte versuche es später erneut.",
         "computePanel": "Berechnung konfigurieren",
         "computeStart": "Berechnung starten",
         "computeSubmitting": "Wird gesendet…",
@@ -103,7 +104,6 @@
             "syncPrompt": "Deine Lesezeichen sind nur in diesem Browser gespeichert – synchronisiere sie mit deinem Konto.",
             "action": "Anmelden und fortfahren"
         },
-        "imported": "Ergebnis importiert",
         "artifactErrors": "Einige Ergebnisse konnten nicht erzeugt werden.",
         "languageMismatch": "Diese Berechnung wurde auf {{ language }} erstellt. Fordere eine neue Berechnung an, wenn du sie auf {{ currentLanguage }} benötigst.",
         "languageMismatchPluginOnly": "Diese Berechnung wurde auf {{ language }} erstellt. Dieses Analysewerkzeug ist derzeit nicht auf {{ currentLanguage }} verfügbar.",

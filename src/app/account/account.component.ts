@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject } from '@angular/core'
+import { Component, OnDestroy, computed, inject } from '@angular/core'
 import { RunSyncService, SyncState } from '@app/persistence/run-sync.service'
 import { TranslocoModule } from '@jsverse/transloco'
 import {
@@ -49,7 +49,7 @@ const SYNC_BADGES: Partial<Record<SyncState, { icon: LucideIcon; labelKey: strin
     templateUrl: './account.component.html',
     styleUrl: './account.component.scss'
 })
-export class AccountComponent implements OnInit, OnDestroy {
+export class AccountComponent implements OnDestroy {
     private appwriteService = inject(AppwriteService)
     private tourEngine = inject(TourEngine)
     private dashboardService = inject(DashboardService)
@@ -67,10 +67,6 @@ export class AccountComponent implements OnInit, OnDestroy {
         this.userSubscription = this.appwriteService._user.subscribe(user => {
             this.user = user
         })
-    }
-
-    async ngOnInit() {
-        await this.appwriteService.tryToLogin()
     }
 
     ngOnDestroy() {

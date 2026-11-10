@@ -1,16 +1,16 @@
 <div class="run-failure-dialog">
     <h3>
         {{
-            (data.revoked ? 'computationsIndex.runFailure.revokedTitle' : 'computationsIndex.runFailure.failedTitle')
+            (revoked ? 'computationsIndex.runFailure.revokedTitle' : 'computationsIndex.runFailure.failedTitle')
                 | transloco
         }}
     </h3>
     <p>
         {{
-            (data.revoked
+            (revoked
                 ? 'computationsIndex.runFailure.revokedDescription'
                 : 'computationsIndex.runFailure.failedDescription'
-            ) | transloco: { plugin: data.pluginName, aoi: data.aoiName }
+            ) | transloco: { plugin: data.pluginName, aoi: data.run.aoiName }
         }}
     </p>
     @if (data.message) {
@@ -18,7 +18,7 @@
     }
     <p class="run-failure-dialog__hint">{{ 'computationsIndex.runFailure.supportHint' | transloco }}</p>
     <div class="run-failure-dialog__id">
-        <code>{{ data.correlationUuid }}</code>
+        <code>{{ data.run.correlation_uuid }}</code>
         <button class="btn-alt btn-small btn-withtext--after" (click)="copyRunId()">
             @if (copied()) {
                 <svg lucideCheck size="16"></svg>

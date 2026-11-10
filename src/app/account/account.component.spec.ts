@@ -34,7 +34,6 @@ describe('AccountComponent', () => {
         userSubject = new BehaviorSubject<Models.User<Models.Preferences> | null>(null)
         appwriteService = {
             _user: userSubject,
-            tryToLogin: vi.fn().mockResolvedValue(true),
             tryToLogout: vi.fn().mockResolvedValue(undefined),
             getAppwriteUrl: vi.fn().mockReturnValue('https://example.com'),
             getRedirectUrl: vi.fn().mockReturnValue('https://example.com'),
@@ -73,11 +72,6 @@ describe('AccountComponent', () => {
     it('should update user when service emits new user', () => {
         userSubject.next(mockUser)
         expect(component.user).toEqual(mockUser)
-    })
-
-    it('should call tryToLogin on init', async () => {
-        await component.ngOnInit()
-        expect(appwriteService.tryToLogin).toHaveBeenCalled()
     })
 
     it('should call tryToLogout when logout is called', async () => {
