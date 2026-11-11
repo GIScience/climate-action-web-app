@@ -14,7 +14,7 @@ import {
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter'
 import { MAT_DATE_LOCALE } from '@angular/material/core'
-import { MatFormFieldModule } from '@angular/material/form-field'
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import {
     constValidationMessage,
@@ -153,6 +153,7 @@ interface BannerState {
                 monthYearA11yLabel: 'LLLL yyyy'
             }
         }),
+        { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
         {
             provide: MAT_DATE_LOCALE,
             deps: [TranslocoService],

@@ -1,11 +1,6 @@
 @use 'spec/tools/rem' as *;
 
 .plugin-parameter-container {
-    --mat-form-field-container-height: 48px;
-    --mat-form-field-filled-with-label-container-padding-top: 20px;
-    --mat-form-field-filled-with-label-container-padding-bottom: 6px;
-    --mat-form-field-container-vertical-padding: 12px;
-
     display: flex;
     flex-direction: column;
     position: relative;
@@ -51,23 +46,30 @@
         }
 
         .area-selection-buttons {
+            background-color: #edf2f2;
+            border-radius: 10px;
             display: grid;
-            gap: rem(8);
+            gap: rem(6);
             grid-template-columns: repeat(6, 1fr);
-            margin: rem(15) 0;
+            margin: rem(12) 0 rem(8);
+            padding: rem(6);
 
             .draw-button {
                 align-items: center;
-                border: 2px solid #008080;
-                border-radius: 15px;
-                color: #008080;
+                background-color: #ffffff;
+                border: 1px solid #b5c7c7;
+                border-radius: 7px;
+                box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+                color: #006666;
                 cursor: pointer;
                 display: flex;
+                font-size: 0.9rem;
                 font-variation-settings: 'wght' 500;
+                gap: rem(5);
                 grid-column: span 2;
                 justify-content: center;
                 margin: 0;
-                padding: rem(5) rem(8);
+                padding: rem(7) rem(8);
                 transition:
                     background-color 0.2s ease,
                     color 0.2s ease;
@@ -78,24 +80,31 @@
                 }
 
                 &:hover {
-                    background-color: #f0f8f8;
+                    background-color: #e6f2f2;
+                    border-color: #008080;
+                }
+
+                &:focus-visible {
+                    outline: 2px solid #008080;
+                    outline-offset: 1px;
                 }
 
                 &.active {
                     background-color: #008080;
+                    border-color: #008080;
                     color: #ffffff;
                 }
 
                 &:disabled {
                     background-color: transparent;
-                    border-color: #b8c4c4;
+                    border-color: #d0d8d8;
+                    box-shadow: none;
                     color: #9aa5a5;
                     cursor: not-allowed;
-                    opacity: 0.6;
                 }
 
                 svg {
-                    margin-right: rem(3);
+                    flex: 0 0 auto;
                 }
             }
         }
@@ -103,31 +112,47 @@
 
     .area-selection-message {
         align-items: center;
-        border-bottom: 3px solid;
-        border-top: 3px solid;
+        border: 1px solid;
+        border-radius: 10px;
         display: flex;
-        margin-bottom: rem(15);
-        margin-left: rem(-10);
+        font-size: 0.9rem;
+        gap: rem(8);
+        margin-bottom: rem(12);
         padding: rem(8) rem(10);
-        width: calc(100% + 1.429rem);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
 
         svg {
-            margin-right: rem(8);
+            flex: 0 0 auto;
         }
 
         &.message--info {
-            background-color: rgb(71 115 163 / 10%);
-            border-color: rgb(71 115 163 / 50%);
+            background-color: rgb(71 115 163 / 8%);
+            border-color: rgb(71 115 163 / 30%);
+
+            svg {
+                color: #4773a3;
+            }
         }
 
         &.message--blocked {
-            background-color: rgb(156 12 5 / 10%);
-            border-color: rgb(156 12 5 / 50%);
+            background-color: rgb(156 12 5 / 8%);
+            border-color: rgb(156 12 5 / 35%);
+
+            svg {
+                color: #9c0c05;
+            }
         }
 
         &.message--warning {
-            background-color: rgb(192 112 0 / 10%);
-            border-color: rgb(192 112 0 / 50%);
+            background-color: rgb(192 112 0 / 8%);
+            border-color: rgb(192 112 0 / 35%);
+
+            svg {
+                color: #c07000;
+            }
         }
     }
 
@@ -163,48 +188,115 @@
             margin-top: rem(15);
         }
 
-        .region-field {
-            width: 100%;
-        }
-
         .region-summary {
             align-items: center;
-            background: linear-gradient(135deg, #f0fdfa, #e6f7f5);
-            border: 1px solid rgba(0, 128, 128, 0.5);
-            border-radius: 4px;
+            background-color: #f0f9f8;
+            border: 1px solid rgb(0 128 128 / 35%);
+            border-radius: 10px;
             display: flex;
             gap: rem(8);
-            padding: rem(10) rem(12);
+            padding: rem(8) rem(8) rem(8) rem(12);
 
             .region-name {
                 flex: 1 1 auto;
                 font-size: 0.9rem;
                 font-weight: 600;
             }
+
+            &.region-summary--editable {
+                display: grid;
+                gap: rem(4) rem(8);
+                grid-template-columns: 1fr auto auto;
+                padding-top: rem(6);
+            }
+
+            &.region-summary--invalid {
+                background-color: rgb(156 12 5 / 5%);
+                border-color: rgb(156 12 5 / 45%);
+
+                .region-name-input {
+                    border-color: #9c0c05;
+
+                    &:focus {
+                        outline-color: rgb(156 12 5 / 20%);
+                    }
+                }
+            }
+        }
+
+        .region-name-label,
+        .region-error {
+            font-size: 0.8rem;
+            grid-column: 1 / -1;
+        }
+
+        .region-name-label {
+            color: #4d6666;
+        }
+
+        .region-error {
+            color: #9c0c05;
+        }
+
+        .region-name-input {
+            background-color: #ffffff;
+            border: 1px solid #b5c7c7;
+            border-radius: 7px;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 0;
+            padding: rem(6) rem(8);
+
+            &::placeholder {
+                color: #8a9a9a;
+                font-weight: 400;
+            }
+
+            &:focus {
+                border-color: #008080;
+                outline: 2px solid rgb(0 128 128 / 25%);
+            }
         }
 
         .region-area {
-            color: #666;
+            color: #4d6666;
             font-size: 0.85rem;
+            font-variant-numeric: tabular-nums;
             white-space: nowrap;
+
+            sup {
+                font-size: 0.7em;
+                line-height: 0;
+            }
         }
 
         .deselect-region {
+            align-items: center;
             background: none;
             border: none;
-            color: #666;
+            border-radius: 7px;
+            color: #4d6666;
             cursor: pointer;
             display: inline-flex;
-            margin-left: rem(8);
-            transition: color 0.15s ease;
+            height: rem(30);
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            transition:
+                background-color 0.15s ease,
+                color 0.15s ease;
+            width: rem(30);
 
             &:hover {
+                background-color: rgb(220 38 38 / 10%);
                 color: #dc2626;
             }
         }
     }
 
     .buffer-field {
+        margin-top: rem(8);
         width: 100%;
     }
 
@@ -237,10 +329,6 @@
         .mat-expansion-panel-body {
             padding: 0;
         }
-    }
-
-    .plugin-params-form .mat-mdc-form-field {
-        margin: rem(4) 0;
     }
 
     .btn-container {

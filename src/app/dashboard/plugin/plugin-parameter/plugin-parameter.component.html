@@ -39,7 +39,6 @@
                         }
                     </ng-template>
                 }
-                <hr />
                 <div class="area-selection-buttons">
                     <button
                         type="button"
@@ -195,27 +194,34 @@
                                     </button>
                                 </div>
                             } @else {
-                                <mat-form-field class="region-field" subscriptSizing="dynamic">
-                                    <mat-label>{{ 'pluginParameter.areaName' | transloco }}</mat-label>
+                                <div
+                                    class="region-summary region-summary--editable"
+                                    [class.region-summary--invalid]="areaLabelControl.invalid">
+                                    <label class="region-name-label" for="areaLabel">
+                                        {{ 'pluginParameter.areaName' | transloco }}
+                                    </label>
                                     <input
-                                        matInput
                                         #areaLabelInput
                                         type="text"
+                                        id="areaLabel"
+                                        class="region-name-input"
                                         [placeholder]="'pluginParameter.customArea' | transloco"
+                                        [attr.aria-invalid]="areaLabelControl.invalid"
                                         [formControl]="areaLabelControl" />
-                                    <span matTextSuffix class="region-area"
-                                        >{{ region.properties?.['area'] }} km<sup>2</sup></span
-                                    >
+                                    <span class="region-area">{{ region.properties?.['area'] }} km<sup>2</sup></span>
                                     <button
-                                        matSuffix
                                         type="button"
                                         class="deselect-region"
                                         [attr.aria-label]="'pluginParameter.removeRegion' | transloco"
                                         (click)="removeSelectedRegion(region)">
                                         <svg lucideTrash size="16"></svg>
                                     </button>
-                                    <mat-error>{{ 'pluginParameter.areaNameRequired' | transloco }}</mat-error>
-                                </mat-form-field>
+                                    @if (areaLabelControl.invalid) {
+                                        <span class="region-error" role="alert">
+                                            {{ 'pluginParameter.areaNameRequired' | transloco }}
+                                        </span>
+                                    }
+                                </div>
                             }
                         }
                     </div>

@@ -1,0 +1,117 @@
+@use '@angular/material' as mat;
+@use 'spec/tools/rem' as *;
+
+// Only Material's design tokens are set here, through its `*-overrides` mixins, never its internal
+// class names. A token that a future Material version renames or removes fails the Sass build.
+
+$brand: #008080;
+$brand-dark: #006666;
+$border: #6b8585;
+$muted: #4d6666;
+$error: #9c0c05;
+
+:root {
+    @include mat.form-field-overrides(
+        (
+            container-height: 48px,
+            container-vertical-padding: 12px,
+            container-text-font: inherit,
+            container-text-size: 1rem,
+            container-text-line-height: 24px,
+            container-text-tracking: normal,
+            container-text-weight: 400,
+            subscript-text-font: inherit,
+            subscript-text-size: 0.85rem,
+            subscript-text-line-height: 1.5em,
+            subscript-text-tracking: normal,
+            subscript-text-weight: 400,
+            outlined-container-shape: rem(7),
+            outlined-outline-color: $border,
+            outlined-hover-outline-color: $brand,
+            outlined-focus-outline-color: $brand,
+            outlined-caret-color: $brand,
+            outlined-label-text-font: inherit,
+            outlined-label-text-size: 1rem,
+            outlined-label-text-populated-size: rem(16),
+            outlined-label-text-tracking: normal,
+            outlined-label-text-weight: 400,
+            outlined-label-text-color: $muted,
+            outlined-hover-label-text-color: $muted,
+            outlined-focus-label-text-color: $brand-dark,
+            outlined-error-outline-color: $error,
+            outlined-error-hover-outline-color: $error,
+            outlined-error-focus-outline-color: $error,
+            outlined-error-label-text-color: $error,
+            outlined-error-hover-label-text-color: $error,
+            outlined-error-focus-label-text-color: $error,
+            outlined-error-caret-color: $error,
+            error-text-color: $error,
+            enabled-select-arrow-color: $muted,
+            focus-select-arrow-color: $brand
+        )
+    );
+
+    @include mat.select-overrides(
+        (
+            trigger-text-font: inherit,
+            trigger-text-size: 1rem,
+            trigger-text-line-height: 24px,
+            trigger-text-tracking: normal,
+            trigger-text-weight: 400,
+            enabled-arrow-color: $muted,
+            focused-arrow-color: $brand,
+            invalid-arrow-color: $error
+        )
+    );
+
+    @include mat.option-overrides(
+        (
+            label-text-font: inherit,
+            label-text-size: 1rem,
+            label-text-tracking: normal,
+            selected-state-label-text-color: $brand-dark
+        )
+    );
+
+    @include mat.pseudo-checkbox-overrides(
+        (
+            full-selected-icon-color: $brand,
+            minimal-selected-checkmark-color: $brand
+        )
+    );
+
+    @include mat.checkbox-overrides(
+        (
+            label-text-font: inherit,
+            label-text-size: 1rem,
+            label-text-tracking: normal,
+            label-text-weight: 400,
+            selected-icon-color: $brand,
+            selected-hover-icon-color: $brand,
+            selected-focus-icon-color: $brand,
+            selected-pressed-icon-color: $brand,
+            selected-checkmark-color: #ffffff,
+            selected-hover-state-layer-color: $brand,
+            selected-focus-state-layer-color: $brand,
+            selected-pressed-state-layer-color: $brand
+        )
+    );
+
+    @include mat.datepicker-overrides(
+        (
+            calendar-text-font: inherit,
+            calendar-date-selected-state-background-color: $brand,
+            calendar-date-selected-state-text-color: #ffffff,
+            calendar-date-today-outline-color: $brand,
+            calendar-date-hover-state-background-color: rgb(0 128 128 / 12%),
+            calendar-date-focus-state-background-color: rgb(0 128 128 / 20%),
+            toggle-icon-color: $muted,
+            toggle-active-state-icon-color: $brand
+        )
+    );
+}
+
+formly-field mat-form-field {
+    margin: rem(12) 0 rem(10);
+    width: 100%;
+}
