@@ -241,7 +241,7 @@
             "description": "To get the most out of this walkthrough, we recommend logging in first. However, you can also try a shorter guest walkthrough to see what the platform offers.",
             "loginButton": "Login for Full Walkthrough",
             "guestTourButton": "Try Guest Walkthrough",
-            "guestNote": "The guest walkthrough provides a preview of what the platform offers, utilising demo data."
+            "guestNote": "The guest walkthrough provides a preview of what the platform offers, using a computation that is already available."
         },
         "tourSteps": {
             "choosePlugin": {
@@ -257,8 +257,8 @@
                 "description": "Now we'll have to go to the area of interest. We've prefilled the search with an example for you. Click on the suggestion that appears to go there on the map."
             },
             "selectBoundary": {
-                "title": "Select the area boundary",
-                "description": "Now select the area boundaries by clicking on the map. You can also zoom in and out to see the area boundaries better."
+                "title": "Select the area",
+                "description": "Now click inside a boundary on the map to select it as your area. Alternatively you may use the other tools in the <strong>Area Selection</strong> panel to define a custom shape."
             },
             "requestCompute": {
                 "title": "Request the computation",
@@ -268,7 +268,7 @@
                 "titleFull": "Open the computation",
                 "titleGuest": "Open the computation",
                 "descriptionFull": "The computation is now ready! Let's expand it to see what results are available.",
-                "descriptionGuest": "Next, let's open the Demo computation that has been pre-loaded for you."
+                "descriptionGuest": "Next, let's open the first computation that's available in the list."
             },
             "viewFirstResult": {
                 "title": "View a result",
@@ -327,7 +327,7 @@
         "selectFile": "Select from a File",
         "uploadFileInstruction": "Upload a GeoJSON, GPX, or KML file. Only the first feature in the file is used.",
         "fileParseError": "Could not read this file. Please upload a valid GeoJSON, GPX, or KML file.",
-        "clickInsideBoundary": "Click inside an area boundary to select an area.",
+        "clickInsideBoundary": "Click inside an area boundary to select an area. Zoom in or out for smaller or larger boundaries.",
         "clickAndMovePointer": "Click once and move the pointer to draw a {{ shape }}. Click again to finish.",
         "clickMultiplePoints": "Click on multiple points to draw a polygon. Double-click anywhere to finish.",
         "multipleAreasSelected": "Multiple areas selected. Please select only one.",

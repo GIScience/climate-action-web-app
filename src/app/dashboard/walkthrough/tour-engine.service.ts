@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
+import { Router } from '@angular/router'
 import { TranslocoService } from '@jsverse/transloco'
 import type { Driver } from 'driver.js'
 import { firstValueFrom, take } from 'rxjs'
@@ -20,6 +21,7 @@ export class TourEngine {
     private tourStepsService = inject(TourStepsService)
     private storageService = inject(StorageService)
     private translocoService = inject(TranslocoService)
+    private router = inject(Router)
 
     private driverObj: Driver | null = null
     private currentSteps: ExtendedDriveStep[] = []
@@ -109,7 +111,20 @@ export class TourEngine {
             this.tourStepsService.cleanupEventHandlers()
             this.driverObj?.moveNext()
         })
-        this.driverObj.drive()
+        await this.driveFromStart()
+    }
+
+    private async driveFromStart() {
+        this.tourStepsService.cleanupEventHandlers()
+        this.dashboardService.clearDashboardState()
+        await this.router.navigate(['/dashboard'])
+
+        const deadline = Date.now() + 5000
+        while (!document.querySelector('.catalog-panel--inline .plugin-card') && Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 100))
+        }
+
+        this.driverObj?.drive(0)
     }
 
     private async ensureDriverReady(): Promise<void> {
@@ -168,9 +183,8 @@ export class TourEngine {
                 this.tourStepsService.cleanupEventHandlers()
             },
             onPrevClick: () => {
-                this.tourStepsService.cleanupEventHandlers()
-                this.dashboardService.clearDashboardState()
-                this.driverObj?.drive(0)
+                this.tourStepsService.showPopoverLoadingState()
+                void this.driveFromStart()
             },
             onNextClick: () => {
                 const instance = this.driverObj

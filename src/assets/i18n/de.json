@@ -241,7 +241,7 @@
             "description": "Dieses Tutorial funktioniert am besten, wenn du angemeldet bist. Alternativ kannst du die kürzere Gästeinführung machen, um zu sehen, was der Navigator bietet.",
             "loginButton": "Anmelden, um das komplette Tutorial zu starten",
             "guestTourButton": "Die Gästeeinführung starten",
-            "guestNote": "Die Gästeeinführung gibt dir einen Vorgeschmack von der Funktionalität des Navigators, verwendet aber Demo-Daten."
+            "guestNote": "Die Gästeeinführung gibt dir einen Vorgeschmack von der Funktionalität des Navigators und verwendet dafür eine bereits vorhandene Berechnung."
         },
         "tourSteps": {
             "choosePlugin": {
@@ -257,8 +257,8 @@
                 "description": "Jetzt müssen wir die Region spezifizieren, die uns interessiert. Das Suchfeld enthält bereits ein Beispiel. Wähle einen der Vorschläge aus, um die Karte dort zu zentrieren."
             },
             "selectBoundary": {
-                "title": "Wähle den Umriss aus",
-                "description": "Wähle nun den Umriss der entsprechenden Region aus, indem Du auf die Karte klickst. Zoome mit dem Mausrad, um die Ansicht anzupassen."
+                "title": "Lege die Region fest",
+                "description": "Klicke nun auf der Karte in eine Grenze, um sie als Region auszuwählen. Alternativ kannst du die anderen Werkzeuge im Bereich <strong>Auswahl einer Region</strong> nutzen, um eine eigene Form festzulegen."
             },
             "requestCompute": {
                 "title": "Starte eine Berechnung",
@@ -268,7 +268,7 @@
                 "titleFull": "Eine Berechnung öffnen",
                 "titleGuest": "Eine Berechnung öffnen",
                 "descriptionFull": "Die Berechnung ist abgeschlossen! Klicke sie an, um die einzelnen Ergebnisse zu begutachten.",
-                "descriptionGuest": "Im nächsten Schritt kannst du dir die Demoberechnung ansehen."
+                "descriptionGuest": "Als Nächstes öffnen wir die erste verfügbare Berechnung in der Liste."
             },
             "viewFirstResult": {
                 "title": "Ergebnisse ansehen",

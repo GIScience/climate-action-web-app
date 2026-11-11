@@ -189,10 +189,13 @@ export class TourStepsService {
     }
 
     private getOpenComputationStep(tourType: 'guest' | 'full'): ExtendedDriveStep {
+        const findComputation = () => {
+            const first = document.querySelector('.computations-container .parent-computation') as HTMLElement
+            return tourType === 'full' ? this.fetchElementWithText('.parent-computation', 'Ventotene') || first : first
+        }
+
         return {
-            element: () =>
-                this.fetchElementWithText('.parent-computation', tourType === 'guest' ? 'Demo' : 'Ventotene') ||
-                document.querySelector('.computations-container .parent-computation'),
+            element: findComputation,
             popover: {
                 title: this.translocoService.translate(
                     tourType === 'guest'
@@ -211,12 +214,7 @@ export class TourStepsService {
                 }
             },
             onNextClicked: () => {
-                const computation =
-                    this.fetchElementWithText('.parent-computation', tourType === 'guest' ? 'Demo' : 'Ventotene') ||
-                    document.querySelector('.computations-container .parent-computation')
-                if (computation) {
-                    ;(computation as HTMLElement).click()
-                }
+                findComputation()?.click()
             }
         }
     }
@@ -294,9 +292,12 @@ export class TourStepsService {
             : this.translocoService.translate('walkthrough.tourSteps.completion.descriptionFull')
 
         return {
+            element: 'app-artifact-viewer .artifact-container',
             popover: {
                 title: this.translocoService.translate('walkthrough.tourSteps.completion.title'),
                 description,
+                side: 'left',
+                align: 'start',
                 doneBtnText: this.translocoService.translate('walkthrough.tourSteps.completion.exitButton')
             }
         }
