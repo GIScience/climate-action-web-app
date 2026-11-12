@@ -98,46 +98,17 @@ variables:
 #             - cypress/snapshots/diff/**/*.png
 #         expire_in: 7 day
 
-build_app:
+build_staging:
     stage: build
+    tags: [buildah]
     rules:
-        - if: $CI_COMMIT_TAG
-        - !reference [build_staging, rules]
-    cache:
-        key:
-            files:
-                - pnpm-lock.yaml
-        paths:
-            - .pnpm-store
-        policy: pull-push
-    image: node:24-slim
+        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
+        - when: always
     variables:
-        CYPRESS_INSTALL_BINARY: '0'
         KUBERNETES_CPU_REQUEST: '4'
         KUBERNETES_CPU_LIMIT: '8'
         KUBERNETES_MEMORY_REQUEST: '8Gi'
         KUBERNETES_MEMORY_LIMIT: '16Gi'
-    before_script:
-        - npm install -g pnpm@${PNPM_VERSION}
-        - pnpm config set store-dir .pnpm-store
-        - pnpm install --frozen-lockfile --prefer-offline
-        - pnpm store prune
-    script:
-        - pnpm run build:prod
-        # Match the path the Dockerfile's build stage produces
-        - mkdir -p prebuilt/ca-web-app && mv dist prebuilt/ca-web-app/dist
-    artifacts:
-        paths:
-            - prebuilt/
-        expire_in: 1 hour
-
-build_staging:
-    stage: build
-    tags: [buildah]
-    needs: [build_app]
-    rules:
-        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
-        - when: always
     before_script:
         - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
         - echo "$CI_DOCKER_TOKEN" | buildah login -u "$CI_DOCKER_USER" --password-stdin "$REGISTRY_URL"
@@ -145,7 +116,6 @@ build_staging:
         - |
             buildah build \
                 --layers \
-                --build-context build=./prebuilt \
                 --build-arg "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}" \
                 --cache-from=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
                 --cache-to=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
@@ -160,9 +130,13 @@ build_staging:
 build_release:
     stage: build
     tags: [buildah]
-    needs: [build_app]
     rules:
         - if: $CI_COMMIT_TAG
+    variables:
+        KUBERNETES_CPU_REQUEST: '4'
+        KUBERNETES_CPU_LIMIT: '8'
+        KUBERNETES_MEMORY_REQUEST: '8Gi'
+        KUBERNETES_MEMORY_LIMIT: '16Gi'
     before_script:
         - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
         - echo "$CI_DOCKER_TOKEN" | buildah login -u "$CI_DOCKER_USER" --password-stdin "$REGISTRY_URL"
@@ -170,7 +144,6 @@ build_release:
         - |
             buildah build \
                 --layers \
-                --build-context build=./prebuilt \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
                 .
         - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
