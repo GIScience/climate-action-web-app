@@ -150,7 +150,7 @@ build_staging:
                 --cache-to=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
-                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:pipeline-test1
+                --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:pipeline-test1 \
                 .
         - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:pipeline-test1
         # - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging
