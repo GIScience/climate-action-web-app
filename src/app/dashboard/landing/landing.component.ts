@@ -77,6 +77,10 @@ export class LandingComponent implements OnInit {
         return computationRouteCommands(entry.plugin_id, entry.correlation_uuid)
     }
 
+    onImageError(event: Event) {
+        ;(event.target as HTMLImageElement).src = 'assets/images/plugin-icons/fallback.jpg'
+    }
+
     relativeTime(timestamp: Date | string): string {
         const date =
             typeof timestamp === 'string'

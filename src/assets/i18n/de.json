@@ -12,19 +12,19 @@
         "notes": {
             "title": "Bevor du beginnst, ein paar Hinweise:",
             "onDemand": {
-                "title": "Auf Abruf berechnet",
+                "title": "Analysen werden auf Abruf berechnet",
                 "text": "Das senkt unseren Energieverbrauch, bedeutet aber, dass Analysen bei hoher Auslastung bis zu 60 Minuten dauern können."
             },
             "urbanAreas": {
-                "title": "Am besten in städtischen Gebieten",
+                "title": "Die Ergebnisse sind in städtischen Gebieten am besten",
                 "text": "Dort sind offene Daten am besten verfügbar. Besonders in ländlichen Gebieten kann die Qualität der Ergebnisse variieren."
             },
             "experts": {
-                "title": "Auf Fachleute zugeschnitten",
+                "title": "Die Werkzeuge sind auf Fachleute zugeschnitten",
                 "text": "Der CAN steht zwar allen offen, unsere Analysewerkzeuge können jedoch Fachbegriffe enthalten."
             },
             "worksInProgress": {
-                "title": "In aktiver Entwicklung",
+                "title": "Die Plattform wird aktiv weiterentwickelt",
                 "text": "Alle Analysewerkzeuge werden beständig weiterentwickelt. Schau regelmäßig vorbei, um neue und verbesserte Funktionen zu entdecken."
             }
         },
@@ -339,7 +339,7 @@
         "constraintLoadFailed": "Die Beschränkungen dieses Analysewerkzeugs konnten nicht geladen werden. Bitte schließe das Berechnungs-Panel und öffne es erneut.",
         "constraintLoading": "Beschränkungen des Analysewerkzeugs werden geprüft…",
         "preparingMap": "Karte wird vorbereitet…",
-        "constraintNote": "Dieses Analysewerkzeug unterstützt nur bestimmte Regionen.",
+        "constraintNote": "Für dieses Analysewerkzeug gelten Beschränkungen bei der Regionsauswahl.",
         "constraintDescArea": "Die Region muss zwischen {{ min }} und {{ max }} km² groß sein.",
         "constraintDescWithin": "Die Region muss innerhalb folgender Gebiete liegen: {{ names }}",
         "constraintDescBoundarySelection": "Nur diese administrativen Grenzen können ausgewählt werden: {{ names }}",

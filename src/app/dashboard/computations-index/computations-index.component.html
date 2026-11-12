@@ -195,6 +195,16 @@
                             [tp]="'computationsIndex.status.done' | transloco"
                             tpPlacement="right"></span>
                     }
+                    @let languageMismatchTooltip = getLanguageMismatchTooltip(computation);
+                    @if (languageMismatchTooltip) {
+                        <svg
+                            lucideMessageSquareWarning
+                            size="18"
+                            color="#9a6700"
+                            class="language-mismatch"
+                            [tp]="languageMismatchTooltip"
+                            tpPlacement="right"></svg>
+                    }
                 </div>
                 <p class="card-subtitle">
                     <svg lucideClock size="15"></svg>

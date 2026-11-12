@@ -25,7 +25,7 @@ describe('translations', () => {
             }
         })
 
-        cy.get('.intro-section h1').should('have.text', 'Explore where climate action is needed in your neighbourhood')
+        cy.get('.intro-section h1').should('have.text', 'Explore where climate action is needed in your neighborhood')
     })
 
     it('should switch the language dynamically when selected through the language menu', () => {

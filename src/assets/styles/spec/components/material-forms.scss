@@ -9,6 +9,8 @@ $brand-dark: #006666;
 $border: #6b8585;
 $muted: #4d6666;
 $error: #9c0c05;
+$surface: #ffffff;
+$surface-disabled: #e9e9e9;
 
 :root {
     @include mat.form-field-overrides(
@@ -114,4 +116,13 @@ $error: #9c0c05;
 formly-field mat-form-field {
     margin: rem(12) 0 rem(10);
     width: 100%;
+}
+
+formly-field .mdc-text-field--outlined {
+    background-color: $surface;
+    border-radius: rem(7);
+
+    &.mdc-text-field--disabled {
+        background-color: $surface-disabled;
+    }
 }

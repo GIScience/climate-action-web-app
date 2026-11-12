@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { AppwriteService } from '@app/auth/appwrite.service'
 import { StorageService } from '@app/storage.service'
+import { SupportedLanguage } from '@app/types/language.types'
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco'
 import {
     LucideBookmark,
@@ -22,6 +23,7 @@ import {
     LucideHash,
     LucideLoader,
     LucideLoaderCircle,
+    LucideMessageSquareWarning,
     LucideShare2
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
@@ -42,7 +44,7 @@ import { ReportService } from '../report/report.service'
 import { computationRouteCommands, ShareService } from '../share/share.service'
 import { confirmUnbookmark, toBookmarkEntity } from './computation-bookmark.utils'
 import { FilterByCriteriaPipe } from './computation-filters.pipe'
-import { formatComputationTimestamp, formatShortUUID } from './computation-format.utils'
+import { formatComputationTimestamp, formatShortUUID, getLanguageMismatchTooltip } from './computation-format.utils'
 import { ComputationSearchService } from './computation-search.service'
 import { ComputationSyncService, RunStateTransition } from './computation-sync.service'
 import { ComputationDatabaseEntity, ComputationDisplayEntity, DiscoverTab } from './computation.interface'
@@ -62,6 +64,7 @@ import { mapDatabaseComputation } from './computation.mapper'
         LucideHash,
         LucideLoader,
         LucideLoaderCircle,
+        LucideMessageSquareWarning,
         LucideShare2,
         TranslocoModule
     ],
@@ -141,6 +144,14 @@ export class ComputationsIndexComponent implements OnInit {
     }
 
     formatUUID = formatShortUUID
+
+    getLanguageMismatchTooltip(computation: Pick<ComputationDisplayEntity, 'language'>): string | null {
+        return getLanguageMismatchTooltip(
+            computation,
+            this.plugin?.language ?? SupportedLanguage.EN,
+            this.translocoService
+        )
+    }
 
     ngOnInit(): void {
         this.loadInitialPluginRuns()

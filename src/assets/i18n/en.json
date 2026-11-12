@@ -6,25 +6,25 @@
             "feedTitle": "Latest assessments"
         },
         "welcome": {
-            "title": "Explore where climate action is needed in your neighbourhood",
+            "title": "Explore where climate action is needed in your neighborhood",
             "description": "The Climate Action Navigator turns open data into high-resolution assessments for NGOs, citizen initiatives and city administrations, from heating emissions to walkability and bikeability. Pick an <strong>Assessment Tool</strong>, choose an area, and see where action is needed."
         },
         "notes": {
             "title": "A few notes before you begin…",
             "onDemand": {
-                "title": "Calculated on demand",
+                "title": "Assessments are calculated on demand",
                 "text": "This reduces our energy consumption, but means that assessments may take up to 60 minutes during high traffic."
             },
             "urbanAreas": {
-                "title": "Best in urban areas",
-                "text": "Open data is most readily available there. Results may be of varying quality, especially in rural areas."
+                "title": "Results are best in urban areas",
+                "text": "Open data is most readily available in cities. Results may be of varying quality, especially in rural areas."
             },
             "experts": {
-                "title": "Tailored to experts",
+                "title": "The tools are tailored to experts",
                 "text": "While CAN is open to everyone, our assessment tools may include technical terms."
             },
             "worksInProgress": {
-                "title": "Continuously updated",
+                "title": "The platform is continuously updated",
                 "text": "New methods and datasets are added as they become available. Check back regularly for new and improved features."
             }
         },
@@ -114,7 +114,7 @@
         },
         "runFailure": {
             "failedTitle": "Computation failed",
-            "revokedTitle": "Computation cancelled",
+            "revokedTitle": "Computation canceled",
             "failedDescription": "The computation in the '{{ plugin }}' tool for the area '{{ aoi }}' could not be completed.",
             "revokedDescription": "The computation in the '{{ plugin }}' tool for the area '{{ aoi }}' was stopped before completion, likely because the maximum calculation time was exceeded. The platform may be busy right now; please try again later.",
             "supportHint": "If this keeps happening, contact support and include the computation ID below so we can look into it.",
@@ -140,9 +140,9 @@
         "retry": "Try again"
     },
     "syncIndicator": {
-        "syncing": "Synchronising Bookmarks…",
-        "pending": "Bookmarks saved on this device, not synchronised yet",
-        "error": "Synchronisation failed, click to retry"
+        "syncing": "Synchronizing Bookmarks…",
+        "pending": "Bookmarks saved on this device, not synchronized yet",
+        "error": "Synchronization failed, click to retry"
     },
     "computation": {
         "addToReport": "Add to Report",
@@ -171,8 +171,8 @@
     },
     "artifactViewer": {
         "download": "Download Result",
-        "maximize": "Maximise",
-        "minimize": "Minimise",
+        "maximize": "Maximize",
+        "minimize": "Minimize",
         "close": "Close"
     },
     "artifact": {
@@ -339,7 +339,7 @@
         "constraintLoadFailed": "The Assessment Tool's area restrictions could not be loaded. Please close and reopen the compute panel to retry.",
         "constraintLoading": "Checking the Assessment Tool's area restrictions…",
         "preparingMap": "Preparing the map…",
-        "constraintNote": "This Assessment Tool only supports specific areas.",
+        "constraintNote": "This Assessment Tool has area restrictions.",
         "constraintDescArea": "The area must be between {{ min }} and {{ max }} km².",
         "constraintDescWithin": "The area must lie within: {{ names }}",
         "constraintDescBoundarySelection": "Only these boundaries can be selected: {{ names }}",

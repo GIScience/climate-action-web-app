@@ -15,6 +15,11 @@
                         @for (entry of discoveries; track entry.correlation_uuid; let i = $index) {
                             <li [style.--i]="i">
                                 <a class="discovery" [routerLink]="computationRoute(entry)">
+                                    <img
+                                        class="discovery__icon"
+                                        [src]="pluginService.getIconUrl(entry.plugin_id)"
+                                        alt=""
+                                        (error)="onImageError($event)" />
                                     <span class="discovery__text">
                                         <span class="discovery__plugin">{{
                                             pluginService.getPluginNameById(entry.plugin_id)
