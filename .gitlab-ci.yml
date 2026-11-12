@@ -139,7 +139,7 @@ build_staging:
     #     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
     before_script:
         - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
-        - echo ${CI_DOCKER_TOKEN} | buildah login -u ${CI_DOCKER_USER} --password-stdin ${REGISTRY_URL}
+        - echo "${CI_DOCKER_TOKEN}" | buildah login -u "${CI_DOCKER_USER}" --password-stdin "${REGISTRY_URL}"
     script:
         - buildah build \
             --build-context build=./prebuilt \
@@ -161,7 +161,7 @@ build_release:
         - if: $CI_COMMIT_TAG
     before_script:
         - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
-        - echo ${CI_DOCKER_TOKEN} | buildah login -u ${CI_DOCKER_USER} --password-stdin ${REGISTRY_URL}
+        - echo "${CI_DOCKER_TOKEN}" | buildah login -u "${CI_DOCKER_USER}" --password-stdin "${REGISTRY_URL}"
     script:
         - buildah build \
             --build-context build=./prebuilt \
