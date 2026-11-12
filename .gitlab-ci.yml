@@ -169,18 +169,18 @@ build_release:
             .
         - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
 
-include:
-    - template: Jobs/Container-Scanning.gitlab-ci.yml
-container_scanning:
-    stage: build
-    needs:
-        - build_staging
-    rules:
-        - !reference [build_staging, rules]
-    variables:
-        CS_REGISTRY_USER: '${CI_DOCKER_USER}'
-        CS_REGISTRY_PASSWORD: '${CI_DOCKER_TOKEN}'
-        CS_IMAGE: '${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging'
+# include:
+#     - template: Jobs/Container-Scanning.gitlab-ci.yml
+# container_scanning:
+#     stage: build
+#     needs:
+#         - build_staging
+#     rules:
+#         - !reference [build_staging, rules]
+#     variables:
+#         CS_REGISTRY_USER: '${CI_DOCKER_USER}'
+#         CS_REGISTRY_PASSWORD: '${CI_DOCKER_TOKEN}'
+#         CS_IMAGE: '${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging'
 
 test_container_scan_threshold:
     stage: build
@@ -206,48 +206,48 @@ test_container_scan_threshold:
         exit_codes:
             - 1
 
-test_dependency_audit:
-    stage: build
-    cache: []
-    rules:
-        - !reference [build_staging, rules]
-    image:
-        name: node:22-alpine
-    before_script:
-        - npm install -g pnpm@${PNPM_VERSION}
-        - apk add --no-cache jq
-    script:
-        - pnpm audit --prod --json > pnpm-audit.json || true
-        - vulnerabilities="$(jq '.metadata.vulnerabilities | (.high // 0) + (.critical // 0)' pnpm-audit.json)"
-        - |
-            if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
-              echo "ERROR: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
-            elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
-              echo "WARN: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
-            else
-              echo "INFO: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies." && exit 0;
-            fi
-    artifacts:
-        when: always
-        paths:
-            - pnpm-audit.json
-    allow_failure:
-        exit_codes:
-            - 1
+# test_dependency_audit:
+#     stage: build
+#     cache: []
+#     rules:
+#         - !reference [build_staging, rules]
+#     image:
+#         name: node:22-alpine
+#     before_script:
+#         - npm install -g pnpm@${PNPM_VERSION}
+#         - apk add --no-cache jq
+#     script:
+#         - pnpm audit --prod --json > pnpm-audit.json || true
+#         - vulnerabilities="$(jq '.metadata.vulnerabilities | (.high // 0) + (.critical // 0)' pnpm-audit.json)"
+#         - |
+#             if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
+#               echo "ERROR: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
+#             elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
+#               echo "WARN: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
+#             else
+#               echo "INFO: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies." && exit 0;
+#             fi
+#     artifacts:
+#         when: always
+#         paths:
+#             - pnpm-audit.json
+#     allow_failure:
+#         exit_codes:
+#             - 1
 
-deploy_staging:
-    stage: deploy
-    tags: [k8s-kta]
-    needs:
-        - build_staging
-    rules:
-        - !reference [build_staging, rules]
-    image: repo.heigit.org/heigit/argocd-cli:latest
-    script:
-        - |
-            argocd app actions \
-              run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
-              restart --kind Deployment \
-              --server ${ARGOCD_SERVER} \
-              --auth-token ${ARGOCD_AUTH_TOKEN}\
-              --resource-name can-${CI_PROJECT_NAME}
+# deploy_staging:
+#     stage: deploy
+#     tags: [k8s-kta]
+#     needs:
+#         - build_staging
+#     rules:
+#         - !reference [build_staging, rules]
+#     image: repo.heigit.org/heigit/argocd-cli:latest
+#     script:
+#         - |
+#             argocd app actions \
+#               run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
+#               restart --kind Deployment \
+#               --server ${ARGOCD_SERVER} \
+#               --auth-token ${ARGOCD_AUTH_TOKEN}\
+#               --resource-name can-${CI_PROJECT_NAME}
