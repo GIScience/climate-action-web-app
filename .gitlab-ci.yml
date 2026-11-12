@@ -1,109 +1,108 @@
 stages:
-    # - test
+    - test
     - build
-    # - deploy
+    - deploy
 
 variables:
     PNPM_STORE_PATH: '$CI_PROJECT_DIR/.pnpm-store'
     PNPM_VERSION: '12.16.1'
     HUSKY: '0'
 
-# test_unit_and_lint:
-#     stage: test
-#     rules:
-#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-#         - when: never
-#     cache:
-#         key:
-#             files:
-#                 - pnpm-lock.yaml
-#         paths:
-#             - .pnpm-store
-#         policy: pull-push
-#     image:
-#         name: node:22-alpine
-#     variables:
-#         NODE_OPTIONS: '--no-warnings'
-#         CYPRESS_INSTALL_BINARY: '0'
-#         KUBERNETES_CPU_REQUEST: '1'
-#         KUBERNETES_CPU_LIMIT: '2'
-#         KUBERNETES_MEMORY_REQUEST: '2Gi'
-#         KUBERNETES_MEMORY_LIMIT: '4Gi'
-#     before_script:
-#         - |
-#             cat > "./src/assets/env.js" << EOF
-#             ;(function (window) {
-#                 window.env = window.env || {}
-#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
-#             })(this)
-#             EOF
-#         - npm install -g pnpm@${PNPM_VERSION}
-#         - pnpm config set store-dir .pnpm-store
-#         - pnpm install --frozen-lockfile --prefer-offline
-#         - pnpm store prune
-#     script:
-#         - pnpm lint
-#         - pnpm test:coverage
-#     artifacts:
-#         reports:
-#             coverage_report:
-#                 coverage_format: cobertura
-#                 path: coverage/cobertura-coverage.xml
+test_unit_and_lint:
+    stage: test
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+        policy: pull-push
+    image:
+        name: node:22-alpine
+    variables:
+        NODE_OPTIONS: '--no-warnings'
+        CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '1'
+        KUBERNETES_CPU_LIMIT: '2'
+        KUBERNETES_MEMORY_REQUEST: '2Gi'
+        KUBERNETES_MEMORY_LIMIT: '4Gi'
+    before_script:
+        - |
+            cat > "./src/assets/env.js" << EOF
+            ;(function (window) {
+                window.env = window.env || {}
+                window['env']['ENVIRONMENT_TYPE'] = 'testing'
+            })(this)
+            EOF
+        - npm install -g pnpm@${PNPM_VERSION}
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
+    script:
+        - pnpm lint
+        - pnpm test:coverage
+    artifacts:
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage/cobertura-coverage.xml
 
-# test_cypress:
-#     stage: test
-#     rules:
-#         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
-#         - when: never
-#     cache:
-#         key:
-#             files:
-#                 - pnpm-lock.yaml
-#         paths:
-#             - .pnpm-store
-#     variables:
-#         NODE_ENV: 'test'
-#         NODE_OPTIONS: '--no-warnings'
-#         CYPRESS_INSTALL_BINARY: '0'
-#         KUBERNETES_CPU_REQUEST: '2'
-#         KUBERNETES_CPU_LIMIT: '4'
-#         KUBERNETES_MEMORY_REQUEST: '8Gi'
-#         KUBERNETES_MEMORY_LIMIT: '12Gi'
-#     needs: ['test_unit_and_lint']
-#     image:
-#         name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
-#         entrypoint: ['']
-#     before_script:
-#         - |
-#             cat > "./src/assets/env.js" << EOF
-#             ;(function (window) {
-#                 window.env = window.env || {}
-#                 window['env']['ENVIRONMENT_TYPE'] = 'testing'
-#                 window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
-#             })(this)
-#             EOF
-#         - npm install -g pnpm@${PNPM_VERSION}
-#         - pnpm config set store-dir .pnpm-store
-#         - pnpm install --frozen-lockfile --prefer-offline
-#         - pnpm store prune
-#     script:
-#         - pnpm start &
-#         - pnpm wait-on http://localhost:4200
-#         - pnpm cy:run
-#     artifacts:
-#         when: on_failure
-#         paths:
-#             - cypress/screenshots/**/*.png
-#             - cypress/snapshots/actual/**/*.png
-#             - cypress/snapshots/diff/**/*.png
-#         expire_in: 7 day
+test_cypress:
+    stage: test
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^(Draft|WIP)/i'
+        - when: never
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+    variables:
+        NODE_ENV: 'test'
+        NODE_OPTIONS: '--no-warnings'
+        CYPRESS_INSTALL_BINARY: '0'
+        KUBERNETES_CPU_REQUEST: '2'
+        KUBERNETES_CPU_LIMIT: '4'
+        KUBERNETES_MEMORY_REQUEST: '8Gi'
+        KUBERNETES_MEMORY_LIMIT: '12Gi'
+    needs: ['test_unit_and_lint']
+    image:
+        name: cypress/included:cypress-16.2.1-node-24.22.1-chrome-156.0.8078.73-1-ff-159.0-edge-156.0.4314.50-1
+        entrypoint: ['']
+    before_script:
+        - |
+            cat > "./src/assets/env.js" << EOF
+            ;(function (window) {
+                window.env = window.env || {}
+                window['env']['ENVIRONMENT_TYPE'] = 'testing'
+                window['env']['GEOCODE_API_KEY'] = '${GEOCODE_API_KEY}'
+            })(this)
+            EOF
+        - npm install -g pnpm@${PNPM_VERSION}
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile --prefer-offline
+        - pnpm store prune
+    script:
+        - pnpm start &
+        - pnpm wait-on http://localhost:4200
+        - pnpm cy:run
+    artifacts:
+        when: on_failure
+        paths:
+            - cypress/screenshots/**/*.png
+            - cypress/snapshots/actual/**/*.png
+            - cypress/snapshots/diff/**/*.png
+        expire_in: 7 day
 
 build_staging:
     stage: build
     tags: [buildah]
     rules:
-        # - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
-        - when: always
+        - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
     variables:
         KUBERNETES_CPU_REQUEST: '2'
         KUBERNETES_CPU_LIMIT: '4'
@@ -162,72 +161,72 @@ container_scanning:
         CS_REGISTRY_PASSWORD: '${CI_DOCKER_TOKEN}'
         CS_IMAGE: '${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging'
 
-# test_container_scan_threshold:
-#     stage: build
-#     needs:
-#         - container_scanning
-#     rules:
-#         - !reference [container_scanning, rules]
-#     image:
-#         name: ubuntu:26.04
-#     before_script:
-#         - apt-get update && apt-get install -y jq
-#     script:
-#         - vulnerabilities="$(jq '.vulnerabilities | length // 0' "gl-container-scanning-report.json")"
-#         - |
-#             if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
-#               echo "ERROR: There are $vulnerabilities vulnerabilities in the built staging image. Try to reduce it below ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
-#             elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
-#               echo "WARN: There are $vulnerabilities vulnerabilities in the built staging image. Try to reduce it below ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
-#             else
-#               echo "INFO: There are $vulnerabilities vulnerabilities in the built staging image." && exit 0;
-#             fi
-#     allow_failure:
-#         exit_codes:
-#             - 1
+test_container_scan_threshold:
+    stage: build
+    needs:
+        - container_scanning
+    rules:
+        - !reference [container_scanning, rules]
+    image:
+        name: ubuntu:26.04
+    before_script:
+        - apt-get update && apt-get install -y jq
+    script:
+        - vulnerabilities="$(jq '.vulnerabilities | length // 0' "gl-container-scanning-report.json")"
+        - |
+            if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
+              echo "ERROR: There are $vulnerabilities vulnerabilities in the built staging image. Try to reduce it below ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
+            elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
+              echo "WARN: There are $vulnerabilities vulnerabilities in the built staging image. Try to reduce it below ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
+            else
+              echo "INFO: There are $vulnerabilities vulnerabilities in the built staging image." && exit 0;
+            fi
+    allow_failure:
+        exit_codes:
+            - 1
 
-# test_dependency_audit:
-#     stage: build
-#     cache: []
-#     rules:
-#         - !reference [build_staging, rules]
-#     image:
-#         name: node:22-alpine
-#     before_script:
-#         - npm install -g pnpm@${PNPM_VERSION}
-#         - apk add --no-cache jq
-#     script:
-#         - pnpm audit --prod --json > pnpm-audit.json || true
-#         - vulnerabilities="$(jq '.metadata.vulnerabilities | (.high // 0) + (.critical // 0)' pnpm-audit.json)"
-#         - |
-#             if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
-#               echo "ERROR: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
-#             elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
-#               echo "WARN: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
-#             else
-#               echo "INFO: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies." && exit 0;
-#             fi
-#     artifacts:
-#         when: always
-#         paths:
-#             - pnpm-audit.json
-#     allow_failure:
-#         exit_codes:
-# #             - 1
+test_dependency_audit:
+    stage: build
+    cache: []
+    rules:
+        - !reference [build_staging, rules]
+    image:
+        name: node:22-alpine
+    before_script:
+        - npm install -g pnpm@${PNPM_VERSION}
+        - apk add --no-cache jq
+    script:
+        - pnpm audit --prod --json > pnpm-audit.json || true
+        - vulnerabilities="$(jq '.metadata.vulnerabilities | (.high // 0) + (.critical // 0)' pnpm-audit.json)"
+        - |
+            if [ "$vulnerabilities" -gt "${CS_VULN_ERROR_THRESHOLD:-0}" ]; then
+              echo "ERROR: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_ERROR_THRESHOLD:-0}." && exit 2;
+            elif [ "$vulnerabilities" -gt "${CS_VULN_WARN_THRESHOLD:-0}" ]; then
+              echo "WARN: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies. Try to reduce it to at most ${CS_VULN_WARN_THRESHOLD:-0}." && exit 1;
+            else
+              echo "INFO: There are $vulnerabilities high/critical vulnerabilities in the production npm dependencies." && exit 0;
+            fi
+    artifacts:
+        when: always
+        paths:
+            - pnpm-audit.json
+    allow_failure:
+        exit_codes:
+            - 1
 
-# deploy_staging:
-#     stage: deploy
-#     tags: [k8s-kta]
-#     needs:
-#         - build_staging
-#     rules:
-#         - !reference [build_staging, rules]
-#     image: repo.heigit.org/heigit/argocd-cli:latest
-#     script:
-#         - |
-#             argocd app actions \
-#               run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
-#               restart --kind Deployment \
-#               --server ${ARGOCD_SERVER} \
-#               --auth-token ${ARGOCD_AUTH_TOKEN}\
-#               --resource-name can-${CI_PROJECT_NAME}
+deploy_staging:
+    stage: deploy
+    tags: [k8s-kta]
+    needs:
+        - build_staging
+    rules:
+        - !reference [build_staging, rules]
+    image: repo.heigit.org/heigit/argocd-cli:latest
+    script:
+        - |
+            argocd app actions \
+              run ca-staging/${ARGOCD_STAGING_APPLICATION_NAME} \
+              restart --kind Deployment \
+              --server ${ARGOCD_SERVER} \
+              --auth-token ${ARGOCD_AUTH_TOKEN}\
+              --resource-name can-${CI_PROJECT_NAME}
