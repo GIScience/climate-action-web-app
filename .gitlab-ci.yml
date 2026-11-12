@@ -116,7 +116,6 @@ build_staging:
         - |
             buildah build \
                 --layers \
-                --build-arg "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}" \
                 --cache-from=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
                 --cache-to=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
