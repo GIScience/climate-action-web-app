@@ -98,83 +98,55 @@ test_cypress:
             - cypress/snapshots/diff/**/*.png
         expire_in: 7 day
 
-build_app:
-    stage: build
-    rules:
-        - if: $CI_COMMIT_TAG
-        - !reference [build_staging, rules]
-    cache:
-        key:
-            files:
-                - pnpm-lock.yaml
-        paths:
-            - .pnpm-store
-        policy: pull-push
-    image: node:24-slim
-    variables:
-        CYPRESS_INSTALL_BINARY: '0'
-        KUBERNETES_CPU_REQUEST: '4'
-        KUBERNETES_CPU_LIMIT: '8'
-        KUBERNETES_MEMORY_REQUEST: '8Gi'
-        KUBERNETES_MEMORY_LIMIT: '16Gi'
-    before_script:
-        - npm install -g pnpm@${PNPM_VERSION}
-        - pnpm config set store-dir .pnpm-store
-        - pnpm install --frozen-lockfile --prefer-offline
-        - pnpm store prune
-    script:
-        - pnpm run build:prod
-        # Match the path the Dockerfile's build stage produces
-        - mkdir -p prebuilt/ca-web-app && mv dist prebuilt/ca-web-app/dist
-    artifacts:
-        paths:
-            - prebuilt/
-        expire_in: 1 hour
-
 build_staging:
     stage: build
-    cache: []
-    needs: [build_app]
+    tags: [buildah]
     rules:
         - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"
-    image: docker.io/docker:29.9.2-cli
+    variables:
+        KUBERNETES_CPU_REQUEST: '2'
+        KUBERNETES_CPU_LIMIT: '4'
+        KUBERNETES_MEMORY_REQUEST: '6Gi'
+        KUBERNETES_MEMORY_LIMIT: '12Gi'
     before_script:
-        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
-        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+        - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
+        - echo "$CI_DOCKER_TOKEN" | buildah login -u "$CI_DOCKER_USER" --password-stdin "$REGISTRY_URL"
     script:
         - |
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --build-context build=./prebuilt \
-                --build-arg "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}" \
-                --cache-from=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache \
-                --cache-to=type=registry,ref=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:buildcache,mode=max \
+            buildah build \
+                --layers \
+                --cache-from=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
+                --cache-to=${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}-buildcache \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel \
-                --push \
                 .
+        - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:staging
+        - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:devel
+    after_script:
+        - buildah logout --all || true
 
 build_release:
     stage: build
-    cache: []
-    needs: [build_app]
+    tags: [buildah]
     rules:
         - if: $CI_COMMIT_TAG
-    image: docker.io/docker:29.9.2-cli
+    variables:
+        KUBERNETES_CPU_REQUEST: '2'
+        KUBERNETES_CPU_LIMIT: '4'
+        KUBERNETES_MEMORY_REQUEST: '6Gi'
+        KUBERNETES_MEMORY_LIMIT: '12Gi'
     before_script:
-        - echo ${CI_DOCKER_TOKEN} | docker --config ~/ca_config login ${REGISTRY_URL} -u ${CI_DOCKER_USER} --password-stdin
-        - docker --config ~/ca_config buildx create --use --name=kube --driver remote tcp://amd64-buildkit-service.ci-cd.svc:1234
+        - export REGISTRY_AUTH_FILE="$(mktemp -d)/auth.json"
+        - echo "$CI_DOCKER_TOKEN" | buildah login -u "$CI_DOCKER_USER" --password-stdin "$REGISTRY_URL"
     script:
         - |
-            docker --config ~/ca_config \
-                buildx build \
-                --builder=kube \
-                --build-context build=./prebuilt \
-                --platform=linux/amd64 \
+            buildah build \
+                --layers \
                 --tag ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
-                --push \
                 .
+        - buildah push ${REGISTRY_URL}/${GROUP_NAME}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
+    after_script:
+        - buildah logout --all || true
 
 include:
     - template: Jobs/Container-Scanning.gitlab-ci.yml
