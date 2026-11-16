@@ -19,7 +19,7 @@ import {
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import { Models } from 'appwrite'
-import { MarkdownModule, provideMarkdown } from 'ngx-markdown'
+import { MARKED_EXTENSIONS, MarkdownModule, MarkedRenderer, provideMarkdown } from 'ngx-markdown'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { EMPTY, Observable, Subscription, catchError, combineLatest, map, switchMap, tap } from 'rxjs'
@@ -35,7 +35,27 @@ import { PluginService } from './plugin.service'
     selector: 'app-plugin',
     templateUrl: './plugin.component.html',
     styleUrls: ['./plugin.component.scss'],
-    providers: [provideMarkdown()],
+    providers: [
+        provideMarkdown({
+            markedExtensions: [
+                {
+                    provide: MARKED_EXTENSIONS,
+                    multi: true,
+                    useValue: {
+                        renderer: {
+                            // Open external links in a new tab
+                            link(token) {
+                                const html = MarkedRenderer.prototype.link.call(this, token)
+                                return /^https?:\/\//i.test(token.href)
+                                    ? html.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ')
+                                    : html
+                            }
+                        }
+                    }
+                }
+            ]
+        })
+    ],
     imports: [
         CommonModule,
         MarkdownModule,

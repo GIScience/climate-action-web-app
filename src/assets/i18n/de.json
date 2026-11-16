@@ -171,8 +171,6 @@
     },
     "artifactViewer": {
         "download": "Ergebnis herunterladen",
-        "maximize": "Vergrößern",
-        "minimize": "Verkleinern",
         "close": "Schließen"
     },
     "artifact": {
@@ -229,6 +227,10 @@
             "imprint": "Impressum",
             "privacyPolicy": "Datenschutz",
             "faqs": "FAQs",
+            "aboutClimateActionUrl": "https://heigit.org/climate-action-2/",
+            "imprintUrl": "https://heigit.org/impressum/",
+            "privacyPolicyUrl": "https://heigit.org/datenschutzerklaerung/",
+            "faqsUrl": "https://heigit.org/climate-action-navigator-faq-2/",
             "version": "Version: {{ version }}",
             "iconsByIcons8": "Icons von Icons8",
             "reportMapProblem": "Ein Problem auf der Karte melden"

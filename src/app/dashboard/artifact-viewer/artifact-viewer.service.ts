@@ -11,7 +11,6 @@ export class ArtifactViewerService {
     private isViewerVisibleSubject = new BehaviorSubject<boolean>(false)
     isViewerVisible$ = this.isViewerVisibleSubject.pipe(distinctUntilChanged())
 
-    minimised = false
     name: string | null = null
 
     get isViewerVisible(): boolean {

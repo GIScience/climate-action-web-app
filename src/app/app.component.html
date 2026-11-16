@@ -38,7 +38,7 @@
         <span class="about-info">
             <span>{{ 'app.footer.copyright' | transloco: { year: currentYear() } }}</span> |
             <strong
-                ><a href="https://heigit.org/climate-action/" target="_blank">{{
+                ><a [href]="'app.footer.aboutClimateActionUrl' | transloco" target="_blank">{{
                     'app.footer.aboutClimateAction' | transloco
                 }}</a></strong
             >
@@ -48,12 +48,13 @@
             }}</a>
             |
             <a [href]="'mailto:' + supportEmail" target="_blank">{{ 'app.footer.partnerWithUs' | transloco }}</a>
-            | <a href="https://heigit.org/imprint" target="_blank">{{ 'app.footer.imprint' | transloco }}</a> |
-            <a href="https://heigit.org/privacy-policy" target="_blank">{{ 'app.footer.privacyPolicy' | transloco }}</a>
             |
-            <a href="https://heigit.org/climate-action-navigator-faq/" target="_blank">{{
-                'app.footer.faqs' | transloco
+            <a [href]="'app.footer.imprintUrl' | transloco" target="_blank">{{ 'app.footer.imprint' | transloco }}</a> |
+            <a [href]="'app.footer.privacyPolicyUrl' | transloco" target="_blank">{{
+                'app.footer.privacyPolicy' | transloco
             }}</a>
+            |
+            <a [href]="'app.footer.faqsUrl' | transloco" target="_blank">{{ 'app.footer.faqs' | transloco }}</a>
         </span>
         <span class="contact-info">
             <span>{{ 'app.footer.version' | transloco: { version: version } }}</span> |

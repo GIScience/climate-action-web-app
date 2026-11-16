@@ -281,7 +281,6 @@ export class ComputationComponent implements OnInit, OnChanges, OnDestroy {
             artifact.modality === 'MARKDOWN'
         ) {
             this.artifactViewerService.isViewerVisible = true
-            this.artifactViewerService.minimised = false
             const { observable, check } = artifactTypeMap[artifact.modality]
             waitForArtifactFetch(observable, check)
             this.artifactService.fetchArtifact(artifact, { setLoading: true })

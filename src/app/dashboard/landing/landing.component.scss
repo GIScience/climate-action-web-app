@@ -45,6 +45,7 @@
         --haze: rgb(8 12 14 / 60%);
         --card: rgb(8 12 14 / 45%);
         --card-border: rgb(243 247 246 / 16%);
+        --icon-filter: brightness(0.85);
     }
 }
 
@@ -153,9 +154,14 @@
     }
 
     .discovery__icon {
+        background-color: #fafafa;
+        border-radius: rem(9);
+        box-sizing: content-box;
+        filter: var(--icon-filter, none);
         flex-shrink: 0;
         height: rem(28);
         object-fit: contain;
+        padding: rem(6);
         width: rem(28);
     }
 

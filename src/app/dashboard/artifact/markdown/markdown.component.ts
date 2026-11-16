@@ -52,17 +52,23 @@ export class MarkdownComponent implements OnInit {
 
     private parseMarkdown(markdown: string): void {
         let html = this.mdParser.render(markdown)
-        html = this.rewriteFootnoteLinks(html)
+        html = this.rewriteLinks(html)
         this.markdownContent = this.sanitizer.bypassSecurityTrustHtml(html)
     }
 
-    private rewriteFootnoteLinks(html: string) {
+    private rewriteLinks(html: string) {
         const baseUrl = location.href.split('#')[0]
         const parser = new DOMParser()
         const doc = parser.parseFromString(html, 'text/html')
 
-        const links = doc.querySelectorAll('a[href^="#fn"], a[href^="#fnref"]')
-        links.forEach(link => {
+        // Open external links in a new tab
+        doc.querySelectorAll('a[href^="http://" i], a[href^="https://" i]').forEach(link => {
+            link.setAttribute('target', '_blank')
+            link.setAttribute('rel', 'noopener noreferrer')
+        })
+
+        const footnoteLinks = doc.querySelectorAll('a[href^="#fn"], a[href^="#fnref"]')
+        footnoteLinks.forEach(link => {
             const originalHref = link.getAttribute('href')
             if (originalHref) {
                 link.setAttribute('href', `${baseUrl}${originalHref}`)

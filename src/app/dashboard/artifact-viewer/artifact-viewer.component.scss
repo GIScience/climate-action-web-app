@@ -21,22 +21,6 @@ $chrome-height: rem(75);
     width: min(#{rem(840)}, 100%);
     z-index: 3;
 
-    &.minimised {
-        bottom: rem(20);
-        height: rem(53);
-        top: auto;
-        transform: none !important;
-        width: min(#{rem(560)}, 100%);
-
-        .artifact-header {
-            cursor: unset;
-
-            .grip-icon {
-                display: none;
-            }
-        }
-    }
-
     .artifact-header {
         align-items: center;
         background-color: rgb(201 210 210 / 75%);
@@ -61,16 +45,6 @@ $chrome-height: rem(75);
             display: flex;
             flex-shrink: 0;
             margin-left: auto;
-
-            .minimise-btn {
-                border-color: #666;
-                color: #666;
-                margin-right: rem(8);
-
-                &:hover {
-                    background-color: #e5e5e5;
-                }
-            }
 
             .close-btn {
                 border-color: #666;
