@@ -44,7 +44,7 @@
                         type="button"
                         class="draw-button"
                         [class.active]="currentSelectionMode === ExternalInput.Boundary"
-                        (click)="setSelectionMode(ExternalInput.Boundary)"
+                        (click)="chooseSelectionMode(ExternalInput.Boundary)"
                         [title]="'pluginParameter.selectFromBoundaries' | transloco">
                         <svg lucideMapPinPlusInside size="16"></svg>
                         {{ 'pluginParameter.boundary' | transloco }}
@@ -54,7 +54,7 @@
                         class="draw-button"
                         [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === ExternalInput.File"
-                        (click)="setSelectionMode(ExternalInput.File)"
+                        (click)="chooseSelectionMode(ExternalInput.File)"
                         [title]="'pluginParameter.selectFile' | transloco">
                         <svg lucideFile size="16"></svg>
                         {{ 'pluginParameter.file' | transloco }}
@@ -64,7 +64,7 @@
                         class="draw-button"
                         [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Circle"
-                        (click)="setSelectionMode(DrawInput.Circle)"
+                        (click)="chooseSelectionMode(DrawInput.Circle)"
                         [title]="'pluginParameter.drawCircle' | transloco">
                         <svg lucideCircleDot size="16"></svg>
                         {{ 'pluginParameter.circle' | transloco }}
@@ -74,7 +74,7 @@
                         class="draw-button"
                         [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Box"
-                        (click)="setSelectionMode(DrawInput.Box)"
+                        (click)="chooseSelectionMode(DrawInput.Box)"
                         [title]="'pluginParameter.drawRectangle' | transloco">
                         <svg lucideSquare size="16"></svg>
                         {{ 'pluginParameter.rectangle' | transloco }}
@@ -84,7 +84,7 @@
                         class="draw-button"
                         [disabled]="boundaryOnly"
                         [class.active]="currentSelectionMode === DrawInput.Polygon"
-                        (click)="setSelectionMode(DrawInput.Polygon)"
+                        (click)="chooseSelectionMode(DrawInput.Polygon)"
                         [title]="'pluginParameter.drawPolygon' | transloco">
                         <svg lucidePentagon size="16"></svg>
                         {{ 'pluginParameter.polygon' | transloco }}

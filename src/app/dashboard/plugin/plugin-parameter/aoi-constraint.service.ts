@@ -75,7 +75,7 @@ export class AoiConstraintService {
         return this.constraints.find(c => c.constraint_type === 'BoundarySelectionConstraint')
     }
 
-    get coveredByGeomConstraint(): CoveredByGeomConstraint | undefined {
+    private get coveredByGeomConstraint(): CoveredByGeomConstraint | undefined {
         return this.constraints.find(c => c.constraint_type === 'CoveredByGeomConstraint')
     }
 

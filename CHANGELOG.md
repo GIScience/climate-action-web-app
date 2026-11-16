@@ -33,6 +33,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Clicking on a computation "Success" toast opens it directly ([#370](https://gitlab.heigit.org/climate-action/web-app/-/issues/370))
 - **experimental** Vulnerability scanning of the container image and PNPM dependencies
 - Unbookmarking a stale computation throws up a confirmation dialog ([#526](https://gitlab.heigit.org/climate-action/web-app/-/issues/526))
+- Persist the chosen AoI selection mode in UI Preferences, and use it as the default across all plugins ([#544](https://gitlab.heigit.org/climate-action/web-app/-/issues/544))
 
 ### Removed
 

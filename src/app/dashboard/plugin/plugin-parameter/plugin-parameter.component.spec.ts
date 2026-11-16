@@ -1540,30 +1540,18 @@ describe('PluginParameterComponent', () => {
             buttons.slice(1).forEach(button => expect(button.disabled).toBe(true))
         })
 
-        it('defaults to Rectangle drawing for a CoveredByGeomConstraint without locking the other tools', () => {
-            vi.spyOn(constraintService, 'coveredByGeomConstraint', 'get').mockReturnValue({
-                constraint_type: 'CoveredByGeomConstraint',
-                geom: { type: 'MultiPolygon', coordinates: [] },
-                description: 'Heidelberg'
-            })
-            const enableSpy = vi.spyOn(component.mapService, 'enableBoundarySelection')
-            const disableSpy = vi.spyOn(component.mapService, 'disableBoundarySelection')
-            const drawSpy = vi.spyOn(component.mapService, 'startDrawing')
+        it('remembers the chosen selection mode as the default for other plugins', () => {
+            try {
+                component.chooseSelectionMode(DrawInput.Box)
+                component.setSelectionMode(ExternalInput.Boundary)
 
-            component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
-            component.ngOnChanges()
-            component.ngOnInit()
-            fixture.detectChanges()
+                component.plugin = { ...test_plugin, operator_schema: { type: 'object', properties: {} } } as Plugin
+                component.ngOnChanges()
 
-            expect(component.currentSelectionMode).toBe(DrawInput.Box)
-            expect(disableSpy).toHaveBeenCalled()
-            expect(drawSpy).toHaveBeenCalledWith(DrawInput.Box)
-            expect(enableSpy).not.toHaveBeenCalled()
-
-            const buttons = Array.from(
-                (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.draw-button')
-            )
-            buttons.forEach(button => expect(button.disabled).toBe(false))
+                expect(component.currentSelectionMode).toBe(DrawInput.Box)
+            } finally {
+                localStorage.clear()
+            }
         })
 
         it('flies to the allowed regions and revalidates when constraint geometries arrive', () => {

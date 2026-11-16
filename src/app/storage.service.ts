@@ -8,6 +8,7 @@ import { isRealUser } from './auth/user.utils'
 import { statusRank } from './dashboard/common/status-rank.util'
 import { ComputationFlags, ComputationRunState } from './dashboard/common/status.types'
 import { ComputationDatabaseEntity, DiscoverTab } from './dashboard/computations-index/computation.interface'
+import { DrawInput, ExternalInput, GeometryInputMode } from './dashboard/plugin/plugin.interface'
 import { AppwriteDbService, PaginatedResult } from './persistence/appwrite-db.service'
 import { RunSyncService } from './persistence/run-sync.service'
 import { RunsDbService } from './persistence/runs-db.service'
@@ -19,6 +20,7 @@ interface MapPreferences {
 
 interface UiPreferences {
     activeTab?: DiscoverTab
+    aoiSelectionMode?: GeometryInputMode
 }
 
 // Central service for all storage operations.
@@ -334,6 +336,18 @@ export class StorageService {
     saveActiveTab(tab: DiscoverTab): void {
         const prefs = this.getUiPreferences()
         prefs.activeTab = tab
+        this.saveUiPreferences(prefs)
+    }
+
+    getAoiSelectionMode(): GeometryInputMode {
+        const mode = this.getUiPreferences().aoiSelectionMode
+        const validModes: GeometryInputMode[] = [...Object.values(ExternalInput), ...Object.values(DrawInput)]
+        return mode && validModes.includes(mode) ? mode : ExternalInput.Boundary
+    }
+
+    saveAoiSelectionMode(mode: GeometryInputMode): void {
+        const prefs = this.getUiPreferences()
+        prefs.aoiSelectionMode = mode
         this.saveUiPreferences(prefs)
     }
 

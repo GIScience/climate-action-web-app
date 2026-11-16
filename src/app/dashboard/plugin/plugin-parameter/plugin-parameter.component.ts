@@ -582,10 +582,8 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
             this.setSelectionMode(ExternalInput.Boundary)
             // setSelectionMode does nothing when Boundary mode is already active, so turn the layer on explicitly
             this.mapService.enableBoundarySelection()
-        } else if (this.aoiConstraints.coveredByGeomConstraint) {
-            // CoveredByGeom constraints can aggravate confusion caused by
-            // admin_level based Boundary display, so default to Rectangle
-            this.setSelectionMode(DrawInput.Box)
+        } else {
+            this.setSelectionMode(this.storageService.getAoiSelectionMode())
         }
         this.refreshConstraintState()
         this.beginMapPreparation()
@@ -631,6 +629,12 @@ export class PluginParameterComponent implements OnInit, OnChanges, OnDestroy {
                 ? this.aoiConstraints.validate(this.mapService.selectedFeatures[0])
                 : null
         this.updateBannerState()
+    }
+
+    // Switch mode on user request and remember it as the default for all plugins
+    chooseSelectionMode(mode: GeometryInputMode): void {
+        this.storageService.saveAoiSelectionMode(mode)
+        this.setSelectionMode(mode)
     }
 
     setSelectionMode(mode: GeometryInputMode): void {
