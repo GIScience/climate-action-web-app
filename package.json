@@ -1,6 +1,6 @@
 {
     "name": "climate-action-navigator",
-    "version": "3.7.0",
+    "version": "4.0.0",
     "packageManager": "pnpm@12.16.1",
     "scripts": {
         "ng": "ng",
