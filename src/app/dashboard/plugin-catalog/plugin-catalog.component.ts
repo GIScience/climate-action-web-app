@@ -28,10 +28,12 @@ import {
 } from '@lucide/angular'
 import { TippyDirective } from '@ngneat/helipopper'
 import type { TippyProps } from '@ngneat/helipopper/config'
+import type { Driver } from 'driver.js'
 import { NgScrollbarModule } from 'ngx-scrollbar'
 import { ToastrService } from 'ngx-toastr'
 import { filter, skip } from 'rxjs'
 import { DropdownMenuDirective } from '../../shared/dropdown-menu.directive'
+import { StorageService } from '../../storage.service'
 import { ArtifactViewerService } from '../artifact-viewer/artifact-viewer.service'
 import { MapArtifactManagerService } from '../map/map-artifact-manager.service'
 import { MapService } from '../map/map.service'
@@ -70,6 +72,8 @@ const FOLD_KEYFRAMES: Keyframe[] = [
 ]
 const FOLD_TIMING: KeyframeAnimationOptions = { duration: 160, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
 
+const SWITCH_HINT_DELAY = 600
+
 const prefersMotion = () => !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 const isKnownConcern = (concern: string): concern is Concern => Object.hasOwn(CONCERN_STYLES, concern)
@@ -100,12 +104,17 @@ export class PluginCatalogComponent implements OnInit {
     private artifactViewerService = inject(ArtifactViewerService)
     private mapService = inject(MapService)
     private mapArtifactManager = inject(MapArtifactManagerService)
+    private storageService = inject(StorageService)
     private destroyRef = inject(DestroyRef)
+
+    private switchHintTimer?: ReturnType<typeof setTimeout>
+    private switchHint?: Driver
 
     @Input() mode: 'deck' | 'inline' = 'inline'
     @Input() label?: string
 
     @ViewChild('deckTrigger') deckTrigger?: ElementRef<HTMLButtonElement>
+    @ViewChild('deckStack') deckStack?: ElementRef<HTMLElement>
     @ViewChild('panel') panel?: ElementRef<HTMLElement>
     @ViewChildren('tile') tiles?: QueryList<ElementRef<HTMLButtonElement>>
 
@@ -140,9 +149,15 @@ export class PluginCatalogComponent implements OnInit {
 
         if (this.mode === 'inline') {
             this.destroyRef.onDestroy(() => (PluginCatalogComponent.leftLanding = true))
-        } else if (PluginCatalogComponent.leftLanding) {
-            PluginCatalogComponent.leftLanding = false
-            this.arriving = prefersMotion()
+        } else {
+            if (PluginCatalogComponent.leftLanding) {
+                PluginCatalogComponent.leftLanding = false
+                this.arriving = prefersMotion()
+            }
+            this.destroyRef.onDestroy(() => {
+                clearTimeout(this.switchHintTimer)
+                this.switchHint?.destroy()
+            })
         }
 
         this.router.events
@@ -196,11 +211,45 @@ export class PluginCatalogComponent implements OnInit {
                 this.concernLegend = this.buildConcernLegend()
                 this.loading = false
                 if (!this.cards.length) this.notifyUnavailable()
+                this.queueSwitchHint()
             },
             error: error => {
                 console.error('Error fetching plugins:', error)
                 this.loading = false
                 if (!this.cards.length) this.notifyUnavailable()
+            }
+        })
+    }
+
+    onArrived(): void {
+        this.arriving = false
+        this.queueSwitchHint()
+    }
+
+    // Points out the deck once per browser, after it has loaded and its arrival cue has played
+    private queueSwitchHint(): void {
+        if (this.mode !== 'deck' || this.loading || this.arriving || !this.activeCard) return
+        if (this.switchHintTimer !== undefined || this.storageService.hasSeenHint('tool-switcher')) return
+
+        this.switchHintTimer = setTimeout(() => void this.showSwitchHint(), SWITCH_HINT_DELAY)
+    }
+
+    private async showSwitchHint(): Promise<void> {
+        const { driver } = await import('driver.js')
+        const stack = this.deckStack?.nativeElement
+        // Left for a later visit if the deck is gone, the launcher is open or the walkthrough is running
+        if (!stack?.isConnected || this.open || document.body.classList.contains('driver-active')) return
+
+        this.storageService.markHintSeen('tool-switcher')
+        this.switchHint = driver({ animate: prefersMotion(), overlayOpacity: 0.4, stageRadius: 12 })
+        this.switchHint.highlight({
+            element: stack,
+            popover: {
+                title: this.translocoService.translate('pluginCatalog.switchTool'),
+                description: this.translocoService.translate('pluginCatalog.switchToolHint'),
+                side: 'bottom',
+                align: 'start',
+                showButtons: ['close']
             }
         })
     }
@@ -239,6 +288,7 @@ export class PluginCatalogComponent implements OnInit {
     }
 
     toggle(event: MouseEvent) {
+        this.switchHint?.destroy()
         if (this.open) {
             this.dismiss()
             return

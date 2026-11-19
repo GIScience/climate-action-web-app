@@ -1,28 +1,25 @@
 <div class="tour-choice-dialog">
     <h2>{{ 'walkthrough.tourChoiceDialog.title' | transloco }}</h2>
-    <button (click)="closeDialog()" class="close-dialog">
+    <button type="button" (click)="closeDialog()" class="close-dialog">
         <svg lucideX size="25"></svg>
     </button>
 
-    <div class="dialog-content">
-        <p>
-            {{ 'walkthrough.tourChoiceDialog.description' | transloco }}
-        </p>
+    <p>{{ 'walkthrough.tourChoiceDialog.description' | transloco }}</p>
 
-        <div class="choice-buttons">
-            <button class="btn-primary btn-withtext--after" (click)="onLoginClick()">
-                <svg lucideLogIn size="20"></svg>
-                {{ 'walkthrough.tourChoiceDialog.loginButton' | transloco }}
-            </button>
+    <p class="guest-tour-note">
+        <svg lucideInfo size="20"></svg>
+        {{ 'walkthrough.tourChoiceDialog.guestNote' | transloco }}
+    </p>
 
-            <button class="btn-alt btn-withtext--after" (click)="onGuestTourClick()">
-                <svg lucidePlay size="20"></svg>
-                {{ 'walkthrough.tourChoiceDialog.guestTourButton' | transloco }}
-            </button>
-        </div>
+    <div class="choice-buttons">
+        <button type="button" class="btn-primary btn-withtext--after" (click)="onLoginClick()">
+            <svg lucideLogIn size="20"></svg>
+            {{ 'walkthrough.tourChoiceDialog.loginButton' | transloco }}
+        </button>
 
-        <p class="guest-tour-note">
-            <small>{{ 'walkthrough.tourChoiceDialog.guestNote' | transloco }}</small>
-        </p>
+        <button type="button" class="btn-alt btn-withtext--after" (click)="onGuestTourClick()">
+            <svg lucidePlay size="20"></svg>
+            {{ 'walkthrough.tourChoiceDialog.guestTourButton' | transloco }}
+        </button>
     </div>
 </div>

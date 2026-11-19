@@ -39,6 +39,7 @@
         "unavailable": "No assessment tools available",
         "unavailableToast": "No assessment tools are online right now. Try reloading the page.",
         "switchTool": "Switch tool",
+        "switchToolHint": "Click this deck at any time to open another assessment tool.",
         "close": "Close",
         "concernsLabel": "Topics",
         "concerns": {
@@ -124,7 +125,7 @@
             "emailSubject": "Climate Action Navigator: Computation #{{ id }} failed",
             "emailBody": "Hello,\n\nmy computation in the '{{ plugin }}' tool did not complete.\n\nComputation ID: {{ id }}\n\n"
         },
-        "runSucceeded": "<strong>{{ plugin }}</strong> computation for <strong>{{ aoi }}</strong> (ID: #{{ id }}) has completed successfully. Click here to open it.",
+        "runSucceeded": "<strong>{{ plugin }}</strong> computation for <strong>{{ aoi }}</strong> (ID: #{{ id }}) has completed successfully.",
         "bookmarkAdded": "Saved to Bookmarks",
         "bookmarkRemoved": "Removed from Bookmarks",
         "unbookmarkCustomAoiConfirm": "This computation uses a custom area and does not appear in the \"Discover\" tab. If you remove it, you will lose access to its results and will have to run the computation again. Remove anyway?",
@@ -278,7 +279,7 @@
             },
             "exploreResult": {
                 "title": "Read more about the results",
-                "description": "You can read more about the results, or even download the raw data from here."
+                "description": "From here you can read more about a result or download its raw data. You can also pin up to two results to the map to compare them, or collect them in a report to print as PDF.<br />Try these after the tour – for now, let's continue."
             },
             "viewChartResult": {
                 "title": "View a different result",

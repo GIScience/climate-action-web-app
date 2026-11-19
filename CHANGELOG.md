@@ -18,6 +18,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - Plugin Catalog sidebar has been converted into a launcher/deck style menu to accommodate the ever-growing list of tools
 - Landing page on revist now displays the latest 3 computations from the search endpoint, instead of the user's last computation
 - Switched to 'infinite scroll' mode for computation lists ([#525](https://gitlab.heigit.org/climate-action/web-app/-/issues/525))
+- Computation created(bookmarked) during an authenticated walkthrough are removed upon exit ([#533](https://gitlab.heigit.org/climate-action/web-app/-/issues/533))
 
 - Migrate unit tests from Jest to Vitest
 
@@ -34,6 +35,7 @@ and this project mostly adheres to [Semantic Versioning](https://semver.org/spec
 - **experimental** Vulnerability scanning of the container image and PNPM dependencies
 - Unbookmarking a stale computation throws up a confirmation dialog ([#526](https://gitlab.heigit.org/climate-action/web-app/-/issues/526))
 - Persist the chosen AoI selection mode in UI Preferences, and use it as the default across all plugins ([#544](https://gitlab.heigit.org/climate-action/web-app/-/issues/544))
+- Track and display one-time UI hints for new/changed features, first one being for the Tool Switcher ([#513](https://gitlab.heigit.org/climate-action/web-app/-/issues/513))
 
 ### Removed
 

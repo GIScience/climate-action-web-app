@@ -1,44 +1,106 @@
 @use 'spec/tools/rem' as *;
 
 .driver-popover {
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgb(16 36 42 / 25%);
+    color: #333;
+    font-family: Manrope;
     max-width: rem(350);
+    padding: rem(16) rem(18);
 
     .driver-popover-title {
-        font-family: Manrope;
-        width: 100%;
+        color: #111;
+        font-size: rem(17);
+        font-weight: 600;
+        line-height: 1.4;
+        padding-right: rem(30);
     }
 
     .driver-popover-description {
-        color: #111;
-        font-family: Manrope;
-        font-variation-settings: 'wght' 400;
+        color: #333;
+        font-size: rem(14);
         line-height: 1.6;
-        padding-right: rem(15);
     }
 
-    .driver-popover-prev-btn {
-        @extend button, .btn-light !optional;
-        @extend button, .btn-small !optional;
+    .driver-popover-close-btn {
+        align-items: center;
+        border-radius: 50%;
+        color: #666;
+        display: flex;
+        font-size: rem(22);
+        height: rem(28);
+        justify-content: center;
+        line-height: 1;
+        right: rem(10);
+        top: rem(12);
+        transition:
+            background-color 0.15s ease-in-out,
+            color 0.15s ease-in-out;
+        width: rem(28);
+        z-index: 5;
 
+        &:hover,
+        &:focus-visible {
+            background-color: rgb(128 128 128 / 15%);
+            color: #111;
+        }
+    }
+
+    .driver-popover-footer {
+        margin-top: rem(14);
+    }
+
+    .driver-popover-progress-text {
+        color: #666;
+        font-size: rem(13);
+    }
+
+    .driver-popover-navigation-btns button + button {
+        margin-left: rem(6);
+    }
+
+    .driver-popover-footer-btn {
+        border: 2px solid;
+        border-radius: 25px;
+        font-size: rem(13);
+        font-weight: 500;
+        line-height: 1.4;
+        padding: rem(4) rem(14);
         text-shadow: none;
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    // Same colours as `.btn-light`
+    .driver-popover-prev-btn {
+        background-color: rgb(128 128 128 / 10%);
+        border-color: rgb(66 66 66 / 10%);
+        color: #424242;
+
+        &:hover,
+        &:focus {
+            background-color: rgb(128 128 128 / 20%);
+        }
 
         &.driver-popover-btn-disabled {
             visibility: hidden;
         }
     }
 
+    // Same colours as `.btn-primary`
     .driver-popover-next-btn {
-        @extend button, .btn-alt !optional;
-        @extend button, .btn-small !optional;
+        background-color: #008080;
+        border-color: #008080;
+        color: #fff;
 
-        text-shadow: none;
+        &:hover,
+        &:focus {
+            background-color: rgb(0 128 128 / 75%);
+        }
     }
 
-    .driver-popover-close-btn {
-        font-size: 1.7rem;
-        right: rem(3);
-        top: rem(10);
-        z-index: 5;
+    .driver-popover-footer-btn:focus-visible {
+        outline: 2px solid rgb(0 128 128 / 40%);
+        outline-offset: 2px;
     }
 
     &--loading {
@@ -50,9 +112,10 @@
         .driver-popover-loading-indicator {
             display: flex;
             justify-content: center;
+            left: 0;
             padding: rem(15) 0;
             position: absolute;
-            width: calc(100% - 2.143rem);
+            right: 0;
 
             .driver-popover-spinner {
                 animation: rotation 1s linear infinite;
@@ -65,6 +128,12 @@
             }
         }
     }
+}
+
+// Hide nested action buttons during tour to prevent flow derailment
+.child-computation.driver-active-element .artifact-actions,
+.parent-computation.driver-active-element .computation-actions {
+    visibility: hidden;
 }
 
 @keyframes rotation {

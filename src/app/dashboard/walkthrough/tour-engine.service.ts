@@ -6,6 +6,7 @@ import type { Driver } from 'driver.js'
 import { firstValueFrom, take } from 'rxjs'
 import { AppwriteService } from '../../auth/appwrite.service'
 import { StorageService } from '../../storage.service'
+import { parseUtcTimestamp } from '../computations-index/computation-format.utils'
 import { DashboardService } from '../dashboard.service'
 import { TourChoice, TourChoiceDialogComponent } from './tour-choice-dialog.component'
 import { TourStepsService } from './tour-steps.service'
@@ -26,6 +27,8 @@ export class TourEngine {
     private driverObj: Driver | null = null
     private currentSteps: ExtendedDriveStep[] = []
     private driverInitPromise: Promise<void>
+
+    private fullTourStartedAt: number | null = null
 
     constructor() {
         this.driverInitPromise = this.loadDriver()
@@ -89,6 +92,7 @@ export class TourEngine {
     }
 
     private async startFullTour() {
+        this.fullTourStartedAt = Date.now()
         const mainTourSteps = this.tourStepsService.getFullTourSteps()
         await this.startTour(mainTourSteps)
     }
@@ -125,6 +129,19 @@ export class TourEngine {
         }
 
         this.driverObj?.drive(0)
+    }
+
+    // Remove bookmarked computation that was created during the tour for the Ventotene
+    private async removeTourBookmarks(tourStartedAt: number) {
+        const tourRuns = this.storageService
+            .getPluginRuns()
+            .filter(
+                run =>
+                    parseUtcTimestamp(run.request_ts).getTime() >= tourStartedAt && run.aoiName?.includes('Ventotene')
+            )
+        for (const run of tourRuns) {
+            await this.storageService.deleteComputation(run.correlation_uuid)
+        }
     }
 
     private async ensureDriverReady(): Promise<void> {
@@ -168,7 +185,7 @@ export class TourEngine {
             prevBtnText: translations.prevButton,
             doneBtnText: translations.closeButton,
             steps: [],
-            overlayOpacity: 0.3,
+            overlayOpacity: 0.4,
             onDestroyStarted: () => {
                 const instance = this.driverObj
                 if (!instance) {
@@ -181,6 +198,12 @@ export class TourEngine {
             },
             onDestroyed: () => {
                 this.tourStepsService.cleanupEventHandlers()
+
+                const tourStartedAt = this.fullTourStartedAt
+                this.fullTourStartedAt = null
+                if (tourStartedAt) {
+                    void this.removeTourBookmarks(tourStartedAt)
+                }
             },
             onPrevClick: () => {
                 this.tourStepsService.showPopoverLoadingState()

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog'
 import { TranslocoModule } from '@jsverse/transloco'
-import { LucideLogIn, LucidePlay, LucideX } from '@lucide/angular'
+import { LucideInfo, LucideLogIn, LucidePlay, LucideX } from '@lucide/angular'
 import { AppwriteService } from '../../auth/appwrite.service'
 
 export enum TourChoice {
@@ -13,7 +13,7 @@ export enum TourChoice {
 
 @Component({
     selector: 'app-tour-choice-dialog',
-    imports: [MatDialogModule, MatButtonModule, LucideLogIn, LucidePlay, LucideX, TranslocoModule],
+    imports: [MatDialogModule, MatButtonModule, LucideInfo, LucideLogIn, LucidePlay, LucideX, TranslocoModule],
     templateUrl: './tour-choice-dialog.component.html',
     styleUrls: ['./tour-choice-dialog.component.scss']
 })

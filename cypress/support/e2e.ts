@@ -10,6 +10,11 @@ addCompareSnapshotCommand()
 const RUNS_DB_NAME = 'climate_action_local'
 
 beforeEach(() => {
+    // Prevent one-time UI hints from popping up and interfering with the flow.
+    cy.on('window:before:load', win => {
+        win.localStorage.setItem('ui_hints_seen', JSON.stringify(['tool-switcher']))
+    })
+
     cy.intercept(`${cypressEnvironment.cachetUrl}/**`, { body: { data: [], included: [] } }).as('blockCachetCalls')
 
     cy.intercept('**/v1/account', {

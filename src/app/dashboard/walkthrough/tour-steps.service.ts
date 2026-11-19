@@ -125,7 +125,10 @@ export class TourStepsService {
                     const focusInterval = setInterval(maintainFocus, 100)
                     this.activeEventHandlers.push(() => clearInterval(focusInterval))
 
-                    this.waitForClickAndElement('.location-suggestion__item:first-child')
+                    this.waitForClickAndElement('.location-suggestion__item:first-child', undefined, [
+                        'mousedown',
+                        'click'
+                    ])
                 }
             },
             onNextClicked: () => {
@@ -251,7 +254,19 @@ export class TourStepsService {
                 title: this.translocoService.translate('walkthrough.tourSteps.exploreResult.title'),
                 description: this.translocoService.translate('walkthrough.tourSteps.exploreResult.description'),
                 side: 'top',
-                align: 'end'
+                align: 'end',
+                onPopoverRender: popover => {
+                    const actions = document.querySelector('.child-computations .artifact-actions')
+                    const swallowClick = (event: Event) => {
+                        event.stopPropagation()
+                        popover.nextButton.animate(
+                            [{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }],
+                            { duration: 300, iterations: 2 }
+                        )
+                    }
+                    actions?.addEventListener('click', swallowClick, true)
+                    this.activeEventHandlers.push(() => actions?.removeEventListener('click', swallowClick, true))
+                }
             },
             onNextClicked: () => {
                 this.nextStepCallback()
@@ -373,11 +388,12 @@ export class TourStepsService {
         })[0] as HTMLElement
     }
 
-    private waitForClickAndElement(clickSelector: string, elementToWaitFor?: string) {
+    private waitForClickAndElement(clickSelector: string, elementToWaitFor?: string, eventTypes = ['click']) {
+        const removeListeners = () => eventTypes.forEach(type => document.removeEventListener(type, clickHandler))
         const clickHandler = (event: Event) => {
             const target = event.target as Element
             if (target && target.closest(clickSelector)) {
-                document.removeEventListener('click', clickHandler)
+                removeListeners()
                 if (elementToWaitFor) {
                     this.showPopoverLoadingState()
                     const poll = () => {
@@ -394,8 +410,8 @@ export class TourStepsService {
                 }
             }
         }
-        document.addEventListener('click', clickHandler)
-        this.activeEventHandlers.push(() => document.removeEventListener('click', clickHandler))
+        eventTypes.forEach(type => document.addEventListener(type, clickHandler))
+        this.activeEventHandlers.push(removeListeners)
     }
 
     private waitForBoundarySelection() {

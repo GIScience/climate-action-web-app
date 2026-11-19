@@ -171,7 +171,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     onDocumentClick(event: MouseEvent): void {
         if (this.isReportVisible && !this.leftColumnCollapsed) {
             const leftColumn = this.elementRef.nativeElement.querySelector('.dashboard__left-column')
-            if (leftColumn && !leftColumn.contains(event.target)) {
+            if (leftColumn && !event.composedPath().includes(leftColumn)) {
                 if (this.collapseTimeout) clearTimeout(this.collapseTimeout)
                 this.setCollapsed(true)
             }

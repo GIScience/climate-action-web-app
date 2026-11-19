@@ -214,11 +214,11 @@
     }
 
     .cta-section {
-        align-items: baseline;
+        align-items: center;
         display: flex;
         flex-wrap: wrap;
         font-size: rem(16);
-        gap: rem(4) rem(8);
+        gap: rem(8) rem(12);
         margin-top: rem(20);
     }
 
@@ -228,17 +228,18 @@
 
     .cta-tour {
         align-items: center;
-        background: none;
-        border: 0;
+        background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+        border-radius: 999px;
         color: var(--accent);
+        display: inline-flex;
         font-size: inherit;
         font-variation-settings: 'wght' 600;
         gap: rem(6);
-        padding: 0;
-        text-decoration: underline;
-        text-decoration-color: transparent;
-        text-underline-offset: rem(4);
-        transition: text-decoration-color 0.2s ease;
+        padding: rem(6) rem(14);
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
 
         svg {
             flex-shrink: 0;
@@ -247,7 +248,8 @@
 
         &:hover,
         &:focus-visible {
-            text-decoration-color: currentcolor;
+            background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+            border-color: var(--accent);
 
             svg {
                 transform: translateX(3px);
@@ -255,9 +257,8 @@
         }
 
         &:focus-visible {
-            border-radius: 4px;
             outline: 2px solid var(--accent);
-            outline-offset: 4px;
+            outline-offset: 2px;
         }
     }
 

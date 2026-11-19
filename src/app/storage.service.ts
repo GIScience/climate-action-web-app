@@ -23,6 +23,9 @@ interface UiPreferences {
     aoiSelectionMode?: GeometryInputMode
 }
 
+// One-time UI hints – add an id per hint.
+export type UiHint = 'tool-switcher'
+
 // Central service for all storage operations.
 // Runs are saved locally first: the in-memory list is what the app reads,
 // IndexedDB keeps a copy that survives reloads, and RunSyncService sends
@@ -42,6 +45,7 @@ export class StorageService {
     private readonly STORAGE_KEYS = {
         MAP_PREFERENCES: 'map_prefs',
         UI_PREFERENCES: 'ui_prefs',
+        UI_HINTS_SEEN: 'ui_hints_seen',
         LANGUAGE_PREFERENCE: 'language_pref',
         TOUR_AFTER_LOGIN: 'start_tour_after_login',
         RUNS_WIPE_PENDING: 'runs_wipe_pending',
@@ -349,6 +353,26 @@ export class StorageService {
         const prefs = this.getUiPreferences()
         prefs.aoiSelectionMode = mode
         this.saveUiPreferences(prefs)
+    }
+
+    // One-time UI hints
+
+    hasSeenHint(hint: UiHint): boolean {
+        try {
+            return this.getItem<UiHint[]>(this.STORAGE_KEYS.UI_HINTS_SEEN, []).includes(hint)
+        } catch {
+            return true
+        }
+    }
+
+    markHintSeen(hint: UiHint): void {
+        if (this.hasSeenHint(hint)) return
+        try {
+            const seen = this.getItem<UiHint[]>(this.STORAGE_KEYS.UI_HINTS_SEEN, [])
+            this.setItem(this.STORAGE_KEYS.UI_HINTS_SEEN, [...seen, hint])
+        } catch {
+            // Storage is full or blocked
+        }
     }
 
     // Tour preferences

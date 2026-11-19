@@ -8,6 +8,11 @@
         margin: 0;
     }
 
+    p {
+        color: #333;
+        line-height: 1.6;
+    }
+
     .close-dialog {
         align-items: center;
         background: #fff;
@@ -22,33 +27,35 @@
         right: rem(5);
         top: rem(13);
 
-        :hover {
+        &:hover {
             color: #111;
         }
     }
 
-    .dialog-content {
-        p {
-            color: #333;
-            line-height: 1.6;
-        }
+    .guest-tour-note {
+        align-items: center;
+        background-color: rgb(71 115 163 / 8%);
+        border: 1px solid rgb(71 115 163 / 30%);
+        border-radius: 10px;
+        display: flex;
+        font-size: 0.9rem;
+        gap: rem(8);
+        margin: 0;
+        padding: rem(8) rem(10);
 
-        .choice-buttons {
-            align-items: center;
-            background-color: #ebebeb;
-            box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.25);
-            display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-            margin: rem(10) 0 rem(10) rem(-25);
-            padding: rem(18) 0;
-            width: rem(550);
+        svg {
+            color: #4773a3;
+            flex: 0 0 auto;
         }
+    }
 
-        .guest-tour-note {
-            color: #666 !important;
-            margin: rem(10) 0 0 0 !important;
-            text-align: center;
-        }
+    .choice-buttons {
+        border-top: 1px solid #ccc;
+        display: flex;
+        flex-wrap: wrap;
+        gap: rem(10);
+        justify-content: center;
+        margin-top: rem(20);
+        padding-top: rem(20);
     }
 }

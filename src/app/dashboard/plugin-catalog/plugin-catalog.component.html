@@ -5,7 +5,7 @@
         class="deck"
         [ngClass]="{ 'deck--open': open, 'deck--arriving': arriving, 'is-loading': loading }"
         (click)="toggle($event)"
-        (animationend)="arriving = false"
+        (animationend)="onArrived()"
         aria-haspopup="dialog"
         [attr.aria-expanded]="open"
         [attr.aria-label]="label ? null : ('pluginCatalog.switchTool' | transloco)"
