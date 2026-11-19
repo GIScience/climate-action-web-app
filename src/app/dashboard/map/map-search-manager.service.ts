@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { TranslocoService } from '@jsverse/transloco'
+import bbox from '@turf/bbox'
 import type { Point } from 'geojson'
 import type {
     AddLayerObject,
@@ -16,17 +17,19 @@ import type {
     PointLike,
     PopupOptions
 } from 'maplibre-gl'
-import { Popup } from 'maplibre-gl'
+import { LngLatBounds, Popup } from 'maplibre-gl'
 import { environment } from 'src/environments/environment'
 import { formatShortUUID } from '../computations-index/computation-format.utils'
 import { AoiFeatureProperties, SearchCentroidCollection } from '../computations-index/computation.interface'
 import { computationRouteCommands } from '../share/share.service'
+import type { Extent } from './map.service'
+import { MapCameraUtils } from './utils/map-camera.utils'
 
 // Fallback when a feature carries no minzoom
 const DEFAULT_FEATURE_MIN_ZOOM = 10
 const CLUSTER_MAX_ZOOM = 9
 
-// Added to a target zoom so the camera lands clearly past the integer threshold
+// Added to a zoom floor so the camera lands clearly past the integer threshold
 // at which a cluster splits / a boundary polygon replaces its centroid
 const ZOOM_NUDGE = 0.25
 
@@ -35,6 +38,8 @@ const BOUNDARY_LAYER_MIN_ZOOM = 4
 
 // Per-feature zoom at which the boundary polygon takes over from the centroid
 const FEATURE_MIN_ZOOM: ExpressionSpecification = ['coalesce', ['get', 'min_zoom'], DEFAULT_FEATURE_MIN_ZOOM]
+// Per-feature zoom past which the boundary polygon is hidden again
+const FEATURE_MAX_ZOOM: ExpressionSpecification = ['coalesce', ['get', 'max_zoom'], 24]
 
 const CENTROID_SOURCE_ID = 'search-centroids-source'
 const BOUNDARY_SOURCE_ID = 'search-boundaries-source'
@@ -46,15 +51,20 @@ const BOUNDARY_FILL_LAYER_ID = 'search-boundary-fill'
 const BOUNDARY_HOVER_LAYER_ID = 'search-boundary-hover'
 const BOUNDARY_CASING_LAYER_ID = 'search-boundary-casing'
 const BOUNDARY_LINE_LAYER_ID = 'search-boundary-line'
+const BOUNDARY_HOVER_CASING_LAYER_ID = 'search-boundary-hover-casing'
+const BOUNDARY_HOVER_LINE_LAYER_ID = 'search-boundary-hover-line'
 
 const INTERACTIVE_LAYER_IDS = [CLUSTER_LAYER_ID, UNCLUSTERED_LAYER_ID, BOUNDARY_FILL_LAYER_ID]
-// Plugin-filtered boundary layers (the hover layer is filtered by UUID instead)
+// Plugin-filtered boundary layers (the hover layers are filtered by UUID instead)
 const BOUNDARY_LAYER_IDS = [BOUNDARY_FILL_LAYER_ID, BOUNDARY_CASING_LAYER_ID, BOUNDARY_LINE_LAYER_ID]
+const HOVER_LAYER_IDS = [BOUNDARY_HOVER_LAYER_ID, BOUNDARY_HOVER_CASING_LAYER_ID, BOUNDARY_HOVER_LINE_LAYER_ID]
 
 const boundaryFilter = (pluginId: string): FilterSpecification => [
     'all',
     ['==', ['get', 'plugin_id'], pluginId],
-    ['>=', ['zoom'], FEATURE_MIN_ZOOM]
+    ['>=', ['zoom'], FEATURE_MIN_ZOOM],
+    // Feature is visible for the whole integer zoom – similar behaviour to Ohsome Boundaries
+    ['<=', ['zoom'], FEATURE_MAX_ZOOM]
 ]
 
 // Tile features carry no ids, so the hover highlight is a filter on the (unique) UUID instead of feature-state
@@ -65,6 +75,9 @@ const BOUNDARY_LAYER_BASE = {
     'source-layer': 'default',
     minzoom: BOUNDARY_LAYER_MIN_ZOOM
 } as const
+
+const CASING_PAINT = { 'line-color': '#ffffff', 'line-width': 4, 'line-opacity': 0.7 }
+const LINE_PAINT = { 'line-color': '#3388ff', 'line-width': 2, 'line-opacity': 0.9 }
 
 // Boundary layers first so clusters/points render on top of the fills
 const SEARCH_LAYERS: AddLayerObject[] = [
@@ -85,13 +98,27 @@ const SEARCH_LAYERS: AddLayerObject[] = [
         id: BOUNDARY_CASING_LAYER_ID,
         type: 'line',
         ...BOUNDARY_LAYER_BASE,
-        paint: { 'line-color': '#ffffff', 'line-width': 4, 'line-opacity': 0.7 }
+        paint: CASING_PAINT
     },
     {
         id: BOUNDARY_LINE_LAYER_ID,
         type: 'line',
         ...BOUNDARY_LAYER_BASE,
-        paint: { 'line-color': '#3388ff', 'line-width': 2, 'line-opacity': 0.9 }
+        paint: LINE_PAINT
+    },
+    {
+        id: BOUNDARY_HOVER_CASING_LAYER_ID,
+        type: 'line',
+        ...BOUNDARY_LAYER_BASE,
+        filter: hoverFilter([]),
+        paint: CASING_PAINT
+    },
+    {
+        id: BOUNDARY_HOVER_LINE_LAYER_ID,
+        type: 'line',
+        ...BOUNDARY_LAYER_BASE,
+        filter: hoverFilter([]),
+        paint: LINE_PAINT
     },
     {
         id: CLUSTER_LAYER_ID,
@@ -166,6 +193,12 @@ const tooltipLine = (...nodes: (string | Node)[]): HTMLDivElement => {
     return line
 }
 
+const featureMinZoom = (feature: { properties: object | null }): number =>
+    (feature.properties as Partial<AoiFeatureProperties> | null)?.min_zoom ?? DEFAULT_FEATURE_MIN_ZOOM
+
+const featureCenter = (feature: { geometry: object }): [number, number] =>
+    (feature.geometry as Point).coordinates as [number, number]
+
 const entryLine = (entry: AoiFeatureProperties): HTMLDivElement =>
     tooltipLine(createElement('strong', '', entry.aoi_name), shortUuidElement(entry))
 
@@ -178,9 +211,10 @@ const tooltipContent = (label: string, lines: HTMLElement[]): HTMLDivElement => 
 interface HoverTarget {
     // Identifies the hovered feature(s) so the tooltip is only rebuilt when they change
     key: string
-    content: HTMLElement
-    // Boundary polygons to highlight; clusters and dots have none
-    highlightUuids?: string[]
+    // Boundary polygons to highlight
+    highlightUuids: string[]
+    // Tooltip; dots have none
+    content?: HTMLElement
 }
 
 @Injectable({
@@ -195,11 +229,11 @@ export class MapSearchManagerService {
     private hoverKey?: string
     private state?: { pluginId: string; centroids: SearchCentroidCollection }
     private visible = false
-    private getPadding?: () => PaddingOptions
+    private getPadding!: () => PaddingOptions
     private expandingClusterId?: number
     private styleReady = false
 
-    setMap(map: MaplibreMap, getPadding?: () => PaddingOptions): void {
+    setMap(map: MaplibreMap, getPadding: () => PaddingOptions): void {
         this.map = map
         this.getPadding = getPadding
         this.styleReady = map.isStyleLoaded() === true
@@ -325,8 +359,7 @@ export class MapSearchManagerService {
             return
         }
         if (top.layer.id === UNCLUSTERED_LAYER_ID) {
-            // Zoom in to where the dot gives way to its boundary polygon
-            this.easeTo(map, top, (top.properties['min_zoom'] as number | undefined) ?? DEFAULT_FEATURE_MIN_ZOOM)
+            this.zoomToBoundary(map, top)
             return
         }
 
@@ -355,7 +388,11 @@ export class MapSearchManagerService {
         }
 
         this.hoverKey = target.key
-        map.setFilter(BOUNDARY_HOVER_LAYER_ID, hoverFilter(target.highlightUuids ?? []))
+        this.setHoverFilter(map, target.highlightUuids)
+        if (!target.content) {
+            this.tooltip?.remove()
+            return
+        }
         this.tooltip ??= createPopup('discover-tooltip', { closeOnClick: false })
         this.tooltip.setLngLat(e.lngLat).setDOMContent(target.content).addTo(map)
     }
@@ -366,13 +403,10 @@ export class MapSearchManagerService {
         if (top.layer.id === CLUSTER_LAYER_ID) return undefined
 
         if (top.layer.id === UNCLUSTERED_LAYER_ID) {
-            const entries = uniqueAoiEntries([top])
-            if (entries.length === 0) return undefined
-            const label = this.translocoService.translate('map.discover.zoomToComputation')
-            return {
-                key: `dot:${entries[0].correlation_uuid}`,
-                content: tooltipContent(label, [entryLine(entries[0])])
-            }
+            // Preview the dot's own polygon when present on a visible polygon (nested AoIs)
+            if (!features.some(feature => feature.layer.id === BOUNDARY_FILL_LAYER_ID)) return undefined
+            const uuid = top.properties['correlation_uuid'] as string
+            return { key: `dot:${uuid}`, highlightUuids: [uuid] }
         }
 
         const entries = uniqueAoiEntries(features)
@@ -391,8 +425,12 @@ export class MapSearchManagerService {
         this.hoverKey = undefined
         this.tooltip?.remove()
         if (this.map && this.layersAdded(this.map)) {
-            this.map.setFilter(BOUNDARY_HOVER_LAYER_ID, hoverFilter([]))
+            this.setHoverFilter(this.map, [])
         }
+    }
+
+    private setHoverFilter(map: MaplibreMap, uuids: string[]): void {
+        HOVER_LAYER_IDS.forEach(layerId => map.setFilter(layerId, hoverFilter(uuids)))
     }
 
     private dismissOverlays(): void {
@@ -412,18 +450,50 @@ export class MapSearchManagerService {
         this.expandingClusterId = clusterId
         map.once('idle', () => (this.expandingClusterId = undefined))
         try {
-            this.easeTo(map, feature, await source.getClusterExpansionZoom(clusterId))
+            const [expansionZoom, leaves] = await Promise.all([
+                source.getClusterExpansionZoom(clusterId),
+                source.getClusterLeaves(clusterId, feature.properties['point_count'] as number, 0)
+            ])
+            // Fit all the cluster's points so one click resolves it, capped where every point is a polygon
+            const bounds = new LngLatBounds()
+            leaves.forEach(leaf => bounds.extend(featureCenter(leaf)))
+            const maxZoom = Math.max(...leaves.map(featureMinZoom))
+            this.easeToBounds(map, bounds, expansionZoom, maxZoom)
         } catch {
             this.expandingClusterId = undefined
         }
     }
 
-    private easeTo(map: MaplibreMap, feature: MapGeoJSONFeature, zoom: number): void {
+    // Fit the dot's polygon, read from the loaded boundary tiles; with none loaded, just go to its min_zoom
+    private zoomToBoundary(map: MaplibreMap, dot: MapGeoJSONFeature): void {
+        const { correlation_uuid, max_zoom } = dot.properties as Partial<AoiFeatureProperties>
+        const minZoom = featureMinZoom(dot)
+        const fragments = map.querySourceFeatures(BOUNDARY_SOURCE_ID, {
+            sourceLayer: BOUNDARY_LAYER_BASE['source-layer'],
+            filter: ['==', ['get', 'correlation_uuid'], correlation_uuid ?? '']
+        })
+        if (fragments.length === 0) {
+            this.easeTo(map, featureCenter(dot), minZoom + ZOOM_NUDGE)
+            return
+        }
+        const bounds = bbox({ type: 'FeatureCollection', features: fragments }) as Extent
+        this.easeToBounds(map, bounds, minZoom, max_zoom ?? map.getMaxZoom())
+    }
+
+    // minZoom (+ nudge) wins over both the fit and maxZoom
+    private easeToBounds(map: MaplibreMap, bounds: LngLatBounds | Extent, minZoom: number, maxZoom: number): void {
+        const fit = MapCameraUtils.fitCamera(map, bounds, { padding: this.getPadding(), maxZoom })
+        const center = LngLatBounds.convert(bounds).getCenter()
+        // Only the floor is nudged: nudging the fitted zoom would push the bounds out of view
+        this.easeTo(map, center, Math.max(fit?.zoom ?? 0, minZoom + ZOOM_NUDGE))
+    }
+
+    private easeTo(map: MaplibreMap, center: LngLatLike, zoom: number): void {
         this.clearHover()
         map.easeTo({
-            center: (feature.geometry as Point).coordinates as [number, number],
-            zoom: zoom + ZOOM_NUDGE,
-            padding: this.getPadding?.(),
+            center,
+            zoom,
+            padding: this.getPadding(),
             duration: 800
         })
     }

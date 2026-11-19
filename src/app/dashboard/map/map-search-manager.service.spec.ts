@@ -42,6 +42,7 @@ describe('MapSearchManagerService', () => {
 
     const centroids: SearchCentroidCollection = { type: 'FeatureCollection', features: [] }
     const mockLayer = { id: 'mock-layer' } as unknown as MapLayer
+    const getPadding = () => ({ top: 0, right: 0, bottom: 0, left: 0 })
 
     beforeEach(() => {
         const popupRemove = vi.fn()
@@ -82,7 +83,7 @@ describe('MapSearchManagerService', () => {
         })
 
         service = TestBed.inject(MapSearchManagerService)
-        service.setMap(mockMap as unknown as MaplibreMap)
+        service.setMap(mockMap as unknown as MaplibreMap, getPadding)
     })
 
     afterEach(() => {
@@ -118,7 +119,7 @@ describe('MapSearchManagerService', () => {
 
     it('showSearchLayers should defer the layer sync until the style has loaded', () => {
         mockMap.isStyleLoaded.mockReturnValue(false)
-        service.setMap(mockMap as unknown as MaplibreMap)
+        service.setMap(mockMap as unknown as MaplibreMap, getPadding)
 
         service.showSearchLayers('test_plugin', centroids)
 

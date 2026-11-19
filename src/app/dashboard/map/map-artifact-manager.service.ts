@@ -9,6 +9,7 @@ import { Artifact, ArtifactData, ArtifactEntity } from '../artifact/artifact.int
 import { ArtifactService } from '../artifact/artifact.service'
 import type { MapService } from './map.service'
 import { type Extent } from './map.service'
+import { MapCameraUtils } from './utils/map-camera.utils'
 
 export interface MapArtifactLayer {
     artifact: ArtifactEntity
@@ -393,7 +394,8 @@ export class MapArtifactManagerService implements OnDestroy {
         )
 
         const lngLatBounds = new LngLatBounds([combined[0], combined[1]], [combined[2], combined[3]])
-        const padding = this.mapService?.calculateMapPadding() ?? { top: 50, right: 100, bottom: 50, left: 250 }
-        this.map.fitBounds(lngLatBounds, { padding, animate: true, duration: 500 })
+        const padding = this.mapService?.calculateMapPadding() ?? { top: 50, right: 100, bottom: 50, left: 450 }
+        const camera = MapCameraUtils.fitCamera(this.map, lngLatBounds, { padding })
+        if (camera) this.map.flyTo({ ...camera, duration: 500 })
     }
 }

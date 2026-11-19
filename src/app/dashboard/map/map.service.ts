@@ -39,6 +39,7 @@ import { MapDrawingService } from './map-drawing.service'
 import { FoWGeometryType, MapFoWManagerService } from './map-fow-manager.service'
 import { MapSearchManagerService } from './map-search-manager.service'
 import { RegionChoiceDialogComponent, RegionChoiceOption } from './region-choice-dialog/region-choice-dialog.component'
+import { MapCameraUtils } from './utils/map-camera.utils'
 import { MapControlsUtils } from './utils/map-controls.utils'
 import { MapGeoJsonUtils } from './utils/map-geojson.utils'
 import { MapGlobeUtils } from './utils/map-globe.utils'
@@ -169,10 +170,6 @@ export class MapService {
     // Emits once the main map exists, its first style has loaded and the initial camera is set
     private mapReadySubject = new ReplaySubject<void>(1)
     public mapReady$ = this.mapReadySubject.asObservable()
-
-    // Window & Display Properties
-    windowWidth?: number
-    windowResolution?: number
 
     // Marker Management
     markerLayer: Marker[] = []
@@ -571,15 +568,8 @@ export class MapService {
     }
 
     calculateMapPadding() {
-        this.windowWidth = window.innerWidth
-        this.windowResolution = window.devicePixelRatio
-        const horMapPadding = 150 / this.windowResolution
-
-        if (this.windowWidth > 1600) {
-            return { top: horMapPadding, right: 100, bottom: horMapPadding, left: 225 }
-        } else {
-            return { top: horMapPadding, right: 100, bottom: horMapPadding, left: 250 }
-        }
+        const verticalPadding = 150 / window.devicePixelRatio
+        return { top: verticalPadding, right: 100, bottom: verticalPadding, left: 450 }
     }
 
     fitToExtent(extent: Extent, options?: maplibregl.FitBoundsOptions) {
@@ -650,20 +640,13 @@ export class MapService {
 
         // Execute the flyTo animation
         if (bounds) {
-            const padding = this.calculateMapPadding()
-            // cameraForBounds also applies the map's current padding, which mid-flight out of the
-            // landing can leave no room at all. Measure without it; nothing renders in between.
-            const currentPadding = this.map.getPadding()
-            this.map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 })
-            const zoom = this.map.cameraForBounds(bounds, { padding })
-            this.map.setPadding(currentPadding)
-            if (zoom?.zoom !== undefined) {
+            const camera = MapCameraUtils.fitCamera(this.map, bounds, { padding: this.calculateMapPadding() })
+            if (camera) {
                 this.map.flyTo({
-                    center: zoom.center,
-                    zoom: Math.min(zoom.zoom, defaultZoom),
-                    bearing: zoom.bearing || 0,
+                    ...camera,
+                    zoom: Math.min(camera.zoom, defaultZoom),
+                    bearing: 0,
                     duration: 1500,
-                    padding,
                     ...options
                 })
             }
@@ -1070,7 +1053,7 @@ export class MapService {
         }
 
         // Pass through optional source properties when present
-        const passthroughProperties = ['min_zoom']
+        const passthroughProperties = ['min_zoom', 'max_zoom']
         for (const key of passthroughProperties) {
             const value = feature.properties?.[key]
             if (value !== undefined) processedFeature.properties![key] = value

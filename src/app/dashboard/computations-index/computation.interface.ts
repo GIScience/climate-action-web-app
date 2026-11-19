@@ -32,6 +32,7 @@ export interface AoiFeatureProperties {
     correlation_uuid: string
     aoi_name: string
     min_zoom?: number
+    max_zoom?: number
 }
 
 export type SearchCentroidCollection = FeatureCollection<Point, AoiFeatureProperties>
